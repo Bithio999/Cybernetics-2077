@@ -1,0 +1,9 @@
+gradle.projectsEvaluated {
+ rootProject.sourceSets.main.java.srcDir(rootProject.file('docs/review'))
+ rootProject.sourceSets.main.resources.setSrcDirs([rootProject.file('docs/review/resources'),rootProject.file('src/main/resources')])
+ rootProject.tasks.named('processResources').configure { duplicatesStrategy=DuplicatesStrategy.EXCLUDE }
+ def reviewRoot=rootProject.findProperty('cyberReviewRoot') ?: '/tmp/cybernetics2077-review'
+ rootProject.neoForge.runs.client.gameDirectory=rootProject.file(reviewRoot+'/client')
+ rootProject.neoForge.runs.client.systemProperty('cybernetics2077.reviewRoot',reviewRoot.toString())
+ rootProject.neoForge.runs.client.programArguments.addAll('--quickPlaySingleplayer','Cybernetics Review','--width','1280','--height','720')
+}
