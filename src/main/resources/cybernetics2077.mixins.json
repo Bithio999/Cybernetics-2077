@@ -1,0 +1,1 @@
+{"required":true,"package":"dev.cybernetics2077.mixin.client","compatibilityLevel":"JAVA_21","client":["ScannerHudMixin","ScannerHudColorMixin","ScannerInputMixin","ScannerOutlineMixin"],"injectors":{"defaultRequire":1}}

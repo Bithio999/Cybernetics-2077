@@ -2,16 +2,16 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.1.0: all four JVM tests, all four native GameTests, the native client review and the packaging check passed on 16 November 2026.
+Release 0.2.0: all **11 JVM tests**, **10 native GameTests**, the native client review and packaging validation passed on 16 November 2026.
 
 ## Automated checks
 
-- Four JVM tests cover socket/category mapping, responsive hitboxes, overlap and full 32-bit stat synchronization through Minecraft's signed-short menu fields.
-- Four native Minecraft GameTests cover category and quantity guards, capacity calculation, equipment serialization, actual player attachment persistence, menu synchronization, and rejection of inventory-editing packets.
-- Native client review opens the inventory, clicks the actual cyberware button using Minecraft mouse input, selects sockets with mouse and keyboard, checks a server-side equipment update, and returns to the correct inventory. It exercises survival and creative, GUI scales 1/2/3, 4:3 and ultrawide windows.
+- JVM tests cover category mapping, responsive hitboxes, overlap, 32-bit menu fields, smooth camera interpolation and staged scanner/native-HUD transitions.
+- Ten native Minecraft GameTests cover category and quantity guards, capacity calculation, equipment serialization, actual player attachment persistence, menu synchronization, rejection of inventory-editing packets, real bench shift-click installation/removal, inventory-full protection, slot/category/capacity guards, bench distance/block validity, and scanner ownership/aim/range/line-of-sight.
+- Native client review opens the inventory, clicks the actual cyberware button using Minecraft mouse input, selects sockets with mouse and keyboard, checks a server-side equipment update, and returns to the correct inventory. It exercises survival and creative, GUI scales 1/2/3, 4:3 and ultrawide windows. It then interacts with the actual bench block, installs the craftable eye using native inventory clicks, scans a husk, verifies server target data, closes the scanner, checks the installed-eye detail view, and removes the eye to confirm the scanner becomes unavailable.
 - The packaging check verifies standalone dependencies, all shipped resources, shader JSON, the font license, and absence of test fixtures or old addon content.
 
-The native client screenshots use software OpenGL. The armor meter shows a real iron chestplate's six armor points; the cyberware sockets are empty. A temporary test-only implant exercises item rendering and 70,000-point capacity synchronization. It is excluded from the release.
+The native client screenshots use software OpenGL. The initial armor meter shows a real iron chestplate's six armor points; later captures show the installed tier 1 eye. A temporary test-only implant exercises item rendering and 70,000-point capacity synchronization. It is excluded from the release.
 
 ## Reproduce
 
@@ -34,6 +34,12 @@ For client review, copy that disposable test server's `world` directory to the c
 
 Both profiles accept `-PcyberReviewRoot=/absolute/path` (default: `/tmp/cybernetics2077-review`). The root holds `server`, `client` and `capture` directories. Client review only edits its specially named disposable save, clears its inventory, and exits automatically with `capture/passed.txt` or `failed.txt`. Use a desktop session or X display. First-launch accessibility setup is handled by the review harness.
 
+Optional: encode the captured native animations (requires ffmpeg):
+
+```sh
+python3 docs/review/assemble-previews.py /tmp/cybernetics2077-review/capture
+```
+
 After running a review profile, **clean before packaging**:
 
 ```sh
@@ -49,4 +55,6 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The first release is a read-only equipment viewer. Implant acquisition, installation, capacity enforcement during installation, and implant gameplay effects are outside this release. Multiplayer uses native server-backed menus; an integrated client and headless server were tested, but a separate two-computer session was not.
+The inventory cyberware screen remains read-only; the bench is the only installation interface. There are no quickhacks or operating-system functions in 0.2.0. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+
+The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed. New anatomy is original procedural geometry; no Cyberpunk game models or textures are distributed.

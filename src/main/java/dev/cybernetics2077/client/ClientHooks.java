@@ -71,6 +71,8 @@ public final class ClientHooks {
     public static void screens(RegisterMenuScreensEvent e) {
       e.<dev.cybernetics2077.cyberware.CyberwareMenu, CyberwareScreen>register(
           Cybernetics2077.MENU.get(), CyberwareScreen::new);
+      e.<dev.cybernetics2077.bench.CyberneticsBenchMenu, CyberneticsBenchScreen>register(
+          Cybernetics2077.BENCH_MENU.get(), CyberneticsBenchScreen::new);
     }
 
     @SubscribeEvent

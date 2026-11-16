@@ -37,6 +37,7 @@ public final class CyberwareClientReview {
         () -> {
           try {
             action.accept(s.getPlayerList().getPlayers().getFirst());
+
           } catch (Throwable ex) {
             error = ex.toString();
             ex.printStackTrace();
@@ -79,6 +80,14 @@ public final class CyberwareClientReview {
             .findFirst()
             .orElseThrow();
     click(button.getX() + 10, button.getY() + 9);
+  }
+
+  static void benchClick(int index) throws Exception {
+    var mc = Minecraft.getInstance();
+    if (!(mc.screen instanceof CyberneticsBenchScreen b))
+      throw new IllegalStateException("Expected workstation menu: " + mc.screen);
+    var slot = mc.player.containerMenu.getSlot(index);
+    click(b.getGuiLeft() + slot.x + 8, b.getGuiTop() + slot.y + 8);
   }
 
   static CyberwareScreen screen() {
@@ -226,6 +235,7 @@ public final class CyberwareClientReview {
       }
       if (ticks == 280) {
         screen().keyPressed(256, 0, 0);
+        if (mc.screen instanceof CyberwareScreen) screen().keyPressed(256, 0, 0);
         if (!(mc.screen instanceof InventoryScreen))
           throw new IllegalStateException("Escape did not return to inventory");
         server(
@@ -254,11 +264,149 @@ public final class CyberwareClientReview {
       if (ticks == 335) {
         if (!(mc.screen instanceof CreativeModeInventoryScreen))
           throw new IllegalStateException("Return to creative inventory failed");
+        // Continue into real workstation installation and optical scanning checks.
+      }
+      if (ticks == 340) {
+        mc.setScreen(null);
+        server(
+            p -> {
+              p.closeContainer();
+              p.setGameMode(GameType.SURVIVAL);
+              for (var old :
+                  p.serverLevel()
+                      .getEntitiesOfClass(
+                          net.minecraft.world.entity.Mob.class, p.getBoundingBox().inflate(20)))
+                old.discard();
+              p.getInventory().clearContent();
+              p.getInventory()
+                  .setItem(0, new net.minecraft.world.item.ItemStack(Cybernetics2077.OPTICS.get()));
+              p.serverLevel()
+                  .setBlock(
+                      new BlockPos(0, 64, 2), Cybernetics2077.BENCH.get().defaultBlockState(), 3);
+              var zombie = net.minecraft.world.entity.EntityType.HUSK.create(p.serverLevel());
+              zombie.setPos(.5, 64, 7.5);
+              zombie.setNoAi(true);
+              zombie.setInvulnerable(true);
+              zombie.setCustomName(
+                  net.minecraft.network.chat.Component.literal("Scanner Test Target"));
+              p.serverLevel().addFreshEntity(zombie);
+              p.teleportTo(p.server.overworld(), .5, 64, .5, Set.of(), 0, 0);
+            });
+      }
+      if (ticks == 355)
+        mc.gameMode.useItemOn(
+            mc.player,
+            net.minecraft.world.InteractionHand.MAIN_HAND,
+            new net.minecraft.world.phys.BlockHitResult(
+                new net.minecraft.world.phys.Vec3(.5, 64.7, 2),
+                net.minecraft.core.Direction.NORTH,
+                new BlockPos(0, 64, 2),
+                false));
+      if (ticks == 365) {
+        if (!(mc.screen instanceof CyberneticsBenchScreen))
+          throw new IllegalStateException("Bench interaction did not open installation menu");
+        benchClick(48);
+      }
+      if (ticks == 370) benchClick(5);
+      if (ticks == 378)
+        mouse(
+            "onMove",
+            new Class[] {long.class, double.class, double.class},
+            mc.getWindow().getWindow(),
+            1100d,
+            650d);
+      if (ticks == 380) {
+        if (!(mc.player.containerMenu instanceof dev.cybernetics2077.bench.CyberneticsBenchMenu b)
+            || !b.getSlot(5).getItem().is(Cybernetics2077.OPTICS.get())
+            || b.capacityUsed() != 4
+            || !b.getCarried().isEmpty()
+            || !ScannerClient.available())
+          throw new IllegalStateException("Native bench install/synchronization failed");
+        shot("installation-bench");
+        mc.screen.onClose();
+      }
+      if (ticks == 390) {
+        mc.player.setYRot(0);
+        mc.player.setXRot(0);
+        ScannerClient.KEY.setDown(true);
+      }
+      if (ticks >= 391 && ticks <= 406) shot("scan-opening-" + (ticks - 391));
+      if (ticks == 456) {
+        if (!ScannerClient.active())
+          throw new IllegalStateException("Installed optics did not enable scanner");
+        var field = ScannerClient.class.getDeclaredField("target");
+        field.setAccessible(true);
+        var data = (net.minecraft.nbt.CompoundTag) field.get(null);
+        if (!data.contains("id")
+            || !data.getString("name").equals("Scanner Test Target")
+            || data.contains("ep")
+            || data.contains("mp"))
+          throw new IllegalStateException(
+              "Optical scan did not acquire correct vanilla target: " + data);
+        System.out.println(
+            "Scanner animation: age="
+                + ScannerClient.hudMotion().age()
+                + " data="
+                + ScannerClient.hudMotion().data()
+                + " shader="
+                + com.mojang.blaze3d.systems.RenderSystem.getShaderColor()[3]);
+        if (ScannerClient.hudMotion().data() < .99)
+          throw new IllegalStateException("Scanner data panel failed to fully reveal");
+        shot("optical-scanner");
+      }
+      if (ticks == 460) ScannerClient.KEY.setDown(false);
+      if (ticks == 470) {
+        if (ScannerClient.active() || ScannerClient.hudMotion().nativeHotbar() < .99)
+          throw new IllegalStateException("Scanner did not restore native HUD");
+        mc.setScreen(new InventoryScreen(mc.player));
+      }
+      if (ticks == 475) openButton();
+      if (ticks == 485) {
+        shot("installed-optics-overview");
+        var l = CyberLayout.fit(mc.screen.width, mc.screen.height);
+        click(l.screenX(1276), l.screenY(370));
+      }
+      if (ticks >= 486 && ticks <= 498) shot("face-zoom-" + (ticks - 486));
+      if (ticks == 505) {
+        shot("installed-optics-detail");
+        screen().keyPressed(65, 0, 0);
+        screen().keyPressed(65, 0, 0);
+        screen().keyPressed(65, 0, 0);
+      }
+      if (ticks == 525) {
+        shot("cortex-detail");
+        screen().onClose();
+        mc.setScreen(null);
+      }
+      if (ticks == 530)
+        mc.gameMode.useItemOn(
+            mc.player,
+            net.minecraft.world.InteractionHand.MAIN_HAND,
+            new net.minecraft.world.phys.BlockHitResult(
+                new net.minecraft.world.phys.Vec3(.5, 64.7, 2),
+                net.minecraft.core.Direction.NORTH,
+                new BlockPos(0, 64, 2),
+                false));
+      if (ticks == 540) benchClick(5);
+      if (ticks == 545) benchClick(48);
+      if (ticks == 555) {
+        if (ScannerClient.available() || !mc.player.containerMenu.getSlot(5).getItem().isEmpty())
+          throw new IllegalStateException("Removing optics left scanner enabled");
+        mc.screen.onClose();
+        ScannerClient.KEY.setDown(true);
+      }
+      if (ticks == 565) {
+        if (ScannerClient.active())
+          throw new IllegalStateException("Scanner opened without installed optics");
+        ScannerClient.KEY.setDown(false);
         Files.writeString(
             OUT.resolve("passed.txt"),
-            "Native inventory button, server menu, 21 read-only sockets, synchronized capacity,"
-                + " native mouse/keyboard selection, live implant sync, GUI scales 1/2/3, 4:3 and"
-                + " ultrawide, survival and creative inventory return passed.\n");
+            "PASS: native inventory button; 21 read-only viewer sockets; mouse and keyboard"
+                + " category zoom; GUI scales 1/2/3, 4:3 and ultrawide; creative inventory"
+                + " entry/return; live 32-bit capacity sync; actual bench block interaction; native"
+                + " pickup/install/remove; scanner availability follows equipment; held scanner"
+                + " acquires server-authorized vanilla target; no Tensura fields; native HUD"
+                + " returns after release.\n");
         finished = true;
         mc.stop();
       }

@@ -22,6 +22,10 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
   private final List<SocketButton> sockets = new ArrayList<>();
   private CyberLayout layout;
   private int selected = -1;
+  private long lastFrame = System.nanoTime();
+  private BodyView bodyView = BodyView.OVERVIEW;
+  private float zoom;
+  private CategoryButton previous, next;
   private BackButton back;
 
   public CyberwareScreen(CyberwareMenu menu, Inventory inventory, Component title) {
@@ -43,6 +47,10 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
       sockets.add(b);
       addRenderableWidget(b);
     }
+    previous = new CategoryButton(-1);
+    next = new CategoryButton(1);
+    addRenderableWidget(previous);
+    addRenderableWidget(next);
     back = new BackButton();
     addRenderableWidget(back);
   }
@@ -50,6 +58,9 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
   @Override
   protected void containerTick() {
     for (var b : sockets) b.setMessage(slotName(b.socket));
+    back.setMessage(
+        Component.translatable(
+            selected >= 0 ? "cybernetics2077.button.all" : "cybernetics2077.button.back"));
   }
 
   private Component slotName(CyberLayout.Socket socket) {
@@ -65,16 +76,32 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
 
   @Override
   public void render(GuiGraphics g, int mouseX, int mouseY, float partial) {
+    long now = System.nanoTime();
+    float dt = (float) Math.min(.1, (now - lastFrame) / 1e9);
+    lastFrame = now;
+    float follow = (float) (1 - Math.exp(-dt / 0.105));
+    zoom += ((selected >= 0 ? 1 : 0) - zoom) * follow;
+    bodyView =
+        bodyView.towards(
+            selected >= 0
+                ? BodyView.category(CyberwareCategory.forSlot(selected))
+                : BodyView.OVERVIEW,
+            follow);
+    for (var b : sockets) {
+      b.visible = selected < 0 || b.socket.category() == CyberwareCategory.forSlot(selected);
+      b.setPosition(layout.screenX(slotX(b.socket)), layout.screenY(slotY(b.socket)));
+    }
+    previous.visible = next.visible = selected >= 0;
     for (var r : renderables) r.render(g, mouseX, mouseY, partial);
     int hovered = -1;
     for (var b : sockets)
-      if (b.isMouseOver(mouseX, mouseY)) {
+      if (b.visible && b.isMouseOver(mouseX, mouseY)) {
         hovered = b.socket.index();
         break;
       }
     if (hovered < 0 && minecraft.getLastInputType().isKeyboard())
       for (var b : sockets)
-        if (b.isFocused()) {
+        if (b.visible && b.isFocused()) {
           hovered = b.socket.index();
           break;
         }
@@ -119,15 +146,17 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
       CyberBatch.flush(g);
       CyberBatch.begin();
       HologramRenderer.draw(
-          g, category, (float) Math.clamp((layout.virtualX(mouseX) - 960) / 85, -7, 7), fade);
-      c.g.pose().pushPose();
-      c.g.pose().translate(960, 878, 0);
-      c.g.pose().scale(1, .14f, 1);
-      c.glowArc(0, 0, 110, 0, (float) (Math.PI * 2), 1, 0x7057c5d7);
-      c.g.pose().popPose();
-      if (category != null) connection(c, category);
-      for (var row : CyberLayout.ROWS) row(c, row, hovered);
-      details(c, focus);
+          g, selected >= 0 ? CyberwareCategory.forSlot(selected) : category, bodyView, fade);
+      if (selected < 0) {
+        c.g.pose().pushPose();
+        c.g.pose().translate(960, 878, 0);
+        c.g.pose().scale(1, .14f, 1);
+        c.glowArc(0, 0, 110, 0, (float) (Math.PI * 2), 1, 0x7057c5d7);
+        c.g.pose().popPose();
+        if (category != null) connection(c, category);
+        for (var row : CyberLayout.ROWS) row(c, row, hovered);
+        details(c, focus);
+      } else categoryView(c, hovered);
       footer(c);
       g.pose().popPose();
     } finally {
@@ -206,62 +235,128 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     c.line(x - 8, y - 9, x + w + 9, y - 9, .8f, 0xff923c49);
   }
 
+  private float slotX(CyberLayout.Socket slot) {
+    return selected < 0 ? slot.x() : 410 + slot.ordinal() * 112;
+  }
+
+  private float slotY(CyberLayout.Socket slot) {
+    return selected < 0 ? slot.y() : 230;
+  }
+
   private void row(CyberCanvas c, CyberLayout.Row row, int hovered) {
     float w = row.category().sockets * 112 - 16;
     String title = I18n.get(row.category().translation()).toUpperCase(Locale.ROOT);
     if (row.left()) c.right(title, row.x() + w, row.y() - 33, 25, RED);
     else c.text(title, row.x(), row.y() - 33, 25, RED);
     for (var slot : CyberLayout.SOCKETS)
-      if (slot.category() == row.category()) {
-        boolean hot = slot.index() == hovered, chosen = slot.index() == selected;
-        var stack = menu.getSlot(slot.index()).getItem();
-        int border = hot ? CYAN : chosen ? 0xfff07d86 : stack.isEmpty() ? 0xa16b3d48 : 0xffbd804c;
-        var shape = Geometry.data(slot.x(), slot.y(), 96, 96);
-        if (hot) c.halo(shape, CYAN);
-        c.shape(shape, hot ? 0xe3182630 : chosen ? 0xed29131f : 0xbc160e17, border);
-        if (!stack.isEmpty()) {
-          c.rect(slot.x() + 1, slot.y() + 1, 5, 93, 0xffc98e47);
-          drawItem(c, stack, slot.x() + 21, slot.y() + 18, 3.6f);
-          c.stroke(
-              List.of(
-                  new Point(slot.x() + 77, slot.y() + 6),
-                  new Point(slot.x() + 89, slot.y() + 6),
-                  new Point(slot.x() + 89, slot.y() + 18),
-                  new Point(slot.x() + 77, slot.y() + 18)),
-              .7f,
-              0xffe5b65d);
-          c.line(slot.x() + 80, slot.y() + 14, slot.x() + 83, slot.y() + 10, .7f, 0xffe5b65d);
-          c.line(slot.x() + 83, slot.y() + 10, slot.x() + 86, slot.y() + 14, .7f, 0xffe5b65d);
-        } else {
-          CyberGlyphs.category(
-              c, row.category(), slot.x() + 26, slot.y() + 15, 44, hot ? 0x6269cbd4 : 0x566e919d);
-          c.stroke(
-              List.of(
-                  new Point(slot.x() + 23, slot.y() + 69),
-                  new Point(slot.x() + 72, slot.y() + 69),
-                  new Point(slot.x() + 72, slot.y() + 77),
-                  new Point(slot.x() + 23, slot.y() + 77)),
-              .7f,
-              hot ? 0xc76ac8d3 : 0x874e2933);
-          c.line(
-              slot.x() + 25,
-              slot.y() + 70,
-              slot.x() + 70,
-              slot.y() + 76,
-              .7f,
-              hot ? 0xc76ac8d3 : 0x87582b37);
-        }
-        if (hot || chosen) {
-          c.rect(slot.x() + 5, slot.y() + 5, 3, 3, hot ? CYAN : RED);
-          c.tracked(
-              String.format(Locale.ROOT, "%02d", slot.ordinal() + 1),
-              slot.x() + 11,
-              slot.y() + 5,
-              9,
-              hot ? CYAN : RED,
-              .4f);
-        }
+      if (slot.category() == row.category()) drawSocket(c, slot, slot.x(), slot.y(), hovered);
+  }
+
+  private void drawSocket(CyberCanvas c, CyberLayout.Socket slot, float x, float y, int hovered) {
+    boolean hot = slot.index() == hovered, chosen = slot.index() == selected;
+    var stack = menu.getSlot(slot.index()).getItem();
+    int tierColor =
+        stack.getItem() instanceof CyberwareItem i ? i.tier().color : CyberwareTier.ONE.color;
+    int border = hot ? CYAN : chosen ? 0xfff07d86 : stack.isEmpty() ? 0xa16b3d48 : tierColor;
+    var shape = Geometry.data(x, y, 96, 96);
+    if (hot) c.halo(shape, CYAN);
+    c.shape(shape, hot ? 0xe3182630 : chosen ? 0xed29131f : 0xbc160e17, border);
+    if (!stack.isEmpty()) {
+      c.rect(x + 1, y + 1, 5, 93, tierColor);
+      drawItem(c, stack, x + 21, y + 18, 3.6f);
+      c.stroke(
+          List.of(
+              new Point(x + 77, y + 6),
+              new Point(x + 89, y + 6),
+              new Point(x + 89, y + 18),
+              new Point(x + 77, y + 18)),
+          .7f,
+          tierColor);
+      c.text(
+          stack.getItem() instanceof CyberwareItem i ? Integer.toString(i.tier().level) : "?",
+          x + 80,
+          y + 6,
+          11,
+          tierColor);
+    } else {
+      CyberGlyphs.category(c, slot.category(), x + 26, y + 15, 44, hot ? 0x6269cbd4 : 0x566e919d);
+      c.stroke(
+          List.of(
+              new Point(x + 23, y + 69),
+              new Point(x + 72, y + 69),
+              new Point(x + 72, y + 77),
+              new Point(x + 23, y + 77)),
+          .7f,
+          hot ? 0xc76ac8d3 : 0x874e2933);
+      c.line(x + 25, y + 70, x + 70, y + 76, .7f, hot ? 0xc76ac8d3 : 0x87582b37);
+    }
+    if (hot || chosen) {
+      c.rect(x + 5, y + 5, 3, 3, hot ? CYAN : RED);
+      c.tracked(
+          String.format(Locale.ROOT, "%02d", slot.ordinal() + 1),
+          x + 11,
+          y + 5,
+          9,
+          hot ? CYAN : RED,
+          .4f);
+    }
+  }
+
+  private void categoryView(CyberCanvas base, int hovered) {
+    var c = base.fade(zoom);
+    var category = CyberwareCategory.forSlot(selected);
+    c.line(410, 196, 925, 196, 1, 0xff6dbcca);
+    c.glowText(I18n.get(category.translation()).toUpperCase(Locale.ROOT), 452, 158, 28, CYAN);
+    c.text("< A", 410, 165, 15, previous.isHoveredOrFocused() ? WHITE : RED);
+    c.right("D >", 925, 165, 15, next.isHoveredOrFocused() ? WHITE : RED);
+    for (var slot : CyberLayout.SOCKETS)
+      if (slot.category() == category) drawSocket(c, slot, slotX(slot), slotY(slot), hovered);
+    var stack = menu.getSlot(selected).getItem();
+    c.panel(410, 371, 515, 390, 12, 0xe70a101b, 0xff5a8492);
+    c.rect(410, 371, 4, 390, CYAN);
+    c.text(
+        stack.isEmpty()
+            ? "EMPTY SOCKET"
+            : c.fit(stack.getHoverName().getString().toUpperCase(Locale.ROOT), 465, 30, true),
+        434,
+        397,
+        30,
+        stack.isEmpty() ? MUTED : WHITE);
+    c.tracked(
+        "SOCKET " + (selected - category.firstSlot() + 1) + " / " + category.sockets,
+        434,
+        440,
+        14,
+        CYAN,
+        1);
+    c.line(434, 477, 900, 477, 1, 0x80568293);
+    if (stack.getItem() instanceof CyberwareItem item) {
+      c.text("TIER " + item.tier().level, 434, 499, 23, item.tier().color);
+      c.right(item.capacityCost() + " CAPACITY", 900, 505, 17, 0xffe3b76f);
+      if (stack.is(Cybernetics2077.OPTICS.get())) {
+        c.glowText("OPTICAL SCANNER", 434, 548, 23, CYAN);
+        c.body("Identify living targets within 32 blocks.", 434, 589, 19, WHITE);
+        c.body("View health, armor and combat data.", 434, 617, 19, WHITE);
+        c.body(
+            "Hold "
+                + ScannerClient.KEY.getTranslatedKeyMessage().getString()
+                + " to activate the scanner.",
+            434,
+            663,
+            19,
+            CYAN);
       }
+    } else {
+      c.body("No implant installed in this socket.", 434, 510, 21, WHITE);
+      c.body("Install compatible cyberware at a", 434, 563, 19, MUTED);
+      c.body("Cybernetics Bench.", 434, 591, 19, MUTED);
+    }
+    c.line(434, 704, 900, 704, 1, 0x80568293);
+    c.tracked("EQUIPMENT VIEW / INSTALLATION LOCKED", 434, 725, 12, 0xffcf7c89, .7f);
+    c.panel(410, 805, 515, 76, 10, 0xc9071019, 0x8077c8d8);
+    c.rect(410, 805, 4, 76, CYAN);
+    c.body("Visit a Cybernetics Bench to install", 432, 824, 19, CYAN);
+    c.body("or remove currently equipped cyberware.", 432, 851, 17, 0xff93bac6);
   }
 
   private void drawItem(CyberCanvas c, ItemStack stack, float x, float y, float scale) {
@@ -332,7 +427,7 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     c.line(96, 1021, 88, 1029, 1, tint);
     c.line(88, 1029, 96, 1037, 1, tint);
     c.tracked("ESC", 112, 1021, 14, tint, .9f);
-    c.text("BACK TO INVENTORY", 155, 1019, 20, tint);
+    c.text(selected >= 0 ? "ALL CYBERWARE" : "BACK TO INVENTORY", 155, 1019, 20, tint);
     c.tracked("LEFT MOUSE  /  INSPECT", 1291, 1023, 12, 0xffba6977, .8f);
     c.tracked("TAB  /  NAVIGATE", 1628, 1023, 12, 0xff77aab6, .8f);
     c.dots(1850, 1015, 3, 6, 0x58623443);
@@ -370,6 +465,20 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
 
   @Override
   public boolean keyPressed(int key, int scan, int modifiers) {
+    if (selected >= 0) {
+      if (key == 256) {
+        selected = -1;
+        return true;
+      }
+      if (key == 65 || key == 263) {
+        cycle(-1);
+        return true;
+      }
+      if (key == 68 || key == 262) {
+        cycle(1);
+        return true;
+      }
+    }
     if (key == 256 || minecraft.options.keyInventory.matches(key, scan)) {
       onClose();
       return true;
@@ -420,6 +529,43 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partial) {}
   }
 
+  private void cycle(int direction) {
+    var c = CyberwareCategory.forSlot(selected);
+    selected =
+        CyberwareCategory.values()[
+            Math.floorMod(c.ordinal() + direction, CyberwareCategory.values().length)]
+            .firstSlot();
+  }
+
+  private final class CategoryButton extends AbstractButton {
+    final int direction;
+
+    CategoryButton(int direction) {
+      super(
+          layout.screenX(direction < 0 ? 402 : 882),
+          layout.screenY(148),
+          layout.size(50),
+          layout.size(48),
+          Component.translatable(
+              direction < 0 ? "cybernetics2077.previous" : "cybernetics2077.next"));
+      this.direction = direction;
+    }
+
+    @Override
+    protected void updateWidgetNarration(
+        net.minecraft.client.gui.narration.NarrationElementOutput out) {
+      defaultButtonNarrationText(out);
+    }
+
+    @Override
+    public void onPress() {
+      if (selected >= 0) cycle(direction);
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics g, int x, int y, float p) {}
+  }
+
   private final class BackButton extends AbstractButton {
     BackButton() {
       super(
@@ -438,7 +584,8 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
 
     @Override
     public void onPress() {
-      onClose();
+      if (selected >= 0) selected = -1;
+      else onClose();
     }
 
     @Override
