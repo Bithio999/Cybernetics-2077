@@ -399,6 +399,21 @@ public final class CyberwareClientReview {
         if (ScannerClient.active())
           throw new IllegalStateException("Scanner opened without installed optics");
         ScannerClient.KEY.setDown(false);
+        mc.setScreen(new InventoryScreen(mc.player));
+      }
+      if (ticks == 570) openButton();
+      if (ticks == 580) {
+        var l = CyberLayout.fit(mc.screen.width, mc.screen.height);
+        click(l.screenX(578), l.screenY(212));
+      }
+      for (int category = 0; category < 10; category++) {
+        int at = 600 + category * 20;
+        if (ticks == at) {
+          shot("anatomy-" + CyberwareCategory.values()[category].id);
+          if (category < 9) screen().keyPressed(68, 0, 0);
+        }
+      }
+      if (ticks == 790) {
         Files.writeString(
             OUT.resolve("passed.txt"),
             "PASS: native inventory button; 21 read-only viewer sockets; mouse and keyboard"

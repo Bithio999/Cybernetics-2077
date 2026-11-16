@@ -7,3 +7,5 @@ gradlew text eol=lf
 *.jar binary
 *.ttf binary
 *.nbt binary
+*.blend binary
+*.cyh binary

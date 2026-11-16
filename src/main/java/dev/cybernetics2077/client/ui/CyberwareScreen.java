@@ -146,7 +146,7 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
       CyberBatch.flush(g);
       CyberBatch.begin();
       HologramRenderer.draw(
-          g, selected >= 0 ? CyberwareCategory.forSlot(selected) : category, bodyView, fade);
+          g, selected >= 0 ? CyberwareCategory.forSlot(selected) : category, bodyView, fade, zoom);
       if (selected < 0) {
         c.g.pose().pushPose();
         c.g.pose().translate(960, 878, 0);

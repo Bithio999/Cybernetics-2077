@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.2.0: all **11 JVM tests**, **10 native GameTests**, the native client review and packaging validation passed on 16 November 2026.
+Release 0.3.0: all **14 JVM tests**, **10 native GameTests**, the native client review and packaging validation passed on 16 November 2026.
 
 ## Automated checks
 
@@ -55,6 +55,12 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The inventory cyberware screen remains read-only; the bench is the only installation interface. There are no quickhacks or operating-system functions in 0.2.0. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+The inventory cyberware screen remains read-only; the bench is the only installation interface. There are no quickhacks or operating-system functions in 0.3.0. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
 
-The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed. New anatomy is original procedural geometry; no Cyberpunk game models or textures are distributed.
+The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed. Anatomy is modeled in Blender 4.3.2 and exported into validated static mesh buffers; no Cyberpunk game models or textures are distributed.
+
+## Blender pipeline validation
+
+The saved `.blend` was reopened in Blender and exported again. Its runtime mesh digest matched the build-script export exactly. The shipped mesh contains 106,571 triangles in 26 role/region groups, including all ten body systems. Packaging checks compare the exported mesh to the Blender report and ensure that Blender source/tools do not become a runtime dependency.
+
+Three asset-loader tests cover the shipped geometry, malformed headers/counts/truncation, and non-finite or out-of-envelope vertices. The native client additionally cycles through every category to capture the cortex, optics, ribs, neural pathways and subdermal mesh. Surface and tissue layers are drawn in cached front/back order; category rotations reuse the uploaded vertex buffers.

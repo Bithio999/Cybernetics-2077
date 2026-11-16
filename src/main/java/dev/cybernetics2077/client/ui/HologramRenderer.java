@@ -16,10 +16,11 @@ import org.lwjgl.opengl.GL11;
 /** Detailed original anatomical geometry in a reusable, depth-isolated diagnostic render target. */
 public final class HologramRenderer extends RenderStateShard {
   private static ShaderInstance shader, composite;
-  private static DiagnosticModel model;
+
+  private record Uploaded(DiagnosticModel.Group group, VertexBuffer buffer, VertexBuffer back) {}
+
+  private static java.util.List<Uploaded> meshes;
   private static RenderTarget target;
-  private static final ByteBufferBuilder MEMORY = new ByteBufferBuilder(32768);
-  private static final MultiBufferSource.BufferSource BUFFER = MultiBufferSource.immediate(MEMORY);
   private static final RenderType MATERIAL =
       RenderType.create(
           "cyberware_hologram",
@@ -32,7 +33,7 @@ public final class HologramRenderer extends RenderStateShard {
               .setShaderState(new ShaderStateShard(() -> shader))
               .setTextureState(
                   new TextureStateShard(
-                      Cybernetics2077.id("textures/entity/white.png"), false, false))
+                      Cybernetics2077.id("textures/entity/dermal_detail.png"), false, false))
               .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
               .setCullState(NO_CULL)
               .setDepthTestState(LEQUAL_DEPTH_TEST)
@@ -51,7 +52,7 @@ public final class HologramRenderer extends RenderStateShard {
               .setShaderState(new ShaderStateShard(() -> shader))
               .setTextureState(
                   new TextureStateShard(
-                      Cybernetics2077.id("textures/entity/white.png"), false, false))
+                      Cybernetics2077.id("textures/entity/dermal_detail.png"), false, false))
               .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
               .setCullState(NO_CULL)
               .setDepthTestState(LEQUAL_DEPTH_TEST)
@@ -74,13 +75,100 @@ public final class HologramRenderer extends RenderStateShard {
   }
 
   public static void reload() {
-    model = null;
+    Runnable clear =
+        () -> {
+          if (meshes != null) {
+            for (var mesh : meshes) {
+              mesh.buffer().close();
+              if (mesh.back() != mesh.buffer()) mesh.back().close();
+            }
+            meshes = null;
+          }
+        };
+    if (RenderSystem.isOnRenderThread()) clear.run();
+    else RenderSystem.recordRenderCall(clear::run);
   }
 
-  public static void draw(GuiGraphics g, CyberwareCategory selected, BodyView view, float alpha) {
+  private static void load() {
+    var mc = Minecraft.getInstance();
+    try (var input = mc.getResourceManager().open(Cybernetics2077.id("models/hologram/body.cyh"))) {
+      var model = DiagnosticModel.read(input);
+      var uploaded = new java.util.ArrayList<Uploaded>();
+      try {
+        for (var group : model.groups) {
+          int role = group.role();
+          boolean film =
+              role == 0 || role == 1 || role == 7 || role == 8 || role == 10 || role == 11;
+          var front = upload(group, film, false);
+          var back = film ? upload(group, true, true) : front;
+          uploaded.add(new Uploaded(group, front, back));
+        }
+        VertexBuffer.unbind();
+        uploaded.sort(java.util.Comparator.comparingInt(p -> priority(p.group().role())));
+        meshes = java.util.List.copyOf(uploaded);
+      } catch (RuntimeException e) {
+        for (var part : uploaded) {
+          part.buffer().close();
+          if (part.back() != part.buffer()) part.back().close();
+        }
+        throw e;
+      }
+    } catch (java.io.IOException e) {
+      throw new IllegalStateException("Cannot load Blender cyberware anatomy", e);
+    }
+  }
+
+  private static int priority(int role) {
+    return switch (role) {
+      case 1, 10, 11 -> 0;
+      case 7 -> 1;
+      case 0 -> 2;
+      case 8 -> 3;
+      default -> -1;
+    };
+  }
+
+  private static VertexBuffer upload(DiagnosticModel.Group group, boolean sorted, boolean back) {
+    var d = group.data();
+    int triangles = group.vertices() / 3;
+    long[] order = new long[triangles];
+    for (int i = 0; i < triangles; i++) {
+      float z = (d[i * 24 + 2] + d[i * 24 + 10] + d[i * 24 + 18]) / 3;
+      long key = Float.floatToRawIntBits(z + 2f) & 0xffffffffL;
+      order[i] = sorted ? (key << 32) | (i & 0xffffffffL) : i;
+    }
+    if (sorted) java.util.Arrays.sort(order);
+    var builder =
+        Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.NEW_ENTITY);
+    int tint =
+        0xff000000
+            | ((int) (group.material()[0] * 255) << 16)
+            | ((int) (group.material()[1] * 255) << 8)
+            | (int) (group.material()[2] * 255);
+    for (int t = 0; t < triangles; t++) {
+      int index = (int) order[sorted && !back ? triangles - 1 - t : t];
+      for (int corner = 0; corner < 3; corner++) {
+        int o = index * 24 + corner * 8;
+        builder
+            .addVertex(d[o], d[o + 1], d[o + 2])
+            .setColor(tint)
+            .setUv(d[o + 6], d[o + 7])
+            .setOverlay(OverlayTexture.NO_OVERLAY)
+            .setLight(0xf000f0)
+            .setNormal(d[o + 3], d[o + 4], d[o + 5]);
+      }
+    }
+    var buffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+    buffer.bind();
+    buffer.upload(builder.buildOrThrow());
+    return buffer;
+  }
+
+  public static void draw(
+      GuiGraphics g, CyberwareCategory selected, BodyView view, float alpha, float detail) {
     if (shader == null) return;
     var mc = Minecraft.getInstance();
-    if (model == null) model = new DiagnosticModel();
+    if (meshes == null) load();
     if (target == null) {
       target = new TextureTarget(768, 1024, true, Minecraft.ON_OSX);
       target.setClearColor(0, 0, 0, 0);
@@ -111,12 +199,15 @@ public final class HologramRenderer extends RenderStateShard {
       RenderSystem.enableDepthTest();
       RenderSystem.enableBlend();
       RenderSystem.defaultBlendFunc();
-      var pose = new PoseStack();
-      pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(view.yaw()));
-      renderParts(pose, model.core, MATERIAL, selected);
-      BUFFER.endBatch();
-      renderParts(pose, model.shell, SHELL, selected);
-      BUFFER.endBatch();
+      var transform = new Matrix4f().rotateY((float) Math.toRadians(view.yaw()));
+      shader
+          .safeGetUniform("SelectedRegion")
+          .set(selected == null ? -1f : (float) selected.ordinal());
+      shader.safeGetUniform("Detail").set(detail);
+      renderParts(
+          transform, MATERIAL, 0, Math.cos(Math.toRadians(view.yaw())) < 0, selected, detail);
+      renderParts(transform, SHELL, 1, Math.cos(Math.toRadians(view.yaw())) < 0, selected, detail);
+      VertexBuffer.unbind();
     } finally {
       mc.getMainRenderTarget().bindWrite(true);
       RenderSystem.setProjectionMatrix(projection, sorting);
@@ -157,38 +248,30 @@ public final class HologramRenderer extends RenderStateShard {
   }
 
   private static void renderParts(
-      PoseStack pose,
-      java.util.List<DiagnosticModel.Face> parts,
+      Matrix4f transform,
       RenderType type,
-      CyberwareCategory selected) {
-    var out = BUFFER.getBuffer(type);
-    var p = pose.last();
-    for (var f : parts) {
-      int color = f.color();
-      boolean hot = f.region() == selected;
-      if (hot) color = (color & 0xff000000) | 0x72e8f1;
-      if (f.shell() && selected != null && selected != CyberwareCategory.INTEGUMENTARY_SYSTEM)
-        color = (color & 0xffffff) | 0x1c000000;
-      float shade =
-          (float)
-              (.66
-                  + .34
-                      * Math.max(
-                          0,
-                          f.normal()
-                              .dot(new net.minecraft.world.phys.Vec3(-.3, -.5, -.8).normalize())));
-      int a = color >>> 24,
-          r = (int) ((color >> 16 & 255) * shade),
-          g = (int) ((color >> 8 & 255) * shade),
-          b = (int) ((color & 255) * shade);
-      int tint = a << 24 | r << 16 | g << 8 | b;
-      for (var v : new net.minecraft.world.phys.Vec3[] {f.a(), f.b(), f.c(), f.d()})
-        out.addVertex(p, (float) v.x, (float) v.y, (float) v.z)
-            .setColor(tint)
-            .setUv(.5f, .5f)
-            .setOverlay(OverlayTexture.NO_OVERLAY)
-            .setLight(0xf000f0)
-            .setNormal(p, (float) f.normal().x, (float) f.normal().y, (float) f.normal().z);
+      int pass,
+      boolean back,
+      CyberwareCategory selected,
+      float detail) {
+    type.setupRenderState();
+    try {
+      for (var part : meshes) {
+        int role = part.group().role();
+        boolean film = role == 0 || role == 1 || role == 7 || role == 8 || role == 10 || role == 11;
+        if (role == 2
+            && detail > .001
+            && (selected == CyberwareCategory.NERVOUS_SYSTEM
+                || selected == CyberwareCategory.OPERATING_SYSTEM)) film = true;
+        if (film != (pass == 1)) continue;
+        shader.safeGetUniform("Role").set((float) role);
+        shader.safeGetUniform("Region").set((float) part.group().region());
+        var buffer = back ? part.back() : part.buffer();
+        buffer.bind();
+        buffer.drawWithShader(transform, RenderSystem.getProjectionMatrix(), shader);
+      }
+    } finally {
+      type.clearRenderState();
     }
   }
 

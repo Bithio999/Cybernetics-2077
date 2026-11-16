@@ -7,3 +7,7 @@ runs/
 .vscode/
 __pycache__/
 .DS_Store
+
+# Blender backup files; the editable .blend source is tracked.
+*.blend1
+*.blend2
