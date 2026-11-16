@@ -31,6 +31,122 @@ public final class CyberwareClientReview {
   static volatile String error;
   static boolean finished;
 
+  static java.lang.reflect.Field skinLookup, customization;
+  static net.minecraft.client.multiplayer.PlayerInfo info;
+  static Object originalLookup;
+  static byte originalParts;
+  static net.minecraft.resources.ResourceLocation fixture;
+  static int[] overlayPixels;
+
+  static void prepareSkinReview() throws Exception {
+    var mc = Minecraft.getInstance();
+    info = mc.getConnection().getPlayerInfo(mc.player.getUUID());
+    skinLookup = net.minecraft.client.multiplayer.PlayerInfo.class.getDeclaredField("skinLookup");
+    skinLookup.setAccessible(true);
+    originalLookup = skinLookup.get(info);
+    customization =
+        net.minecraft.world.entity.player.Player.class.getDeclaredField(
+            "DATA_PLAYER_MODE_CUSTOMISATION");
+    customization.setAccessible(true);
+    originalParts =
+        mc.player
+            .getEntityData()
+            .get((net.minecraft.network.syncher.EntityDataAccessor<Byte>) customization.get(null));
+  }
+
+  static void parts(int mask) throws Exception {
+    var mc = Minecraft.getInstance();
+    mc.player
+        .getEntityData()
+        .set(
+            (net.minecraft.network.syncher.EntityDataAccessor<Byte>) customization.get(null),
+            (byte) mask);
+  }
+
+  static void skin(
+      net.minecraft.resources.ResourceLocation texture,
+      net.minecraft.client.resources.PlayerSkin.Model model)
+      throws Exception {
+    var value =
+        new net.minecraft.client.resources.PlayerSkin(texture, null, null, null, model, true);
+    skinLookup.set(
+        info, (java.util.function.Supplier<net.minecraft.client.resources.PlayerSkin>) () -> value);
+  }
+
+  static void defaultSkin(String path, net.minecraft.client.resources.PlayerSkin.Model model)
+      throws Exception {
+    var texture =
+        net.minecraft.resources.ResourceLocation.withDefaultNamespace(
+            "textures/entity/player/" + path + ".png");
+    if (Minecraft.getInstance().getResourceManager().getResource(texture).isEmpty())
+      throw new IllegalStateException("Missing vanilla skin fixture");
+    skin(texture, model);
+  }
+
+  static void assertSkin(boolean slim, boolean overlays) throws Exception {
+    var mc = Minecraft.getInstance();
+    var flag = HologramRenderer.class.getDeclaredField("modelSlim");
+    flag.setAccessible(true);
+    var texture = HologramRenderer.class.getDeclaredField("texture");
+    texture.setAccessible(true);
+    if (flag.getBoolean(null) != slim || !mc.player.getSkin().texture().equals(texture.get(null)))
+      throw new IllegalStateException("Hologram did not follow live player skin/model");
+    var field = HologramRenderer.class.getDeclaredField("model");
+    field.setAccessible(true);
+    var model = (net.minecraft.client.model.PlayerModel<?>) field.get(null);
+    var cubes = net.minecraft.client.model.geom.ModelPart.class.getDeclaredField("cubes");
+    cubes.setAccessible(true);
+    var cube =
+        ((java.util.List<net.minecraft.client.model.geom.ModelPart.Cube>) cubes.get(model.rightArm))
+            .getFirst();
+    if (Math.abs(cube.maxX - cube.minX - (slim ? 3 : 4)) > .001)
+      throw new IllegalStateException("Incorrect arm geometry");
+    for (var part :
+        java.util.List.of(
+            model.hat,
+            model.jacket,
+            model.leftSleeve,
+            model.rightSleeve,
+            model.leftPants,
+            model.rightPants))
+      if (part.visible != overlays)
+        throw new IllegalStateException("Skin Customization flags ignored");
+  }
+
+  static int[] hologramPixels() throws Exception {
+    var field = HologramRenderer.class.getDeclaredField("target");
+    field.setAccessible(true);
+    var target = (com.mojang.blaze3d.pipeline.RenderTarget) field.get(null);
+    try (var image = Screenshot.takeScreenshot(target)) {
+      int[] data = new int[image.getWidth() * image.getHeight()];
+      int index = 0;
+      for (int y = 0; y < image.getHeight(); y++)
+        for (int x = 0; x < image.getWidth(); x++) data[index++] = image.getPixelRGBA(x, y);
+      return data;
+    }
+  }
+
+  static void overlayFixture() throws Exception {
+    var mc = Minecraft.getInstance();
+    try (var input =
+        mc.getResourceManager()
+            .open(
+                net.minecraft.resources.ResourceLocation.withDefaultNamespace(
+                    "textures/entity/player/slim/alex.png"))) {
+      var image = com.mojang.blaze3d.platform.NativeImage.read(input);
+      for (int y = 0; y < 16; y++)
+        for (int x = 32; x < 64; x++) image.setPixelRGBA(x, y, 0xffff00ff);
+      for (int y = 32; y < 48; y++)
+        for (int x = 16; x < 40; x++) image.setPixelRGBA(x, y, 0xffffffff);
+      fixture =
+          mc.getTextureManager()
+              .register(
+                  "cyberware_review_skin",
+                  new net.minecraft.client.renderer.texture.DynamicTexture(image));
+    }
+    skin(fixture, net.minecraft.client.resources.PlayerSkin.Model.SLIM);
+  }
+
   static void server(java.util.function.Consumer<ServerPlayer> action) {
     var s = Minecraft.getInstance().getSingleplayerServer();
     s.execute(
@@ -414,6 +530,66 @@ public final class CyberwareClientReview {
         }
       }
       if (ticks == 790) {
+        prepareSkinReview();
+        screen().keyPressed(256, 0, 0);
+        parts(127);
+        defaultSkin("wide/steve", net.minecraft.client.resources.PlayerSkin.Model.WIDE);
+      }
+      if (ticks == 810) {
+        assertSkin(false, true);
+        shot("player-skin-wide");
+      }
+      if (ticks == 820)
+        defaultSkin("slim/alex", net.minecraft.client.resources.PlayerSkin.Model.SLIM);
+      if (ticks == 840) {
+        assertSkin(true, true);
+        shot("player-skin-slim");
+      }
+      if (ticks == 850) parts(0);
+      if (ticks == 865) {
+        assertSkin(true, false);
+        shot("player-skin-layers-disabled");
+      }
+      if (ticks == 875) parts(127);
+      if (ticks == 890) {
+        assertSkin(true, true);
+        shot("player-skin-layers-enabled");
+      }
+      if (ticks == 900) overlayFixture();
+      if (ticks == 915) {
+        assertSkin(true, true);
+        overlayPixels = hologramPixels();
+      }
+      if (ticks == 920) parts(0);
+      if (ticks == 935) {
+        assertSkin(true, false);
+        var base = hologramPixels();
+        int changed = 0;
+        for (int k = 0; k < base.length; k++) {
+          int a = base[k], b = overlayPixels[k];
+          int difference =
+              Math.abs((a & 255) - (b & 255))
+                  + Math.abs((a >> 8 & 255) - (b >> 8 & 255))
+                  + Math.abs((a >> 16 & 255) - (b >> 16 & 255));
+          if (difference > 80) changed++;
+        }
+        if (changed < 500)
+          throw new IllegalStateException(
+              "Hat/jacket layer geometry failed to change the rendered skin: " + changed);
+        System.out.println("Skin overlay regression: " + changed + " pixels changed");
+      }
+      if (ticks == 940) {
+        skinLookup.set(info, originalLookup);
+        parts(originalParts);
+        Minecraft.getInstance().getTextureManager().release(fixture);
+        HologramRenderer.reload();
+      }
+      if (ticks == 950) {
+        var mcSkin = mc.player.getSkin();
+        var texture = HologramRenderer.class.getDeclaredField("texture");
+        texture.setAccessible(true);
+        if (!mcSkin.texture().equals(texture.get(null)))
+          throw new IllegalStateException("Player skin did not return after resource reset");
         Files.writeString(
             OUT.resolve("passed.txt"),
             "PASS: native inventory button; 21 read-only viewer sockets; mouse and keyboard"
@@ -421,7 +597,9 @@ public final class CyberwareClientReview {
                 + " entry/return; live 32-bit capacity sync; actual bench block interaction; native"
                 + " pickup/install/remove; scanner availability follows equipment; held scanner"
                 + " acquires server-authorized vanilla target; no Tensura fields; native HUD"
-                + " returns after release.\n");
+                + " returns after release; live player skin textures, four/three-pixel arm"
+                + " geometry, all six skin-layer flags, rendered hat/jacket pixel comparison and"
+                + " resource reset passed.\n");
         finished = true;
         mc.stop();
       }

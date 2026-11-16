@@ -38,7 +38,3 @@ for name,color in [('red_glow',(197,34,65)),('cyan_glow',(31,174,194))]:
   for x in range(256):
    r=math.hypot((x-127.5)/128,(y-127.5)/128);px[x,y]=(*color,round(110*max(0,1-r)**2.2))
  im.save(root/f'textures/gui/{name}.png')
-
-# The hologram uses the original first-release diagnostic texture.
-import runpy
-runpy.run_path(str(Path(__file__).with_name("generate-hologram-texture.py")))

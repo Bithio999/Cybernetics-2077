@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.3.1 restores the first-release hologram. All 11 JVM tests and the native client review pass. The client review covers the restored model, category close-ups, installation and scanning.
+Release 0.3.2 uses the local player’s skin in the hologram. All 11 JVM tests and the native client review pass. The client review covers live textures, classic/slim geometry, skin-layer settings, category close-ups, installation and scanning.
 
 ## Automated checks
 
@@ -55,12 +55,14 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The inventory cyberware screen remains read-only; the bench is the only installation interface. There are no quickhacks or operating-system functions in 0.3.1. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+The inventory cyberware screen remains read-only; the bench is the only installation interface. There are no quickhacks or operating-system functions in 0.3.2. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
 
 The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed.
 
-## Original hologram restoration
+## Player skin validation
 
-The model is Minecraft's native `PlayerModel`. Its diagnostic texture and hologram shader files are restored byte-for-byte from the first release (`a66c2a2`). The original overview framing and pointer tracking are retained, with an adapter for the later category close-ups.
+The hologram reads Minecraft's own `PlayerSkin` provider each frame, uses the matching classic/slim model layer, and draws each enabled skin layer. Skin pixels and overlays resolve against depth in an isolated render target; the completed avatar is then composited once at holographic opacity. This preserves skin colours and prevents outer layers from being hidden by the base model.
 
-The Blender mesh, its runtime loader, anatomy shaders and obsolete loader tests have been removed from the current tree. Packaging checks reject those assets/classes and verify the original diagnostic texture's digest. Git history and previous release JARs remain available.
+Native review verifies the bound skin texture and actual four/three-pixel arm geometry while switching between Minecraft's built-in Steve and Alex skins. It toggles all six outer skin-layer flags and compares render-target pixels using a temporary high-contrast hat/jacket fixture: **84,229 pixels changed**. The fixture exists only in the test process, is released afterward, and is excluded from the public preview images and release JAR. The original player skin is restored and the hologram cache reset at the end.
+
+The diagnostic placeholder texture is no longer shipped. Offline/unavailable custom skins use Minecraft's normal fallback. No additional skin service, credential or asset download mechanism is introduced. Hats, jackets, sleeves and trouser overlays are supported; armor, held items and capes are outside this skin preview.
