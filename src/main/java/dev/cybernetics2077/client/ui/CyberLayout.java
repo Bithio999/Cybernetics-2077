@@ -13,15 +13,15 @@ public record CyberLayout(double scale, double left, double top) {
 
   public static final List<Row> ROWS =
       List.of(
-          new Row(CyberwareCategory.FRONTAL_CORTEX, 530, 164, true),
+          new Row(CyberwareCategory.FRONTAL_CORTEX, 490, 164, true),
           new Row(CyberwareCategory.OPERATING_SYSTEM, 1164, 164, false),
-          new Row(CyberwareCategory.ARMS, 706, 322, true),
+          new Row(CyberwareCategory.ARMS, 650, 322, true),
           new Row(CyberwareCategory.FACE, 1228, 322, false),
           new Row(CyberwareCategory.SKELETON, 386, 480, true),
           new Row(CyberwareCategory.HANDS, 1308, 480, false),
-          new Row(CyberwareCategory.NERVOUS_SYSTEM, 530, 638, true),
+          new Row(CyberwareCategory.NERVOUS_SYSTEM, 490, 638, true),
           new Row(CyberwareCategory.CIRCULATORY_SYSTEM, 1164, 638, false),
-          new Row(CyberwareCategory.INTEGUMENTARY_SYSTEM, 530, 796, true),
+          new Row(CyberwareCategory.INTEGUMENTARY_SYSTEM, 490, 796, true),
           new Row(CyberwareCategory.LEGS, 1164, 796, false));
   public static final List<Socket> SOCKETS =
       ROWS.stream()

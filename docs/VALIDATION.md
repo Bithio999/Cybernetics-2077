@@ -2,11 +2,11 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.3.2 uses the local player’s skin in the hologram. All 11 JVM tests and the native client review pass. The client review covers live textures, classic/slim geometry, skin-layer settings, category close-ups, installation and scanning.
+Release 0.3.3 uses the local player’s skin in the hologram. All 13 JVM tests and the native client review pass. The client review covers live textures, classic/slim geometry, skin-layer settings, category close-ups, installation and scanning.
 
 ## Automated checks
 
-- JVM tests cover category mapping, responsive hitboxes, overlap, 32-bit menu fields, smooth camera interpolation and staged scanner/native-HUD transitions.
+- JVM tests cover category mapping, responsive hitboxes, overlap, 32-bit menu fields, smooth camera interpolation, equal horizontal/vertical pixel scale throughout every category transition, centered region targets for classic/slim models, and staged scanner/native-HUD transitions.
 - Ten native Minecraft GameTests cover category and quantity guards, capacity calculation, equipment serialization, actual player attachment persistence, menu synchronization, rejection of inventory-editing packets, real bench shift-click installation/removal, inventory-full protection, slot/category/capacity guards, bench distance/block validity, and scanner ownership/aim/range/line-of-sight.
 - Native client review opens the inventory, clicks the actual cyberware button using Minecraft mouse input, selects sockets with mouse and keyboard, checks a server-side equipment update, and returns to the correct inventory. It exercises survival and creative, GUI scales 1/2/3, 4:3 and ultrawide windows. It then interacts with the actual bench block, installs the craftable eye using native inventory clicks, scans a husk, verifies server target data, closes the scanner, checks the installed-eye detail view, and removes the eye to confirm the scanner becomes unavailable.
 - The packaging check verifies standalone dependencies, all shipped resources, shader JSON, the font license, and absence of test fixtures or old addon content.
@@ -55,14 +55,14 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The inventory cyberware screen remains read-only; the bench is the only installation interface. There are no quickhacks or operating-system functions in 0.3.2. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+The inventory cyberware screen remains read-only; the bench is the only installation interface. There are no quickhacks or operating-system functions in 0.3.3. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
 
 The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed.
 
 ## Player skin validation
 
-The hologram reads Minecraft's own `PlayerSkin` provider each frame, uses the matching classic/slim model layer, and draws each enabled skin layer. Skin pixels and overlays resolve against depth in an isolated render target; the completed avatar is then composited once at holographic opacity. This preserves skin colours and prevents outer layers from being hidden by the base model.
+The hologram reads Minecraft's own `PlayerSkin` provider each frame, uses the matching classic/slim model layer, and draws each enabled skin layer. Skin pixels and overlays resolve against depth in an isolated render target; the completed avatar is then composited once at holographic opacity. This retains recognizable skin markings beneath cyan shading and prevents outer layers from being hidden by the base model. Scanlines and the silhouette glow are applied to the completed projection, with no geometry jitter.
 
-Native review verifies the bound skin texture and actual four/three-pixel arm geometry while switching between Minecraft's built-in Steve and Alex skins. It toggles all six outer skin-layer flags and compares render-target pixels using a temporary high-contrast hat/jacket fixture: **84,229 pixels changed**. The fixture exists only in the test process, is released afterward, and is excluded from the public preview images and release JAR. The original player skin is restored and the hologram cache reset at the end.
+Native review verifies the bound skin texture and actual four/three-pixel arm geometry while switching between Minecraft's built-in Steve and Alex skins. It toggles all six outer skin-layer flags and compares render-target pixels using a temporary high-contrast hat/jacket fixture: **96,055 pixels changed**. The fixture exists only in the test process, is released afterward, and is excluded from the public preview images and release JAR. The original player skin is restored and the hologram cache reset at the end. A separate alpha-preserving render-target check measures the classic head’s displayed width/height ratio at **0.99990** (square is 1.0), with the full-body silhouette centered at **0, 0 pixels** of offset. The standard screenshot helper forces alpha to 255, so this silhouette check reads the texture without discarding alpha.
 
 The diagnostic placeholder texture is no longer shipped. Offline/unavailable custom skins use Minecraft's normal fallback. No additional skin service, credential or asset download mechanism is introduced. Hats, jackets, sleeves and trouser overlays are supported; armor, held items and capes are outside this skin preview.

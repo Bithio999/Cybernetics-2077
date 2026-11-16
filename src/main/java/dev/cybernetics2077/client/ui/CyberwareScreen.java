@@ -84,7 +84,10 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     bodyView =
         bodyView.towards(
             selected >= 0
-                ? BodyView.category(CyberwareCategory.forSlot(selected))
+                ? BodyView.category(
+                    CyberwareCategory.forSlot(selected),
+                    minecraft.player.getSkin().model()
+                        == net.minecraft.client.resources.PlayerSkin.Model.SLIM)
                 : BodyView.OVERVIEW,
             follow);
     for (var b : sockets) {
@@ -150,10 +153,10 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
           selected >= 0 ? CyberwareCategory.forSlot(selected) : category,
           bodyView,
           fade,
-          (float) Math.clamp((layout.virtualX(mouseX) - 960) / 85, -7, 7) * (1 - zoom));
+          (float) Math.clamp((layout.virtualX(mouseX) - 960) / 85, -3, 3) * (1 - zoom));
       if (selected < 0) {
         c.g.pose().pushPose();
-        c.g.pose().translate(960, 878, 0);
+        c.g.pose().translate(960, BodyView.OVERVIEW.canvasY(1.52f), 0);
         c.g.pose().scale(1, .14f, 1);
         c.glowArc(0, 0, 110, 0, (float) (Math.PI * 2), 1, 0x7057c5d7);
         c.g.pose().popPose();

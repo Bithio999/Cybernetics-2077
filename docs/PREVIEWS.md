@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.3.2. The hologram displays the local player’s current Minecraft skin with transparency and scanlines. The tier 1 Optical Scanner, installation bench and category close-ups remain available.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.3.3. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. The tier 1 Optical Scanner, installation bench and category close-ups remain available.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 

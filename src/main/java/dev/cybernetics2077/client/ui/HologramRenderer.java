@@ -93,6 +93,7 @@ public final class HologramRenderer extends RenderStateShard {
     if (target == null) {
       target = new TextureTarget(448, 896, true, Minecraft.ON_OSX);
       target.setClearColor(0, 0, 0, 0);
+      target.setFilterMode(GL11.GL_LINEAR);
     }
     g.flush();
     var projection = new Matrix4f(RenderSystem.getProjectionMatrix());
@@ -106,29 +107,19 @@ public final class HologramRenderer extends RenderStateShard {
     try {
       target.clear(Minecraft.ON_OSX);
       target.bindWrite(true);
-      RenderSystem.setProjectionMatrix(
-          new Matrix4f()
-              .setOrtho(
-                  view.centerX() - halfWidth(view),
-                  view.centerX() + halfWidth(view),
-                  view.centerY() + view.span() / 2,
-                  view.centerY() - view.span() / 2,
-                  10,
-                  -10),
-          VertexSorting.ORTHOGRAPHIC_Z);
+      RenderSystem.setProjectionMatrix(view.projection(yaw), VertexSorting.ORTHOGRAPHIC_Z);
       RenderSystem.setShaderColor(1, 1, 1, 1);
       RenderSystem.enableDepthTest();
       RenderSystem.enableBlend();
       RenderSystem.defaultBlendFunc();
       var pose = new PoseStack();
       pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(view.yaw() + yaw));
-      pose.scale(.88f, 1, 1);
-      model.head.xRot = -.025f;
-      model.head.yRot = yaw * .0015f;
-      model.rightArm.zRot = .055f;
-      model.leftArm.zRot = -.055f;
-      model.rightLeg.zRot = .012f;
-      model.leftLeg.zRot = -.012f;
+      model.head.xRot = 0;
+      model.head.yRot = 0;
+      model.rightArm.zRot = 0;
+      model.leftArm.zRot = 0;
+      model.rightLeg.zRot = 0;
+      model.leftLeg.zRot = 0;
       var out = BUFFER.getBuffer(skinMaterial);
       boolean all =
           selected == CyberwareCategory.SKELETON
@@ -206,7 +197,7 @@ public final class HologramRenderer extends RenderStateShard {
           Tesselator.getInstance()
               .begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
       var p = g.pose().last().pose();
-      int color = ((int) (255 * alpha * .72f) << 24) | 0xffffff;
+      int color = ((int) (255 * alpha * .58f) << 24) | 0xffffff;
       float l = view.x(), t = view.y(), r = l + view.w(), bottom = t + view.h();
       b.addVertex(p, l, t, 0).setUv(0, 1).setColor(color);
       b.addVertex(p, l, bottom, 0).setUv(0, 0).setColor(color);
@@ -221,11 +212,6 @@ public final class HologramRenderer extends RenderStateShard {
       if (blend) RenderSystem.enableBlend();
       else RenderSystem.disableBlend();
     }
-  }
-
-  private static float halfWidth(BodyView view) {
-    // Match the first release's .73 horizontal extent in its original overview viewport.
-    return view.span() * view.w() / view.h() * (1.46f * 830f / (2.28f * 448f)) / 2;
   }
 
   private HologramRenderer() {

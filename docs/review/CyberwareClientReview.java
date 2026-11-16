@@ -117,12 +117,57 @@ public final class CyberwareClientReview {
     var field = HologramRenderer.class.getDeclaredField("target");
     field.setAccessible(true);
     var target = (com.mojang.blaze3d.pipeline.RenderTarget) field.get(null);
-    try (var image = Screenshot.takeScreenshot(target)) {
+    // Minecraft's screenshot helper forces alpha to 255; retain it for silhouette checks.
+    try (var image =
+        new com.mojang.blaze3d.platform.NativeImage(target.width, target.height, false)) {
+      com.mojang.blaze3d.systems.RenderSystem.bindTexture(target.getColorTextureId());
+      image.downloadTexture(0, false);
+      image.flipY();
       int[] data = new int[image.getWidth() * image.getHeight()];
       int index = 0;
       for (int y = 0; y < image.getHeight(); y++)
         for (int x = 0; x < image.getWidth(); x++) data[index++] = image.getPixelRGBA(x, y);
       return data;
+    }
+  }
+
+  static void assertRenderedProportions() throws Exception {
+    var field = HologramRenderer.class.getDeclaredField("target");
+    field.setAccessible(true);
+    var target = (com.mojang.blaze3d.pipeline.RenderTarget) field.get(null);
+    var view = BodyView.OVERVIEW;
+    // Minecraft's screenshot helper forces alpha to 255; retain it for silhouette checks.
+    try (var image =
+        new com.mojang.blaze3d.platform.NativeImage(target.width, target.height, false)) {
+      com.mojang.blaze3d.systems.RenderSystem.bindTexture(target.getColorTextureId());
+      image.downloadTexture(0, false);
+      image.flipY();
+      int left = image.getWidth(), right = -1, top = image.getHeight(), bottom = -1;
+      int headLeft = image.getWidth(), headRight = -1;
+      for (int y = 0; y < image.getHeight(); y++) {
+        float modelY = view.centerY() - view.span() / 2 + y * view.span() / image.getHeight();
+        for (int x = 0; x < image.getWidth(); x++) {
+          if ((image.getPixelRGBA(x, y) >>> 24) < 230) continue;
+          left = Math.min(left, x);
+          right = Math.max(right, x);
+          top = Math.min(top, y);
+          bottom = Math.max(bottom, y);
+          if (modelY > -.46f && modelY < -.04f) {
+            headLeft = Math.min(headLeft, x);
+            headRight = Math.max(headRight, x);
+          }
+        }
+      }
+      float headWidth = (headRight - headLeft + 1f) * view.w() / image.getWidth();
+      float headHeight = .5f / view.span() * view.h();
+      float ratio = headWidth / headHeight;
+      float dx = ((left + right + 1f) / 2 / image.getWidth() - .5f) * view.w();
+      float dy = ((top + bottom + 1f) / 2 / image.getHeight() - .5f) * view.h();
+      if (Math.abs(ratio - 1) > .03 || Math.abs(dx) > 3 || Math.abs(dy) > 3)
+        throw new IllegalStateException(
+            "Rendered body geometry: head aspect=" + ratio + ", center offset=" + dx + "," + dy);
+      System.out.println(
+          "Rendered body geometry: head aspect=" + ratio + ", center offset=" + dx + "," + dy);
     }
   }
 
@@ -311,7 +356,7 @@ public final class CyberwareClientReview {
       }
       if (ticks == 110) {
         var l = CyberLayout.fit(mc.screen.width, mc.screen.height);
-        click(l.screenX(578), l.screenY(212));
+        click(l.screenX(538), l.screenY(212));
       }
       if (ticks == 120) {
         var field = CyberwareScreen.class.getDeclaredField("selected");
@@ -520,7 +565,7 @@ public final class CyberwareClientReview {
       if (ticks == 570) openButton();
       if (ticks == 580) {
         var l = CyberLayout.fit(mc.screen.width, mc.screen.height);
-        click(l.screenX(578), l.screenY(212));
+        click(l.screenX(538), l.screenY(212));
       }
       for (int category = 0; category < 10; category++) {
         int at = 600 + category * 20;
@@ -535,7 +580,17 @@ public final class CyberwareClientReview {
         parts(127);
         defaultSkin("wide/steve", net.minecraft.client.resources.PlayerSkin.Model.WIDE);
       }
+      if (ticks == 802) {
+        var l = CyberLayout.fit(mc.screen.width, mc.screen.height);
+        mouse(
+            "onMove",
+            new Class[] {long.class, double.class, double.class},
+            mc.getWindow().getWindow(),
+            l.screenX(960) * mc.getWindow().getGuiScale(),
+            l.screenY(540) * mc.getWindow().getGuiScale());
+      }
       if (ticks == 810) {
+        assertRenderedProportions();
         assertSkin(false, true);
         shot("player-skin-wide");
       }
@@ -599,7 +654,7 @@ public final class CyberwareClientReview {
                 + " acquires server-authorized vanilla target; no Tensura fields; native HUD"
                 + " returns after release; live player skin textures, four/three-pixel arm"
                 + " geometry, all six skin-layer flags, rendered hat/jacket pixel comparison and"
-                + " resource reset passed.\n");
+                + " resource reset; pixel-verified square head and centered full body passed.\n");
         finished = true;
         mc.stop();
       }
