@@ -5,7 +5,7 @@ import dev.cybernetics2077.cyberware.CyberwareCategory;
 /** Camera and viewport move together; category changes never snap the model. */
 public record BodyView(
     float x, float y, float w, float h, float centerX, float centerY, float span, float yaw) {
-  public static final BodyView OVERVIEW = new BodyView(736, 100, 448, 830, 0, .5f, 2.25f, -9);
+  public static final BodyView OVERVIEW = new BodyView(736, 100, 448, 830, 0, .53f, 2.28f, -12);
 
   public static BodyView category(CyberwareCategory category) {
     float cx = 0, cy = .32f, span = 1.27f, yaw = -10;

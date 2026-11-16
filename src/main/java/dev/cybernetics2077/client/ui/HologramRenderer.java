@@ -7,20 +7,22 @@ import dev.cybernetics2077.Cybernetics2077;
 import dev.cybernetics2077.cyberware.CyberwareCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
-/** Detailed original anatomical geometry in a reusable, depth-isolated diagnostic render target. */
+/** A real Minecraft player mesh in a reusable, depth-isolated diagnostic render target. */
 public final class HologramRenderer extends RenderStateShard {
-  private static ShaderInstance shader, composite;
-
-  private record Uploaded(DiagnosticModel.Group group, VertexBuffer buffer, VertexBuffer back) {}
-
-  private static java.util.List<Uploaded> meshes;
+  private static ShaderInstance shader;
+  private static PlayerModel<AbstractClientPlayer> model;
   private static RenderTarget target;
+  private static final ByteBufferBuilder MEMORY = new ByteBufferBuilder(32768);
+  private static final MultiBufferSource.BufferSource BUFFER = MultiBufferSource.immediate(MEMORY);
   private static final RenderType MATERIAL =
       RenderType.create(
           "cyberware_hologram",
@@ -33,39 +35,14 @@ public final class HologramRenderer extends RenderStateShard {
               .setShaderState(new ShaderStateShard(() -> shader))
               .setTextureState(
                   new TextureStateShard(
-                      Cybernetics2077.id("textures/entity/dermal_detail.png"), false, false))
+                      Cybernetics2077.id("textures/entity/diagnostic.png"), false, false))
               .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-              .setCullState(NO_CULL)
+              .setCullState(CULL)
               .setDepthTestState(LEQUAL_DEPTH_TEST)
               .setWriteMaskState(COLOR_DEPTH_WRITE)
               .createCompositeState(false));
 
-  private static final RenderType SHELL =
-      RenderType.create(
-          "cyberware_glass",
-          DefaultVertexFormat.NEW_ENTITY,
-          VertexFormat.Mode.QUADS,
-          32768,
-          false,
-          true,
-          RenderType.CompositeState.builder()
-              .setShaderState(new ShaderStateShard(() -> shader))
-              .setTextureState(
-                  new TextureStateShard(
-                      Cybernetics2077.id("textures/entity/dermal_detail.png"), false, false))
-              .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-              .setCullState(NO_CULL)
-              .setDepthTestState(LEQUAL_DEPTH_TEST)
-              .setWriteMaskState(COLOR_WRITE)
-              .createCompositeState(false));
-
   public static void register(RegisterShadersEvent e) throws java.io.IOException {
-    e.registerShader(
-        new ShaderInstance(
-            e.getResourceProvider(),
-            Cybernetics2077.id("body_composite"),
-            DefaultVertexFormat.POSITION_TEX_COLOR),
-        s -> composite = s);
     e.registerShader(
         new ShaderInstance(
             e.getResourceProvider(),
@@ -75,102 +52,17 @@ public final class HologramRenderer extends RenderStateShard {
   }
 
   public static void reload() {
-    Runnable clear =
-        () -> {
-          if (meshes != null) {
-            for (var mesh : meshes) {
-              mesh.buffer().close();
-              if (mesh.back() != mesh.buffer()) mesh.back().close();
-            }
-            meshes = null;
-          }
-        };
-    if (RenderSystem.isOnRenderThread()) clear.run();
-    else RenderSystem.recordRenderCall(clear::run);
-  }
-
-  private static void load() {
-    var mc = Minecraft.getInstance();
-    try (var input = mc.getResourceManager().open(Cybernetics2077.id("models/hologram/body.cyh"))) {
-      var model = DiagnosticModel.read(input);
-      var uploaded = new java.util.ArrayList<Uploaded>();
-      try {
-        for (var group : model.groups) {
-          int role = group.role();
-          boolean film =
-              role == 0 || role == 1 || role == 7 || role == 8 || role == 10 || role == 11;
-          var front = upload(group, film, false);
-          var back = film ? upload(group, true, true) : front;
-          uploaded.add(new Uploaded(group, front, back));
-        }
-        VertexBuffer.unbind();
-        uploaded.sort(java.util.Comparator.comparingInt(p -> priority(p.group().role())));
-        meshes = java.util.List.copyOf(uploaded);
-      } catch (RuntimeException e) {
-        for (var part : uploaded) {
-          part.buffer().close();
-          if (part.back() != part.buffer()) part.back().close();
-        }
-        throw e;
-      }
-    } catch (java.io.IOException e) {
-      throw new IllegalStateException("Cannot load Blender cyberware anatomy", e);
-    }
-  }
-
-  private static int priority(int role) {
-    return switch (role) {
-      case 1, 10, 11 -> 0;
-      case 7 -> 1;
-      case 0 -> 2;
-      case 8 -> 3;
-      default -> -1;
-    };
-  }
-
-  private static VertexBuffer upload(DiagnosticModel.Group group, boolean sorted, boolean back) {
-    var d = group.data();
-    int triangles = group.vertices() / 3;
-    long[] order = new long[triangles];
-    for (int i = 0; i < triangles; i++) {
-      float z = (d[i * 24 + 2] + d[i * 24 + 10] + d[i * 24 + 18]) / 3;
-      long key = Float.floatToRawIntBits(z + 2f) & 0xffffffffL;
-      order[i] = sorted ? (key << 32) | (i & 0xffffffffL) : i;
-    }
-    if (sorted) java.util.Arrays.sort(order);
-    var builder =
-        Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.NEW_ENTITY);
-    int tint =
-        0xff000000
-            | ((int) (group.material()[0] * 255) << 16)
-            | ((int) (group.material()[1] * 255) << 8)
-            | (int) (group.material()[2] * 255);
-    for (int t = 0; t < triangles; t++) {
-      int index = (int) order[sorted && !back ? triangles - 1 - t : t];
-      for (int corner = 0; corner < 3; corner++) {
-        int o = index * 24 + corner * 8;
-        builder
-            .addVertex(d[o], d[o + 1], d[o + 2])
-            .setColor(tint)
-            .setUv(d[o + 6], d[o + 7])
-            .setOverlay(OverlayTexture.NO_OVERLAY)
-            .setLight(0xf000f0)
-            .setNormal(d[o + 3], d[o + 4], d[o + 5]);
-      }
-    }
-    var buffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
-    buffer.bind();
-    buffer.upload(builder.buildOrThrow());
-    return buffer;
+    model = null;
   }
 
   public static void draw(
-      GuiGraphics g, CyberwareCategory selected, BodyView view, float alpha, float detail) {
+      GuiGraphics g, CyberwareCategory selected, BodyView view, float alpha, float yaw) {
     if (shader == null) return;
     var mc = Minecraft.getInstance();
-    if (meshes == null) load();
+    if (model == null)
+      model = new PlayerModel<>(mc.getEntityModels().bakeLayer(ModelLayers.PLAYER), false);
     if (target == null) {
-      target = new TextureTarget(768, 1024, true, Minecraft.ON_OSX);
+      target = new TextureTarget(448, 896, true, Minecraft.ON_OSX);
       target.setClearColor(0, 0, 0, 0);
     }
     g.flush();
@@ -188,26 +80,56 @@ public final class HologramRenderer extends RenderStateShard {
       RenderSystem.setProjectionMatrix(
           new Matrix4f()
               .setOrtho(
-                  view.centerX() - view.span() * view.w() / view.h() / 2,
-                  view.centerX() + view.span() * view.w() / view.h() / 2,
+                  view.centerX() - halfWidth(view),
+                  view.centerX() + halfWidth(view),
                   view.centerY() + view.span() / 2,
                   view.centerY() - view.span() / 2,
-                  10,
-                  -10),
+                  -10,
+                  10),
           VertexSorting.ORTHOGRAPHIC_Z);
       RenderSystem.setShaderColor(1, 1, 1, 1);
       RenderSystem.enableDepthTest();
       RenderSystem.enableBlend();
       RenderSystem.defaultBlendFunc();
-      var transform = new Matrix4f().rotateY((float) Math.toRadians(view.yaw()));
-      shader
-          .safeGetUniform("SelectedRegion")
-          .set(selected == null ? -1f : (float) selected.ordinal());
-      shader.safeGetUniform("Detail").set(detail);
-      renderParts(
-          transform, MATERIAL, 0, Math.cos(Math.toRadians(view.yaw())) < 0, selected, detail);
-      renderParts(transform, SHELL, 1, Math.cos(Math.toRadians(view.yaw())) < 0, selected, detail);
-      VertexBuffer.unbind();
+      var pose = new PoseStack();
+      pose.mulPose(com.mojang.math.Axis.YP.rotationDegrees(view.yaw() + yaw));
+      pose.scale(.88f, 1, 1);
+      model.head.xRot = -.025f;
+      model.head.yRot = yaw * .0015f;
+      model.rightArm.zRot = .055f;
+      model.leftArm.zRot = -.055f;
+      model.rightLeg.zRot = .012f;
+      model.leftLeg.zRot = -.012f;
+      var out = BUFFER.getBuffer(MATERIAL);
+      boolean all =
+          selected == CyberwareCategory.SKELETON
+              || selected == CyberwareCategory.INTEGUMENTARY_SYSTEM;
+      boolean head =
+          all
+              || selected == CyberwareCategory.FRONTAL_CORTEX
+              || selected == CyberwareCategory.FACE
+              || selected == CyberwareCategory.NERVOUS_SYSTEM;
+      boolean torso =
+          all
+              || selected == CyberwareCategory.OPERATING_SYSTEM
+              || selected == CyberwareCategory.CIRCULATORY_SYSTEM
+              || selected == CyberwareCategory.NERVOUS_SYSTEM;
+      boolean arms =
+          all || selected == CyberwareCategory.ARMS || selected == CyberwareCategory.HANDS;
+      boolean legs = all || selected == CyberwareCategory.LEGS;
+      model.head.render(
+          pose, out, 0xf000f0, OverlayTexture.NO_OVERLAY, head ? 0xf07ef4ff : 0xbff3a3b5);
+      model.body.render(
+          pose, out, 0xf000f0, OverlayTexture.NO_OVERLAY, torso ? 0xf07ef4ff : 0xbfe68194);
+      model.rightArm.render(
+          pose, out, 0xf000f0, OverlayTexture.NO_OVERLAY, arms ? 0xf07ef4ff : 0xbfba7d9a);
+      model.leftArm.render(
+          pose, out, 0xf000f0, OverlayTexture.NO_OVERLAY, arms ? 0xf07ef4ff : 0xbfba7d9a);
+      model.rightLeg.render(
+          pose, out, 0xf000f0, OverlayTexture.NO_OVERLAY, legs ? 0xf07ef4ff : 0xbf66a7c6);
+      model.leftLeg.render(
+          pose, out, 0xf000f0, OverlayTexture.NO_OVERLAY, legs ? 0xf07ef4ff : 0xbf66a7c6);
+      BUFFER.endBatch();
     } finally {
       mc.getMainRenderTarget().bindWrite(true);
       RenderSystem.setProjectionMatrix(projection, sorting);
@@ -224,7 +146,7 @@ public final class HologramRenderer extends RenderStateShard {
           com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
           com.mojang.blaze3d.platform.GlStateManager.SourceFactor.ONE,
           com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-      RenderSystem.setShader(() -> composite);
+      RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
       RenderSystem.setShaderTexture(0, target.getColorTextureId());
       var b =
           Tesselator.getInstance()
@@ -247,32 +169,9 @@ public final class HologramRenderer extends RenderStateShard {
     }
   }
 
-  private static void renderParts(
-      Matrix4f transform,
-      RenderType type,
-      int pass,
-      boolean back,
-      CyberwareCategory selected,
-      float detail) {
-    type.setupRenderState();
-    try {
-      for (var part : meshes) {
-        int role = part.group().role();
-        boolean film = role == 0 || role == 1 || role == 7 || role == 8 || role == 10 || role == 11;
-        if (role == 2
-            && detail > .001
-            && (selected == CyberwareCategory.NERVOUS_SYSTEM
-                || selected == CyberwareCategory.OPERATING_SYSTEM)) film = true;
-        if (film != (pass == 1)) continue;
-        shader.safeGetUniform("Role").set((float) role);
-        shader.safeGetUniform("Region").set((float) part.group().region());
-        var buffer = back ? part.back() : part.buffer();
-        buffer.bind();
-        buffer.drawWithShader(transform, RenderSystem.getProjectionMatrix(), shader);
-      }
-    } finally {
-      type.clearRenderState();
-    }
+  private static float halfWidth(BodyView view) {
+    // Match the first release's .73 horizontal extent in its original overview viewport.
+    return view.span() * view.w() / view.h() * (1.46f * 830f / (2.28f * 448f)) / 2;
   }
 
   private HologramRenderer() {

@@ -5,7 +5,6 @@ from PIL import Image, ImageDraw
 import math
 root=Path(__file__).resolve().parents[1]/'src/main/resources/assets/cybernetics2077'
 for sub in ['textures/item','textures/block','textures/entity','textures/gui','models/item','models/block','blockstates']:(root/sub).mkdir(parents=True,exist_ok=True)
-Image.new('RGBA',(1,1),'white').save(root/'textures/entity/white.png')
 im=Image.new('RGBA',(32,32));d=ImageDraw.Draw(im)
 d.line([(9,19),(4,23),(4,27),(14,27),(17,23)],fill='#50697e',width=3)
 d.line([(9,19),(4,23),(4,27),(14,27),(17,23)],fill='#8de4e9',width=1)
@@ -39,3 +38,7 @@ for name,color in [('red_glow',(197,34,65)),('cyan_glow',(31,174,194))]:
   for x in range(256):
    r=math.hypot((x-127.5)/128,(y-127.5)/128);px[x,y]=(*color,round(110*max(0,1-r)**2.2))
  im.save(root/f'textures/gui/{name}.png')
+
+# The hologram uses the original first-release diagnostic texture.
+import runpy
+runpy.run_path(str(Path(__file__).with_name("generate-hologram-texture.py")))

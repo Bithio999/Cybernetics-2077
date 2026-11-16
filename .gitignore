@@ -8,6 +8,6 @@ runs/
 __pycache__/
 .DS_Store
 
-# Blender backup files; the editable .blend source is tracked.
+# Local Blender backup files from earlier visual experiments.
 *.blend1
 *.blend2

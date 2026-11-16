@@ -9,8 +9,7 @@ out vec2 texCoord;
 out vec4 vertexColor;
 out vec3 localPosition;
 out vec3 surfaceNormal;
-void main(){
+void main() {
   gl_Position=ProjMat*ModelViewMat*vec4(Position,1.0);
-  texCoord=UV0;vertexColor=Color;localPosition=Position;
-  surfaceNormal=normalize(mat3(ModelViewMat)*Normal);
+  texCoord=UV0;vertexColor=Color;localPosition=Position;surfaceNormal=normalize(Normal);
 }

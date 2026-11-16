@@ -409,7 +409,7 @@ public final class CyberwareClientReview {
       for (int category = 0; category < 10; category++) {
         int at = 600 + category * 20;
         if (ticks == at) {
-          shot("anatomy-" + CyberwareCategory.values()[category].id);
+          shot("category-" + CyberwareCategory.values()[category].id);
           if (category < 9) screen().keyPressed(68, 0, 0);
         }
       }
