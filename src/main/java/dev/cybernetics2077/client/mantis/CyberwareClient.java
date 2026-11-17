@@ -70,7 +70,7 @@ public final class CyberwareClient {
 
   private static long lungeId = Long.MIN_VALUE;
   private static int lungeAge;
-  private static boolean lungeBlocked;
+  private static boolean lungeBlocked, lungeComplete;
 
   /**
    * Used by the local player's travel hook, so ground friction and gravity cannot swallow a leap.
@@ -84,6 +84,7 @@ public final class CyberwareClient {
       lungeId = id;
       lungeAge = 0;
       lungeBlocked = false;
+      lungeComplete = false;
     }
     if (lungeBlocked) return false;
     var path =
@@ -97,6 +98,8 @@ public final class CyberwareClient {
             t.getDouble("arc"),
             t.getInt("ticks"));
     if (lungeAge >= path.ticks()) {
+      lungeBlocked = true;
+      lungeComplete = true;
       player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
       return false;
     }
@@ -107,6 +110,7 @@ public final class CyberwareClient {
     player.resetFallDistance();
     if (player.position().distanceToSqr(before) < .0004 || player.horizontalCollision) {
       lungeBlocked = true;
+      lungeComplete = true;
       player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
     }
     return true;
@@ -172,6 +176,11 @@ public final class CyberwareClient {
       level = m.level;
       chargeHeld = false;
       lungeId = Long.MIN_VALUE;
+      lungeComplete = false;
+    }
+    if (lungeComplete && m.player != null) {
+      lungeComplete = false;
+      PacketDistributor.sendToServer(new CyberwareNetwork.Action(4));
     }
     while (DRAW.consumeClick())
       if (m.player != null && m.screen == null && !ScannerClient.active())
@@ -197,14 +206,16 @@ public final class CyberwareClient {
       p.pushPose();
       // Fixed shoulder anchors extend off the bottom/sides of the view. Convert the canonical
       // player axes into camera axes before applying the SAME joint rig as third person.
-      p.translate(sign * .46, -.50, -.72);
-      p.scale(-.82f, -.82f, .82f);
+      float enter = pose.ready();
+      p.translate(sign * (.65 - .27 * enter), -.58 + .38 * enter, -.62 - .10 * enter);
+      p.scale(-.90f, -.90f, .90f);
       p.mulPose(
           MantisRig.shoulder(
               left,
               m.player.getSkin().model() == net.minecraft.client.resources.PlayerSkin.Model.SLIM,
               pose));
-      MantisMesh.render(p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose);
+      MantisMesh.render(
+          p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose, true);
       p.popPose();
     }
   }

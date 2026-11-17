@@ -3,15 +3,16 @@
 from pathlib import Path
 import json
 import sys
+import struct
 import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.4.1.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.5.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.4.1'
+    assert metadata['mods'][0]['version']=='0.5.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -41,6 +42,9 @@ with ZipFile(jar) as z:
         assert required in names, required
     assert not any(n.endswith(('.blend','.py','.cyh')) or 'DiagnosticModel' in n for n in names), 'Replaced hologram pipeline leaked into release'
     assert 'assets/cybernetics2077/textures/entity/diagnostic.png' not in names, 'Diagnostic placeholder skin still shipped'
+    for icon in ('optical_scanner','cyberdeck_tier_1','mantis_claws_tier_1','short_circuit_tier_1'):
+        png=z.read('assets/cybernetics2077/textures/item/'+icon+'.png')
+        assert struct.unpack('>II',png[16:24]) == (32,32), 'Equipment sprite is not 32px pixel art: '+icon
     for mixin in json.loads(z.read('cybernetics2077.mixins.json'))['client']:
         assert 'dev/cybernetics2077/mixin/client/'+mixin+'.class' in names
 print(f'PASS: standalone metadata, classes, resource parity, JSON, font license, no review fixtures: {jar.name}')

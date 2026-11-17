@@ -159,7 +159,7 @@ public final class CombatGameTests {
     CyberwareRuntime.action(p, 1);
     h.assertTrue(!CyberwareRuntime.state(p).pendingHit, "Attack during deployment allowed");
     h.runAfterDelay(
-        25,
+        31,
         () -> {
           CyberwareRuntime.action(p, 1);
           h.assertTrue(
@@ -221,6 +221,42 @@ public final class CombatGameTests {
     CyberwareRuntime.tick(p);
     h.assertTrue(
         s.lunge == null && !s.deployed && !s.pendingHit, "Unequip failed to cancel leap/contact");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void viewerOpensInstalledDeckAndRejectsMissingDeckAndCarriedStack(
+      GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    var menu = CyberwareMenu.server(1, p.getInventory());
+    h.assertTrue(!menu.clickMenuButton(p, 0), "Missing deck opened a chip editor");
+    install(p);
+    menu.setCarried(new ItemStack(Items.DIAMOND));
+    h.assertTrue(!menu.clickMenuButton(p, 0), "Carried item was lost through menu transition");
+    menu.setCarried(ItemStack.EMPTY);
+    h.assertTrue(!menu.clickMenuButton(p, 99), "Unknown viewer button accepted");
+    h.assertTrue(
+        menu.clickMenuButton(p, 0), "Installed deck was not available from cyberware viewer");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void leapSurvivesDelayedMovementAndCompletionCancelsIt(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    install(p);
+    p.getInventory().clearContent();
+    var s = CyberwareRuntime.state(p);
+    s.deployed = true;
+    s.lunge =
+        new CyberwareRuntime.Lunge(
+            null,
+            new LungePath(p.getX(), p.getY(), p.getZ(), p.getX(), p.getY(), p.getZ() + 6, .65, 7),
+            p.serverLevel().getGameTime() - 20);
+    CyberwareRuntime.tick(p);
+    h.assertTrue(s.lunge != null, "Delayed client movement was cancelled before acknowledgement");
+    CyberwareRuntime.action(p, 4);
+    CyberwareRuntime.tick(p);
+    h.assertTrue(s.lunge == null && !s.pendingHit, "Client completion failed to finish leap");
     h.succeed();
   }
 }

@@ -16,6 +16,25 @@ public final class CyberdeckScreen extends AbstractContainerScreen<CyberdeckMenu
   }
 
   @Override
+  protected void init() {
+    super.init();
+    addRenderableWidget(
+        new CyberActionButton(
+            leftPos + 12, topPos + 9, 26, 20, Component.literal("<"), this::onClose));
+  }
+
+  @Override
+  public void onClose() {
+    if (!menu.getCarried().isEmpty()) {
+      super.onClose();
+      return;
+    }
+    CyberwareScreen.returnToOperatingSystem = true;
+    net.neoforged.neoforge.network.PacketDistributor.sendToServer(
+        dev.cybernetics2077.network.OpenCyberware.INSTANCE);
+  }
+
+  @Override
   public void render(GuiGraphics g, int x, int y, float partial) {
     super.render(g, x, y, partial);
     renderTooltip(g, x, y);
@@ -29,7 +48,7 @@ public final class CyberdeckScreen extends AbstractContainerScreen<CyberdeckMenu
     try {
       var c = new CyberCanvas(g, 1);
       c.panel(0, 0, 276, 219, 8, 0xfb080e19, 0xffb44b59);
-      c.glowText("CYBERDECK", 12, 9, 20, 0xffef6b77);
+      c.glowText("QUICKHACKS", 46, 9, 20, 0xffef6b77);
       c.right("TIER 1", 263, 15, 11, 0xffd2e8e9);
       c.line(12, 35, 264, 35, 1, 0xff693642);
       c.tracked("RAM", 15, 48, 9, 0xff70e1ee, .5f);

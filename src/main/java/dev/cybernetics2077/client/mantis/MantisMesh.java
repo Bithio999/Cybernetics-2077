@@ -52,6 +52,17 @@ public final class MantisMesh {
       AbstractClientPlayer player,
       boolean left,
       MantisMotion.Pose motion) {
+    render(p, buffers, light, player, left, motion, false);
+  }
+
+  public static void render(
+      PoseStack p,
+      MultiBufferSource buffers,
+      int light,
+      AbstractClientPlayer player,
+      boolean left,
+      MantisMotion.Pose motion,
+      boolean firstPerson) {
     boolean slim = player.getSkin().model() == PlayerSkin.Model.SLIM;
     float width = slim ? 3 / 16f : 4 / 16f;
     var local = source(player.getSkin().texture());
@@ -64,7 +75,7 @@ public final class MantisMesh {
         left
             ? net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE
             : net.minecraft.world.entity.player.PlayerModelPart.RIGHT_SLEEVE;
-    for (int layer = 0; layer < 2; layer++) {
+    for (int layer = 0; !firstPerson && layer < 2; layer++) {
       if (layer == 1 && !player.isModelPartShown(sleeveFlag)) continue;
       float inflate = layer == 0 ? 0 : .016f;
       int U = layer == 0 ? u : left ? 48 : 40, V = layer == 0 ? v : left ? 48 : 32;
@@ -76,7 +87,7 @@ public final class MantisMesh {
           -.125f - inflate,
           -.125f - inflate,
           width / 2 + inflate,
-          .1875f,
+          .25f,
           .125f + inflate,
           U,
           V,
@@ -84,163 +95,314 @@ public final class MantisMesh {
           true,
           true);
     }
-    cylinder(p, metal, light, 0, MantisRig.ELBOW_Y, 0, .113f, width * .96f, 0xff5c6970);
+    // Skin-covered upper/lower halves meet at a true central elbow, without a detached ball joint.
     p.pushPose();
     p.mulPose(MantisRig.elbow(motion));
-
     for (int layer = 0; layer < 2; layer++) {
       if (layer == 1 && !player.isModelPartShown(sleeveFlag)) continue;
-      float inflate = layer == 0 ? 0 : .016f;
+      float inf = layer == 0 ? 0 : .016f;
       int U = layer == 0 ? u : left ? 48 : 40, V = layer == 0 ? v : left ? 48 : 32;
       skinBox(
           p,
           skin,
           light,
-          -width / 2 - inflate,
-          .4375f,
-          -.125f - inflate,
-          width / 2 + inflate,
-          .625f + inflate,
-          .125f + inflate,
+          -width / 2 - inf,
+          .50f,
+          -.125f - inf,
+          width / 2 + inf,
+          .625f + inf,
+          .125f + inf,
           U,
           V,
           width,
           false,
           true);
-      // Inner half stays anchored; the outside half becomes the hinged hatch.
       skinBox(
           p,
           skin,
           light,
-          side < 0 ? 0 : -width / 2 - inflate,
-          .1875f,
-          -.125f - inflate,
-          side < 0 ? width / 2 + inflate : 0,
-          .4375f,
-          .125f + inflate,
+          side < 0 ? 0 : -width / 2 - inf,
+          .25f,
+          -.125f - inf,
+          side < 0 ? width / 2 + inf : 0,
+          .50f,
+          .125f + inf,
           U,
           V,
           width,
           false,
           false);
-      p.pushPose();
-      p.translate(side * .025f * motion.panels(), .1875f, 0);
-      p.mulPose(Axis.ZP.rotationDegrees(-side * motion.panels() * 32));
-      p.translate(0, -.1875f, 0);
-      skinBox(
-          p,
-          skin,
-          light,
-          side < 0 ? -width / 2 - inflate : 0,
-          .1875f,
-          -.125f - inflate,
-          side < 0 ? 0 : width / 2 + inflate,
-          .4375f,
-          .125f + inflate,
-          U,
-          V,
-          width,
-          false,
-          false);
-      if (layer == 0) {
-        // Recessed inner metal of the casing, plus small ceramic edge fasteners.
-        box(p, metal, light, -.003f, .192f, -.119f, .003f, .433f, .119f, 0xff41525b);
-        for (int k = 0; k < 4; k++) {
-          float xx = side * (width / 2 + .004f);
+      for (int plate = 0; plate < 2; plate++) {
+        float y = .25f + plate * .125f;
+        p.pushPose();
+        p.translate(side * width * .46f, y, 0);
+        p.mulPose(Axis.YP.rotationDegrees(side * motion.panels() * (plate == 0 ? 95 : 110)));
+        p.translate(-side * width * .46f, -y, 0);
+        skinBox(
+            p,
+            skin,
+            light,
+            side < 0 ? -width / 2 - inf : width / 2 - .025f,
+            y,
+            -.125f - inf,
+            side < 0 ? -width / 2 + .025f : width / 2 + inf,
+            y + .125f,
+            .125f + inf,
+            U,
+            V,
+            width,
+            false,
+            false);
+        if (layer == 0) {
+          float inner = side * (width / 2 - .026f);
           box(
               p,
               metal,
               light,
-              xx - .008f,
-              .222f + k * .05f,
-              -.102f,
-              xx + .008f,
-              .234f + k * .05f,
-              -.087f,
-              0xffbfc5bb);
-          box(
-              p,
-              metal,
-              light,
-              xx - .008f,
-              .222f + k * .05f,
-              .087f,
-              xx + .008f,
-              .234f + k * .05f,
-              .102f,
-              0xffbfc5bb);
+              inner - .003f,
+              y + .006f,
+              -.108f,
+              inner + .003f,
+              y + .119f,
+              .108f,
+              0xff3e4c51);
+          for (int k = 0; k < 3; k++) {
+            float xx = side * width * .43f;
+            box(
+                p,
+                metal,
+                light,
+                xx - .009f,
+                y + .014f + k * .034f,
+                -.13f,
+                xx + .009f,
+                y + .025f + k * .034f,
+                -.115f,
+                0xffd1d6c5);
+          }
         }
+        p.popPose();
       }
-      p.popPose();
     }
-    // The exposed lateral rail replaces the skin-covered interior of the opened hatch.
-    box(
-        p,
-        metal,
-        light,
-        side < 0 ? -.035f : -.004f,
-        .195f,
-        -.108f,
-        side < 0 ? .004f : .035f,
-        .432f,
-        .108f,
-        0xff28373f);
-    // Cuff joint, sliding carriage and external piston only emerge once the skin panels separate.
-    float open = motion.panels();
-    if (open > .005) {
-      p.pushPose();
-      // Mirrored lateral mount: local -Z becomes the OUTER side of the actual arm.
-      p.mulPose(Axis.YP.rotationDegrees(side < 0 ? 90 : -90));
-      p.translate(0, 0, -.085 * open);
-      cylinder(p, metal, light, 0, .25f, -.075f, .073f, .17f, 0xffa29167);
-      cylinder(p, metal, light, 0, .25f, -.075f, .043f, .184f, 0xff252f38);
-      box(p, metal, light, -.075f, .285f, -.12f, .075f, .43f, -.045f, 0xffa6aeac);
-      box(p, metal, light, -.022f, .32f, -.142f, .022f, .52f, -.095f, 0xff454f57);
-      for (int k = 0; k < 7; k++)
-        box(
-            p,
-            metal,
-            light,
-            -.045f,
-            .31f + k * .027f,
-            -.127f,
-            .045f,
-            .316f + k * .027f,
-            -.119f,
-            0xffe0dfd2);
-      for (int k = -1; k <= 1; k += 2) {
-        box(
-            p,
-            metal,
-            light,
-            k * .072f - .012f,
-            .25f,
-            -.055f,
-            k * .072f + .012f,
-            .55f,
-            -.033f,
-            0xff647478);
-        box(
-            p,
-            metal,
-            light,
-            k * .072f - .007f,
-            .38f,
-            -.061f,
-            k * .072f + .007f,
-            .595f,
-            -.04f,
-            0xffc9d4d3);
-      }
-      box(p, metal, 0xf000f0, -.027f, .36f, -.148f, .027f, .369f, -.142f, 0xffef6552);
-      p.translate(0, .38, -.125);
-      p.mulPose(Axis.XP.rotationDegrees(160 * (1 - motion.blade()) - 12));
-      p.scale(1, .035f + .965f * motion.blade(), 1);
-      blade(p, metal, light, left);
-      p.popPose();
-    }
+    if (motion.panels() > .002f) mechanism(p, metal, light, width, side, motion, left);
     p.popPose();
     local.endBatch();
+  }
+
+  /** Open cavity, two sliding rails, exposed wiring and a folding external parallelogram. */
+  private static void mechanism(
+      PoseStack p,
+      VertexConsumer out,
+      int light,
+      float width,
+      float side,
+      MantisMotion.Pose m,
+      boolean left) {
+    float open = m.panels(), extension = m.extension();
+    // A recessed floor and perimeter rails leave the front OPEN; a closed box hid the internals.
+    box(p, out, light, -.085f, .252f, -.106f, .085f, .496f, -.081f, 0xff1e2e35);
+    for (int k = -1; k <= 1; k += 2)
+      box(
+          p,
+          out,
+          light,
+          k * .078f - .007f,
+          .252f,
+          -.081f,
+          k * .078f + .007f,
+          .496f,
+          .085f,
+          0xff465860);
+    box(p, out, light, -.063f, .273f, -.079f, .063f, .465f, -.059f, 0xff2f5b55);
+    for (int chip = 0; chip < 3; chip++) {
+      float y = .283f + chip * .057f;
+      box(p, out, light, -.022f, y, -.06f, .022f, y + .035f, -.047f, 0xff192b32);
+      for (int pin = 0; pin < 3; pin++) {
+        float yy = y + .004f + pin * .011f;
+        box(p, out, light, -.031f, yy, -.059f, .031f, yy + .004f, -.052f, 0xffc1a667);
+      }
+      box(p, out, light, -.043f, y + .012f, -.061f, -.034f, y + .023f, -.043f, 0xff93d5c3);
+    }
+    box(
+        p,
+        out,
+        light,
+        side < 0 ? -.095f : .045f,
+        .269f,
+        -.084f,
+        side < 0 ? -.045f : .095f,
+        .478f,
+        .084f,
+        0xff314c51);
+    for (int k = -1; k <= 1; k += 2) {
+      rod(
+          p,
+          out,
+          light,
+          side * .07f,
+          .26f,
+          k * .084f,
+          side * .07f,
+          .49f,
+          k * .084f,
+          .009f,
+          0xffbac6bf);
+      rod(
+          p,
+          out,
+          light,
+          side * .09f,
+          .28f,
+          k * .061f,
+          side * (.13f + .05f * open),
+          .46f,
+          k * .061f,
+          .013f,
+          0xff515e62);
+      rod(
+          p,
+          out,
+          light,
+          side * .09f,
+          .28f,
+          k * .061f,
+          side * (.13f + .05f * open),
+          .44f,
+          k * .061f,
+          .005f,
+          0xffd8ddd2);
+    }
+    for (int k = 0; k < 6; k++) {
+      float y = .277f + k * .033f;
+      box(
+          p,
+          out,
+          light,
+          side < 0 ? -.103f : .075f,
+          y,
+          -.045f,
+          side < 0 ? -.075f : .103f,
+          y + .016f,
+          .045f,
+          0xff8b957e);
+      box(
+          p,
+          out,
+          light,
+          side < 0 ? -.109f : .10f,
+          y + .004f,
+          -.025f,
+          side < 0 ? -.10f : .109f,
+          y + .009f,
+          .025f,
+          k % 2 == 0 ? 0xff97c6ba : 0xffd1b86e);
+    }
+    for (int wire = 0; wire < 5; wire++) {
+      float lastX = side * .07f, lastY = .27f, lastZ = -.075f + wire * .035f;
+      int color = new int[] {0xff913e37, 0xff3e6c72, 0xffb6a05b, 0xff233138, 0xff9eaaa4}[wire];
+      for (int j = 1; j <= 7; j++) {
+        float t = j / 7f,
+            x = side * (.07f + .10f * open * t + .024f * (float) Math.sin(t * Math.PI));
+        float y = .27f + .21f * t,
+            z = -.075f + wire * .035f + .025f * (float) Math.sin(t * Math.PI);
+        rod(p, out, light, lastX, lastY, lastZ, x, y, z, .0035f, color);
+        lastX = x;
+        lastY = y;
+        lastZ = z;
+      }
+    }
+    // Side-mounted hinge: its cylinder axis runs across the forearm, not through the fist.
+    p.pushPose();
+    p.translate(side * (width / 2 + .016 + .05 * open), .365, 0);
+    cylinder(p, out, light, 0, 0, 0, .058f, .16f, 0xff8b7955);
+    cylinder(p, out, light, 0, 0, 0, .034f, .177f, 0xff223139);
+    cylinder(p, out, light, 0, 0, 0, .012f, .186f, 0xffc7cbbd);
+    p.mulPose(Axis.XP.rotationDegrees(148 * (1 - m.blade()) - 30));
+    // Fixed outer guide, with a visibly translating chrome inner guide; no geometry is scaled.
+    for (int k = -1; k <= 1; k += 2) {
+      box(p, out, light, k * .052f - .017f, 0, -.029f, k * .052f + .017f, .31f, .029f, 0xff3e4d54);
+      box(
+          p,
+          out,
+          light,
+          k * .052f - .008f,
+          .20f,
+          -.013f,
+          k * .052f + .008f,
+          .35f + .30f * extension,
+          .013f,
+          0xffc0cbc6);
+      box(
+          p,
+          out,
+          light,
+          k * .052f - .012f,
+          .29f + .30f * extension,
+          -.021f,
+          k * .052f + .012f,
+          .35f + .30f * extension,
+          .021f,
+          0xff7c8e90);
+    }
+    box(p, out, light, -.032f, .06f, -.039f, .032f, .235f, .039f, 0xffa2966d);
+    for (int k = 0; k < 6; k++)
+      box(
+          p,
+          out,
+          light,
+          -.035f,
+          .08f + k * .025f,
+          -.044f,
+          .035f,
+          .086f + k * .025f,
+          -.038f,
+          0xff26343b);
+    rod(p, out, light, 0, .10f, .047f, 0, .37f + .30f * extension, .047f, .011f, 0xff3a484e);
+    rod(p, out, light, 0, .20f, .047f, 0, .37f + .30f * extension, .047f, .005f, 0xffe0dfc9);
+    p.translate(0, .35 + .30 * extension, 0);
+    cylinder(p, out, light, 0, 0, 0, .041f, .16f, 0xff9eaa9f);
+    box(p, out, light, -.061f, -.027f, -.034f, .061f, .075f, .034f, 0xff34434a);
+    // Cutting assembly has its own hinge and a constant-size machined profile.
+    p.mulPose(Axis.XP.rotationDegrees(-12 * m.blade()));
+    blade(p, out, light, left);
+    p.popPose();
+  }
+
+  private static void rod(
+      PoseStack p,
+      VertexConsumer out,
+      int light,
+      float x,
+      float y,
+      float z,
+      float X,
+      float Y,
+      float Z,
+      float radius,
+      int color) {
+    var delta = new Vector3f(X - x, Y - y, Z - z);
+    float length = delta.length();
+    if (length < .00001f) return;
+    p.pushPose();
+    p.translate(x, y, z);
+    p.mulPose(new org.joml.Quaternionf().rotationTo(new Vector3f(0, 1, 0), delta.div(length)));
+    for (int k = 0; k < 8; k++) {
+      float a = k * (float) Math.PI / 4, b = (k + 1) * (float) Math.PI / 4;
+      float ax = (float) Math.cos(a) * radius,
+          az = (float) Math.sin(a) * radius,
+          bx = (float) Math.cos(b) * radius,
+          bz = (float) Math.sin(b) * radius;
+      quad(
+          p,
+          out,
+          light,
+          new float[] {ax, 0, az},
+          new float[] {bx, 0, bz},
+          new float[] {bx, length, bz},
+          new float[] {ax, length, az},
+          color);
+    }
+    p.popPose();
   }
 
   private static void blade(PoseStack p, VertexConsumer out, int light, boolean left) {
@@ -253,10 +415,10 @@ public final class MantisMesh {
           p,
           out,
           light,
-          new float[] {mirror * a[0], a[1], -.010f},
-          new float[] {mirror * b[0], b[1], -.010f},
-          new float[] {mirror * b[0], b[1], .010f},
-          new float[] {mirror * a[0], a[1], .010f},
+          new float[] {mirror * a[0], a[1] * .80f, -.010f},
+          new float[] {mirror * b[0], b[1] * .80f, -.010f},
+          new float[] {mirror * b[0], b[1] * .80f, .010f},
+          new float[] {mirror * a[0], a[1] * .80f, .010f},
           0xffedf3ef);
       for (int side : new int[] {-1, 1}) {
         float z = side * .010f;
@@ -264,28 +426,62 @@ public final class MantisMesh {
             p,
             out,
             light,
-            new float[] {mirror * a[0], a[1], z},
-            new float[] {mirror * b[0], b[1], z},
-            new float[] {mirror * .025f, .61f, side * .032f},
-            new float[] {mirror * .025f, .61f, side * .032f},
+            new float[] {mirror * a[0], a[1] * .80f, z},
+            new float[] {mirror * b[0], b[1] * .80f, z},
+            new float[] {mirror * .025f, .49f, side * .032f},
+            new float[] {mirror * .025f, .49f, side * .032f},
             side < 0 ? 0xffaebbbd : 0xff72838b);
       }
     }
-    // Narrow fuller, serrated heel and a gold maker plate.
-    box(p, out, light, -.013f, .12f, -.035f, .019f, .72f, -.031f, 0xff34444e);
+    // Raised spine, recessed vent insets, long machined fuller and graduated edge etching.
+    for (int face : new int[] {-1, 1}) {
+      float z = face * .034f;
+      box(p, out, light, -.019f, .12f, z - .002f, .021f, 1.02f, z + .002f, 0xff31434b);
+      for (int i = 0; i < 9; i++) {
+        float yy = .18f + i * .065f, xx = mirror * (.055f + .025f * (float) Math.sin(yy * 2));
+        box(
+            p,
+            out,
+            light,
+            xx - .022f,
+            yy,
+            z - .003f,
+            xx + .022f,
+            yy + .028f,
+            z + .003f,
+            0xff25353c);
+        box(p, out, light, xx - .02f, yy, z - .004f, xx + .02f, yy + .004f, z + .004f, 0xffbbc7c4);
+      }
+      for (int i = 0; i < 3; i++) {
+        float yy = .09f + i * .055f;
+        box(p, out, light, -.042f, yy, z - .005f, -.024f, yy + .015f, z + .005f, 0xffc1af78);
+      }
+      box(p, out, light, -.01f, .08f, z - .004f, .043f, .15f, z + .004f, 0xffa99561);
+      for (int i = 0; i < 4; i++)
+        box(
+            p,
+            out,
+            light,
+            .003f + i * .009f,
+            .095f,
+            z - .005f,
+            .007f + i * .009f,
+            .129f,
+            z + .005f,
+            0xff2c3d45);
+    }
     for (int i = 0; i < 8; i++)
       box(
           p,
           out,
           light,
-          -.055f,
-          .13f + i * .031f,
+          -.064f,
+          .17f + i * .036f,
           -.015f,
-          -.037f,
-          .142f + i * .031f,
+          -.047f,
+          .185f + i * .036f,
           .015f,
-          0xffd0d6ce);
-    box(p, out, light, -.035f, .055f, -.022f, .037f, .14f, .022f, 0xffab9c72);
+          0xffcbd6cb);
   }
 
   private static void cylinder(

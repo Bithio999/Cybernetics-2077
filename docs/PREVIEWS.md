@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.4.1. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, attributed Cyberpunk icons and chip-shaped quickhack/upload display.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.5.0. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons independent hatch/hinge/carriage deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -41,3 +41,15 @@ The review switches the local player's loaded skin to Minecraft's built-in Steve
 ![Connected arm during a cut](images/mantis-cut.png)
 
 These are native Minecraft captures. The forearm hatch and mechanism open from the **outer side** of each arm. Player skin and sleeve pixels follow the articulated panels; the blade has a tapered mesh, separate bevels, fuller, serrated heel and articulated hinge.
+
+## Quickhack management
+
+[Watch quickhack editing from the cyberware menu](media/quickhack-management.mp4)
+
+Select your installed Operating System, then **Manage Quickhacks**. Implant installation stays at the bench.
+
+![Quickhack action on the OS page](images/cyberware-quickhack-entry.png)
+
+![Server-backed quickhack loadout editor](images/cyberware-quickhack-editor.png)
+
+![32px equipment sprites](images/equipment-icons.png)

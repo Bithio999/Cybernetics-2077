@@ -9,7 +9,7 @@ public final class CyberwareInventoryButton extends AbstractButton {
   private final Runnable press;
 
   public CyberwareInventoryButton(Runnable press) {
-    super(0, 0, 18, 20, Component.translatable("cybernetics2077.button.open"));
+    super(0, 0, 20, 28, Component.translatable("cybernetics2077.button.open"));
     this.press = press;
   }
 
@@ -29,16 +29,26 @@ public final class CyberwareInventoryButton extends AbstractButton {
     CyberBatch.begin();
     try {
       g.pose().pushPose();
-      g.pose().translate(getX() + 18, getY(), 0);
+      g.pose().translate(getX() + 20, getY(), 0);
       g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(90));
       var c = new CyberCanvas(g, active ? 1 : .4f);
-      var p = Geometry.panel(0, 0, 20, 18, 3);
-      c.shape(
-          p,
-          isHoveredOrFocused() ? 0xf0431720 : 0xed180f19,
-          isHoveredOrFocused() ? 0xff6ee9f5 : 0xffd24651);
-      if (isHoveredOrFocused()) c.halo(p, 0xffef5361);
-      float x = 10, y = 9;
+      var p =
+          java.util.List.of(
+              new Geometry.Point(0, 0),
+              new Geometry.Point(28, 0),
+              new Geometry.Point(28, 15),
+              new Geometry.Point(23, 20),
+              new Geometry.Point(5, 20),
+              new Geometry.Point(0, 15));
+      c.shape(p, isHoveredOrFocused() ? 0xff43202b : 0xff211722, 0);
+      // The open side overlaps the inventory by two pixels; no gap or detached border.
+      for (int k = 1; k < p.size(); k++) {
+        var a = p.get(k);
+        var b = p.get((k + 1) % p.size());
+        c.line(a.x(), a.y(), b.x(), b.y(), .8f, isHoveredOrFocused() ? 0xff6ee9f5 : 0xffd24651);
+      }
+
+      float x = 14, y = 10;
       c.rect(x - 4, y - 4, 8, 8, 0x204ac8db);
       c.stroke(
           java.util.List.of(

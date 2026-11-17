@@ -240,6 +240,11 @@ public final class CyberwareClientReview {
             .map(c -> (CyberwareInventoryButton) c)
             .findFirst()
             .orElseThrow();
+    if (mc.screen
+            instanceof
+            net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?> inventory
+        && button.getX() + button.getWidth() != inventory.getGuiLeft() + 2)
+      throw new IllegalStateException("Inventory tab detached from inventory edge");
     click(button.getX() + 10, button.getY() + 9);
   }
 

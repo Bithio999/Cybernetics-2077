@@ -10,7 +10,7 @@ The Minecraft rig keeps the shoulder attached to the body. The upper arm and for
 - [Gamestegy: Mantis Blades](https://gamestegy.com/cyberpunk-2077/wiki/994/mantis-blades): arm-system placement and original item icon.
 - [PowerPyx: Mantis Blades](https://www.powerpyx.com/cyberpunk-2077-mantis-blades-location/): reviewed article and screenshots for installation, drawing, slashes and held/released heavy leaps. This is a pre-2.0 guide, not a source for current acquisition or damage values.
 
-The mod's heavy attack acquires a visible target within **8 blocks** and follows a short arcing leap using Minecraft collision movement, including when released in midair. Damage occurs at contact. Minecraft controls remain **G** to draw, left-click to slash, and held/released right-click to charge. Those controls and the range are Minecraft adaptations.
+The mod's heavy attack acquires a visible target within **8 blocks**; without one it leaps **6 blocks** in the look direction. Both use short arcing Minecraft collision movement, including when released in midair. Damage occurs at contact. Minecraft controls remain **G** to draw, left-click to slash, and held/released right-click to charge. Those controls and the range are Minecraft adaptations.
 
 ## Scanner
 
@@ -24,7 +24,15 @@ The eye enables scanning; a loaded cyberdeck enables hacking. Server checks cove
 
 ## Icons and attribution
 
-The four implant/program icons now use Cyberpunk 2077 artwork hosted by Gamestegy, credited to **CD PROJEKT RED**. Exact asset URLs and SHA-256 hashes are recorded in [the source manifest](../../art/cyberpunk-icons/sources.json). The preparation script crops transparent margins and adds a transparent square border without stretching the artwork. These icons are referenced game artwork, not original mod drawings. The mod's arm meshes, interface geometry, category glyphs and workstation textures are original.
+The production icons are now **original 32×32 pixel art**, with restrained colour clusters, dark outlines and no smoothing. The Kiroshi optic, Parallel deck, folded Mantis assembly and Short Circuit program keep recognizable silhouettes while fitting Minecraft. Earlier high-detail source artwork is no longer used. Research asset URLs remain in [the reference manifest](../../art/cyberpunk-icons/sources.json); downloaded icon PNGs have been removed from the current source tree.
+
+## Mechanical presentation
+
+For this revision the uploaded physical-blade sequence at **8.3–10.4 seconds** was sampled at six frames per second, in addition to the broader attack review. It shows the side cavity, articulated linkage, blade extension and brief crossed inspection pose. The new model separates the two hatch plates, folding hinge and translating chrome guide. The cutting mesh remains constant size; deployment no longer scales it. Retraction reverses the channels so the guide slides back before the hinge folds and the skin closes. A brief inspection motion transitions into the guard.
+
+The first-person mesh shows the forearms and hands while omitting the obstructing upper-arm geometry. Third person retains the complete connected arm, with its elbow at the middle of Minecraft's twelve-pixel arm. The exposed cavity contains recessed circuitry, five curved wire bundles, actuator sleeves, guide rails and fasteners. The blade adds separate spine, bevel, vent insets, serrations and maker plate. This is a custom Minecraft mesh, not an extracted game model.
+
+The cyberware inventory tab overlaps the inventory border by two GUI pixels and leaves its joining edge open. It is repositioned from the current inventory origin each render, including recipe-book shifts. The Operating System page can open the same native, server-backed chip editor as the bench; implant installation still requires the bench. Server guards retain deck identity, duplicate-program rejection and cursor safety. Leap completion follows the ordinary client position packet, with a bounded server timeout to tolerate slow frames; damage still requires server-side reach and line of sight.
 
 Fandom and wiki.gg pages were inaccessible. YouTube itself was unavailable; the uploaded MP4 and accessible community-hosted MP4 were used. No blocked page or inaccessible video was treated as reviewed. Full reference videos are not redistributed in the mod.
 

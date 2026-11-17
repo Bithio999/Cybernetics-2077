@@ -24,7 +24,7 @@ ID: `cybernetics2077:optical_scanner`
 
 **4 RAM · 2 quickhack slots · regenerates 1 RAM per 5 seconds**
 
-Install the deck in the bench’s **OS** socket. Press **Cyberdeck** in the bench menu to manage chips. Shift-click a chip to install it, or move it into a quickhack socket. Only one copy of each program can be installed. Removing the deck preserves its chips; removing the deck or program cancels pending uploads and refunds their reserved RAM.
+Install the deck in the bench’s **OS** socket. Select the installed deck under **Operating System** in the inventory cyberware menu, then press **Manage Quickhacks**. The back arrow returns to the same Operating System page. The bench also has a **Cyberdeck** shortcut. Shift-click a chip to install it, or move it into a quickhack socket. Only one copy of each program can be installed. Removing the deck preserves its chips; removing the deck or program cancels pending uploads and refunds their reserved RAM.
 
 ID: `cybernetics2077:cyberdeck_tier_1`
 
@@ -61,7 +61,7 @@ Install in **Arms**, empty both hands, and press **G** to deploy or retract the 
 | Left-click | Alternating right/left slash, then rising cut | 8 / 8 / 10 | 0.5 seconds |
 | Hold right-click ≥0.4 seconds, release | Charged double-blade lunge | 14 | 1.1 seconds |
 
-Deployment takes **1.2 seconds**. Damage lands on the animated contact frame and requires aim, range and line of sight. Aim at a visible living target within **8 blocks** for a leap, including from midair. The leap follows a short arc, stops at solid obstacles and deals damage at contact. Without a target it performs a heavy slash in place. Holding an item retracts the claws. Keys can be rebound under **Options → Controls → Cybernetics 2077**.
+Deployment takes **1.5 seconds**: the arm rises, the two skin panels open, the hinge unfolds, and the chrome carriage extends. Retraction reverses those stages. Damage lands on the animated contact frame and requires aim, range and line of sight. Aim at a visible living target within **8 blocks** to leap toward it, including from midair. With no target, leap **6 blocks in the direction you are looking**. Both use normal collision and stop at solid obstacles. Aimed leaps deal damage at contact; free leaps can hit an enemy at their endpoint. Holding an item retracts the claws. Keys can be rebound under **Options → Controls → Cybernetics 2077**.
 
 ID: `cybernetics2077:mantis_claws_tier_1`
 

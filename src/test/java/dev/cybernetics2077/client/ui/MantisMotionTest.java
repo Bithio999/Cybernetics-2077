@@ -10,18 +10,34 @@ final class MantisMotionTest {
   @Test
   void panelsOpenBeforeBladeAndRetractionReturnsToClosed() {
     var beginning = MantisMotion.sample(true, 0, 100, 0, false, 0, false);
-    var opened = MantisMotion.sample(true, 24, 100, 0, false, 0, false);
-    var closed = MantisMotion.sample(false, 24, 100, 0, false, 0, false);
+    var opened = MantisMotion.sample(true, CombatRules.DEPLOY, 100, 0, false, 0, false);
+    var closed = MantisMotion.sample(false, CombatRules.DEPLOY, 100, 0, false, 0, false);
     assertEquals(0, beginning.panels());
     assertEquals(0, beginning.blade());
     assertEquals(1, opened.panels());
     assertEquals(1, opened.blade());
     assertEquals(0, closed.panels());
     assertEquals(0, closed.blade());
-    for (float t = 0; t < 24; t += .05f) {
+    for (float t = 0; t < CombatRules.DEPLOY; t += .05f) {
       var pose = MantisMotion.sample(true, t, 100, 0, false, 0, false);
       assertTrue(pose.panels() >= pose.blade());
     }
+  }
+
+  @Test
+  void carriageExtendsAfterHingeAndRetractsBeforeHatchesClose() {
+    for (float age = 0; age <= CombatRules.DEPLOY; age += .125f) {
+      var a = MantisMotion.sample(true, age, 100, 0, false, 0, false);
+      var b = MantisMotion.sample(false, CombatRules.DEPLOY - age, 100, 0, false, 0, false);
+      assertEquals(a.panels(), b.panels(), .00001);
+      assertEquals(a.blade(), b.blade(), .00001);
+      assertEquals(a.extension(), b.extension(), .00001);
+      assertTrue(a.panels() >= a.blade());
+      assertTrue(a.blade() >= a.extension());
+      assertTrue(a.elbow() >= -65 && a.elbow() <= 0);
+    }
+    assertEquals(0, MantisMotion.sample(true, 8, 100, 0, false, 0, false).extension());
+    assertEquals(1, MantisMotion.sample(true, 30, 100, 0, false, 0, false).extension());
   }
 
   @Test
@@ -38,7 +54,7 @@ final class MantisMotionTest {
         }
       }
     assertNotEquals(0, MantisMotion.sample(true, 100, 4, 0, false, 0, false).roll());
-    assertEquals(0, MantisMotion.sample(true, 100, 4, 0, false, 0, true).roll());
+    assertEquals(0, MantisMotion.sample(true, 100, 4, 0, false, 0, true).roll(), .00001);
     assertNotEquals(0, MantisMotion.sample(true, 100, 4, 1, false, 0, true).roll());
   }
 

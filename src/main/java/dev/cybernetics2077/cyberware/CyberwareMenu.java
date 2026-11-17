@@ -89,6 +89,26 @@ public final class CyberwareMenu extends AbstractContainerMenu {
     return player.isAlive();
   }
 
+  @Override
+  public boolean clickMenuButton(Player player, int button) {
+    if (button != 0
+        || !stillValid(player)
+        || !getCarried().isEmpty()
+        || !(player instanceof net.minecraft.server.level.ServerPlayer server)) return false;
+    var deck =
+        player
+            .getData(Cybernetics2077.CYBERWARE)
+            .getStackInSlot(CyberwareCategory.OPERATING_SYSTEM.firstSlot());
+    if (!(deck.getItem() instanceof dev.cybernetics2077.deck.CyberdeckItem)) return false;
+    server.openMenu(
+        new net.minecraft.world.SimpleMenuProvider(
+            (id, inv, owner) ->
+                new dev.cybernetics2077.deck.CyberdeckMenu(
+                    id, inv, ContainerLevelAccess.NULL, deck),
+            net.minecraft.network.chat.Component.translatable("cybernetics2077.deck.title")));
+    return true;
+  }
+
   // The menu is an equipment viewer. Reject forged clicks as well as normal pickup/quick-move.
   @Override
   public void clicked(int slot, int button, ClickType type, Player player) {}

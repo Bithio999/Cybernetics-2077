@@ -2,7 +2,7 @@ package dev.cybernetics2077.combat;
 
 /** Tier-one timing in game ticks, shared with animation and tested without a game runtime. */
 public final class CombatRules {
-  public static final int DEPLOY = 24, LIGHT_INTERVAL = 10, HEAVY_INTERVAL = 22, UPLOAD = 20;
+  public static final int DEPLOY = 30, LIGHT_INTERVAL = 10, HEAVY_INTERVAL = 22, UPLOAD = 20;
   public static final float SHORT_CIRCUIT_DAMAGE = 8,
       RAM_COST = 2,
       RAM_MAX = 4,

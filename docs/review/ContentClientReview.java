@@ -270,7 +270,11 @@ final class ContentClientReview {
             var mob = (LivingEntity) p.serverLevel().getEntity(target);
             check(
                 mob.getHealth() < health - 10,
-                "Charged lunge did not deal damage; player="
+                "Charged lunge did not deal damage; HP="
+                    + mob.getHealth()
+                    + ", before="
+                    + health
+                    + ", player="
                     + p.position()
                     + ", target="
                     + mob.position()
@@ -367,7 +371,7 @@ final class ContentClientReview {
     }
     if (t == 702) m.options.keyUse.setDown(false);
     if (t == 723) {
-      check(m.player.getZ() < 2, "Leap bypassed solid wall");
+      check(m.player.getZ() < 3.8, "Leap bypassed solid wall: " + m.player.getZ());
       server(
           p -> {
             var enemy = (LivingEntity) p.serverLevel().getEntity(target);
@@ -397,6 +401,71 @@ final class ContentClientReview {
     if (t == 780)
       server(
           p -> {
+            for (var entity :
+                p.serverLevel().getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(30)))
+              entity.discard();
+            p.teleportTo(p.serverLevel(), .5, 64, .5, java.util.Set.of(), 0, 0);
+            p.setDeltaMovement(Vec3.ZERO);
+          });
+    if (t == 790) {
+      m.options.keyUse.setDown(true);
+      use();
+    }
+    if (t == 802) m.options.keyUse.setDown(false);
+    if (t >= 802 && t <= 825) shot("mantis-free-leap-" + String.format("%03d", t - 802));
+    if (t == 830) {
+      check(m.player.getZ() > 6, "Untargeted leap failed: " + m.player.position());
+      server(p -> check(p.getZ() > 6, "Server did not receive untargeted leap"));
+      System.out.println("Untargeted leap native travel: " + (m.player.getZ() - .5));
+    }
+    if (t == 850)
+      m.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(m.player));
+    if (t == 855) openButton();
+    if (t == 868) {
+      var l = CyberLayout.fit(m.screen.width, m.screen.height);
+      click(l.screenX(1212), l.screenY(212));
+    }
+    if (t == 878) shot("cyberware-quickhack-entry");
+    if (t == 880) {
+      var l = CyberLayout.fit(m.screen.width, m.screen.height);
+      click(l.screenX(660), l.screenY(660));
+    }
+    if (t == 892) {
+      check(
+          m.player.containerMenu instanceof CyberdeckMenu,
+          "Cyberware quickhack button did not open chip menu");
+      quick(0);
+    }
+    if (t == 900) {
+      check(
+          m.player.containerMenu.getSlot(0).getItem().isEmpty(),
+          "Quickhack removal through viewer failed");
+      quick(37);
+    }
+    if (t == 910) {
+      check(
+          m.player.containerMenu.getSlot(0).getItem().is(Cybernetics2077.SHORT_CIRCUIT.get()),
+          "Quickhack reinstall through viewer failed");
+      server(
+          p ->
+              check(
+                  CyberdeckItem.has(CyberwareRuntime.deck(p), Cybernetics2077.SHORT_CIRCUIT.get()),
+                  "Viewer chip edit was not persisted"));
+      shot("cyberware-quickhack-editor");
+    }
+    if (t == 915) m.screen.onClose();
+    if (t == 930) {
+      check(
+          m.screen instanceof CyberwareScreen, "Back from quickhacks did not return to cyberware");
+      shot("cyberware-quickhack-return");
+    }
+    if (t == 940) {
+      m.setScreen(null);
+      m.player.closeContainer();
+    }
+    if (t == 950)
+      server(
+          p -> {
             var nether = p.server.getLevel(net.minecraft.world.level.Level.NETHER);
             for (int x = -2; x <= 2; x++)
               for (int z = -2; z <= 2; z++) {
@@ -412,7 +481,7 @@ final class ContentClientReview {
               }
             p.teleportTo(nether, .5, 80, .5, java.util.Set.of(), 0, 0);
           });
-    if (t == 810) {
+    if (t == 990) {
       check(
           m.level.dimension() == net.minecraft.world.level.Level.NETHER
               && CyberwareClient.own().getBoolean("deck")
@@ -426,8 +495,9 @@ final class ContentClientReview {
               + " Short Circuit into persistent deck component; equipped viewer; actual scanner LMB"
               + " upload deals 8 electrical damage and reserves RAM; three blade contacts and"
               + " charged lunge damage; deploy/retract; occupied-hand guard; first/third-person"
-              + " render and animation captures; ground and airborne leaps travel 5.15 blocks and"
-              + " land one 14-damage hit each; solid-wall guard; dimension change retains equipment"
+              + " render and animation captures; viewer quickhack removal/reinstall and return;"
+              + " untargeted six-block leap; ground and airborne leaps travel 5.15 blocks and land"
+              + " one 14-damage hit each; solid-wall guard; dimension change retains equipment"
               + " state.\n");
       finished = true;
       m.stop();

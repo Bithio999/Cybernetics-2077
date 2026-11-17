@@ -27,7 +27,7 @@ public final class CyberwareRuntime {
     public boolean deployed;
     public long changed = -1000, attack = -1000, charge = -1, lastAttack = -1000;
     public int combo, nextCombo, target = -1;
-    public boolean pendingHit;
+    public boolean pendingHit, lungeFinished;
     public Lunge lunge;
     public final ArrayDeque<Upload> uploads = new ArrayDeque<>();
     private CompoundTag sent;
@@ -125,6 +125,10 @@ public final class CyberwareRuntime {
   public static void action(ServerPlayer p, int action) {
     var s = state(p);
     long now = p.serverLevel().getGameTime();
+    if (action == 4) {
+      if (s.lunge != null) s.lungeFinished = true;
+      return;
+    }
     if (!usable(p)) return;
     if (action == 0) {
       if (!claws(p)) return;
@@ -133,8 +137,9 @@ public final class CyberwareRuntime {
         return;
       }
       if (now - s.changed < 6) return;
+      long elapsed = Math.clamp(now - s.changed, 0, CombatRules.DEPLOY);
       s.deployed = !s.deployed;
-      s.changed = now;
+      s.changed = now - (CombatRules.DEPLOY - elapsed);
       s.charge = -1;
       s.pendingHit = false;
       s.lunge = null;
@@ -149,10 +154,17 @@ public final class CyberwareRuntime {
       broadcast(p);
       return;
     }
-    if (!claws(p) || !s.deployed || !emptyHands(p) || now - s.changed < CombatRules.DEPLOY) return;
+    if (!claws(p) || !s.deployed || !emptyHands(p)) return;
     if (action == 2) {
       if (s.charge < 0) {
-        s.charge = now;
+        s.charge = Math.max(now, s.changed + CombatRules.DEPLOY);
+        broadcast(p);
+      }
+      return;
+    }
+    if (now - s.changed < CombatRules.DEPLOY) {
+      if (action == 3) {
+        s.charge = -1;
         broadcast(p);
       }
       return;
@@ -220,8 +232,9 @@ public final class CyberwareRuntime {
       broadcast(p);
     }
     if (s.deployed && (!claws(p) || !p.isAlive() || p.isSpectator() || !emptyHands(p))) {
+      long elapsed = Math.clamp(now - s.changed, 0, CombatRules.DEPLOY);
       s.deployed = false;
-      s.changed = now;
+      s.changed = now - (CombatRules.DEPLOY - elapsed);
       s.charge = -1;
       s.pendingHit = false;
       s.lunge = null;
@@ -315,39 +328,52 @@ public final class CyberwareRuntime {
 
   private static void beginLunge(ServerPlayer p) {
     var target = lungeTarget(p);
-    if (target == null || p.isPassenger()) return;
+    if (p.isPassenger()) return;
     var start = p.position();
-    var toward = target.position().subtract(start).multiply(1, 0, 1);
-    double separation = (p.getBbWidth() + target.getBbWidth()) * .5 + .75;
-    if (toward.length() <= separation + .15) return;
-    var destination = target.position().subtract(toward.normalize().scale(separation));
+    var destination = start.add(p.getLookAngle().scale(6));
+    if (target != null) {
+      var toward = target.position().subtract(start).multiply(1, 0, 1);
+      double separation = (p.getBbWidth() + target.getBbWidth()) * .5 + .75;
+      if (toward.length() <= separation + .15) return;
+      destination = target.position().subtract(toward.normalize().scale(separation));
+    }
     int duration = LungePath.duration(start.distanceTo(destination));
     var path =
         new LungePath(
             start.x, start.y, start.z, destination.x, destination.y, destination.z, .65, duration);
-    state(p).lunge = new Lunge(target.getUUID(), path, p.serverLevel().getGameTime());
+    state(p).lungeFinished = false;
+    state(p).lunge =
+        new Lunge(target == null ? null : target.getUUID(), path, p.serverLevel().getGameTime());
   }
 
   private static void tickLunge(ServerPlayer p) {
     var s = state(p);
     var l = s.lunge;
     long age = p.serverLevel().getGameTime() - l.started();
-    var target = p.serverLevel().getEntity(l.target());
+    var target = l.target() == null ? null : p.serverLevel().getEntity(l.target());
     boolean valid =
         usable(p)
             && !p.isPassenger()
             && claws(p)
             && emptyHands(p)
-            && target instanceof LivingEntity living
-            && canAttack(p, living);
+            && (l.target() == null
+                || target instanceof LivingEntity living && canAttack(p, living));
     boolean arrived =
-        valid && age >= 2 && target.getBoundingBox().inflate(1.15).intersects(p.getBoundingBox());
-    if (!valid || arrived || age > l.path().ticks() + 8) {
+        valid
+            && age >= 2
+            && (l.target() == null
+                ? p.position().distanceToSqr(l.path().ex(), l.path().ey(), l.path().ez()) < .25
+                : target.getBoundingBox().inflate(1.15).intersects(p.getBoundingBox()));
+    boolean contact = arrived || valid && target == null && s.lungeFinished;
+    // Completion follows the client's normal position packet. Allow time for slow frames/latency;
+    // a blocked path still cancels immediately on acknowledgement, with no terrain bypass.
+    if (!valid || contact || s.lungeFinished || age > l.path().ticks() + 40) {
       s.lunge = null;
-      if (arrived) {
+      if (contact) {
         s.pendingHit = false;
         s.attack = p.serverLevel().getGameTime() - CombatRules.impactTick(3);
-        if (p.hasLineOfSight(target)) hit(p, (LivingEntity) target, 3);
+        if (target == null) bladeHit(p, 3);
+        else if (p.hasLineOfSight(target)) hit(p, (LivingEntity) target, 3);
       } else s.pendingHit = false;
       p.setDeltaMovement(Vec3.ZERO);
       p.connection.send(

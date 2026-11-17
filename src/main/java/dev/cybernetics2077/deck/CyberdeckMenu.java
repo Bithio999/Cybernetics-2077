@@ -10,7 +10,10 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.neoforged.neoforge.items.*;
 
-/** A bench-only chip editor. Removing/switching the backing deck invalidates access. */
+/**
+ * An installed-deck chip editor, opened from the cyberware viewer or bench. Removing/switching the
+ * backing deck invalidates access.
+ */
 public final class CyberdeckMenu extends AbstractContainerMenu {
   private final ContainerLevelAccess access;
   private final ItemStack deck;

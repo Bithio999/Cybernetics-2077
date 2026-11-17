@@ -21,7 +21,9 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
   private final long opened = System.nanoTime();
   private final List<SocketButton> sockets = new ArrayList<>();
   private CyberLayout layout;
+  public static boolean returnToOperatingSystem;
   private int selected = -1;
+  private LoadoutButton loadout;
   private long lastFrame = System.nanoTime();
   private BodyView bodyView = BodyView.OVERVIEW;
   private float zoom;
@@ -30,6 +32,10 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
 
   public CyberwareScreen(CyberwareMenu menu, Inventory inventory, Component title) {
     super(menu, inventory, title);
+    if (returnToOperatingSystem) {
+      selected = CyberwareCategory.OPERATING_SYSTEM.firstSlot();
+      returnToOperatingSystem = false;
+    }
   }
 
   public static void reloadResources() {
@@ -53,6 +59,8 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     addRenderableWidget(next);
     back = new BackButton();
     addRenderableWidget(back);
+    loadout = new LoadoutButton();
+    addRenderableWidget(loadout);
   }
 
   @Override
@@ -95,6 +103,8 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
       b.setPosition(layout.screenX(slotX(b.socket)), layout.screenY(slotY(b.socket)));
     }
     previous.visible = next.visible = selected >= 0;
+    loadout.visible =
+        selected >= 0 && menu.getSlot(selected).getItem().is(Cybernetics2077.CYBERDECK.get());
     for (var r : renderables) r.render(g, mouseX, mouseY, partial);
     int hovered = -1;
     for (var b : sockets)
@@ -354,9 +364,27 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
             CYAN);
       } else if (stack.is(Cybernetics2077.CYBERDECK.get())) {
         c.glowText("CYBERDECK / RAM 4", 434, 548, 23, CYAN);
-        c.body("Two slots for tier 1 quickhack chips.", 434, 589, 19, WHITE);
-        c.body("Regenerates 1 RAM every 5 seconds.", 434, 617, 19, WHITE);
-        c.body("Manage chips at a Cybernetics Bench.", 434, 663, 19, CYAN);
+        c.body("2 QUICKHACK SLOTS / 1 RAM PER 5s", 434, 584, 16, WHITE);
+        var chips = net.minecraft.core.NonNullList.withSize(2, ItemStack.EMPTY);
+        stack
+            .getOrDefault(
+                net.minecraft.core.component.DataComponents.CONTAINER,
+                net.minecraft.world.item.component.ItemContainerContents.EMPTY)
+            .copyInto(chips);
+        for (int i = 0; i < 2; i++) {
+          c.panel(764 + i * 66, 536, 54, 54, 5, 0xff14232c, 0xff5c8c96);
+          if (!chips.get(i).isEmpty()) drawItem(c, chips.get(i), 772 + i * 66, 544, 2.4f);
+          else c.center("+", 791 + i * 66, 550, 23, MUTED);
+        }
+        c.panel(
+            434,
+            637,
+            466,
+            48,
+            7,
+            loadout.isHoveredOrFocused() ? 0xff244454 : 0xff172632,
+            loadout.isHoveredOrFocused() ? WHITE : CYAN);
+        c.text("MANAGE QUICKHACKS  >", 452, 649, 23, CYAN);
       } else if (stack.is(Cybernetics2077.MANTIS.get())) {
         c.glowText("PAIRED ARM BLADES", 434, 548, 23, CYAN);
         c.body("Alternating slashes: 8 / 8 / 10 damage.", 434, 589, 19, WHITE);
@@ -378,7 +406,15 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
       c.body("Cybernetics Bench.", 434, 591, 19, MUTED);
     }
     c.line(434, 704, 900, 704, 1, 0x80568293);
-    c.tracked("EQUIPMENT VIEW / INSTALLATION LOCKED", 434, 725, 12, 0xffcf7c89, .7f);
+    c.tracked(
+        stack.is(Cybernetics2077.CYBERDECK.get())
+            ? "CYBERDECK / PROGRAM MANAGEMENT"
+            : "EQUIPMENT VIEW / INSTALLATION LOCKED",
+        434,
+        725,
+        12,
+        0xffcf7c89,
+        .7f);
     c.panel(410, 805, 515, 76, 10, 0xc9071019, 0x8077c8d8);
     c.rect(410, 805, 4, 76, CYAN);
     c.body("Visit a Cybernetics Bench to install", 432, 824, 19, CYAN);
@@ -561,6 +597,31 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
         CyberwareCategory.values()[
             Math.floorMod(c.ordinal() + direction, CyberwareCategory.values().length)]
             .firstSlot();
+  }
+
+  private final class LoadoutButton extends AbstractButton {
+    LoadoutButton() {
+      super(
+          layout.screenX(434),
+          layout.screenY(637),
+          layout.size(466),
+          layout.size(48),
+          Component.literal("Manage quickhacks"));
+    }
+
+    @Override
+    public void onPress() {
+      minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 0);
+    }
+
+    @Override
+    protected void renderWidget(GuiGraphics g, int x, int y, float p) {}
+
+    @Override
+    protected void updateWidgetNarration(
+        net.minecraft.client.gui.narration.NarrationElementOutput out) {
+      defaultButtonNarrationText(out);
+    }
   }
 
   private final class CategoryButton extends AbstractButton {

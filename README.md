@@ -8,7 +8,7 @@ A standalone **Minecraft 1.21.1 / NeoForge** mod inspired by Cyberpunk 2077's cy
 
 Open your inventory and press the **cyberware tab beside the inventory**. Select a socket to zoom into that body system and inspect its installed implant. Use **A / D** or the arrows in the category header to change systems. **Esc** returns to the full body; press it again to return to your inventory. **Tab / Enter** also navigate and select sockets.
 
-The inventory viewer is **read-only**. Its 21 sockets cover ten body systems. The hologram uses **your current Minecraft skin**, with the correct classic or slim body model. Hats, jackets, sleeves and trouser layers follow your **Skin Customization** settings. Skin colours remain recognizable beneath transparency, a cyan projection tint, visible scanlines, a moving scan sweep and a fine illuminated silhouette. Uniform scaling preserves Minecraft body proportions; the overview and category cameras center on the body and selected region respectively. Category close-ups remain available. Capacity and armor meters reflect your equipment.
+Implant sockets in the inventory viewer are **read-only**. Select an installed **Operating System → Manage Quickhacks** to install or remove programs without visiting a bench. Its 21 sockets cover ten body systems. The hologram uses **your current Minecraft skin**, with the correct classic or slim body model. Hats, jackets, sleeves and trouser layers follow your **Skin Customization** settings. Skin colours remain recognizable beneath transparency, a cyan projection tint, visible scanlines, a moving scan sweep and a fine illuminated silhouette. Uniform scaling preserves Minecraft body proportions; the overview and category cameras center on the body and selected region respectively. Category close-ups remain available. Capacity and armor meters reflect your equipment.
 
 All implants have a strength tier from **1–5**, shown in their tooltip and socket badge: white, green, blue, purple and orange.
 
@@ -23,7 +23,7 @@ The scanner shows health, armor, attack damage, absorption and visible effects. 
 
 ![Short Circuit scanner](docs/images/short-circuit-scanner.png)
 
-Mantis Claws open the outside of each forearm, reveal the mechanism, and unfold into combat position. **Left-click** chains alternating slashes; **hold and release right-click** for a charged lunge toward a visible target within **8 blocks**, from the ground or in midair. First- and third-person animations follow the contact frames used for damage.
+Mantis Claws open the outside of each forearm, reveal the mechanism, and unfold into combat position. **Left-click** chains alternating slashes; **hold and release right-click** for a charged leap, from the ground or in midair. Aim at a visible target within **8 blocks** to stop at it; without a target, leap **6 blocks** in the look direction. First- and third-person animations follow the contact frames used for damage.
 
 [Watch the claw animations](docs/media/mantis-claws.mp4) · [Equipment, controls and recipes](docs/CYBERWARE.md)
 
@@ -31,7 +31,7 @@ Mantis Claws open the outside of each forearm, reveal the mechanism, and unfold 
 
 ## Install cyberware
 
-Craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. Install a deck, then press **Cyberdeck** at the bench to load or remove quickhack chips. Its programs stay with the physical deck when it is removed.
+Craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. Install a deck, then select **Operating System → Manage Quickhacks** in the cyberware menu to load or remove chips. The bench’s **Cyberdeck** shortcut also remains available. Its programs stay with the physical deck when it is removed.
 
 ![Cybernetics Bench installation menu](docs/images/bench.png)
 
@@ -39,7 +39,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.4.1.jar](releases/Cybernetics2077-0.4.1.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.5.0.jar](releases/Cybernetics2077-0.5.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 
@@ -58,4 +58,4 @@ Development client: `./gradlew runClient`. See [validation and review instructio
 
 ## Credits
 
-Articulated arm and blade meshes, interface geometry, shaders, workstation textures and category glyphs are original mod assets. The four implant/program icons use Cyberpunk 2077 artwork © CD PROJEKT RED, hosted by Gamestegy; see the [asset manifest](art/cyberpunk-icons/sources.json) and [implementation references](docs/research/CYBERWARE.md). Rajdhani is distributed under the [SIL Open Font License](src/main/resources/assets/cybernetics2077/font/rajdhani-license.txt). Cyberpunk 2077 belongs to CD PROJEKT; this is an independent fan project.
+Articulated arm and blade meshes, interface geometry, shaders, workstation textures and category glyphs are original mod assets. The four equipment icons are original 32×32 pixel art inspired by the reference silhouettes. See the [implementation references](docs/research/CYBERWARE.md). Rajdhani is distributed under the [SIL Open Font License](src/main/resources/assets/cybernetics2077/font/rajdhani-license.txt). Cyberpunk 2077 belongs to CD PROJEKT; this is an independent fan project.

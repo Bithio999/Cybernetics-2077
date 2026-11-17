@@ -46,7 +46,7 @@ public final class ClientHooks {
     if (inventory instanceof AbstractContainerScreen<?> screen && button != null) {
       // Attach outside the inventory's left edge: recipe book is inside, effects are on the right.
       // Creative category tabs occupy the top/bottom, so use the same side attachment there.
-      int x = Math.max(1, screen.getGuiLeft() - 19);
+      int x = screen.getGuiLeft() - 18;
       button.setPosition(x, screen.getGuiTop() + 32);
       var player = Minecraft.getInstance().player;
       boolean free = player != null && player.containerMenu.getCarried().isEmpty();

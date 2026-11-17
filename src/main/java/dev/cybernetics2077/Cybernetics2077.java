@@ -125,8 +125,10 @@ public final class Cybernetics2077 {
                     () -> {
                       if (context.player() instanceof ServerPlayer p
                           && p.isAlive()
-                          && p.containerMenu == p.inventoryMenu
-                          && p.inventoryMenu.getCarried().isEmpty())
+                          && (p.containerMenu == p.inventoryMenu
+                              || p.containerMenu instanceof dev.cybernetics2077.deck.CyberdeckMenu
+                                  && p.containerMenu.stillValid(p))
+                          && p.containerMenu.getCarried().isEmpty())
                         p.openMenu(
                             new SimpleMenuProvider(
                                 (id, inventory, owner) -> CyberwareMenu.server(id, inventory),
