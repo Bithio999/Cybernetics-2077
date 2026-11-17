@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.10; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.11; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -77,3 +77,7 @@ The ready hands sit near the bottom corners rather than floating in the centre o
 The first-person rig now has its own resting shoulder angles, outward forearm presentation, a slightly higher off hand and a wider 68° vertical weapon lens. The hands remain visible and the blade profiles occupy the outer sides of the screen, rather than forming a narrow triangle over the crosshair. A smooth camera-space anchor keeps the upper arm ends below the viewport through cuts and charging. Player skin, physical implant size and third-person animations are unchanged. The supplied Cyberpunk clip’s physical-blade idle holds guide the composition; the world FOV setting remains independent.
 
 ![First-person strike with the revised stance](images/mantis-first-person-cut.png)
+
+## Slight inward rotation (0.5.11)
+
+Both first-person arms roll 7° inward from the 0.5.10 stance. The hand anchors, asymmetric placement, weapon FOV and implant size stay the same. The current clips and screenshots show this adjustment.
