@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.13; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.14; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -89,3 +89,7 @@ Both first-person arms roll another 10° inward from 0.5.11, for a total of 17°
 ## Stronger inward forearm roll (0.5.13)
 
 Both forearms roll another 30° inward from 0.5.12. The tops of the forearms and dorsal mounts face upward more directly. The existing hand anchors, weapon lens and arm-aim directions remain in place. The current screenshots and clips show this pose.
+
+## Slightly lower ready pose (0.5.14)
+
+The first-person ready pose sits a little lower. A 0.025-block downward offset blends in with deployment after the shoulder-visibility correction, preserving the selected inward roll and weapon lens. The current clips and screenshots show this position.

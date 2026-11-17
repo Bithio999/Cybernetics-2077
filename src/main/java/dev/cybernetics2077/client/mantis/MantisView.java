@@ -48,7 +48,10 @@ public final class MantisView {
             .rotateZ((float) Math.PI)
             .scale(.9f)
             .mul(shoulder(left, slim, pose));
-    return blend <= 0 ? start : anchor(blend(start, goal, blend), slim);
+    if (blend <= 0) return start;
+    var view = anchor(blend(start, goal, blend), slim);
+    // Apply the small ready-pose drop after the shoulder guard so it is not cancelled by it.
+    return view.m31(view.m31() - .025f * blend);
   }
 
   /** Camera-space stance is independent of the world-space third-person shoulders. */
