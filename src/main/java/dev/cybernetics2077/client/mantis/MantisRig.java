@@ -4,7 +4,8 @@ import org.joml.Matrix4f;
 
 /** Canonical player-model axes: X left, Y down, Z backward. Every rotation has a real joint. */
 public final class MantisRig {
-  public static final float ELBOW_Y = .25f;
+  // Vanilla has one rigid arm; this is our cyberarm joint, not a vanilla anatomical boundary.
+  public static final float ELBOW_Y = .10f;
 
   public static float centerOffset(boolean left, boolean slim) {
     return (left ? 1 : -1) * (slim ? .5f : 1f) / 16f;

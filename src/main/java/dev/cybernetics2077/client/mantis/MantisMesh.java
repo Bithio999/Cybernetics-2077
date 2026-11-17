@@ -74,10 +74,10 @@ public final class MantisMesh {
           metal,
           light,
           -width / 2 + .002f,
-          .235f,
+          MantisRig.ELBOW_Y - .015f,
           -.123f,
           width / 2 - .002f,
-          .25f,
+          MantisRig.ELBOW_Y,
           .123f,
           0xff445158);
     p.pushPose();
@@ -88,13 +88,13 @@ public final class MantisMesh {
       float z = -.125f - (layer == 0 ? 0 : .015625f);
       for (var face : faces) {
         if (face.getFirst().nz() > -.5f) {
-          NativeArmSkin.part(p, skin, light, face, -1, 1, .25f, 1);
+          NativeArmSkin.part(p, skin, light, face, -1, 1, MantisRig.ELBOW_Y, 1);
           continue;
         }
         // Four strips retain the original arm silhouette around the hatch.
-        NativeArmSkin.part(p, skin, light, face, -1, -window, .25f, 1);
-        NativeArmSkin.part(p, skin, light, face, window, 1, .25f, 1);
-        NativeArmSkin.part(p, skin, light, face, -window, window, .25f, .255f);
+        NativeArmSkin.part(p, skin, light, face, -1, -window, MantisRig.ELBOW_Y, 1);
+        NativeArmSkin.part(p, skin, light, face, window, 1, MantisRig.ELBOW_Y, 1);
+        NativeArmSkin.part(p, skin, light, face, -window, window, MantisRig.ELBOW_Y, .11f);
         NativeArmSkin.part(p, skin, light, face, -window, window, .52f, 1);
         for (int flap : new int[] {-1, 1}) {
           float edge = flap * window;
@@ -103,14 +103,14 @@ public final class MantisMesh {
           p.mulPose(Axis.YP.rotationDegrees(-flap * motion.panels() * 105));
           p.translate(-edge, 0, -z);
           NativeArmSkin.part(
-              p, skin, light, face, flap < 0 ? -window : 0, flap < 0 ? 0 : window, .255f, .52f);
+              p, skin, light, face, flap < 0 ? -window : 0, flap < 0 ? 0 : window, .11f, .52f);
           if (layer == 0 && motion.panels() > .001f)
             box(
                 p,
                 metal,
                 light,
                 flap < 0 ? -window + .002f : .002f,
-                .258f,
+                .113f,
                 z + .0015f,
                 flap < 0 ? -.002f : window - .002f,
                 .517f,
@@ -144,14 +144,14 @@ public final class MantisMesh {
         out,
         light,
         -width / 2 + .002f,
-        .25f,
+        MantisRig.ELBOW_Y,
         -.075f,
         width / 2 - .002f,
         .52f,
         .123f,
         0xff293840);
-    box(p, out, light, -w - .005f, .255f, -.123f, -w + .005f, .52f, -.075f, 0xff677d81);
-    box(p, out, light, w - .005f, .255f, -.123f, w + .005f, .52f, -.075f, 0xff677d81);
+    box(p, out, light, -w - .005f, .11f, -.123f, -w + .005f, .52f, -.075f, 0xff677d81);
+    box(p, out, light, w - .005f, .11f, -.123f, w + .005f, .52f, -.075f, 0xff677d81);
     box(p, out, light, -w, .515f, -.123f, w, .53f, -.075f, 0xff677d81);
   }
 

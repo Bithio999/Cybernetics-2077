@@ -95,13 +95,13 @@ final class MantisBlenderMeshTest {
             for (float width : new float[] {3 / 16f, 4 / 16f}) {
               boolean inArm =
                   java.lang.Math.abs(point.x) < width / 2
-                      && point.y > .25f
+                      && point.y > MantisRig.ELBOW_Y
                       && point.y < .625f
                       && point.z > -.125f
                       && point.z < .125f;
               boolean inOpening =
                   java.lang.Math.abs(point.x) < width * .44f - .004f
-                      && point.y > .255f
+                      && point.y > .11f
                       && point.y < .52f;
               if (age == 0)
                 assertTrue(inArm, "The stowed blade must fit completely inside the actual arm");
@@ -113,6 +113,33 @@ final class MantisBlenderMeshTest {
         }
       }
     }
+  }
+
+  @Test
+  void deployedCuttingAssemblyStaysLargeWhileTheReceiverIsSlim() throws Exception {
+    var model = read("near");
+    var axis =
+        MantisArticulation.mount(1)
+            .mul(MantisArticulation.support(1))
+            .mul(MantisArticulation.blade(1, 1));
+    var origin = axis.transformPosition(new Vector3f());
+    axis.mul(MantisArticulation.tip(1)).mul(MantisArticulation.edge(1));
+    float reach = 0;
+    var edge = model.parts().get("edge").vertices();
+    for (int i = 0; i < edge.length; i += 8)
+      reach =
+          java.lang.Math.max(
+              reach,
+              origin.distance(
+                  axis.transformPosition(new Vector3f(edge[i], edge[i + 1], edge[i + 2]))));
+    assertTrue(reach >= .95f, "Do not shrink the deployed blade to solve storage clearance");
+    var receiver = model.parts().get("blade").vertices();
+    float low = Float.POSITIVE_INFINITY, high = Float.NEGATIVE_INFINITY;
+    for (int i = 2; i < receiver.length; i += 8) {
+      low = java.lang.Math.min(low, receiver[i]);
+      high = java.lang.Math.max(high, receiver[i]);
+    }
+    assertTrue(high - low < .06f, "Keep the housing shallow without shortening the cutting blade");
   }
 
   @Test

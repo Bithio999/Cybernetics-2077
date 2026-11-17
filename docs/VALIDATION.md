@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.5.3 uses the local player’s skin in the hologram. All 33 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+Release 0.5.4 uses the local player’s skin in the hologram. All 34 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
 
 ## Automated checks
 
@@ -55,7 +55,7 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The inventory cyberware screen remains read-only; the bench is the only installation interface. Release 0.5.3 includes the tier 1 deck and Short Circuit; other quickhacks and operating systems are not implemented. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+The inventory cyberware screen remains read-only; the bench is the only installation interface. Release 0.5.4 includes the tier 1 deck and Short Circuit; other quickhacks and operating systems are not implemented. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
 
 The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed.
 
@@ -85,31 +85,36 @@ python3 docs/review/trim-native-recording.py recording.mp4 /path/to/capture RECO
 
 For desktop recording, match the capture rectangle to the actual game window; a 1280×720 review window can otherwise be centered inside a larger virtual display. The current Mantis clips were recorded with both the desktop and game window at 960×540 and visually checked after trimming.
 
-Release 0.5.3 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
+Release 0.5.4 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
 
-The 0.5.3 revision also checks ordered hatch/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
+The 0.5.4 revision also checks ordered hatch/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
 
 Lunges now acknowledge completion after the client’s normal position packet. The server permits a bounded delay for slow frames or latency, while validating target contact and terrain visibility. The six-block free leap also waits for actual movement rather than ending on elapsed time alone.
 
 ## Mantis handover and anatomy
 
-The 0.5.3 review checks the rest-hand matrix against the actual vanilla `RenderArmEvent` transform before deployment. Classic/slim and left/right mathematical tests check continuous wrist movement, non-collapsing transforms, a dorsal mount facing up and a blade axis pointing forward. The distal tip has its own channel and extends after the support, then retracts before it. Native captures include the original empty hand, deployment, a zoomed dorsal view, tip retraction and redeployment. Native cube UVs preserve skin alignment, and the shallow recess has an opaque floor, palm, sides and wrist.
+The 0.5.4 review checks the rest-hand matrix against the actual vanilla `RenderArmEvent` transform before deployment. Classic/slim and left/right mathematical tests check continuous wrist movement, non-collapsing transforms, a dorsal mount facing up and a blade axis pointing forward. The distal tip has its own channel and extends after the support, then retracts before it. Native captures include the original empty hand, deployment, a zoomed dorsal view, tip retraction and redeployment. Native cube UVs preserve skin alignment, and the shallow recess has an opaque floor, palm, sides and wrist.
 
 The presentation clock begins at the first displayed frame instead of the server timestamp, preventing delayed packets from skipping the normal-hand starting pose. Reversal preserves the last displayed progress. Native checks also validate cube-local bounds and skin UVs for both arms/sleeves, catching accidental baked ModelPart transforms.
 
 ## Blender model checks
 
-The 0.5.3 model is built and baked in Blender 4.3.2. Four additional JVM tests validate the exported groups, finite coordinates, triangle indices, normalized normals, atlas UVs, near/far geometry budgets, preserved LOD bounds, rejection of corrupt/truncated data, and hinge continuity throughout deployment. The deployed support goes backward/up; the blade counter-rotates forward. Both LODs use these same local pivots.
+The 0.5.4 model is built and baked in Blender 4.3.2. Four additional JVM tests validate the exported groups, finite coordinates, triangle indices, normalized normals, atlas UVs, near/far geometry budgets, preserved LOD bounds, rejection of corrupt/truncated data, and hinge continuity throughout deployment. The deployed support goes backward/up; the blade counter-rotates forward. Both LODs use these same local pivots.
 
 The native content review was repeated with the imported model and resource-reload preload path. It passed the existing handover, deployment/retraction, three light attacks, charged damage, ground/air/free leap and terrain checks. First- and third-person captures were visually inspected. The near mesh has 3,086 triangles per blade; the far mesh has 504 and is used beyond 16 blocks in third person. Meshes and the 512px atlas are cached; no Blender dependency ships in the mod. This is a bounded geometry budget, not a hardware FPS guarantee. [Editable source and rebuild instructions](../art/mantis/README.md).
 
 
 ## Deployment clearance and recording
 
-The 0.5.3 clearance test samples real exported vertices throughout deployment for both classic and slim arms and both mesh LODs. It uses the native arm end at Y=.625, checks the mechanism against the intact skin outside the dorsal opening, and checks that the hatch is fully open before the support unfolds. The receiver and nested sliding leaves fit inside the forearm when stowed. The hand and wrist remain closed. The opening is about 1.9× its previous area, with outward-spreading panels and an opaque recess.
+The 0.5.4 clearance test samples real exported vertices throughout deployment for both classic and slim arms and both mesh LODs. It uses the native arm end at Y=.625, checks the mechanism against the intact skin outside the dorsal opening, and checks that the hatch is fully open before the support unfolds. The receiver and nested sliding leaves fit inside the forearm when stowed. The hand and wrist remain closed. The opening is about 3.0× its previous area, with outward-spreading panels and an opaque recess.
 
 The recording profile (`-PcyberRecording -PcyberContentOnly`) stores capture timestamps in memory and writes them after the run, without per-tick GPU readbacks or PNG encoding. A separate full-size diagnostic run retains screenshot/pixel checks. Recording uses a 960×540 framebuffer on this software-rendered cloud machine and exports at 30 fps. The profile records actual combat frame times in `capture/recording-frame-times.txt`; the MP4 frame-rate field alone is not evidence of smooth rendering. The trimming helper reads `recording-marks.json`; use marks from the same recording. Pass `--mantis-only --fps 30` to replace just the Mantis clips.
 
 The model now uses actual triangle rendering, a shared atlas and cached skin patches. It submits about 55% fewer blade vertices than 0.5.2. These changes reduce CPU/geometry work; they do not guarantee a particular FPS on a modded client.
 
-The final recording run measured **55.5 mean rendered FPS**, with **23.042 ms P95** and **39.672 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.5.3.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
+The final recording run measured **51.2 mean rendered FPS**, with **25.901 ms P95** and **37.008 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.5.4.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
+
+
+## Full-size blade correction
+
+The 0.5.4 rig defines its elbow at Y=.10 and the dorsal opening at Y=.11–.52; these are custom cyberarm proportions, not anatomical limits imposed by Minecraft. The cutting assembly has about .98 blocks of deployed reach from its upper hinge, about 60% longer than 0.5.3. Only the housing remains shallow: its side-profile depth stays below .06 blocks. The final sliding blade retains a broad cutting surface. A regression test checks deployed reach together with housing depth, and the exported-vertex clearance test still checks the stowed and moving assembly against both arm widths.

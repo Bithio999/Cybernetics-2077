@@ -57,12 +57,12 @@ def empty(name, parent=None, loc=(0, 0, 0), angle=0):
     return o
 
 
-base = empty("DORSAL_MOUNT", loc=(0, 0.455, 0.15))
+base = empty("DORSAL_MOUNT", loc=(0, 0.45, 0.15))
 PARTS["mount"] = base
 PARTS["support"] = empty("SUPPORT_PIVOT", base, angle=145)
-PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.18, 0), angle=-137)
-PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.202, 0))
-PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.196, 0))
+PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.30, 0), angle=-137)
+PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.327, 0))
+PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.321, 0))
 
 
 def finish(o, name, part, mat="gunmetal", bevel=0, detail=False):
@@ -480,10 +480,10 @@ for name, parent in PARTS.items():
     o.matrix_basis = Matrix.Identity(4)
     proportions = {
         "mount": (0.90, 0.80, 0.85),
-        "support": (0.55, 0.18 / 0.34, 0.50),
-        "blade": (0.55, 0.36, 0.40),
-        "tip": (0.55, 0.36, 0.40),
-        "edge": (0.42, 0.36, 0.30),
+        "support": (0.55, 0.30 / 0.34, 0.50),
+        "blade": (0.55, 0.55, 0.40),
+        "tip": (0.55, 0.55, 0.70),
+        "edge": (0.42, 0.55, 0.65),
     }
     o.data.transform(Matrix.Diagonal((*proportions[name], 1)))
     near[name] = o
@@ -663,9 +663,9 @@ def aim(o, point):
 
 bpy.ops.object.camera_add(location=(1.55, 2.1, 1.55))
 camera = bpy.context.object
-aim(camera, (0, 0.55, 0.23))
+aim(camera, (0, 0.73, 0.30))
 camera.data.type = "ORTHO"
-camera.data.ortho_scale = 0.95
+camera.data.ortho_scale = 1.35
 scene.camera = camera
 for loc, power, size in [
     ((2, 1, 3), 600, 3),
