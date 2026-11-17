@@ -40,6 +40,10 @@ The Operating System page opens the same native, server-backed chip editor as th
 
 Fandom and wiki.gg pages were inaccessible. YouTube itself was unavailable; the uploaded MP4 and accessible community-hosted MP4 were used. No blocked page or inaccessible video was treated as reviewed. Full reference videos are not redistributed in the mod.
 
-## Balance
+## Blender mechanism revision
+
+The user's latest side-view image clarifies the two-link shape beyond the earlier dorsal orientation: the short support reaches **back and up**, and the long cutting assembly hinges there to point **forward**. The new original Blender model follows that shape instead of placing a straight blade along the forearm. Named mount/support/blade/tip pivots are exported in local coordinates and articulated by the game. Chamfers, inset panels, hinge rings, fasteners, rails and cables are authored in Blender; colour and ambient occlusion share one baked atlas. The editable source, generator and geometry budgets are in [art/mantis](../../art/mantis/README.md). No extracted Cyberpunk model or texture is shipped.
+
+## Tier-one balance
 
 Tier-one Minecraft values: **4 RAM**, **2 program sockets**, **8 electrical damage**, **8/8/10 physical light damage**, **14 charged damage**. They are mod balance choices, not exact Cyberpunk statistics. No Relic, Overclock or broader perk system is included.

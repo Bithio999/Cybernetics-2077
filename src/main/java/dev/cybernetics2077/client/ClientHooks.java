@@ -84,7 +84,10 @@ public final class ClientHooks {
     public static void reload(RegisterClientReloadListenersEvent e) {
       e.registerReloadListener(
           (net.minecraft.server.packs.resources.ResourceManagerReloadListener)
-              manager -> CyberwareScreen.reloadResources());
+              manager -> {
+                CyberwareScreen.reloadResources();
+                dev.cybernetics2077.client.mantis.MantisBlenderMesh.preload(manager);
+              });
     }
   }
 

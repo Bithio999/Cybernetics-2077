@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.5.1. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.5.2. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -35,6 +35,8 @@ The review switches the local player's loaded skin to Minecraft's built-in Steve
 ![Target-mounted upload chip](images/short-circuit-upload.png)
 
 ![Mantis Claws in first person](images/mantis-first-person.png)
+
+The 0.5.2 blades use the [original Blender model](../art/mantis/README.md). The lower support angles backward and upward, then the upper cutting section points forward from its hinge. Both sections and the sliding tip move independently. The gameplay clips above use this model.
 
 ![Mantis Claws in third person](images/mantis-third-person.png)
 

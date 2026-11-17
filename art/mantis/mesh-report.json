@@ -1,0 +1,131 @@
+{
+  "atlas": [
+    512,
+    512
+  ],
+  "parts": {
+    "mount": {
+      "near": {
+        "vertices": 4076,
+        "triangles": 1644,
+        "bounds_min": [
+          -0.068,
+          -0.105,
+          -0.037
+        ],
+        "bounds_max": [
+          0.068,
+          0.077,
+          0.0365
+        ]
+      },
+      "far": {
+        "vertices": 426,
+        "triangles": 142,
+        "bounds_min": [
+          -0.067231,
+          -0.104167,
+          -0.036848
+        ],
+        "bounds_max": [
+          0.067231,
+          0.076167,
+          0.035667
+        ]
+      }
+    },
+    "support": {
+      "near": {
+        "vertices": 3668,
+        "triangles": 1346,
+        "bounds_min": [
+          -0.0695,
+          0.0,
+          -0.037
+        ],
+        "bounds_max": [
+          0.0695,
+          0.377,
+          0.037
+        ]
+      },
+      "far": {
+        "vertices": 610,
+        "triangles": 206,
+        "bounds_min": [
+          -0.06936,
+          0.000676,
+          -0.036833
+        ],
+        "bounds_max": [
+          0.069378,
+          0.376784,
+          0.036751
+        ]
+      }
+    },
+    "blade": {
+      "near": {
+        "vertices": 5242,
+        "triangles": 1980,
+        "bounds_min": [
+          -0.02325,
+          -0.045,
+          -0.067
+        ],
+        "bounds_max": [
+          0.02325,
+          0.659569,
+          0.059757
+        ]
+      },
+      "far": {
+        "vertices": 310,
+        "triangles": 106,
+        "bounds_min": [
+          -0.017537,
+          -0.044381,
+          -0.066869
+        ],
+        "bounds_max": [
+          0.017537,
+          0.659547,
+          0.054859
+        ]
+      }
+    },
+    "tip": {
+      "near": {
+        "vertices": 398,
+        "triangles": 152,
+        "bounds_min": [
+          -0.01105,
+          -0.0,
+          -0.045
+        ],
+        "bounds_max": [
+          0.01105,
+          0.602732,
+          0.018987
+        ]
+      },
+      "far": {
+        "vertices": 108,
+        "triangles": 36,
+        "bounds_min": [
+          -0.010739,
+          0.000154,
+          -0.044769
+        ],
+        "bounds_max": [
+          0.010736,
+          0.602181,
+          0.018838
+        ]
+      }
+    }
+  },
+  "near_triangles": 5122,
+  "far_triangles": 490,
+  "schema": 1
+}

@@ -41,6 +41,7 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
   public static void reloadResources() {
     CyberFont.warmup();
     HologramRenderer.reload();
+    dev.cybernetics2077.client.mantis.MantisBlenderMesh.reload();
   }
 
   @Override
