@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 final class MantisViewTest {
   @Test
-  void shoulderEndsStayBelowTheScreenThroughoutDeploymentAndCombat() {
+  void shoulderEndsStayOutsideTheScreenThroughoutDeploymentAndCombat() {
     for (boolean left : new boolean[] {false, true})
       for (boolean slim : new boolean[] {false, true}) {
         for (int combo = 0; combo < 4; combo++)
@@ -26,20 +26,52 @@ final class MantisViewTest {
   }
 
   private static void checkShoulderBelowScreen(boolean left, boolean slim, MantisMotion.Pose pose) {
-    var nativeProjection =
-        new Matrix4f().perspective((float) java.lang.Math.toRadians(70), 16f / 9, .05f, 1000);
-    var projection = MantisView.projection(nativeProjection, pose.ready());
-    for (boolean main : new boolean[] {false, true}) {
-      var view = MantisView.frame(left, main, slim, 0, 0, pose);
-      var matrix = new Matrix4f(projection).mul(view);
-      float depth = slim ? 3 / 16f : 4 / 16f;
-      float sleeve = .25f / 16;
-      for (float x : new float[] {-.125f - sleeve, .125f + sleeve})
-        for (float z : new float[] {-depth / 2 - sleeve, depth / 2 + sleeve}) {
-          var point = matrix.transformProject(new Vector3f(x, -.125f - sleeve, z));
-          assertTrue(point.y < -1, "Exposed shoulder cap in first person: " + point);
+    for (float aspect : new float[] {4f / 3, 16f / 9, 21f / 9}) {
+      var nativeProjection =
+          new Matrix4f().perspective((float) java.lang.Math.toRadians(70), aspect, .05f, 1000);
+      var projection = MantisView.projection(nativeProjection, pose.ready());
+      for (boolean main : new boolean[] {false, true}) {
+        var upper = MantisView.frame(left, main, slim, 0, 0, pose);
+        var matrix = new Matrix4f(projection).mul(upper);
+        float depth = slim ? 3 / 16f : 4 / 16f, sleeve = .25f / 16;
+        float X = .125f + sleeve, Z = depth / 2 + sleeve;
+        var polygon = new java.util.ArrayList<Vector4f>();
+        for (float[] corner : new float[][] {{-X, -Z}, {-X, Z}, {X, Z}, {X, -Z}})
+          polygon.add(matrix.transform(new Vector4f(corner[0], -.125f - sleeve, corner[1], 1)));
+        // Clip the entire cap polygon against the actual homogeneous viewing frustum.
+        // Testing isolated projected corners misses triangles crossing the near plane.
+        for (int plane = 0; plane < 6 && !polygon.isEmpty(); plane++) {
+          var clipped = new java.util.ArrayList<Vector4f>();
+          var previous = polygon.getLast();
+          float da = distance(previous, plane);
+          for (var current : polygon) {
+            float db = distance(current, plane);
+            if ((da >= 0) != (db >= 0))
+              clipped.add(new Vector4f(previous).lerp(current, da / (da - db)));
+            if (db >= 0) clipped.add(current);
+            previous = current;
+            da = db;
+          }
+          polygon = clipped;
         }
+        assertTrue(
+            polygon.isEmpty(),
+            "Exposed shoulder cap: "
+                + left
+                + " "
+                + main
+                + " "
+                + aspect
+                + " "
+                + pose
+                + " "
+                + polygon);
+      }
     }
+  }
+
+  private static float distance(Vector4f p, int plane) {
+    return p.w + (plane % 2 == 0 ? 1 : -1) * (plane < 2 ? p.x : plane < 4 ? p.y : p.z);
   }
 
   @Test
@@ -48,11 +80,13 @@ final class MantisViewTest {
       for (boolean slim : new boolean[] {false, true}) {
         var pose = MantisMotion.sample(true, 100, 100, 0, false, 0, left);
         var projection =
-            new Matrix4f().perspective((float) java.lang.Math.toRadians(52), 16f / 9, .05f, 1000);
+            new Matrix4f()
+                .perspective(
+                    (float) java.lang.Math.toRadians(MantisView.WEAPON_FOV), 16f / 9, .05f, 1000);
         var view = MantisView.frame(left, true, slim, 0, 0, pose).mul(MantisRig.elbow(pose));
         var wrist = projection.mul(view).transformProject(new Vector3f(0, .56f, 0));
         assertTrue(
-            wrist.y < -.6f && wrist.y > -.95f,
+            wrist.y < -.55f && wrist.y > -.85f,
             "Wrist should stay in the lower part of the view: " + wrist);
         assertTrue(java.lang.Math.abs(wrist.x) > .2f && java.lang.Math.abs(wrist.x) < .6f);
       }
@@ -65,7 +99,10 @@ final class MantisViewTest {
           new Matrix4f().perspective((float) java.lang.Math.toRadians(70), aspect, .05f, 1000);
       assertEquals(original, MantisView.projection(original, 0));
       var lens = MantisView.projection(original, 1);
-      assertEquals(52, java.lang.Math.toDegrees(2 * java.lang.Math.atan(1 / lens.m11())), .0001);
+      assertEquals(
+          MantisView.WEAPON_FOV,
+          java.lang.Math.toDegrees(2 * java.lang.Math.atan(1 / lens.m11())),
+          .0001);
       assertEquals(aspect, lens.m11() / lens.m00(), .00001);
       assertEquals(original.m22(), lens.m22());
       assertEquals(original.m32(), lens.m32());
@@ -85,7 +122,9 @@ final class MantisViewTest {
                 .transformDirection(new Vector3f(left ? 1 : -1, 0, 0))
                 .normalize();
         var towardHand = frame.transformDirection(new Vector3f(0, 1, 0)).normalize();
-        assertTrue(dorsal.y > .85, "Dorsal mount is not up: " + dorsal);
+        assertTrue(dorsal.y > .4, "Dorsal mount should face outward and up: " + dorsal);
+        assertTrue(
+            (left ? -dorsal.x : dorsal.x) > .7, "Dorsal mount should face outward: " + dorsal);
         var third =
             new Matrix4f()
                 .scale(-1, -1, 1)

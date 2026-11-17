@@ -7,6 +7,8 @@ import org.joml.Vector3f;
 
 /** First-person handover starts at Minecraft's actual empty-hand matrix, not a substitute pose. */
 public final class MantisView {
+  public static final float WEAPON_FOV = 68;
+
   private static float rad(float degrees) {
     return (float) Math.toRadians(degrees);
   }
@@ -42,13 +44,47 @@ public final class MantisView {
     }
     var goal =
         new Matrix4f()
-            .translate(side * .62f, -.55f, -.60f)
+            .translate(side * (main ? .59f : .43f), main ? -.72f : -.68f, main ? -.73f : -.78f)
             .rotateZ((float) Math.PI)
-            // Keep the shoulder below the viewport while the forearm reaches forward.
-            .rotateX(rad(-30))
             .scale(.9f)
-            .mul(MantisRig.shoulder(left, slim, pose));
-    return blend(start, goal, blend);
+            .mul(shoulder(left, slim, pose));
+    return blend <= 0 ? start : anchor(blend(start, goal, blend), slim);
+  }
+
+  /** Camera-space stance is independent of the world-space third-person shoulders. */
+  private static Matrix4f shoulder(boolean left, boolean slim, MantisMotion.Pose pose) {
+    float side = left ? -1 : 1, ready = pose.ready();
+    return new Matrix4f()
+        .rotateZ(rad(-side * 6 * ready + pose.roll()))
+        .rotateY(rad(-side * 12 * ready + pose.yaw()))
+        .rotateX(rad(-101 * ready + pose.pitch()))
+        // Present the dorsal housing toward the outside, rather than pinching it inward.
+        .rotateY(rad(side * 75 * ready))
+        .rotateY(rad((left ? -90 : 90) * (1 - ready)))
+        .translate(
+            MantisRig.nativeToMount(left)
+                .transformDirection(new Vector3f(MantisRig.centerOffset(left, slim), 0, 0)));
+  }
+
+  /** Keep the finite shoulder caps below the view without modifying any skin geometry. */
+  private static Matrix4f anchor(Matrix4f frame, boolean slim) {
+    float depth = slim ? 3 / 16f : 4 / 16f, sleeve = .25f / 16;
+    float tangent = (float) Math.tan(Math.toRadians(Math.max(70, WEAPON_FOV)) / 2);
+    float capY = -.125f - sleeve;
+    float centre =
+        (frame.m11() - tangent * frame.m12()) * capY + frame.m31() - tangent * frame.m32() + .02f;
+    float across = (frame.m01() - tangent * frame.m02()) * (.125f + sleeve);
+    float deep = (frame.m21() - tangent * frame.m22()) * (depth / 2 + sleeve);
+    // Smooth support of the cap rectangle against the bottom frustum plane.
+    // This is a smooth maximum of its four corners, with no per-frame allocations.
+    float boundary = centre + softAbs(across) + softAbs(deep);
+    float drop = .5f * (boundary + (float) Math.sqrt(boundary * boundary + .000001f));
+    return frame.m31(frame.m31() - drop);
+  }
+
+  private static float softAbs(float value) {
+    float absolute = Math.abs(value);
+    return absolute + .008f * (float) Math.log1p(Math.exp(-2 * absolute / .008));
   }
 
   /** Dedicated weapon lens; never modifies the player's world FOV setting. */
@@ -56,7 +92,7 @@ public final class MantisView {
     var result = new Matrix4f(current);
     float focal = Math.abs(current.m11());
     if (ready <= 0 || !Float.isFinite(focal) || focal < .0001f) return result;
-    float target = 1f / (float) Math.tan(Math.toRadians(52) / 2);
+    float target = 1f / (float) Math.tan(Math.toRadians(WEAPON_FOV) / 2);
     float ratio = (focal + (target - focal) * Math.clamp(ready, 0, 1)) / focal;
     return result.m00(current.m00() * ratio).m11(current.m11() * ratio);
   }

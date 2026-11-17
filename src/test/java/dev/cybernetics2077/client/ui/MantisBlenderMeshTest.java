@@ -19,6 +19,39 @@ final class MantisBlenderMeshTest {
   }
 
   @Test
+  void idleBladeMeshLeavesTheCentralAimLaneClear() throws Exception {
+    var model = read("near");
+    for (boolean left : new boolean[] {false, true}) {
+      var pose = MantisMotion.sample(true, 100, 100, 0, false, 0, left);
+      var bone = MantisView.frame(left, true, false, 0, 0, pose).mul(MantisRig.elbow(pose));
+      var projection =
+          new Matrix4f()
+              .perspective(
+                  (float) java.lang.Math.toRadians(MantisView.WEAPON_FOV), 16f / 9, .05f, 1000);
+      for (String name : new String[] {"mount", "carriage", "support", "blade", "tip", "edge"}) {
+        bone.mul(
+            switch (name) {
+              case "mount" -> MantisArticulation.mount(1);
+              case "carriage" -> MantisArticulation.carriage(1);
+              case "support" -> MantisArticulation.support(1, 1);
+              case "blade" -> MantisArticulation.blade(1, 1);
+              case "tip" -> MantisArticulation.tip(1);
+              default -> MantisArticulation.edge(1);
+            });
+        var matrix = new Matrix4f(projection).mul(bone);
+        var vertices = model.parts().get(name).vertices();
+        for (int j = 0; j < vertices.length; j += 8) {
+          var point =
+              matrix.transformProject(new Vector3f(vertices[j], vertices[j + 1], vertices[j + 2]));
+          assertTrue(
+              (left ? -point.x : point.x) > .25f,
+              "Idle blade points into the aim lane: " + name + " " + point);
+        }
+      }
+    }
+  }
+
+  @Test
   void foldedReceiverRisesWithTheSupportThenSlidesBackBeforeUnfolding() {
     for (float rise = 0; rise <= 1; rise += .025f) {
       var upper = MantisArticulation.blade(rise, 0);
