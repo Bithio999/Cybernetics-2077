@@ -53,16 +53,20 @@ final class NativeArmSkin {
               sleeve
                   ? (left ? model.leftSleeve : model.rightSleeve)
                   : (left ? model.leftArm : model.rightArm);
-          var collector = new Collector(MantisRig.centerOffset(left, slim));
-          var identity = new PoseStack();
-          part.visit(
-              new PoseStack(),
-              (pose, path, index, cube) -> cube.compile(identity.last(), collector, 0, 0, -1));
-          List<List<V>> faces = new ArrayList<>();
-          for (int i = 0; i < collector.vertices.size(); i += 4)
-            faces.add(List.copyOf(collector.vertices.subList(i, i + 4)));
-          return List.copyOf(faces);
+          return capture(part, left, slim);
         });
+  }
+
+  static List<List<V>> capture(ModelPart part, boolean left, boolean slim) {
+    var collector = new Collector(MantisRig.centerOffset(left, slim), left);
+    var identity = new PoseStack();
+    part.visit(
+        new PoseStack(),
+        (pose, path, index, cube) -> cube.compile(identity.last(), collector, 0, 0, -1));
+    List<List<V>> faces = new ArrayList<>();
+    for (int i = 0; i < collector.vertices.size(); i += 4)
+      faces.add(List.copyOf(collector.vertices.subList(i, i + 4)));
+    return List.copyOf(faces);
   }
 
   static List<V> clip(List<V> poly, int axis, float boundary, boolean greater) {
@@ -227,10 +231,12 @@ final class NativeArmSkin {
   private static final class Collector implements VertexConsumer {
     final List<V> vertices = new ArrayList<>();
     final float center;
+    final org.joml.Matrix4f basis;
     float x, y, z, u, v;
 
-    Collector(float center) {
+    Collector(float center, boolean left) {
       this.center = center;
+      this.basis = MantisRig.nativeToMount(left);
     }
 
     public VertexConsumer addVertex(float x, float y, float z) {
@@ -259,7 +265,9 @@ final class NativeArmSkin {
     }
 
     public VertexConsumer setNormal(float x, float y, float z) {
-      vertices.add(new V(this.x, this.y, this.z, u, v, x, y, z));
+      var position = basis.transformPosition(new org.joml.Vector3f(this.x, this.y, this.z));
+      var normal = basis.transformDirection(new org.joml.Vector3f(x, y, z));
+      vertices.add(new V(position.x, position.y, position.z, u, v, normal.x, normal.y, normal.z));
       return this;
     }
   }

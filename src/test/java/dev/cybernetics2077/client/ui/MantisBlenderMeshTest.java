@@ -76,42 +76,39 @@ final class MantisBlenderMeshTest {
 
   @Test
   void mechanismStaysWithinTheOpenForearmFootprintUntilItClearsTheSkin() throws Exception {
-    // The actual baked Minecraft arm ends at Y=.625, not .75. Check real
-    // exported vertices, for both widths, through opening and closing.
     for (String lod : new String[] {"near", "far"}) {
       var model = read(lod);
-      for (float age = 0; age <= 30; age += .125f) {
-        var motion = MantisMotion.sample(true, age, 100, 0, false, 0, false);
-        var matrix = MantisArticulation.mount(motion.panels());
-        for (String name : new String[] {"mount", "support", "blade", "tip", "edge"}) {
-          if (name.equals("support")) matrix.mul(MantisArticulation.support(motion.blade()));
-          if (name.equals("blade"))
-            matrix.mul(MantisArticulation.blade(motion.blade(), motion.extension()));
-          if (name.equals("tip")) matrix.mul(MantisArticulation.tip(motion.tip()));
-          if (name.equals("edge")) matrix.mul(MantisArticulation.edge(motion.tip()));
-          float[] v = model.parts().get(name).vertices();
-          for (int i = 0; i < v.length; i += 8) {
-            var point = matrix.transformPosition(new Vector3f(v[i], v[i + 1], v[i + 2]));
-            for (float width : new float[] {3 / 16f, 4 / 16f}) {
+      for (float depth : new float[] {3 / 16f, 4 / 16f})
+        for (float age = 0; age <= 30; age += .125f) {
+          var motion = MantisMotion.sample(true, age, 100, 0, false, 0, false);
+          var matrix = MantisArticulation.mount(motion.panels(), depth);
+          for (String name : new String[] {"mount", "support", "blade", "tip", "edge"}) {
+            if (name.equals("support")) matrix.mul(MantisArticulation.support(motion.blade()));
+            if (name.equals("blade"))
+              matrix.mul(MantisArticulation.blade(motion.blade(), motion.extension()));
+            if (name.equals("tip")) matrix.mul(MantisArticulation.tip(motion.tip()));
+            if (name.equals("edge")) matrix.mul(MantisArticulation.edge(motion.tip()));
+            var v = model.parts().get(name).vertices();
+            for (int i = 0; i < v.length; i += 8) {
+              var point = matrix.transformPosition(new Vector3f(v[i], v[i + 1], v[i + 2]));
               boolean inArm =
-                  java.lang.Math.abs(point.x) < width / 2
+                  java.lang.Math.abs(point.x) < MantisRig.ARM_WIDTH / 2
                       && point.y > -.125f
                       && point.y < .625f
-                      && point.z > -.125f
-                      && point.z < .125f;
+                      && point.z > -depth / 2
+                      && point.z < depth / 2;
               boolean inOpening =
-                  java.lang.Math.abs(point.x) < width * MantisSkinPanels.WIDTH - .004f
+                  java.lang.Math.abs(point.x) < MantisRig.ARM_WIDTH * MantisSkinPanels.WIDTH - .004f
                       && point.y > MantisSkinPanels.START
                       && point.y < MantisSkinPanels.END;
               if (age == 0)
-                assertTrue(inArm, "The stowed blade must fit completely inside the actual arm");
+                assertTrue(inArm, "The stowed implant must fit the actual skin cross section");
               assertFalse(
                   inArm && !inOpening,
                   () -> "Mechanism crosses intact arm skin: " + name + " " + point);
             }
           }
         }
-      }
     }
   }
 
@@ -166,7 +163,7 @@ final class MantisBlenderMeshTest {
       for (float age = 0; age <= 30; age += .5f) {
         var pose = MantisMotion.sample(true, age, 100, 0, false, 0, false);
         var elbow = MantisRig.elbow(pose);
-        var bone = new Matrix4f(elbow).mul(MantisArticulation.mount(pose.panels()));
+        var bone = new Matrix4f(elbow).mul(MantisArticulation.mount(pose.panels(), width));
         for (String name : new String[] {"mount", "support", "blade", "tip", "edge"}) {
           if (name.equals("support")) bone.mul(MantisArticulation.support(pose.blade()));
           if (name.equals("blade"))
@@ -185,8 +182,10 @@ final class MantisBlenderMeshTest {
                     || panel == MantisSkinPanels.Panel.SIDE_RIGHT;
             float plane =
                 side
-                    ? (panel == MantisSkinPanels.Panel.SIDE_LEFT ? -width / 2 : width / 2)
-                    : -.125f;
+                    ? (panel == MantisSkinPanels.Panel.SIDE_LEFT
+                        ? -MantisRig.ARM_WIDTH / 2
+                        : MantisRig.ARM_WIDTH / 2)
+                    : -width / 2;
             var a = new Vector3f();
             var b = new Vector3f();
             var c = new Vector3f();

@@ -58,10 +58,15 @@ public final class MantisBlenderMesh {
   }
 
   public static void render(
-      PoseStack p, VertexConsumer out, int light, MantisMotion.Pose motion, boolean distant) {
+      PoseStack p,
+      VertexConsumer out,
+      int light,
+      MantisMotion.Pose motion,
+      boolean distant,
+      float depth) {
     var model = model(distant);
     p.pushPose();
-    p.mulPose(MantisArticulation.mount(motion.panels()));
+    p.mulPose(MantisArticulation.mount(motion.panels(), depth));
     part(p, out, light, model, "mount");
     p.mulPose(MantisArticulation.support(motion.blade()));
     part(p, out, light, model, "support");

@@ -11,7 +11,7 @@ final class MantisSkinPanelsTest {
   @Test
   void closedPlatesTileTheDorsalSkinWithoutMissingOrDuplicatedAreas() {
     for (float width : new float[] {3 / 16f, 4 / 16f}) {
-      float border = width * MantisSkinPanels.WIDTH;
+      float border = MantisRig.ARM_WIDTH * MantisSkinPanels.WIDTH;
       for (int i = 0; i < 41; i++)
         for (int j = 0; j < 71; j++) {
           float x = -border + 2 * border * (i + .371f) / 41;
@@ -22,7 +22,7 @@ final class MantisSkinPanelsTest {
           for (var panel : MantisSkinPanels.ALL)
             if (panel != MantisSkinPanels.Panel.SIDE_LEFT
                 && panel != MantisSkinPanels.Panel.SIDE_RIGHT
-                && MantisSkinPanels.region(panel, width).contains(x, y, -.125f)) count++;
+                && MantisSkinPanels.region(panel, width).contains(x, y, -width / 2)) count++;
           assertEquals(1, count, "Overlapping or missing dermal plate");
         }
     }
@@ -37,11 +37,11 @@ final class MantisSkinPanelsTest {
               new Matrix4f().equals(MantisSkinPanels.transform(panel, width, 0, sleeve), .000001f));
           var previous =
               MantisSkinPanels.transform(panel, width, 0, sleeve)
-                  .transformPosition(new Vector3f(0, .3f, -.125f));
+                  .transformPosition(new Vector3f(0, .3f, -width / 2));
           for (float t = .001f; t <= 1; t += .001f) {
             var matrix = MantisSkinPanels.transform(panel, width, t, sleeve);
             assertEquals(1, matrix.determinant(), .00001);
-            var point = matrix.transformPosition(new Vector3f(0, .3f, -.125f));
+            var point = matrix.transformPosition(new Vector3f(0, .3f, -width / 2));
             assertTrue(previous.distance(point) < .01, "Skin cover jumped during deployment");
             previous = point;
           }
@@ -58,18 +58,19 @@ final class MantisSkinPanelsTest {
     for (float width : new float[] {3 / 16f, 4 / 16f}) {
       var wrist =
           MantisSkinPanels.transform(MantisSkinPanels.Panel.WRIST, width, 1, false)
-              .transformPosition(new Vector3f(0, .44f, -.125f));
+              .transformPosition(new Vector3f(0, .44f, -width / 2));
       assertTrue(wrist.y > .53f, "Wrist collar did not clear the mount");
       var rear =
           MantisSkinPanels.transform(MantisSkinPanels.Panel.PROXIMAL, width, 1, false)
-              .transformPosition(new Vector3f(0, .1f, -.125f));
+              .transformPosition(new Vector3f(0, .1f, -width / 2));
       assertTrue(rear.y < 0, "Proximal cover must slide behind the emerging support");
       for (var side :
           new MantisSkinPanels.Panel[] {
             MantisSkinPanels.Panel.SIDE_LEFT, MantisSkinPanels.Panel.SIDE_RIGHT
           }) {
         var r = MantisSkinPanels.region(side, width);
-        assertFalse(r.contains(width / 2, .3f, .08f), "A side cover cuts into the palm");
+        assertFalse(
+            r.contains(MantisRig.ARM_WIDTH / 2, .3f, .08f), "A side cover cuts into the palm");
       }
     }
   }

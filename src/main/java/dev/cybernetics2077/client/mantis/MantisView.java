@@ -27,7 +27,8 @@ public final class MantisView {
         .translate(side * 5.6f, 0, 0)
         .translate(-side * 5 / 16f, (slim ? 2.5f : 2f) / 16f, 0)
         .rotateZ(side * .1f)
-        .translate(MantisRig.centerOffset(left, slim), 0, 0);
+        .translate(MantisRig.centerOffset(left, slim), 0, 0)
+        .mul(MantisRig.mountToNative(left));
   }
 
   public static Matrix4f frame(

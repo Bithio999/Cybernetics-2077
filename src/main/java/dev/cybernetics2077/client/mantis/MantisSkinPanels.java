@@ -44,12 +44,12 @@ public final class MantisSkinPanels {
 
   private static final Map<Float, Region[]> REGIONS = new ConcurrentHashMap<>();
 
-  public static Region region(Panel panel, float width) {
+  public static Region region(Panel panel, float depth) {
     return REGIONS
         .computeIfAbsent(
-            width,
+            depth,
             w -> {
-              float b = w * WIDTH;
+              float b = MantisRig.ARM_WIDTH * WIDTH;
               return new Region[] {
                 new Region(-b, b, START, MantisRig.ELBOW_Y, -1, 1, 0, 0, 0),
                 new Region(-b, b, MantisRig.ELBOW_Y, .31f, -1, 1, .12f, -.024f, -1),
@@ -67,8 +67,8 @@ public final class MantisSkinPanels {
     return MantisMotion.smooth(Math.clamp((p - a) / (b - a), 0, 1));
   }
 
-  public static Matrix4f transform(Panel panel, float width, float open, boolean sleeve) {
-    float z = -.125f - (sleeve ? .015625f : 0), b = width * WIDTH;
+  public static Matrix4f transform(Panel panel, float depth, float open, boolean sleeve) {
+    float z = -depth / 2 - (sleeve ? .015625f : 0), b = MantisRig.ARM_WIDTH * WIDTH;
     var m = new Matrix4f();
     switch (panel) {
       case PROXIMAL -> {
@@ -103,7 +103,7 @@ public final class MantisSkinPanels {
       }
       case SIDE_LEFT, SIDE_RIGHT -> {
         float side = panel == Panel.SIDE_LEFT ? -1 : 1, t = phase(open, .12f, .86f);
-        float edge = side * (width / 2 + (sleeve ? .015625f : 0));
+        float edge = side * (MantisRig.ARM_WIDTH / 2 + (sleeve ? .015625f : 0));
         m.translate(side * .035f * t, 0, .006f * t)
             .translate(edge, 0, .02f)
             .rotateY((float) Math.toRadians(-side * 32 * t))

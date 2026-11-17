@@ -15,8 +15,7 @@ final class MantisRigTest {
           for (float t = 0; t < 24; t += .125f) {
             var motion = MantisMotion.sample(true, 100, t, combo, false, 0, left);
             var shoulder = MantisRig.shoulder(left, slim, motion);
-            var socket =
-                shoulder.transformPosition(new Vector3f(-MantisRig.centerOffset(left, slim), 0, 0));
+            var socket = shoulder.transformPosition(MantisRig.shoulderSocket(left, slim));
             assertEquals(0, socket.length(), .00001, "Shoulder detached");
             var upperEnd = shoulder.transformPosition(new Vector3f(0, MantisRig.ELBOW_Y, 0));
             var lowerStart =

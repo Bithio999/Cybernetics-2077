@@ -37,7 +37,8 @@ public final class NativeHandReferenceReview {
         new Matrix4f(e.getPoseStack().last().pose())
             .mul(
                 MantisView.frame(
-                    left, true, slim, e.getEquipProgress(), e.getSwingProgress(), rest));
+                    left, true, slim, e.getEquipProgress(), e.getSwingProgress(), rest))
+            .mul(MantisRig.nativeToMount(left));
   }
 
   @SubscribeEvent

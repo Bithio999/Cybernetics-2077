@@ -9,8 +9,12 @@ public final class MantisArticulation {
   public static final float SUPPORT_LENGTH = .405f;
 
   public static Matrix4f mount(float open) {
+    return mount(open, .25f);
+  }
+
+  public static Matrix4f mount(float open, float armDepth) {
     float lift = MantisMotion.smooth(Math.clamp((open - .65f) / .35f, 0, 1));
-    return new Matrix4f().translate(0, .43f, -.065f - .105f * lift);
+    return new Matrix4f().translate(0, .43f, -armDepth / 2 + .060f - .105f * lift);
   }
 
   public static Matrix4f support(float hinge) {

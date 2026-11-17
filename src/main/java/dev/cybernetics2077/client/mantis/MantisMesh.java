@@ -51,7 +51,7 @@ public final class MantisMesh {
       MantisMotion.Pose motion,
       boolean firstPerson) {
     boolean slim = player.getSkin().model() == PlayerSkin.Model.SLIM;
-    float width = slim ? 3 / 16f : 4 / 16f;
+    float depth = slim ? 3 / 16f : 4 / 16f;
     var local = source(player.getSkin().texture());
     var skin = local.getBuffer(RenderType.entityCutoutNoCull(player.getSkin().texture()));
     var metal = local.getBuffer(RenderType.entityCutoutNoCull(METAL));
@@ -61,10 +61,10 @@ public final class MantisMesh {
             ? net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE
             : net.minecraft.world.entity.player.PlayerModelPart.RIGHT_SLEEVE;
     boolean sleeves = player.isModelPartShown(sleeveFlag);
-    section(p, skin, metal, light, player, left, slim, width, motion, sleeves, true);
+    section(p, skin, metal, light, player, left, slim, depth, motion, sleeves, true);
     p.pushPose();
     p.mulPose(MantisRig.elbow(motion));
-    section(p, skin, metal, light, player, left, slim, width, motion, sleeves, false);
+    section(p, skin, metal, light, player, left, slim, depth, motion, sleeves, false);
     if (motion.panels() > .001f) {
       boolean distant =
           !firstPerson
@@ -74,7 +74,7 @@ public final class MantisMesh {
                       .getPosition()
                       .distanceToSqr(player.position())
                   > 256;
-      MantisBlenderMesh.render(p, modelBuffer, light, motion, distant);
+      MantisBlenderMesh.render(p, modelBuffer, light, motion, distant, depth);
     }
     p.popPose();
     local.endBatch();
@@ -88,10 +88,11 @@ public final class MantisMesh {
       AbstractClientPlayer player,
       boolean left,
       boolean slim,
-      float width,
+      float depth,
       MantisMotion.Pose motion,
       boolean sleeves,
       boolean upper) {
+    float width = MantisRig.ARM_WIDTH;
     float from = upper ? -1 : MantisRig.ELBOW_Y, to = upper ? MantisRig.ELBOW_Y : 1;
     float border = width * MantisSkinPanels.WIDTH;
     if (motion.panels() > .001f) {
@@ -103,10 +104,10 @@ public final class MantisMesh {
           light,
           -width / 2 + .006f,
           upper ? MantisSkinPanels.START : MantisRig.ELBOW_Y,
-          -.065f,
+          -depth / 2 + .060f,
           width / 2 - .006f,
           upper ? MantisRig.ELBOW_Y : MantisSkinPanels.END,
-          .118f,
+          depth / 2 - .007f,
           0xff463438);
     }
     for (int layer = 0; layer < 2; layer++) {
@@ -120,14 +121,14 @@ public final class MantisMesh {
           if (upper) {
             NativeArmSkin.part(p, skin, light, face, -border, border, from, MantisSkinPanels.START);
             panel(
-                p, skin, metal, light, face, MantisSkinPanels.Panel.PROXIMAL, width, motion, layer);
+                p, skin, metal, light, face, MantisSkinPanels.Panel.PROXIMAL, depth, motion, layer);
           } else {
             NativeArmSkin.part(p, skin, light, face, -border, border, MantisSkinPanels.END, to);
             for (var part : MantisSkinPanels.ALL)
               if (part != MantisSkinPanels.Panel.PROXIMAL
                   && part != MantisSkinPanels.Panel.SIDE_LEFT
                   && part != MantisSkinPanels.Panel.SIDE_RIGHT)
-                panel(p, skin, metal, light, face, part, width, motion, layer);
+                panel(p, skin, metal, light, face, part, depth, motion, layer);
           }
         } else if (!upper && Math.abs(normal.nx()) > .5f) {
           NativeArmSkin.part(p, skin, light, face, -1, 1, from, to, -.01f, 1);
@@ -141,7 +142,7 @@ public final class MantisMesh {
               normal.nx() < 0
                   ? MantisSkinPanels.Panel.SIDE_LEFT
                   : MantisSkinPanels.Panel.SIDE_RIGHT,
-              width,
+              depth,
               motion,
               layer);
         } else NativeArmSkin.part(p, skin, light, face, -1, 1, from, to);
@@ -156,10 +157,11 @@ public final class MantisMesh {
       int light,
       java.util.List<NativeArmSkin.V> face,
       MantisSkinPanels.Panel part,
-      float width,
+      float depth,
       MantisMotion.Pose motion,
       int layer) {
-    var transform = MantisSkinPanels.transform(part, width, motion.panels(), layer == 1);
+    float width = MantisRig.ARM_WIDTH, surface = -depth / 2;
+    var transform = MantisSkinPanels.transform(part, depth, motion.panels(), layer == 1);
     if (layer == 0 && motion.panels() > .001f) {
       float side =
           (part == MantisSkinPanels.Panel.MID_LEFT
@@ -171,14 +173,15 @@ public final class MantisMesh {
       switch (part) {
         case PROXIMAL -> {
           for (int sign : new int[] {-1, 1}) {
-            var tip = transform.transformPosition(new Vector3f(sign * width * .18f, .015f, -.125f));
-            strut(p, metal, light, new Vector3f(sign * width * .18f, -.025f, -.13f), tip);
+            var tip =
+                transform.transformPosition(new Vector3f(sign * width * .18f, .015f, surface));
+            strut(p, metal, light, new Vector3f(sign * width * .18f, -.025f, surface - .005f), tip);
           }
         }
         case WRIST -> {
           for (int sign : new int[] {-1, 1}) {
-            var tip = transform.transformPosition(new Vector3f(sign * width * .18f, .50f, -.125f));
-            strut(p, metal, light, new Vector3f(sign * width * .18f, .515f, -.13f), tip);
+            var tip = transform.transformPosition(new Vector3f(sign * width * .18f, .50f, surface));
+            strut(p, metal, light, new Vector3f(sign * width * .18f, .515f, surface - .005f), tip);
           }
         }
         case MID_LEFT, MID_RIGHT, CARRIER_LEFT, CARRIER_RIGHT -> {
@@ -186,19 +189,21 @@ public final class MantisMesh {
               (part == MantisSkinPanels.Panel.MID_LEFT || part == MantisSkinPanels.Panel.MID_RIGHT)
                   ? .20f
                   : .415f;
-          var tip = transform.transformPosition(new Vector3f(side * (border - .008f), y, -.125f));
-          strut(p, metal, light, new Vector3f(side * (border - .014f), y, -.09f), tip);
+          var tip = transform.transformPosition(new Vector3f(side * (border - .008f), y, surface));
+          strut(p, metal, light, new Vector3f(side * (border - .014f), y, surface + .035f), tip);
         }
         case SIDE_LEFT, SIDE_RIGHT -> {
-          var tip = transform.transformPosition(new Vector3f(side * width / 2, .32f, -.08f));
-          strut(p, metal, light, new Vector3f(side * (width / 2 - .01f), .32f, -.07f), tip);
+          var tip =
+              transform.transformPosition(new Vector3f(side * width / 2, .32f, surface + .045f));
+          strut(
+              p, metal, light, new Vector3f(side * (width / 2 - .01f), .32f, surface + .055f), tip);
         }
       }
     }
     p.pushPose();
     p.mulPose(transform);
     NativeArmSkin.panel(
-        p, skin, metal, light, face, MantisSkinPanels.region(part, width), layer == 0);
+        p, skin, metal, light, face, MantisSkinPanels.region(part, depth), layer == 0);
     p.popPose();
   }
 
