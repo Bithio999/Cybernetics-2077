@@ -35,6 +35,20 @@ public final class ScannerClient {
   private static long received;
   private static int focus = -1, focusTicks;
   private static long lastHack;
+  private static final org.joml.Matrix4f worldView = new org.joml.Matrix4f(),
+      worldProjection = new org.joml.Matrix4f();
+  private static net.minecraft.world.phys.Vec3 worldCamera = net.minecraft.world.phys.Vec3.ZERO;
+  private static boolean matrices;
+
+  @SubscribeEvent
+  public static void capture(RenderLevelStageEvent e) {
+    if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+      worldView.set(e.getModelViewMatrix());
+      worldProjection.set(e.getProjectionMatrix());
+      worldCamera = e.getCamera().getPosition();
+      matrices = true;
+    }
+  }
 
   public static void quickhack() {
     var own = dev.cybernetics2077.client.mantis.CyberwareClient.own();
@@ -125,6 +139,7 @@ public final class ScannerClient {
       down = false;
       motion = new ScannerMotion();
       prepared = false;
+      matrices = false;
     }
     held();
     if (!active() || m.level == null) return;
@@ -199,6 +214,7 @@ public final class ScannerClient {
       g.pose().scale((float) layout.scale(), (float) layout.scale(), 1);
       scanner(new CyberCanvas(g, 1), frame);
       g.pose().popPose();
+      overhead(g, w, h);
     } finally {
       CyberBatch.flush(g);
     }
@@ -243,61 +259,10 @@ public final class ScannerClient {
         17,
         RED);
     edge(chrome, f);
-    var link = root.fade(f.resource());
-    link.dots(695, 111, 3, 5, RED);
     var equipment = dev.cybernetics2077.client.mantis.CyberwareClient.own();
     boolean deck = equipment.getBoolean("deck"), chip = equipment.getBoolean("shortCircuit");
-    link.glowText(deck ? "CYBERDECK RAM" : "OPTICAL LINK", 720, 106, 23, CYAN);
-    if (deck) {
-      float ram = equipment.getFloat("ram");
-      for (int i = 0; i < 4; i++) {
-        float x = 997 + i * 38;
-        link.shape(Geometry.panel(x, 111, 29, 22, 4), 0xff10232b, 0xff4b8994);
-        link.rect(x + 3, 114, 23 * Math.clamp(ram - i, 0, 1), 16, 0xff74e2ed);
-        link.line(x + 8, 115, x + 8, 129, .8f, 0x9a142e39);
-        link.line(x + 20, 115, x + 20, 129, .8f, 0x9a142e39);
-      }
-      link.right(String.format(Locale.ROOT, "%.1f / 4", ram), 1255, 111, 16, 0xffb3dce2);
-    } else link.right("TIER 1", 1255, 111, 16, 0xffb3dce2);
-    link.glowLine(695, 151, 1255, 151, 1, 0x89e72c38);
-    var left = root.fade(f.layer(420, 230));
-    left.tracked(deck ? "AVAILABLE QUICKHACKS" : "OPTICAL SCANNER", 177, 315, 19, CYAN, 1);
-    left.line(177, 352, 552, 352, 1, 0x99cf3c45);
-    if (chip) {
-      boolean ready =
-          focus >= 0
-              && equipment.getFloat("ram") >= 2
-              && equipment.getList("uploads", 10).size() < 2;
-      left.shape(
-          Geometry.data(177, 370, 375, 77),
-          ready ? 0xd4371b28 : 0xd0141923,
-          ready ? 0xffe85565 : 0xff4c5963);
-      left.rect(177, 370, 4, 77, ready ? RED : 0xff64727a);
-      left.glowText("SHORT CIRCUIT", 245, 384, 24, ready ? 0xfff07983 : 0xff8799a5);
-      left.right("2", 532, 386, 23, CYAN);
-      left.tracked("RAM", 505, 417, 11, MUTED, .8f);
-      CyberGlyphs.quickhack(left, 194, 389, 33, ready ? 0xffff7882 : 0xff617889);
-      left.body("8 electrical damage  /  1 s upload", 177, 471, 17, 0xffa9c9d2);
-      left.body(
-          ready
-              ? "[LMB] UPLOAD SHORT CIRCUIT"
-              : focus < 0 ? "AIM AT A LIVING TARGET" : "RAM OR QUEUE UNAVAILABLE",
-          177,
-          501,
-          15,
-          ready ? CYAN : MUTED);
-      left.tracked("2 UPLOADS MAX  /  RAM REGENERATES", 177, 537, 11, MUTED, .7f);
-    } else {
-      left.body(
-          deck
-              ? "NO QUICKHACKS INSTALLED"
-              : entity == null ? "SEARCHING FOR A TARGET" : "LIVE TARGET ACQUIRED",
-          177,
-          373,
-          16,
-          0xffc5898f);
-      left.tracked(deck ? "MANAGE CHIPS AT THE BENCH" : "RANGE / 32 m", 177, 405, 12, MUTED, .8f);
-    }
+    resource(root.fade(f.resource()), f, equipment, deck);
+    hacks(root, f, equipment, deck, chip);
     data(root.fade(f.data()), f, entity);
     var controls = root.fade(f.layer(550, 180));
     controls.right(
@@ -308,6 +273,144 @@ public final class ScannerClient {
         1005,
         21,
         RED);
+  }
+
+  private static void resource(
+      CyberCanvas c, ScannerMotion.Frame f, CompoundTag equipment, boolean deck) {
+    c.dots(693, 97, 3, 5, 0x99ff323e);
+    if (!deck) {
+      c.glowText("OPTICAL LINK", 719, 108, 23, RED);
+      return;
+    }
+    float ram = equipment.getFloat("ram");
+    c.glowText(String.format(Locale.ROOT, "CYBERDECK RAM: %.1f / 4", ram), 719, 108, 23, RED);
+    c.glowLine(693, 151, 1257, 151, 1, 0xcfe72c38);
+    c.tracked("NEURAL RESERVE", 696, 146, 7, 0x99a52a30, 1);
+    for (int k = 0; k < 4; k++) {
+      var cell = c.fade(f.layer(230 + k * 4, 140) / Math.max(.0001, f.resource()));
+      float x = 720 + k * 17.55f, y = 163, w = 13.55f;
+      var path = Geometry.pip(x, y, w, 44);
+      float amount = Math.clamp(ram - k, 0, 1);
+      cell.shape(path, 0xd9190a0d, amount > 0 ? 0xff56dceb : 0xd9ff323e);
+      if (amount > 0) {
+        cell.polygon(path, amount >= 1 ? 0xf256dceb : 0x8056dceb);
+        cell.rect(x + 3, y + 4, 3, 4, 0xd0043e53);
+        cell.line(x + 1, y + 1, x + w - 1, y + 1, .65f, 0xb3b3f7ff);
+      }
+    }
+  }
+
+  private static void hacks(
+      CyberCanvas root, ScannerMotion.Frame f, CompoundTag equipment, boolean deck, boolean chip) {
+    var title = root.fade(f.hacks());
+    title.dots(181, 297, 3, 5, 0xb3cd3538);
+    title.tracked("NEURAL INTERFACE v.01", 195, 293, 12, 0xb3ac3335, .7f);
+    title.glowText(deck ? "AVAILABLE QUICKHACKS:" : "OPTICAL SCANNER", 200, 315, 26, CYAN);
+    title.glowLine(200, 361, 598, 361, 1, 0xffd62f39);
+    if (!chip) {
+      title.body(deck ? "NO QUICKHACKS INSTALLED" : "OPTICAL DATA ONLY", 230, 389, 17, MUTED);
+      return;
+    }
+    var c = root.fade(f.row(0));
+    float x = 210, y = 379, w = 410;
+    boolean poor = equipment.getFloat("ram") < 2,
+        queued = !equipment.getList("uploads", 10).isEmpty();
+    int tint = poor ? 0xffff565c : CYAN;
+    var path = Geometry.chip(x, y, w, 57);
+    c.halo(path, poor ? RED : CYAN);
+    c.shape(path, poor ? 0xf0421117 : 0xf2123c4f, poor ? 0xffd7414c : 0xff70f2ff);
+    c.glowText("SHORT CIRCUIT", x + 23, y + 7, 25, tint);
+    String status = queued ? "QUEUED" : poor ? "LOW RAM" : "READY";
+    float badge = c.width(status, 12, true) + 8;
+    c.stroke(Geometry.panel(x + 23, y + 35, badge, 16, 0), .7f, tint);
+    c.text(status, x + 27, y + 37, 12, tint);
+    c.stroke(Geometry.panel(x + 28 + badge, y + 35, 58, 16, 0), .7f, 0xfff7b05e);
+    c.text("COMBAT", x + 32 + badge, y + 37, 11, 0xfff7b05e);
+    float iconX = x + w - 49;
+    c.stroke(
+        List.of(
+            new Point(iconX, y + 4.5f),
+            new Point(iconX + 45, y + 4.5f),
+            new Point(iconX + 45, y + 52.5f),
+            new Point(iconX, y + 52.5f)),
+        .75f,
+        tint);
+    c.image(
+        Cybernetics2077.id("textures/item/short_circuit_tier_1.png"),
+        iconX + 5.5f,
+        y + 10.5f,
+        34,
+        36,
+        0xffffffff);
+    c.right("2", iconX - 35, y + 10, 31, tint);
+    c.line(iconX - 29, y + 16, iconX - 29, y + 38, .75f, tint);
+    c.line(iconX - 9, y + 16, iconX - 9, y + 38, .75f, tint);
+    c.text("RAM", iconX - 26, y + 23, 9, tint);
+    var help = root.fade(f.layer(570, 180));
+    help.g.pose().pushPose();
+    help.g.pose().translate(231, 466, 0);
+    help.g.pose().scale(.65f, .65f, 1);
+    help.mouse(0, 0, 0);
+    help.g.pose().popPose();
+    help.tracked("CLICK TO UPLOAD", 252, 468, 13, 0xffd35a60, .6f);
+    help.body("8 ELECTRICAL DAMAGE / 1 s UPLOAD", 230, 503, 14, MUTED);
+  }
+
+  private static void overhead(net.minecraft.client.gui.GuiGraphics g, float w, float h) {
+    var m = Minecraft.getInstance();
+    if (!matrices || m.level == null) return;
+    Map<Integer, List<CompoundTag>> groups = new LinkedHashMap<>();
+    for (var n : dev.cybernetics2077.client.mantis.CyberwareClient.own().getList("uploads", 10)) {
+      var q = (CompoundTag) n;
+      groups.computeIfAbsent(q.getInt("target"), id -> new ArrayList<>()).add(q);
+    }
+    if (active() && focus >= 0) groups.computeIfAbsent(focus, id -> new ArrayList<>());
+    for (var group : groups.entrySet()) {
+      var entity = m.level.getEntity(group.getKey());
+      if (entity == null) continue;
+      var at =
+          entity
+              .getPosition(m.getTimer().getGameTimeDeltaPartialTick(false))
+              .add(0, entity.getBbHeight() + .5, 0)
+              .subtract(worldCamera);
+      var clip =
+          new org.joml.Vector4f((float) at.x, (float) at.y, (float) at.z, 1)
+              .mul(worldView)
+              .mul(worldProjection);
+      if (clip.w <= 0) continue;
+      clip.div(clip.w);
+      if (Math.abs(clip.x) > 1.1 || Math.abs(clip.y) > 1.1) continue;
+      g.pose().pushPose();
+      g.pose().translate((clip.x + 1) * w / 2, (1 - clip.y) * h / 2, 0);
+      float scale = Math.min(w / 1920, h / 1080);
+      g.pose().scale(scale, scale, 1);
+      var c = new CyberCanvas(g, (float) frame.chrome());
+      String name = c.fit(entity.getName().getString().toUpperCase(Locale.ROOT), 440, 25, true);
+      c.glowText(name, -c.width(name, 25, true) / 2, -37, 25, 0xff71e9fa);
+      c.line(-5, -8, 0, -2, 1, CYAN);
+      c.line(0, -2, 5, -8, 1, CYAN);
+      var queue = group.getValue();
+      double now = m.level.getGameTime() + m.getTimer().getGameTimeDeltaPartialTick(false);
+      for (int k = 0; k < queue.size(); k++) {
+        var q = queue.get(k);
+        float x = -queue.size() * 25 + 4 + k * 50, y = -98;
+        float progress = (float) Math.clamp((now - q.getLong("start")) / 20, 0, 1);
+        var tile = Geometry.data(x, y, 42, 42);
+        c.halo(tile, RED);
+        c.shape(tile, 0xde3d131a, 0xfffa3b46);
+        if (now >= q.getLong("start"))
+          c.rect(x + 1, y + 41 - 40 * progress, 40, 40 * progress, 0x807c323d);
+        c.image(
+            Cybernetics2077.id("textures/item/short_circuit_tier_1.png"),
+            x + 6,
+            y + 5,
+            30,
+            30,
+            RED);
+        if (now >= q.getLong("start")) c.text((int) (progress * 100) + "%", x - 1, y - 20, 16, RED);
+      }
+      g.pose().popPose();
+    }
   }
 
   private static void edge(CyberCanvas c, ScannerMotion.Frame f) {

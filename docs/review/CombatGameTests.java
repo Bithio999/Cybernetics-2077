@@ -190,4 +190,37 @@ public final class CombatGameTests {
     h.assertTrue(CyberwareRuntime.bladeTarget(p, 4) == null, "Blade ray bypassed a wall");
     h.succeed();
   }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void leapTargetRequiresAimRangeVisibilityAndCancelsOnUnequip(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    install(p);
+    var mob = target(h, p);
+    h.assertTrue(CyberwareRuntime.lungeTarget(p) == mob, "Visible aimed target was not acquired");
+    p.setYRot(p.getYRot() + 90);
+    h.assertTrue(
+        CyberwareRuntime.lungeTarget(p) == null, "Leap acquired a target outside aim cone");
+    p.lookAt(
+        net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, mob.getEyePosition());
+    for (int y = 20; y <= 23; y++)
+      h.setBlock(new BlockPos(2, y, 3), net.minecraft.world.level.block.Blocks.STONE);
+    h.assertTrue(CyberwareRuntime.lungeTarget(p) == null, "Leap acquired through solid terrain");
+    for (int y = 20; y <= 23; y++)
+      h.setBlock(new BlockPos(2, y, 3), net.minecraft.world.level.block.Blocks.AIR);
+    mob.setPos(mob.getX(), mob.getY(), mob.getZ() + 9);
+    h.assertTrue(CyberwareRuntime.lungeTarget(p) == null, "Leap acquired beyond eight blocks");
+    var s = CyberwareRuntime.state(p);
+    s.deployed = true;
+    s.lunge =
+        new CyberwareRuntime.Lunge(
+            mob.getUUID(),
+            new LungePath(
+                p.getX(), p.getY(), p.getZ(), mob.getX(), mob.getY(), mob.getZ(), .65, 10),
+            p.serverLevel().getGameTime());
+    p.getInventory().setItem(0, new ItemStack(Items.STICK));
+    CyberwareRuntime.tick(p);
+    h.assertTrue(
+        s.lunge == null && !s.deployed && !s.pendingHit, "Unequip failed to cancel leap/contact");
+    h.succeed();
+  }
 }

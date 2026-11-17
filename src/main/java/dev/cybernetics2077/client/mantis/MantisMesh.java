@@ -59,13 +59,13 @@ public final class MantisMesh {
     var metal = local.getBuffer(RenderType.entityCutoutNoCull(METAL));
     int u = left ? 32 : 40, v = left ? 48 : 16;
     float side = left ? 1 : -1;
-    // Upper arm and fist remain intact. The lateral forearm casing opens along the outside.
+    // Upper arm rotates only at the shoulder; its end and the forearm share one elbow pivot.
+    var sleeveFlag =
+        left
+            ? net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE
+            : net.minecraft.world.entity.player.PlayerModelPart.RIGHT_SLEEVE;
     for (int layer = 0; layer < 2; layer++) {
-      var flag =
-          left
-              ? net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE
-              : net.minecraft.world.entity.player.PlayerModelPart.RIGHT_SLEEVE;
-      if (layer == 1 && !player.isModelPartShown(flag)) continue;
+      if (layer == 1 && !player.isModelPartShown(sleeveFlag)) continue;
       float inflate = layer == 0 ? 0 : .016f;
       int U = layer == 0 ? u : left ? 48 : 40, V = layer == 0 ? v : left ? 48 : 32;
       skinBox(
@@ -82,7 +82,16 @@ public final class MantisMesh {
           V,
           width,
           true,
-          false);
+          true);
+    }
+    cylinder(p, metal, light, 0, MantisRig.ELBOW_Y, 0, .113f, width * .96f, 0xff5c6970);
+    p.pushPose();
+    p.mulPose(MantisRig.elbow(motion));
+
+    for (int layer = 0; layer < 2; layer++) {
+      if (layer == 1 && !player.isModelPartShown(sleeveFlag)) continue;
+      float inflate = layer == 0 ? 0 : .016f;
+      int U = layer == 0 ? u : left ? 48 : 40, V = layer == 0 ? v : left ? 48 : 32;
       skinBox(
           p,
           skin,
@@ -230,6 +239,7 @@ public final class MantisMesh {
       blade(p, metal, light, left);
       p.popPose();
     }
+    p.popPose();
     local.endBatch();
   }
 

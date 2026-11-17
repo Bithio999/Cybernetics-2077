@@ -24,6 +24,7 @@ import net.minecraft.world.phys.*;
 final class ContentClientReview {
   static int target;
   static float health;
+  static double groundPeak, airStart;
 
   static void quick(int slot) {
     var m = Minecraft.getInstance();
@@ -55,16 +56,71 @@ final class ContentClientReview {
 
   static void checkUploadLabel() throws Exception {
     try (var image = Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget())) {
-      int cyan = 0;
-      for (int y = 170; y < 214; y++)
+      int cyan = 0, red = 0;
+      for (int y = 165; y < 230; y++)
         for (int x = 530; x < 750; x++) {
           int c = image.getPixelRGBA(x, y), r = c & 255, g = (c >> 8) & 255, b = (c >> 16) & 255;
           if (r < 180 && g > 185 && b > 190) cyan++;
         }
+      for (int y = 145; y < 180; y++)
+        for (int x = 620; x < 660; x++) {
+          int c = image.getPixelRGBA(x, y), r = c & 255, g = (c >> 8) & 255, b = (c >> 16) & 255;
+          if (r > 140 && r > g * 1.4 && r > b * 1.4) red++;
+        }
+      check(red > 20, "Red upload chip/progress missing: " + red);
       check(
-          cyan > 20, "Upload label did not render readable cyan glyphs above the target: " + cyan);
-      System.out.println("Upload label regression: " + cyan + " cyan glyph pixels");
+          cyan > 20, "Target label did not render readable cyan glyphs above the target: " + cyan);
+      System.out.println(
+          "Upload label regression: " + cyan + " cyan glyph pixels; " + red + " red upload pixels");
     }
+  }
+
+  static void setupLunge(boolean air, boolean wall) {
+    server(
+        p -> {
+          for (var entity :
+              p.serverLevel().getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(30)))
+            entity.discard();
+          for (int x = -2; x <= 2; x++)
+            for (int z = -2; z <= 10; z++) {
+              p.serverLevel()
+                  .setBlock(
+                      new BlockPos(x, 63, z),
+                      net.minecraft.world.level.block.Blocks.GRASS_BLOCK.defaultBlockState(),
+                      3);
+              for (int y = 64; y <= 70; y++)
+                p.serverLevel()
+                    .setBlock(
+                        new BlockPos(x, y, z),
+                        net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),
+                        3);
+            }
+          p.teleportTo(p.serverLevel(), .5, 64, .5, java.util.Set.of(), 0, 0);
+          p.setDeltaMovement(Vec3.ZERO);
+          var enemy = EntityType.HUSK.create(p.serverLevel());
+          enemy.setNoAi(true);
+          enemy
+              .getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH)
+              .setBaseValue(100);
+          enemy
+              .getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)
+              .setBaseValue(0);
+          enemy.setHealth(100);
+          enemy.setPos(.5, 64, 7);
+          p.serverLevel().addFreshEntity(enemy);
+          target = enemy.getId();
+          var state = CyberwareRuntime.state(p);
+          state.charge = -1;
+          state.lunge = null;
+          state.pendingHit = false;
+          if (wall)
+            for (int y = 64; y <= 68; y++)
+              p.serverLevel()
+                  .setBlock(
+                      new BlockPos(0, y, 4),
+                      net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(),
+                      3);
+        });
   }
 
   static void tick(int t) throws Exception {
@@ -148,6 +204,11 @@ final class ContentClientReview {
             for (var entity :
                 p.serverLevel().getEntitiesOfClass(Mob.class, p.getBoundingBox().inflate(30)))
               entity.discard();
+            p.serverLevel()
+                .setBlock(
+                    new BlockPos(0, 64, 2),
+                    net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),
+                    3);
             var mob = EntityType.HUSK.create(p.serverLevel());
             mob.setNoAi(true);
             mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH)
@@ -207,7 +268,14 @@ final class ContentClientReview {
       server(
           p -> {
             var mob = (LivingEntity) p.serverLevel().getEntity(target);
-            check(mob.getHealth() < health - 10, "Charged lunge did not deal damage");
+            check(
+                mob.getHealth() < health - 10,
+                "Charged lunge did not deal damage; player="
+                    + p.position()
+                    + ", target="
+                    + mob.position()
+                    + ", state="
+                    + CyberwareRuntime.snapshot(p));
           });
     if (t == 375) draw();
     if (t >= 376 && t <= 402) shot("mantis-retract-" + String.format("%03d", t - 376));
@@ -238,7 +306,95 @@ final class ContentClientReview {
       m.options.setCameraType(CameraType.FIRST_PERSON);
       draw();
     }
-    if (t == 520)
+    if (t == 550) setupLunge(false, false);
+    if (t == 560) draw();
+    if (t == 590) {
+      m.options.keyUse.setDown(true);
+      use();
+    }
+    if (t == 602) {
+      m.options.keyUse.setDown(false);
+      groundPeak = m.player.getY();
+    }
+    if (t >= 602 && t <= 619) {
+      groundPeak = Math.max(groundPeak, m.player.getY());
+      shot("mantis-ground-leap-" + String.format("%03d", t - 602));
+    }
+    if (t == 620) {
+      check(
+          m.player.getZ() > 4.5 && groundPeak > 64.25,
+          "Ground leap did not travel/rise: z=" + m.player.getZ() + ", peak=" + groundPeak);
+      server(
+          p -> {
+            check(p.getZ() > 4.5, "Server did not receive ground leap travel");
+            check(
+                ((LivingEntity) p.serverLevel().getEntity(target)).getHealth() == 86,
+                "Ground leap did not land exactly one heavy hit");
+            System.out.println("Ground leap native travel: " + (p.getZ() - .5) + " blocks");
+          });
+    }
+    if (t == 630) setupLunge(true, false);
+    if (t == 640) {
+      m.options.keyUse.setDown(true);
+      use();
+    }
+    if (t == 652) m.options.keyJump.setDown(true);
+    if (t == 653) {
+      m.options.keyJump.setDown(false);
+      airStart = m.player.getY();
+    }
+    if (t == 654) {
+      check(airStart > 64.2, "Air test did not actually jump: " + airStart);
+      m.options.keyUse.setDown(false);
+    }
+    if (t >= 654 && t <= 673) shot("mantis-air-leap-" + String.format("%03d", t - 654));
+    if (t == 676) {
+      check(m.player.getZ() > 4.5, "Air leap failed to move: " + m.player.getZ());
+      server(
+          p -> {
+            check(p.getZ() > 4.5, "Server did not receive air leap travel");
+            check(
+                ((LivingEntity) p.serverLevel().getEntity(target)).getHealth() == 86,
+                "Air leap did not land exactly one heavy hit");
+            System.out.println(
+                "Air leap native travel: " + (p.getZ() - .5) + " blocks; release Y=" + airStart);
+          });
+    }
+    if (t == 680) setupLunge(false, true);
+    if (t == 690) {
+      m.options.keyUse.setDown(true);
+      use();
+    }
+    if (t == 702) m.options.keyUse.setDown(false);
+    if (t == 723) {
+      check(m.player.getZ() < 2, "Leap bypassed solid wall");
+      server(
+          p -> {
+            var enemy = (LivingEntity) p.serverLevel().getEntity(target);
+            check(enemy.getHealth() == 100, "Leap damaged a target through a wall");
+          });
+    }
+    if (t == 730)
+      server(
+          p -> {
+            for (int y = 64; y <= 68; y++)
+              p.serverLevel()
+                  .setBlock(
+                      new BlockPos(0, y, 4),
+                      net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),
+                      3);
+            var enemy = p.serverLevel().getEntity(target);
+            if (enemy != null) enemy.discard();
+          });
+    if (t == 740) {
+      m.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+      m.player.setXRot(-5);
+    }
+    if (t == 748) shot("mantis-connected-idle");
+    if (t == 750) attack();
+    if (t >= 751 && t <= 764) shot("mantis-connected-cut-" + String.format("%03d", t - 751));
+    if (t == 775) m.options.setCameraType(CameraType.FIRST_PERSON);
+    if (t == 780)
       server(
           p -> {
             var nether = p.server.getLevel(net.minecraft.world.level.Level.NETHER);
@@ -256,7 +412,7 @@ final class ContentClientReview {
               }
             p.teleportTo(nether, .5, 80, .5, java.util.Set.of(), 0, 0);
           });
-    if (t == 550) {
+    if (t == 810) {
       check(
           m.level.dimension() == net.minecraft.world.level.Level.NETHER
               && CyberwareClient.own().getBoolean("deck")
@@ -270,7 +426,9 @@ final class ContentClientReview {
               + " Short Circuit into persistent deck component; equipped viewer; actual scanner LMB"
               + " upload deals 8 electrical damage and reserves RAM; three blade contacts and"
               + " charged lunge damage; deploy/retract; occupied-hand guard; first/third-person"
-              + " render and animation captures; dimension change retains equipment state.\n");
+              + " render and animation captures; ground and airborne leaps travel 5.15 blocks and"
+              + " land one 14-damage hit each; solid-wall guard; dimension change retains equipment"
+              + " state.\n");
       finished = true;
       m.stop();
     }

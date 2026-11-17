@@ -1,0 +1,26 @@
+[
+  {
+    "item": "optical_scanner",
+    "url": "https://cdn.gamestegy.com/posts-images/basic-kiroshi-optics-cyberpunk-2077-UHkT8XEiSK.png?height=116",
+    "sha256": "51d3484d9f8fa7ad359feadf03e9896e612a9694d5fa3dc485bf27eda71e52d1",
+    "credit": "Cyberpunk 2077 icon artwork \u00a9 CD PROJEKT RED; reference hosted by Gamestegy."
+  },
+  {
+    "item": "cyberdeck_tier_1",
+    "url": "https://cdn.gamestegy.com/cp2077/icons/cyberware/militech-paraline.png?height=116",
+    "sha256": "fbd11a70c86de2b4007ceba88008dc0687b7ae0aa2e875d69850f70a35909953",
+    "credit": "Cyberpunk 2077 icon artwork \u00a9 CD PROJEKT RED; reference hosted by Gamestegy."
+  },
+  {
+    "item": "mantis_claws_tier_1",
+    "url": "https://cdn.gamestegy.com/cp2077/icons/cyberware/mantis-blades.png?height=116",
+    "sha256": "bf58c4e2b6fe888753e684a7880e504740c14621caf7205c5bc7714728af0c34",
+    "credit": "Cyberpunk 2077 icon artwork \u00a9 CD PROJEKT RED; reference hosted by Gamestegy."
+  },
+  {
+    "item": "short_circuit_tier_1",
+    "url": "https://cdn.gamestegy.com/cp2077/quickhacks-icons/short-circuit.png?width=128",
+    "sha256": "2333a4e6227bdbf82606a8d2c9dce8c91bbe2138f541f2e42041d6948bb5dced",
+    "credit": "Cyberpunk 2077 icon artwork \u00a9 CD PROJEKT RED; reference hosted by Gamestegy."
+  }
+]

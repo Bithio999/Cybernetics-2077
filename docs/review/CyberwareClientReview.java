@@ -308,6 +308,7 @@ public final class CyberwareClientReview {
           Files.createDirectories(OUT);
           Files.deleteIfExists(OUT.resolve("passed.txt"));
           Files.deleteIfExists(OUT.resolve("failed.txt"));
+          Files.deleteIfExists(OUT.resolve("content-passed.txt"));
           mc.options.pauseOnLostFocus = false;
           mc.options.guiScale().set(2);
           mc.options.enableVsync().set(false);

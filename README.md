@@ -23,7 +23,7 @@ The scanner shows health, armor, attack damage, absorption and visible effects. 
 
 ![Short Circuit scanner](docs/images/short-circuit-scanner.png)
 
-Mantis Claws open the outside of each forearm, reveal the mechanism, and unfold into combat position. **Left-click** chains alternating slashes; **hold and release right-click** for a charged lunge. First- and third-person animations follow the contact frames used for damage.
+Mantis Claws open the outside of each forearm, reveal the mechanism, and unfold into combat position. **Left-click** chains alternating slashes; **hold and release right-click** for a charged lunge toward a visible target within **8 blocks**, from the ground or in midair. First- and third-person animations follow the contact frames used for damage.
 
 [Watch the claw animations](docs/media/mantis-claws.mp4) · [Equipment, controls and recipes](docs/CYBERWARE.md)
 
@@ -39,7 +39,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.4.0.jar](releases/Cybernetics2077-0.4.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.4.1.jar](releases/Cybernetics2077-0.4.1.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 
@@ -58,4 +58,4 @@ Development client: `./gradlew runClient`. See [validation and review instructio
 
 ## Credits
 
-Interface artwork, articulated arm and blade meshes, shaders, implant and workstation textures, and category glyphs are original mod assets. Rajdhani is distributed under the [SIL Open Font License](src/main/resources/assets/cybernetics2077/font/rajdhani-license.txt). Cyberpunk 2077 belongs to CD PROJEKT; this is an independent fan project, with no game textures included.
+Articulated arm and blade meshes, interface geometry, shaders, workstation textures and category glyphs are original mod assets. The four implant/program icons use Cyberpunk 2077 artwork © CD PROJEKT RED, hosted by Gamestegy; see the [asset manifest](art/cyberpunk-icons/sources.json) and [implementation references](docs/research/CYBERWARE.md). Rajdhani is distributed under the [SIL Open Font License](src/main/resources/assets/cybernetics2077/font/rajdhani-license.txt). Cyberpunk 2077 belongs to CD PROJEKT; this is an independent fan project.

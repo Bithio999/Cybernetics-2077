@@ -68,6 +68,50 @@ public final class CyberwareClient {
         p.getMainArm() == HumanoidArm.LEFT ? !left : left);
   }
 
+  private static long lungeId = Long.MIN_VALUE;
+  private static int lungeAge;
+  private static boolean lungeBlocked;
+
+  /**
+   * Used by the local player's travel hook, so ground friction and gravity cannot swallow a leap.
+   */
+  public static boolean moveLunge(net.minecraft.world.entity.player.Player player) {
+    var t = own().getCompound("lunge");
+    if (!active() || !t.contains("started") || !player.isAlive() || player.isPassenger())
+      return false;
+    long id = t.getLong("started");
+    if (id != lungeId) {
+      lungeId = id;
+      lungeAge = 0;
+      lungeBlocked = false;
+    }
+    if (lungeBlocked) return false;
+    var path =
+        new LungePath(
+            t.getDouble("sx"),
+            t.getDouble("sy"),
+            t.getDouble("sz"),
+            t.getDouble("ex"),
+            t.getDouble("ey"),
+            t.getDouble("ez"),
+            t.getDouble("arc"),
+            t.getInt("ticks"));
+    if (lungeAge >= path.ticks()) {
+      player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+      return false;
+    }
+    var step = path.step(player.getX(), player.getY(), player.getZ(), lungeAge++);
+    var before = player.position();
+    player.setDeltaMovement(step.x(), step.y(), step.z());
+    player.move(net.minecraft.world.entity.MoverType.SELF, player.getDeltaMovement());
+    player.resetFallDistance();
+    if (player.position().distanceToSqr(before) < .0004 || player.horizontalCollision) {
+      lungeBlocked = true;
+      player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+    }
+    return true;
+  }
+
   public static void attack() {
     if (!ScannerClient.active()) PacketDistributor.sendToServer(new CyberwareNetwork.Action(1));
   }
@@ -127,6 +171,7 @@ public final class CyberwareClient {
       }
       level = m.level;
       chargeHeld = false;
+      lungeId = Long.MIN_VALUE;
     }
     while (DRAW.consumeClick())
       if (m.player != null && m.screen == null && !ScannerClient.active())
@@ -150,12 +195,15 @@ public final class CyberwareClient {
       float sign = left ? -1 : 1;
       var p = e.getPoseStack();
       p.pushPose();
-      p.translate(sign * .48 + pose.x(), -.57 + pose.y(), -.58 + pose.z());
-      p.mulPose(com.mojang.math.Axis.YP.rotationDegrees(sign * 8 + pose.yaw()));
-      p.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(sign * 10 + pose.roll()));
-      p.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-72 + pose.pitch()));
-      // Player model coordinates face the camera in third person; hands use the reverse X axis.
-      p.scale(-.82f, .82f, .82f);
+      // Fixed shoulder anchors extend off the bottom/sides of the view. Convert the canonical
+      // player axes into camera axes before applying the SAME joint rig as third person.
+      p.translate(sign * .46, -.50, -.72);
+      p.scale(-.82f, -.82f, .82f);
+      p.mulPose(
+          MantisRig.shoulder(
+              left,
+              m.player.getSkin().model() == net.minecraft.client.resources.PlayerSkin.Model.SLIM,
+              pose));
       MantisMesh.render(p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose);
       p.popPose();
     }

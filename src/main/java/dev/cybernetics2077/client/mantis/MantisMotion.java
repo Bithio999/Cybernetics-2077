@@ -3,7 +3,7 @@ package dev.cybernetics2077.client.mantis;
 import dev.cybernetics2077.combat.CombatRules;
 
 /**
- * Continuous articulated motion: anticipation, fast contact stroke, follow-through, eased recovery.
+ * Connected joint choreography from the reference: alternating cuts and a two-arm strong thrust.
  */
 public final class MantisMotion {
   public record Pose(
@@ -15,7 +15,8 @@ public final class MantisMotion {
       float pitch,
       float yaw,
       float roll,
-      float trail) {}
+      float trail,
+      float elbow) {}
 
   public static Pose sample(
       boolean deployed,
@@ -30,43 +31,36 @@ public final class MantisMotion {
     float panels = smooth(Math.clamp((d - .05f) / .48f, 0, 1));
     float blade = smooth(Math.clamp((d - .27f) / .68f, 0, 1));
     float side = left ? -1 : 1;
-    float duration = combo == 3 ? 22 : 10;
-    float t = sinceAttack / duration;
-    float x = 0, y = 0, z = 0, pitch = 0, yaw = 0, roll = 0, trail = 0;
-    boolean strikes = combo == 3 || left == (combo == 1);
-    if (strikes && t >= 0 && t < 1) {
+    float duration = combo == 3 ? 22 : 10, t = sinceAttack / duration;
+    float pitch = 0, yaw = 0, roll = 0, trail = 0, elbow = -65 * blade;
+    if ((combo == 3 || left == (combo == 1)) && t >= 0 && t < 1) {
       float wind = smooth(Math.clamp(t / .23f, 0, 1));
       float cut = smooth(Math.clamp((t - .23f) / .25f, 0, 1));
       float recover = smooth(Math.clamp((t - .53f) / .47f, 0, 1));
       float anticipation = wind * (1 - cut), follow = cut * (1 - recover);
       if (combo == 3) {
-        x = side * (-.12f * anticipation - .18f * follow);
-        y = .20f * anticipation - .06f * follow;
-        z = .12f * anticipation - .42f * follow;
-        pitch = 48 * anticipation - 32 * follow;
-        yaw = side * (22 * anticipation - 16 * follow);
-        roll = side * (30 * anticipation - 24 * follow);
+        pitch = 8 * anticipation - 15 * follow;
+        yaw = side * (14 * anticipation - 8 * follow);
+        roll = side * (8 * anticipation - 10 * follow);
+        elbow += -28 * anticipation + 18 * follow;
       } else {
         float reverse = combo == 2 ? -1 : 1;
-        x = side * (.20f * anticipation - .48f * follow);
-        y = -.10f * anticipation + .14f * follow;
-        z = .10f * anticipation - .22f * follow;
-        pitch = -18 * anticipation + 15 * follow;
-        yaw = side * (30 * anticipation - 45 * follow);
-        roll = side * reverse * (40 * anticipation - 64 * follow);
+        pitch = -6 * anticipation + reverse * 12 * follow;
+        yaw = side * (20 * anticipation - 60 * follow);
+        roll = side * reverse * (18 * anticipation - 60 * follow);
+        elbow += -22 * anticipation + 16 * follow;
       }
       trail = (float) Math.sin(Math.PI * Math.clamp((t - .20f) / .35f, 0, 1));
     }
     if (charging) {
       float c = smooth(Math.clamp(chargeAge / 15, 0, 1));
-      y += .18f * c;
-      pitch += 40 * c;
-      roll += side * 26 * c;
-      z += .08f * c;
+      pitch += 6 * c;
+      yaw += side * 8 * c;
+      roll += side * 7 * c;
+      elbow -= 15 * c;
     }
-    y -= .07f * (1 - d);
-    z += .18f * (1 - d);
-    return new Pose(panels, blade, x, y, z, pitch, yaw, roll, trail);
+    // Animation never translates a shoulder away from its socket. Reach comes from the joints.
+    return new Pose(panels, blade, 0, 0, 0, pitch, yaw, roll, trail, elbow);
   }
 
   public static float smooth(float t) {

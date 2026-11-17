@@ -1,7 +1,6 @@
 package dev.cybernetics2077.client.mantis;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -33,17 +32,11 @@ public final class MantisLayer
       var motion = CyberwareClient.pose(player, left, partial);
       p.pushPose();
       arm.translateAndRotate(p);
-      p.translate(
-          (left ? 1 : -1)
-              * (player.getSkin().model() == net.minecraft.client.resources.PlayerSkin.Model.SLIM
-                  ? .5f
-                  : 1f)
-              / 16f,
-          0,
-          0);
-      p.mulPose(Axis.ZP.rotationDegrees(motion.roll() * .9f));
-      p.mulPose(Axis.YP.rotationDegrees(motion.yaw() * .8f));
-      p.mulPose(Axis.XP.rotationDegrees(motion.pitch() - motion.blade() * 55));
+      p.mulPose(
+          MantisRig.shoulder(
+              left,
+              player.getSkin().model() == net.minecraft.client.resources.PlayerSkin.Model.SLIM,
+              motion));
       MantisMesh.render(p, buffers, light, player, left, motion);
       p.popPose();
     }

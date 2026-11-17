@@ -61,7 +61,7 @@ Install in **Arms**, empty both hands, and press **G** to deploy or retract the 
 | Left-click | Alternating right/left slash, then rising cut | 8 / 8 / 10 | 0.5 seconds |
 | Hold right-click ≥0.4 seconds, release | Charged double-blade lunge | 14 | 1.1 seconds |
 
-Deployment takes **1.2 seconds**. Damage lands on the animated contact frame and requires aim, range and line of sight. The lunge uses normal movement and collision. Holding an item retracts the claws. Keys can be rebound under **Options → Controls → Cybernetics 2077**.
+Deployment takes **1.2 seconds**. Damage lands on the animated contact frame and requires aim, range and line of sight. Aim at a visible living target within **8 blocks** for a leap, including from midair. The leap follows a short arc, stops at solid obstacles and deals damage at contact. Without a target it performs a heavy slash in place. Holding an item retracts the claws. Keys can be rebound under **Options → Controls → Cybernetics 2077**.
 
 ID: `cybernetics2077:mantis_claws_tier_1`
 

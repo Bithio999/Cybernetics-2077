@@ -39,6 +39,27 @@ final class CyberCanvas {
     v.addVertex(p, d.x(), d.y(), 0).setColor(tint);
   }
 
+  void image(
+      net.minecraft.resources.ResourceLocation texture,
+      float x,
+      float y,
+      float w,
+      float h,
+      int tint) {
+    int color = color(tint);
+    var pose = new org.joml.Matrix4f(g.pose().last().pose());
+    CyberBatch.submit(
+        g,
+        texture,
+        1,
+        out -> {
+          out.addVertex(pose, x, y, 0).setUv(0, 0).setColor(color);
+          out.addVertex(pose, x, y + h, 0).setUv(0, 1).setColor(color);
+          out.addVertex(pose, x + w, y + h, 0).setUv(1, 1).setColor(color);
+          out.addVertex(pose, x + w, y, 0).setUv(1, 0).setColor(color);
+        });
+  }
+
   void polygon(List<Point> p, int c) {
     for (var t : triangulate(p)) quad(t.a(), t.b(), t.c(), t.c(), c);
   }

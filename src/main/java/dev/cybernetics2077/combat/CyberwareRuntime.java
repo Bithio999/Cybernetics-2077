@@ -28,11 +28,14 @@ public final class CyberwareRuntime {
     public long changed = -1000, attack = -1000, charge = -1, lastAttack = -1000;
     public int combo, nextCombo, target = -1;
     public boolean pendingHit;
+    public Lunge lunge;
     public final ArrayDeque<Upload> uploads = new ArrayDeque<>();
     private CompoundTag sent;
   }
 
   public record Upload(UUID target, long start, long finish, int id) {}
+
+  public record Lunge(UUID target, LungePath path, long started) {}
 
   private static final Map<ServerPlayer, State> STATES = new WeakHashMap<>();
 
@@ -73,6 +76,21 @@ public final class CyberwareRuntime {
     t.putLong("attack", s.attack);
     t.putInt("combo", s.combo);
     t.putLong("charge", s.charge);
+    if (s.lunge != null) {
+      var l = s.lunge;
+      var path = l.path();
+      var q = new CompoundTag();
+      q.putLong("started", l.started());
+      q.putInt("ticks", path.ticks());
+      q.putDouble("arc", path.arc());
+      q.putDouble("sx", path.sx());
+      q.putDouble("sy", path.sy());
+      q.putDouble("sz", path.sz());
+      q.putDouble("ex", path.ex());
+      q.putDouble("ey", path.ey());
+      q.putDouble("ez", path.ez());
+      t.put("lunge", q);
+    }
     var queue = new ListTag();
     for (var upload : s.uploads) {
       var q = new CompoundTag();
@@ -119,6 +137,7 @@ public final class CyberwareRuntime {
       s.changed = now;
       s.charge = -1;
       s.pendingHit = false;
+      s.lunge = null;
       p.level()
           .playSound(
               null,
@@ -132,7 +151,7 @@ public final class CyberwareRuntime {
     }
     if (!claws(p) || !s.deployed || !emptyHands(p) || now - s.changed < CombatRules.DEPLOY) return;
     if (action == 2) {
-      if (s.charge < 0 && CombatRules.ready(now, s.lastAttack, CombatRules.LIGHT_INTERVAL)) {
+      if (s.charge < 0) {
         s.charge = now;
         broadcast(p);
       }
@@ -154,14 +173,7 @@ public final class CyberwareRuntime {
     s.attack = now;
     s.lastAttack = now;
     s.pendingHit = true;
-    if (heavy) {
-      // A short collision-tested lunge, never a terrain-ignoring teleport.
-      var direction = p.getLookAngle().multiply(1, 0, 1).normalize();
-      if (!p.horizontalCollision) {
-        p.setDeltaMovement(p.getDeltaMovement().add(direction.scale(.55)));
-        p.hurtMarked = true;
-      }
-    }
+    if (heavy) beginLunge(p);
     p.level()
         .playSound(
             null,
@@ -212,9 +224,14 @@ public final class CyberwareRuntime {
       s.changed = now;
       s.charge = -1;
       s.pendingHit = false;
+      s.lunge = null;
       broadcast(p);
     }
-    if (s.deployed && s.pendingHit && now - s.attack >= CombatRules.impactTick(s.combo)) {
+    if (s.lunge != null) tickLunge(p);
+    if (s.deployed
+        && s.lunge == null
+        && s.pendingHit
+        && now - s.attack >= CombatRules.impactTick(s.combo)) {
       s.pendingHit = false;
       if (usable(p) && claws(p) && emptyHands(p)) bladeHit(p, s.combo);
     }
@@ -272,6 +289,73 @@ public final class CyberwareRuntime {
     if (now % 4 == 0) syncIfChanged(p);
   }
 
+  public static LivingEntity lungeTarget(ServerPlayer p) {
+    var eye = p.getEyePosition();
+    var direction = p.getLookAngle();
+    LivingEntity nearest = null;
+    double best = 9 * 9;
+    for (var target :
+        p.serverLevel()
+            .getEntitiesOfClass(
+                LivingEntity.class, p.getBoundingBox().inflate(8), e -> canAttack(p, e))) {
+      var center = target.getBoundingBox().getCenter();
+      var delta = center.subtract(eye);
+      double distance = delta.length();
+      if (distance < .1
+          || distance > 8
+          || direction.dot(delta.scale(1 / distance)) < .95
+          || !p.hasLineOfSight(target)) continue;
+      if (distance * distance < best) {
+        best = distance * distance;
+        nearest = target;
+      }
+    }
+    return nearest;
+  }
+
+  private static void beginLunge(ServerPlayer p) {
+    var target = lungeTarget(p);
+    if (target == null || p.isPassenger()) return;
+    var start = p.position();
+    var toward = target.position().subtract(start).multiply(1, 0, 1);
+    double separation = (p.getBbWidth() + target.getBbWidth()) * .5 + .75;
+    if (toward.length() <= separation + .15) return;
+    var destination = target.position().subtract(toward.normalize().scale(separation));
+    int duration = LungePath.duration(start.distanceTo(destination));
+    var path =
+        new LungePath(
+            start.x, start.y, start.z, destination.x, destination.y, destination.z, .65, duration);
+    state(p).lunge = new Lunge(target.getUUID(), path, p.serverLevel().getGameTime());
+  }
+
+  private static void tickLunge(ServerPlayer p) {
+    var s = state(p);
+    var l = s.lunge;
+    long age = p.serverLevel().getGameTime() - l.started();
+    var target = p.serverLevel().getEntity(l.target());
+    boolean valid =
+        usable(p)
+            && !p.isPassenger()
+            && claws(p)
+            && emptyHands(p)
+            && target instanceof LivingEntity living
+            && canAttack(p, living);
+    boolean arrived =
+        valid && age >= 2 && target.getBoundingBox().inflate(1.15).intersects(p.getBoundingBox());
+    if (!valid || arrived || age > l.path().ticks() + 8) {
+      s.lunge = null;
+      if (arrived) {
+        s.pendingHit = false;
+        s.attack = p.serverLevel().getGameTime() - CombatRules.impactTick(3);
+        if (p.hasLineOfSight(target)) hit(p, (LivingEntity) target, 3);
+      } else s.pendingHit = false;
+      p.setDeltaMovement(Vec3.ZERO);
+      p.connection.send(
+          new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(p));
+      broadcast(p);
+    }
+  }
+
   public static LivingEntity bladeTarget(ServerPlayer p, double reach) {
     var eye = p.getEyePosition();
     var end = eye.add(p.getLookAngle().scale(reach));
@@ -293,6 +377,10 @@ public final class CyberwareRuntime {
   private static void bladeHit(ServerPlayer p, int combo) {
     var target = bladeTarget(p, combo == 3 ? 4 : 3.3);
     if (target == null) return;
+    hit(p, target, combo);
+  }
+
+  private static void hit(ServerPlayer p, LivingEntity target, int combo) {
     if (target.hurt(p.damageSources().playerAttack(p), CombatRules.damage(combo))) {
       target.knockback(combo == 3 ? .55 : .2, p.getX() - target.getX(), p.getZ() - target.getZ());
       p.serverLevel()
@@ -344,6 +432,7 @@ public final class CyberwareRuntime {
       state(p).uploads.clear();
       state(p).deployed = false;
       state(p).charge = -1;
+      state(p).lunge = null;
       broadcast(p);
     }
   }
