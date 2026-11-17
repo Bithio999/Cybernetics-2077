@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.5.0. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons independent hatch/hinge/carriage deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.5.1. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -40,7 +40,7 @@ The review switches the local player's loaded skin to Minecraft's built-in Steve
 
 ![Connected arm during a cut](images/mantis-cut.png)
 
-These are native Minecraft captures. The forearm hatch and mechanism open from the **outer side** of each arm. Player skin and sleeve pixels follow the articulated panels; the blade has a tapered mesh, separate bevels, fuller, serrated heel and articulated hinge.
+These are native Minecraft captures. The hatch and mount sit on the **dorsal side** of each forearm. The mount faces up and the blades point forward past the hands. The recess has an opaque backing; the rest of the arm remains closed. Player skin and sleeve pixels follow the articulated panels; the blade has a tapered mesh, separate bevels, fuller, serrated heel and articulated hinge.
 
 ## Quickhack management
 
@@ -53,3 +53,7 @@ Select your installed Operating System, then **Manage Quickhacks**. Implant inst
 ![Server-backed quickhack loadout editor](images/cyberware-quickhack-editor.png)
 
 ![32px equipment sprites](images/equipment-icons.png)
+
+[Watch the distal tip retract and extend in a native close-up](media/mantis-mechanism.mp4)
+
+![Dorsal mounts and closed forearms](images/mantis-dorsal-ready.png)

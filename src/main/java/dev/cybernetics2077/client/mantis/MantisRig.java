@@ -13,9 +13,9 @@ public final class MantisRig {
   public static Matrix4f shoulder(boolean left, boolean slim, MantisMotion.Pose motion) {
     float side = left ? -1 : 1;
     return new Matrix4f()
-        .rotateZ((float) Math.toRadians(-side * 10 * motion.ready() + motion.roll()))
-        .rotateY((float) Math.toRadians(side * 12 * motion.ready() + motion.yaw()))
-        .rotateX((float) Math.toRadians(-35 * motion.ready() + motion.pitch()))
+        .rotateZ((float) Math.toRadians(-side * 8 * motion.ready() + motion.roll()))
+        .rotateY((float) Math.toRadians(-side * 25 * motion.ready() + motion.yaw()))
+        .rotateX((float) Math.toRadians(-67 * motion.ready() + motion.pitch()))
         // This offset belongs AFTER shoulder rotation. Moving the pivot to the arm centre
         // disconnects its inner edge from the torso during a large slash.
         .translate(centerOffset(left, slim), 0, 0);

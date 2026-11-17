@@ -16,14 +16,14 @@ All implants have a strength tier from **1–5**, shown in their tooltip and soc
 | --- | --- | --- | --- | --- |
 | Optical Scanner | 1 | Face | 4 | Hold **V** to scan a living target within 32 blocks. |
 | Cyberdeck | 1 | Operating System | 8 | 4 RAM and two quickhack slots; regenerates 1 RAM per 5 seconds. |
-| Mantis Claws | 1 | Arms | 12 | Press **G** with empty hands to deploy a pair of side-mounted arm blades. |
+| Mantis Claws | 1 | Arms | 12 | Press **G** with empty hands to deploy a pair of dorsal-mounted arm blades. |
 | Short Circuit chip | 1 | Cyberdeck | — | 2 RAM, 1-second upload, 8 electrical damage. |
 
 The scanner shows health, armor, attack damage, absorption and visible effects. With a loaded cyberdeck, **left-click** to upload Short Circuit to the target; upload progress appears over its head. The overlay opens and closes with an animated transition from Minecraft’s HUD.
 
 ![Short Circuit scanner](docs/images/short-circuit-scanner.png)
 
-Mantis Claws open the outside of each forearm, reveal the mechanism, and unfold into combat position. **Left-click** chains alternating slashes; **hold and release right-click** for a charged leap, from the ground or in midair. Aim at a visible target within **8 blocks** to stop at it; without a target, leap **6 blocks** in the look direction. First- and third-person animations follow the contact frames used for damage.
+Mantis Claws open a shallow hatch on the back of each forearm. The palm, wrist and sides remain solid; the recess exposes wiring and the mount. In the ready stance the mount faces up and the blade points forward past the hand. A separate distal tip slides out of its fixed blade sleeve. **Left-click** chains alternating slashes; **hold and release right-click** for a charged leap, from the ground or in midair. Aim at a visible target within **8 blocks** to stop at it; without a target, leap **6 blocks** in the look direction. The existing empty hand moves continuously into the armed pose, using Minecraft’s native hand transform and skin UVs. First- and third-person attacks follow the contact frames used for damage.
 
 [Watch the claw animations](docs/media/mantis-claws.mp4) · [Equipment, controls and recipes](docs/CYBERWARE.md)
 
@@ -39,7 +39,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.5.0.jar](releases/Cybernetics2077-0.5.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.5.1.jar](releases/Cybernetics2077-0.5.1.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

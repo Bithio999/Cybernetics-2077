@@ -32,6 +32,8 @@ final class MantisMotionTest {
       assertEquals(a.panels(), b.panels(), .00001);
       assertEquals(a.blade(), b.blade(), .00001);
       assertEquals(a.extension(), b.extension(), .00001);
+      assertEquals(a.tip(), b.tip(), .00001);
+      assertTrue(a.extension() >= a.tip());
       assertTrue(a.panels() >= a.blade());
       assertTrue(a.blade() >= a.extension());
       assertTrue(a.elbow() >= -65 && a.elbow() <= 0);

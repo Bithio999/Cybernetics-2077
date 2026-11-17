@@ -27,10 +27,7 @@ def encode(name, segments):
                     '-crf', '18', '-movflags', '+faststart', str(out / (name + '.mp4'))], check=True)
 
 encode('mantis-claws', [
-    ('mantis-deploy-000', 'mantis-first-person'),
-    ('mantis-combo-000', 'mantis-combo-052'),
-    ('mantis-heavy-000', 'mantis-heavy-040'),
-    ('mantis-retract-000', 'mantis-retract-026'),
+    ('mantis-native-hand', 'mantis-retract-026'),
     ('mantis-ground-leap-000', 'mantis-ground-leap-017'),
     ('mantis-air-leap-000', 'mantis-air-leap-019'),
     ('mantis-free-leap-000', 'mantis-free-leap-023'),
@@ -38,3 +35,5 @@ encode('mantis-claws', [
 encode('short-circuit', [('short-circuit-scanner', 'short-circuit-frame-025')])
 
 encode('quickhack-management', [('cyberware-quickhack-entry', 'cyberware-quickhack-return')])
+
+encode('mantis-mechanism', [('mantis-dorsal-open', 'mantis-dorsal-closed'), ('mantis-dorsal-deploy-000', 'mantis-dorsal-ready')])

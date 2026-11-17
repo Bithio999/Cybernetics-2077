@@ -25,12 +25,22 @@ public final class CyberwareClient {
           GLFW.GLFW_KEY_G,
           "key.categories.cybernetics2077");
   private static final Map<Integer, CompoundTag> STATES = new HashMap<>();
+  private static final Map<Integer, MantisDeployment> DEPLOYMENT = new HashMap<>();
   public static final Map<Integer, Long> IMPACTS = new HashMap<>();
   private static Object level;
   private static boolean chargeHeld;
 
   public static void receive(CompoundTag t) {
-    STATES.put(t.getInt("entity"), t);
+    int id = t.getInt("entity");
+    var old = STATES.get(id);
+    boolean active = t.getBoolean("deployed");
+    if (old == null) DEPLOYMENT.put(id, new MantisDeployment(active ? 1 : 0, active ? 1 : 0));
+    else if (old.getBoolean("deployed") != active) {
+      var previous = DEPLOYMENT.get(id);
+      float from = previous == null ? (old.getBoolean("deployed") ? 1 : 0) : previous.last();
+      DEPLOYMENT.put(id, new MantisDeployment(from, active ? 1 : 0));
+    }
+    STATES.put(id, t);
   }
 
   public static CompoundTag own() {
@@ -52,15 +62,18 @@ public final class CyberwareClient {
     var t = state(p.getId());
     return t.getBoolean("claws")
         && (t.getBoolean("deployed")
-            || p.level().getGameTime() - t.getLong("changed") < CombatRules.DEPLOY);
+            || DEPLOYMENT.containsKey(p.getId()) && DEPLOYMENT.get(p.getId()).visible());
   }
 
   public static MantisMotion.Pose pose(AbstractClientPlayer p, boolean left, float partial) {
     var t = state(p.getId());
     long now = p.level().getGameTime();
+    var track = DEPLOYMENT.get(p.getId());
+    float progress =
+        track == null ? (t.getBoolean("deployed") ? 1 : 0) : track.sample(now + partial);
     return MantisMotion.sample(
-        t.getBoolean("deployed"),
-        now - t.getLong("changed") + partial,
+        true,
+        progress * CombatRules.DEPLOY,
         now - t.getLong("attack") + partial,
         t.getInt("combo"),
         t.getLong("charge") >= 0,
@@ -165,12 +178,18 @@ public final class CyberwareClient {
     if (level != m.level) {
       if (m.level == null) {
         STATES.clear();
+        DEPLOYMENT.clear();
         IMPACTS.clear();
       } else if (level != null) {
         // A dimension-sync payload may precede the first tick in its new level. Retain the
         // local player's equipment snapshot; only discard remote entities from the old level.
         int ownId = m.player == null ? -1 : m.player.getId();
         STATES.keySet().removeIf(id -> id != ownId);
+        DEPLOYMENT.clear();
+        if (STATES.containsKey(ownId)) {
+          float d = STATES.get(ownId).getBoolean("deployed") ? 1 : 0;
+          DEPLOYMENT.put(ownId, new MantisDeployment(d, d));
+        }
         IMPACTS.clear();
       }
       level = m.level;
@@ -204,15 +223,13 @@ public final class CyberwareClient {
       float sign = left ? -1 : 1;
       var p = e.getPoseStack();
       p.pushPose();
-      // Fixed shoulder anchors extend off the bottom/sides of the view. Convert the canonical
-      // player axes into camera axes before applying the SAME joint rig as third person.
-      float enter = pose.ready();
-      p.translate(sign * (.65 - .27 * enter), -.58 + .38 * enter, -.62 - .10 * enter);
-      p.scale(-.90f, -.90f, .90f);
       p.mulPose(
-          MantisRig.shoulder(
+          MantisView.frame(
               left,
+              left == (m.player.getMainArm() == HumanoidArm.LEFT),
               m.player.getSkin().model() == net.minecraft.client.resources.PlayerSkin.Model.SLIM,
+              e.getEquipProgress(),
+              e.getSwingProgress(),
               pose));
       MantisMesh.render(
           p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose, true);

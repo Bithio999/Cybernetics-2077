@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.5.0 uses the local player’s skin in the hologram. All 22 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+Release 0.5.1 uses the local player’s skin in the hologram. All 28 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
 
 ## Automated checks
 
@@ -55,7 +55,7 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The inventory cyberware screen remains read-only; the bench is the only installation interface. Release 0.5.0 includes the tier 1 deck and Short Circuit; other quickhacks and operating systems are not implemented. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+The inventory cyberware screen remains read-only; the bench is the only installation interface. Release 0.5.1 includes the tier 1 deck and Short Circuit; other quickhacks and operating systems are not implemented. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
 
 The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed.
 
@@ -83,8 +83,14 @@ To trim a 60-fps desktop recording against the same run’s capture timestamps:
 python3 docs/review/trim-native-recording.py recording.mp4 /path/to/capture RECORDING_START_UNIX_TIME
 ```
 
-Release 0.5.0 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
+Release 0.5.1 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
 
-The 0.5.0 revision also checks ordered hatch/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
+The 0.5.1 revision also checks ordered hatch/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
 
 Lunges now acknowledge completion after the client’s normal position packet. The server permits a bounded delay for slow frames or latency, while validating target contact and terrain visibility. The six-block free leap also waits for actual movement rather than ending on elapsed time alone.
+
+## Mantis handover and anatomy
+
+The 0.5.1 review checks the rest-hand matrix against the actual vanilla `RenderArmEvent` transform before deployment. Classic/slim and left/right mathematical tests check continuous wrist movement, non-collapsing transforms, a dorsal mount facing up and a blade axis pointing forward. The distal tip has its own channel and extends after the support, then retracts before it. Native captures include the original empty hand, deployment, a zoomed dorsal view, tip retraction and redeployment. Native cube UVs preserve skin alignment, and the shallow recess has an opaque floor, palm, sides and wrist.
+
+The presentation clock begins at the first displayed frame instead of the server timestamp, preventing delayed packets from skipping the normal-hand starting pose. Reversal preserves the last displayed progress. Native checks also validate cube-local bounds and skin UVs for both arms/sleeves, catching accidental baked ModelPart transforms.

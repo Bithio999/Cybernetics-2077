@@ -243,8 +243,17 @@ final class ContentClientReview {
                 "RAM was not charged");
           });
     if (t == 205) ScannerClient.KEY.setDown(false);
+    if (t == 219) {
+      dev.cybernetics2077.client.mantis.ArmSkinBoundsReview.verify(m.player);
+      check(NativeHandReferenceReview.samples > 0, "No native empty-hand reference was compared");
+      System.out.println(
+          "Native hand transform matches: "
+              + NativeHandReferenceReview.samples
+              + " real render samples");
+      shot("mantis-native-hand");
+    }
     if (t == 220) draw();
-    if (t >= 221 && t <= 248) shot("mantis-deploy-" + String.format("%03d", t - 221));
+    if (t >= 221 && t <= 254) shot("mantis-deploy-" + String.format("%03d", t - 221));
     if (t == 252) {
       check(CyberwareClient.active(), "Claws did not deploy");
       shot("mantis-first-person");
@@ -462,8 +471,23 @@ final class ContentClientReview {
     if (t == 940) {
       m.setScreen(null);
       m.player.closeContainer();
+      m.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+      m.options.fov().set(40);
+      m.player.setXRot(-20);
     }
-    if (t == 950)
+    if (t == 945) shot("mantis-dorsal-open");
+    if (t == 950) draw();
+    if (t >= 950 && t <= 984) shot("mantis-dorsal-retract-" + String.format("%03d", t - 950));
+    if (t == 986) shot("mantis-dorsal-closed");
+    if (t == 990) draw();
+    if (t >= 990 && t <= 1025) shot("mantis-dorsal-deploy-" + String.format("%03d", t - 990));
+    if (t == 1050) shot("mantis-dorsal-ready");
+    if (t == 1055) {
+      m.options.setCameraType(CameraType.FIRST_PERSON);
+      m.options.fov().set(70);
+      m.player.setXRot(0);
+    }
+    if (t == 1120)
       server(
           p -> {
             var nether = p.server.getLevel(net.minecraft.world.level.Level.NETHER);
@@ -481,7 +505,7 @@ final class ContentClientReview {
               }
             p.teleportTo(nether, .5, 80, .5, java.util.Set.of(), 0, 0);
           });
-    if (t == 990) {
+    if (t == 1160) {
       check(
           m.level.dimension() == net.minecraft.world.level.Level.NETHER
               && CyberwareClient.own().getBoolean("deck")
@@ -495,10 +519,11 @@ final class ContentClientReview {
               + " Short Circuit into persistent deck component; equipped viewer; actual scanner LMB"
               + " upload deals 8 electrical damage and reserves RAM; three blade contacts and"
               + " charged lunge damage; deploy/retract; occupied-hand guard; first/third-person"
-              + " render and animation captures; viewer quickhack removal/reinstall and return;"
-              + " untargeted six-block leap; ground and airborne leaps travel 5.15 blocks and land"
-              + " one 14-damage hit each; solid-wall guard; dimension change retains equipment"
-              + " state.\n");
+              + " render and animation captures; actual native hand transform reference; dorsal"
+              + " model closeup and independent tip extension; viewer quickhack removal/reinstall"
+              + " and return; untargeted six-block leap; ground and airborne leaps travel 5.15"
+              + " blocks and land one 14-damage hit each; solid-wall guard; dimension change"
+              + " retains equipment state.\n");
       finished = true;
       m.stop();
     }
