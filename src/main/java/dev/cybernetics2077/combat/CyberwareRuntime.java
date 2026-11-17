@@ -55,7 +55,7 @@ public final class CyberwareRuntime {
   }
 
   public static boolean emptyHands(Player p) {
-    return p.getMainHandItem().isEmpty() && p.getOffhandItem().isEmpty();
+    return p.getInventory().getSelected().isEmpty() && p.getInventory().offhand.get(0).isEmpty();
   }
 
   public static boolean usable(Player p) {
@@ -154,7 +154,7 @@ public final class CyberwareRuntime {
       broadcast(p);
       return;
     }
-    if (!claws(p) || !s.deployed || !emptyHands(p)) return;
+    if (!claws(p) || !s.deployed) return;
     if (action == 2) {
       if (s.charge < 0) {
         s.charge = Math.max(now, s.changed + CombatRules.DEPLOY);
@@ -231,7 +231,7 @@ public final class CyberwareRuntime {
       s.charge = -1;
       broadcast(p);
     }
-    if (s.deployed && (!claws(p) || !p.isAlive() || p.isSpectator() || !emptyHands(p))) {
+    if (s.deployed && (!claws(p) || !p.isAlive() || p.isSpectator())) {
       long elapsed = Math.clamp(now - s.changed, 0, CombatRules.DEPLOY);
       s.deployed = false;
       s.changed = now - (CombatRules.DEPLOY - elapsed);
@@ -246,7 +246,7 @@ public final class CyberwareRuntime {
         && s.pendingHit
         && now - s.attack >= CombatRules.impactTick(s.combo)) {
       s.pendingHit = false;
-      if (usable(p) && claws(p) && emptyHands(p)) bladeHit(p, s.combo);
+      if (usable(p) && claws(p)) bladeHit(p, s.combo);
     }
     if (!(deck(p).getItem() instanceof CyberdeckItem)
         || !CyberdeckItem.has(deck(p), Cybernetics2077.SHORT_CIRCUIT.get())
@@ -355,7 +355,6 @@ public final class CyberwareRuntime {
         usable(p)
             && !p.isPassenger()
             && claws(p)
-            && emptyHands(p)
             && (l.target() == null
                 || target instanceof LivingEntity living && canAttack(p, living));
     boolean arrived =
@@ -375,9 +374,7 @@ public final class CyberwareRuntime {
         if (target == null) bladeHit(p, 3);
         else if (p.hasLineOfSight(target)) hit(p, (LivingEntity) target, 3);
       } else s.pendingHit = false;
-      p.setDeltaMovement(Vec3.ZERO);
-      p.connection.send(
-          new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(p));
+      // Hand back to ordinary collision movement without erasing the leap velocity.
       broadcast(p);
     }
   }
@@ -455,10 +452,12 @@ public final class CyberwareRuntime {
   @SubscribeEvent
   public static void dimension(PlayerEvent.PlayerChangedDimensionEvent e) {
     if (e.getEntity() instanceof ServerPlayer p) {
-      state(p).uploads.clear();
-      state(p).deployed = false;
-      state(p).charge = -1;
-      state(p).lunge = null;
+      var s = state(p);
+      s.uploads.clear();
+      s.deployed = false;
+      s.changed = p.serverLevel().getGameTime() - CombatRules.DEPLOY;
+      s.charge = -1;
+      s.lunge = null;
       broadcast(p);
     }
   }
@@ -471,7 +470,7 @@ public final class CyberwareRuntime {
 
   @SubscribeEvent
   public static void vanillaAttack(AttackEntityEvent e) {
-    if (e.getEntity() instanceof ServerPlayer p && state(p).deployed) e.setCanceled(true);
+    if (MantisHands.occupied(e.getEntity())) e.setCanceled(true);
   }
 
   private CyberwareRuntime() {}

@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.6.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.6.1.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.6.0'
+    assert metadata['mods'][0]['version']=='0.6.1'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -44,6 +44,9 @@ with ZipFile(jar) as z:
                      'dev/cybernetics2077/client/mantis/MantisDeployment.class',
                      'dev/cybernetics2077/client/mantis/NativeArmSkin.class',
                      'dev/cybernetics2077/combat/LungePath.class',
+                     'dev/cybernetics2077/combat/MantisHands.class',
+                     'dev/cybernetics2077/mixin/MantisHandsMixin.class',
+                     'cybernetics2077.common.mixins.json',
                      'dev/cybernetics2077/mixin/client/MantisTravelMixin.class',
                      'assets/cybernetics2077/textures/item/cyberdeck_tier_1.png',
                      'assets/cybernetics2077/textures/item/mantis_claws_tier_1.png',
@@ -58,4 +61,6 @@ with ZipFile(jar) as z:
         assert struct.unpack('>II',png[16:24]) == (32,32), 'Equipment sprite is not 32px pixel art: '+icon
     for mixin in json.loads(z.read('cybernetics2077.mixins.json'))['client']:
         assert 'dev/cybernetics2077/mixin/client/'+mixin+'.class' in names
+    for mixin in json.loads(z.read('cybernetics2077.common.mixins.json'))['mixins']:
+        assert 'dev/cybernetics2077/mixin/'+mixin+'.class' in names
 print(f'PASS: standalone metadata, classes, resource parity, JSON, font license, no review fixtures: {jar.name}')

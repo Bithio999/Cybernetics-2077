@@ -48,6 +48,97 @@ public final class CombatGameTests {
     return mob;
   }
 
+  static void refreshEquipment(ServerPlayer p) {
+    try {
+      var method = LivingEntity.class.getDeclaredMethod("detectEquipmentUpdates");
+      method.setAccessible(true);
+      method.invoke(p);
+    } catch (ReflectiveOperationException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 120)
+  public static void selectedWeaponsAreInactiveAndRestoredAfterRetraction(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    install(p);
+    p.getInventory().clearContent();
+    p.getInventory().selected = 0;
+    var mob = target(h, p);
+    refreshEquipment(p);
+    double bareDamage =
+        p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+    double bareSpeed =
+        p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED);
+    CyberwareRuntime.action(p, 0);
+    var weapon = new ItemStack(Items.NETHERITE_SWORD);
+    var enchants =
+        p.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT);
+    weapon.enchant(
+        enchants.getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.SHARPNESS), 5);
+    weapon.enchant(
+        enchants.getHolderOrThrow(net.minecraft.world.item.enchantment.Enchantments.FIRE_ASPECT),
+        2);
+    var saved = weapon.copy();
+    p.getInventory().setItem(0, weapon);
+    p.getInventory().offhand.set(0, new ItemStack(Items.SHIELD));
+    refreshEquipment(p);
+    h.assertTrue(!CyberwareRuntime.emptyHands(p), "Activation check must see real inventory hands");
+    h.assertTrue(
+        p.getMainHandItem().isEmpty() && p.getOffhandItem().isEmpty(),
+        "Gameplay hands are not empty");
+    h.assertTrue(
+        p.damageSources().playerAttack(p).getWeaponItem().isEmpty(),
+        "Damage source leaked weapon/enchantments");
+    h.assertTrue(
+        p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)
+                == bareDamage
+            && p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED)
+                == bareSpeed,
+        "Held weapon attributes affected cyberarm combat");
+    h.runAfterDelay(
+        31,
+        () -> {
+          CyberwareRuntime.tick(p);
+          h.assertTrue(CyberwareRuntime.state(p).deployed, "Item selection closed deployed claws");
+          CyberwareRuntime.action(p, 1);
+          h.runAfterDelay(
+              5,
+              () -> {
+                CyberwareRuntime.tick(p);
+                h.assertTrue(
+                    Math.abs(mob.getHealth() - 92) < .001 && !mob.isOnFire(),
+                    "Weapon affected Mantis damage or added fire");
+                h.assertTrue(
+                    ItemStack.matches(saved, p.getInventory().getSelected()),
+                    "Weapon stack or durability changed");
+                CyberwareRuntime.action(p, 0);
+                h.assertTrue(
+                    p.getMainHandItem().isEmpty(),
+                    "Item returned before cyberarms finished closing");
+                h.runAfterDelay(
+                    31,
+                    () -> {
+                      refreshEquipment(p);
+                      h.assertTrue(
+                          p.getMainHandItem().is(Items.NETHERITE_SWORD)
+                              && p.getOffhandItem().is(Items.SHIELD),
+                          "Stored hands were not restored");
+                      h.assertTrue(
+                          p.getAttributeValue(
+                                  net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)
+                              > bareDamage,
+                          "Weapon attributes did not return after retraction");
+                      CyberwareRuntime.action(p, 0);
+                      h.assertTrue(
+                          !CyberwareRuntime.state(p).deployed,
+                          "Virtual hands bypassed the real empty-hand activation rule");
+                      h.succeed();
+                    });
+              });
+        });
+  }
+
   @GameTest(template = "empty", timeoutTicks = 60)
   public static void benchAcceptsDeckAndArmsInTheirOwnCategories(GameTestHelper h) {
     var p = ImplantGameTests.player(h);
@@ -174,7 +265,10 @@ public final class CombatGameTests {
                     "Light contact damage incorrect: " + mob.getHealth());
                 p.getInventory().setItem(0, new ItemStack(Items.STICK));
                 CyberwareRuntime.tick(p);
-                h.assertTrue(!CyberwareRuntime.state(p).deployed, "Equipping item did not retract");
+                h.assertTrue(
+                    CyberwareRuntime.state(p).deployed, "Selecting an item retracted the blades");
+                h.assertTrue(
+                    p.getMainHandItem().isEmpty(), "Selected item leaked into cyberarm hand");
                 h.succeed();
               });
         });
@@ -219,8 +313,13 @@ public final class CombatGameTests {
             p.serverLevel().getGameTime());
     p.getInventory().setItem(0, new ItemStack(Items.STICK));
     CyberwareRuntime.tick(p);
+    h.assertTrue(s.lunge != null && s.deployed, "Selecting an item interrupted the leap");
+    p.getData(Cybernetics2077.CYBERWARE)
+        .setStackInSlot(CyberwareCategory.ARMS.firstSlot(), ItemStack.EMPTY);
+    CyberwareRuntime.tick(p);
     h.assertTrue(
-        s.lunge == null && !s.deployed && !s.pendingHit, "Unequip failed to cancel leap/contact");
+        s.lunge == null && !s.deployed && !s.pendingHit,
+        "Removing the implant failed to cancel leap/contact");
     h.succeed();
   }
 
@@ -254,9 +353,14 @@ public final class CombatGameTests {
             p.serverLevel().getGameTime() - 20);
     CyberwareRuntime.tick(p);
     h.assertTrue(s.lunge != null, "Delayed client movement was cancelled before acknowledgement");
+    var momentum = new Vec3(.2, .15, .8);
+    p.setDeltaMovement(momentum);
     CyberwareRuntime.action(p, 4);
     CyberwareRuntime.tick(p);
     h.assertTrue(s.lunge == null && !s.pendingHit, "Client completion failed to finish leap");
+    h.assertTrue(
+        p.getDeltaMovement().distanceToSqr(momentum) < .000001,
+        "Server erased momentum at the end of the leap");
     h.succeed();
   }
 }

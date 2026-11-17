@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "dev.cybernetics2077.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["MantisHandsMixin"],
+  "injectors": {"defaultRequire": 1}
+}

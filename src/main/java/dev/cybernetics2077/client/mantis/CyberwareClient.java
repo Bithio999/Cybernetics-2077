@@ -125,7 +125,6 @@ public final class CyberwareClient {
     if (lungeAge >= path.ticks()) {
       lungeBlocked = true;
       lungeComplete = true;
-      player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
       return false;
     }
     var step = path.step(player.getX(), player.getY(), player.getZ(), lungeAge++);
@@ -136,7 +135,6 @@ public final class CyberwareClient {
     if (player.position().distanceToSqr(before) < .0004 || player.horizontalCollision) {
       lungeBlocked = true;
       lungeComplete = true;
-      player.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
     }
     return true;
   }
@@ -167,6 +165,8 @@ public final class CyberwareClient {
       e.enqueueWork(
           () -> {
             CyberwareNetwork.receiver = CyberwareClient::receive;
+            MantisHands.clientOccupied =
+                p -> p instanceof AbstractClientPlayer player && visible(player);
             CyberwareNetwork.impact =
                 id -> {
                   var m = Minecraft.getInstance();

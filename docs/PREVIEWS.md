@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.6.0; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.6.1; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -107,3 +107,7 @@ Light attacks alternate cross-body cuts, then use a rising third strike. The oth
 ![Forward lunge strike](images/mantis-lunge.png)
 
 ![Wider third-person guard](images/mantis-detail.png)
+
+## Momentum and selected items (0.6.1)
+
+The lunge hands its remaining velocity back to normal Minecraft movement rather than forcing a stop. Selecting a hotbar item or browsing inventory leaves deployed claws out. Stored hand items are inactive until the claws retract; their attributes and enchantments do not affect the Mantis attacks. Deployment still requires empty hands. The current combat preview includes an enchanted sword selected while using the claws.

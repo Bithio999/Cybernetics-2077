@@ -25,6 +25,18 @@ final class ContentClientReview {
   static int target;
   static float health;
   static double groundPeak, airStart;
+  static int momentumSeen, momentumFinished;
+
+  static void observeMomentum(int mask) {
+    var m = Minecraft.getInstance();
+    if (CyberwareClient.own().getCompound("lunge").contains("started")) momentumSeen |= mask;
+    else if ((momentumSeen & mask) != 0 && (momentumFinished & mask) == 0) {
+      double speed = m.player.getDeltaMovement().horizontalDistance();
+      check(speed > .05 && speed < 1.5, "Invalid momentum handoff: " + speed);
+      momentumFinished |= mask;
+      System.out.println("Lunge momentum handoff " + mask + ": " + speed);
+    }
+  }
 
   static void quick(int slot) {
     var m = Minecraft.getInstance();
@@ -229,6 +241,8 @@ final class ContentClientReview {
             mob.setNoAi(true);
             mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH)
                 .setBaseValue(100);
+            mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)
+                .setBaseValue(0);
             mob.setHealth(100);
             mob.setPos(.5, 64, 3.4);
             p.serverLevel().addFreshEntity(mob);
@@ -274,13 +288,59 @@ final class ContentClientReview {
       check(CyberwareClient.active(), "Claws did not deploy");
       shot("mantis-first-person");
     }
+    if (t == 295)
+      server(
+          p -> {
+            var weapon = new ItemStack(Items.NETHERITE_SWORD);
+            var enchants =
+                p.registryAccess()
+                    .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT);
+            weapon.enchant(
+                enchants.getHolderOrThrow(
+                    net.minecraft.world.item.enchantment.Enchantments.SHARPNESS),
+                5);
+            weapon.enchant(
+                enchants.getHolderOrThrow(
+                    net.minecraft.world.item.enchantment.Enchantments.FIRE_ASPECT),
+                2);
+            p.getInventory().setItem(1, weapon);
+            p.getInventory().offhand.set(0, new ItemStack(Items.SHIELD));
+          });
+    if (t == 299) {
+      m.player.getInventory().selected = 1;
+      m.player.connection.send(
+          new net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket(1));
+    }
+    if (t == 306)
+      m.setScreen(new net.minecraft.client.gui.screens.inventory.InventoryScreen(m.player));
+    if (t == 308) {
+      check(CyberwareClient.active(), "Inventory browsing closed the blades");
+      m.setScreen(null);
+    }
     if (t == 260 || t == 280 || t == 300) attack();
     if (t >= 260 && t <= 312) shot("mantis-combo-" + String.format("%03d", t - 260));
     if (t == 315)
       server(
           p -> {
             var mob = (LivingEntity) p.serverLevel().getEntity(target);
-            check(mob.getHealth() < health - 20, "Blade combos did not deal damage");
+            check(
+                Math.abs(mob.getHealth() - (health - 26)) < .01 && !mob.isOnFire(),
+                "Selected weapon changed Mantis damage or added fire: " + mob.getHealth());
+            check(
+                CyberwareRuntime.state(p).deployed
+                    && p.getMainHandItem().isEmpty()
+                    && p.getOffhandItem().isEmpty(),
+                "Selected items affected cyberarm hands");
+            check(
+                p.getInventory().getSelected().is(Items.NETHERITE_SWORD)
+                    && p.getInventory().getSelected().getDamageValue() == 0,
+                "Stored weapon changed");
+            check(
+                p.getAttributeValue(
+                        net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)
+                    == p.getAttributeBaseValue(
+                        net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE),
+                "Weapon attack attribute leaked");
             health = mob.getHealth();
           });
     if (t == 320) {
@@ -310,7 +370,19 @@ final class ContentClientReview {
     if (t >= 376 && t <= 402) shot("mantis-retract-" + String.format("%03d", t - 376));
     if (t == 410) {
       check(!CyberwareClient.active(), "Retraction failed");
-      server(p -> p.getInventory().setItem(0, new ItemStack(Items.DIAMOND_SWORD)));
+      server(
+          p -> {
+            check(
+                p.getMainHandItem().is(Items.NETHERITE_SWORD)
+                    && p.getOffhandItem().is(Items.SHIELD),
+                "Original selected items did not return after retraction");
+            p.getInventory().clearContent();
+            p.getInventory().selected = 0;
+            p.getInventory().setItem(0, new ItemStack(Items.DIAMOND_SWORD));
+          });
+      m.player.getInventory().selected = 0;
+      m.player.connection.send(
+          new net.minecraft.network.protocol.game.ServerboundSetCarriedItemPacket(0));
     }
     if (t == 420) draw();
     if (t == 432) {
@@ -349,7 +421,9 @@ final class ContentClientReview {
       groundPeak = Math.max(groundPeak, m.player.getY());
       shot("mantis-ground-leap-" + String.format("%03d", t - 602));
     }
+    if (t >= 590 && t <= 625) observeMomentum(1);
     if (t == 620) {
+      check((momentumFinished & 1) != 0, "Ground leap momentum handoff was not observed");
       check(
           m.player.getZ() > 4.5 && groundPeak > 64.25,
           "Ground leap did not travel/rise: z=" + m.player.getZ() + ", peak=" + groundPeak);
@@ -377,7 +451,9 @@ final class ContentClientReview {
       m.options.keyUse.setDown(false);
     }
     if (t >= 654 && t <= 673) shot("mantis-air-leap-" + String.format("%03d", t - 654));
+    if (t >= 640 && t <= 678) observeMomentum(2);
     if (t == 676) {
+      check((momentumFinished & 2) != 0, "Air leap momentum handoff was not observed");
       check(m.player.getZ() > 4.5, "Air leap failed to move: " + m.player.getZ());
       server(
           p -> {
@@ -438,7 +514,9 @@ final class ContentClientReview {
     }
     if (t == 802) m.options.keyUse.setDown(false);
     if (t >= 802 && t <= 825) shot("mantis-free-leap-" + String.format("%03d", t - 802));
+    if (t >= 790 && t <= 832) observeMomentum(4);
     if (t == 830) {
+      check((momentumFinished & 4) != 0, "Free leap momentum handoff was not observed");
       check(m.player.getZ() > 6, "Untargeted leap failed: " + m.player.position());
       server(p -> check(p.getZ() > 6, "Server did not receive untargeted leap"));
       System.out.println("Untargeted leap native travel: " + (m.player.getZ() - .5));
@@ -573,7 +651,8 @@ final class ContentClientReview {
               + " model closeup and independent tip extension; viewer quickhack removal/reinstall"
               + " and return; untargeted six-block leap; ground and airborne leaps travel 5.15"
               + " blocks and land one 14-damage hit each; solid-wall guard; dimension change"
-              + " retains equipment state.\n");
+              + " retains equipment state; selected enchanted weapons remain inactive and restore"
+              + " after retraction; lunge momentum carries into normal movement.\n");
       if (Boolean.getBoolean("cybernetics2077.recording")) {
         Files.writeString(
             OUT.resolve("recording-marks.json"), new com.google.gson.Gson().toJson(recordingMarks));

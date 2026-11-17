@@ -54,14 +54,14 @@ ID: `cybernetics2077:short_circuit_tier_1`
 
 ## Mantis Claws
 
-Install in **Arms**, empty both hands, and press **G** to deploy or retract the pair. A shallow dorsal hatch opens on the back of each forearm, while the palm, wrist and sides stay opaque. Native skin and enabled sleeve UVs remain on the arm and hatch. The mount faces upward; the blade points forward past the hand.
+Install in **Arms** and press **G** with both hands empty to deploy. Press **G** again to retract the pair. A shallow dorsal hatch opens on the back of each forearm, while the palm, wrist and sides stay opaque. Native skin and enabled sleeve UVs remain on the arm and hatch. The mount faces upward; the blade points forward past the hand.
 
 | Control | Attack | Physical damage | Interval |
 | --- | --- | --- | --- |
 | Left-click | Alternating right/left slash, then rising cut | 8 / 8 / 10 | 0.5 seconds |
 | Hold right-click ≥0.4 seconds, release | Charged double-blade lunge | 14 | 1.1 seconds |
 
-Deployment takes **1.5 seconds**: the original Minecraft hand moves into position, the covers start opening, the folded support and blade rise together, the support/housing slides backward, then the blade pivots forward and the nested tip extends. Retraction pulls the tip in first and returns the same hand to its normal pose. Damage lands on the animated contact frame and requires aim, range and line of sight. Aim at a visible living target within **8 blocks** to leap toward it, including from midair. With no target, leap **6 blocks in the direction you are looking**. Both use normal collision and stop at solid obstacles. Aimed leaps deal damage at contact; free leaps can hit an enemy at their endpoint. Holding an item retracts the claws. Keys can be rebound under **Options → Controls → Cybernetics 2077**.
+Deployment takes **1.5 seconds**: the original Minecraft hand moves into position, the covers start opening, the folded support and blade rise together, the support/housing slides backward, then the blade pivots forward and the nested tip extends. Retraction pulls the tip in first and returns the same hand to its normal pose. Damage lands on the animated contact frame and requires aim, range and line of sight. Aim at a visible living target within **8 blocks** to leap toward it, including from midair. With no target, leap **6 blocks in the direction you are looking**. Both use normal collision and stop at solid obstacles. When the guided leap ends, its remaining velocity passes into normal movement with ordinary gravity and friction. Aimed leaps deal damage at contact; free leaps can hit an enemy at their endpoint. Selected items stay stored and inactive while the claws are out: their attack attributes, enchantments, use actions and durability do not contribute to Mantis attacks. Both hands must be empty to deploy. Retracting the claws restores ordinary item use. Keys can be rebound under **Options → Controls → Cybernetics 2077**.
 
 ID: `cybernetics2077:mantis_claws_tier_1`
 

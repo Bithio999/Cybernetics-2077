@@ -14,23 +14,26 @@ public abstract class ScannerInputMixin {
     if (ScannerClient.active()) {
       ScannerClient.quickhack();
       ci.setReturnValue(false);
-    } else if (dev.cybernetics2077.client.mantis.CyberwareClient.active()) {
-      dev.cybernetics2077.client.mantis.CyberwareClient.attack();
+    } else if (dev.cybernetics2077.combat.MantisHands.occupied(Minecraft.getInstance().player)) {
+      if (dev.cybernetics2077.client.mantis.CyberwareClient.active())
+        dev.cybernetics2077.client.mantis.CyberwareClient.attack();
       ci.setReturnValue(false);
     }
   }
 
   @Inject(method = "continueAttack", at = @At("HEAD"), cancellable = true)
   private void cybernetics$mine(boolean held, CallbackInfo ci) {
-    if (ScannerClient.active() || dev.cybernetics2077.client.mantis.CyberwareClient.active())
+    if (ScannerClient.active()
+        || dev.cybernetics2077.combat.MantisHands.occupied(Minecraft.getInstance().player))
       ci.cancel();
   }
 
   @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
   private void cybernetics$use(CallbackInfo ci) {
     if (ScannerClient.active()) ci.cancel();
-    else if (dev.cybernetics2077.client.mantis.CyberwareClient.active()) {
-      dev.cybernetics2077.client.mantis.CyberwareClient.charge();
+    else if (dev.cybernetics2077.combat.MantisHands.occupied(Minecraft.getInstance().player)) {
+      if (dev.cybernetics2077.client.mantis.CyberwareClient.active())
+        dev.cybernetics2077.client.mantis.CyberwareClient.charge();
       ci.cancel();
     }
   }

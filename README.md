@@ -31,7 +31,7 @@ Mantis Claws deploy from the top/back-of-hand face of the forearm through multip
 
 ## Install cyberware
 
-Craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. Install a deck, then select **Operating System → Manage Quickhacks** in the cyberware menu to load or remove chips. The bench’s **Cyberdeck** shortcut also remains available. Its programs stay with the physical deck when it is removed.
+Craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. While Mantis Claws are out, selected main-hand and off-hand items stay in their inventory slots and act as empty hands. Retract the claws to use them again. Drawing the claws still requires both hands to be empty. Install a deck, then select **Operating System → Manage Quickhacks** in the cyberware menu to load or remove chips. The bench’s **Cyberdeck** shortcut also remains available. Its programs stay with the physical deck when it is removed.
 
 ![Cybernetics Bench installation menu](docs/images/bench.png)
 
@@ -39,7 +39,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.6.0.jar](releases/Cybernetics2077-0.6.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.6.1.jar](releases/Cybernetics2077-0.6.1.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 
