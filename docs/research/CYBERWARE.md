@@ -53,3 +53,5 @@ The 0.5.3 revision keeps the same dorsal mechanism but narrows its housing and s
 The user clarified that “sleek” primarily refers to the housing, not a smaller overall weapon. Version 0.5.4 restores a large cutting assembly while retaining shallow covers, and changes the custom elbow split and hatch instead of treating the earlier forearm split as a Minecraft constraint. The outer player arm bounds remain unchanged.
 
 For 0.5.5, the user’s side-view image and the uploaded physical-blade sequence at 8.7–10.3 seconds were compared again. The interpretation is the complete Mantis implant, not just its cutting edge. The replacement uses segmented, offset skin covers and exposed lateral cable bundles instead of long rectangular hatch doors. The mount, support, receiver and sliding sections grow together; cover pivots are independently animated from the wearer’s native skin geometry.
+
+In 0.5.6 the user requested a thicker implant and shorter blade portion. The model therefore keeps its support length, increases housing and linkage cross sections, and reduces sliding-leaf length and extension. The segmented skin opening and its timing are retained.

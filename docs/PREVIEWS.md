@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.5; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.6; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -36,7 +36,7 @@ The review switches the local player's loaded skin to Minecraft's built-in Steve
 
 ![Mantis Claws in first person](images/mantis-first-person.png)
 
-The 0.5.5 blades use the [original Blender model](../art/mantis/README.md). The lower support angles backward and upward, then the slim cutting section points forward from its hinge. The cutting assembly is restored to a large silhouette; the receiver and support covers are slimmer. The whole mechanical assembly is enlarged, including its base and linkage. Eight independent covers lift and shift away to expose the harness. The separate covers clear before the mechanism rises; the palm and hand stay closed. The gameplay clips above use this model.
+The 0.5.6 blades use the [original Blender model](../art/mantis/README.md). The lower support angles backward and upward, then the shorter cutting section points forward from its hinge. The mount and linkage retain their size, while the housing is deeper and wider and the cutting section is shorter. Eight independent covers lift and shift away to expose the harness. The separate covers clear before the mechanism rises; the palm and hand stay closed. The gameplay clips above use this model.
 
 ![Mantis Claws in third person](images/mantis-third-person.png)
 

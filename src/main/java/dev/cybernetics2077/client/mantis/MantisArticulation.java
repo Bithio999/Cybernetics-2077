@@ -26,14 +26,15 @@ public final class MantisArticulation {
 
   public static Matrix4f tip(float extension) {
     return new Matrix4f()
-        .translate(0, .0162f + .42525f * MantisMotion.smooth(Math.clamp(extension / .7f, 0, 1)), 0);
+        .translate(
+            0, .0162f + .2764125f * MantisMotion.smooth(Math.clamp(extension / .7f, 0, 1)), 0);
   }
 
   public static Matrix4f edge(float extension) {
     return new Matrix4f()
         .translate(
             0,
-            .0081f + .42525f * MantisMotion.smooth(Math.clamp((extension - .3f) / .7f, 0, 1)),
+            .0081f + .2764125f * MantisMotion.smooth(Math.clamp((extension - .3f) / .7f, 0, 1)),
             0);
   }
 

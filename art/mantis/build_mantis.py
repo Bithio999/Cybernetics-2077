@@ -61,8 +61,8 @@ base = empty("DORSAL_MOUNT", loc=(0, 0.43, 0.17))
 PARTS["mount"] = base
 PARTS["support"] = empty("SUPPORT_PIVOT", base, angle=145)
 PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.405, 0), angle=-137)
-PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.44145, 0))
-PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.43335, 0))
+PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.2926125, 0))
+PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.2845125, 0))
 
 
 def finish(o, name, part, mat="gunmetal", bevel=0, detail=False):
@@ -533,11 +533,11 @@ for name, parent in PARTS.items():
     o.matrix_parent_inverse = Matrix.Identity(4)
     o.matrix_basis = Matrix.Identity(4)
     proportions = {
-        "mount": (0.90, 0.80, 0.85),
-        "support": (0.55, 0.30 / 0.34, 0.50),
-        "blade": (0.55, 0.55, 0.40),
-        "tip": (0.55, 0.55, 0.70),
-        "edge": (0.42, 0.55, 0.65),
+        "mount": (0.936, 0.80, 1.0625),
+        "support": (0.66, 0.30 / 0.34, 0.675),
+        "blade": (0.715, 0.55, 0.56),
+        "tip": (0.66, 0.44, 0.84),
+        "edge": (0.42, 0.44, 0.715),
     }
     o.data.transform(Matrix.Diagonal((*(v * 1.35 for v in proportions[name]), 1)))
     near[name] = o

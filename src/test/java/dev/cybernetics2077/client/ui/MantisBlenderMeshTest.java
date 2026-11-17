@@ -116,7 +116,7 @@ final class MantisBlenderMeshTest {
   }
 
   @Test
-  void deployedCuttingAssemblyStaysLargeWhileTheReceiverIsSlim() throws Exception {
+  void substantialHousingAndSupportHaveAShorterBalancedCuttingSection() throws Exception {
     var model = read("near");
     var axis =
         MantisArticulation.mount(1)
@@ -132,13 +132,15 @@ final class MantisBlenderMeshTest {
               reach,
               origin.distance(
                   axis.transformPosition(new Vector3f(edge[i], edge[i + 1], edge[i + 2]))));
-    assertTrue(reach >= 1.28f, "Do not shrink the deployed blade to solve storage clearance");
+    assertTrue(
+        reach >= .90f && reach <= .99f,
+        "Keep the cutting section shorter without shrinking the supporting implant");
     // The larger implant includes the base, linkage and receiver, not only the edge.
     var mount = model.parts().get("mount").vertices();
     float mx = 0;
     for (int i = 0; i < mount.length; i += 8)
       mx = java.lang.Math.max(mx, java.lang.Math.abs(mount[i]));
-    assertTrue(mx * 2 >= .16f, "The mount must grow with the complete implant");
+    assertTrue(mx * 2 >= .17f, "The mount must grow with the complete implant");
     assertTrue(MantisArticulation.SUPPORT_LENGTH >= .40f, "Keep the support full size");
     var receiver = model.parts().get("blade").vertices();
     float low = Float.POSITIVE_INFINITY, high = Float.NEGATIVE_INFINITY;
@@ -146,7 +148,15 @@ final class MantisBlenderMeshTest {
       low = java.lang.Math.min(low, receiver[i]);
       high = java.lang.Math.max(high, receiver[i]);
     }
-    assertTrue(high - low < .08f, "Keep the housing shallow without shortening the cutting blade");
+    assertTrue(
+        high - low >= .09f && high - low <= .105f, "The receiver needs a substantial side profile");
+    var support = model.parts().get("support").vertices();
+    float smin = Float.POSITIVE_INFINITY, smax = Float.NEGATIVE_INFINITY;
+    for (int i = 2; i < support.length; i += 8) {
+      smin = java.lang.Math.min(smin, support[i]);
+      smax = java.lang.Math.max(smax, support[i]);
+    }
+    assertTrue(smax - smin >= .065f, "The support needs more depth as well as the housing");
   }
 
   @Test
