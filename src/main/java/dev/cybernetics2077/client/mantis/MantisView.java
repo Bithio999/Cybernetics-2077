@@ -58,8 +58,8 @@ public final class MantisView {
         .rotateZ(rad(-side * 6 * ready + pose.roll()))
         .rotateY(rad(-side * 12 * ready + pose.yaw()))
         .rotateX(rad(-101 * ready + pose.pitch()))
-        // Present the dorsal housing toward the outside, rather than pinching it inward.
-        .rotateY(rad(side * 58 * ready))
+        // Present the dorsal forearm and mount upward.
+        .rotateY(rad(side * 28 * ready))
         .rotateY(rad((left ? -90 : 90) * (1 - ready)))
         .translate(
             MantisRig.nativeToMount(left)

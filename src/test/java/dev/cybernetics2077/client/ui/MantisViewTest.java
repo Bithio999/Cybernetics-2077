@@ -122,9 +122,7 @@ final class MantisViewTest {
                 .transformDirection(new Vector3f(left ? 1 : -1, 0, 0))
                 .normalize();
         var towardHand = frame.transformDirection(new Vector3f(0, 1, 0)).normalize();
-        assertTrue(dorsal.y > .4, "Dorsal mount should face outward and up: " + dorsal);
-        assertTrue(
-            (left ? -dorsal.x : dorsal.x) > .7, "Dorsal mount should face outward: " + dorsal);
+        assertTrue(dorsal.y > .85, "The top of the forearm should face upward: " + dorsal);
         var third =
             new Matrix4f()
                 .scale(-1, -1, 1)
