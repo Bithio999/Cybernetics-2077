@@ -11,3 +11,6 @@ __pycache__/
 # Local Blender backup files from earlier visual experiments.
 *.blend1
 *.blend2
+
+# Locally downloaded gameplay references and extracted frame sheets.
+/references-local/

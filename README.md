@@ -54,6 +54,8 @@ python3 scripts/verify-release.py
 
 Development client: `./gradlew runClient`. See [validation and review instructions](docs/VALIDATION.md) for native Minecraft checks and more screenshots.
 
+[Reference video download and frame-review helper](docs/REFERENCE-VIDEOS.md)
+
 ## Credits
 
 Interface artwork, articulated arm and blade meshes, shaders, implant and workstation textures, and category glyphs are original mod assets. Rajdhani is distributed under the [SIL Open Font License](src/main/resources/assets/cybernetics2077/font/rajdhani-license.txt). Cyberpunk 2077 belongs to CD PROJEKT; this is an independent fan project, with no game textures included.
