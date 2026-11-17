@@ -57,11 +57,12 @@ def empty(name, parent=None, loc=(0, 0, 0), angle=0):
     return o
 
 
-base = empty("DORSAL_MOUNT", loc=(0, 0.40, 0.15))
+base = empty("DORSAL_MOUNT", loc=(0, 0.455, 0.15))
 PARTS["mount"] = base
 PARTS["support"] = empty("SUPPORT_PIVOT", base, angle=145)
-PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.34, 0), angle=-137)
-PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.51, 0))
+PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.18, 0), angle=-137)
+PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.202, 0))
+PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.196, 0))
 
 
 def finish(o, name, part, mat="gunmetal", bevel=0, detail=False):
@@ -411,6 +412,39 @@ for sign in [-1, 1]:
             0,
             True,
         )
+# A nested distal leaf fits within the receiver when stowed. It gives the
+# extended blade reach without storing a rigid sword through the player's hand.
+for source in [o for o in list(scene.objects) if o.get("part") == "tip"]:
+    leaf = source.copy()
+    leaf.data = source.data.copy()
+    scene.collection.objects.link(leaf)
+    leaf.parent = PARTS["edge"]
+    leaf["part"] = "edge"
+    leaf.name = "Distal " + source.name
+
+# The middle leaf is a straight receiver, not a second pointed blade.
+# Its open end overlaps the narrow distal leaf instead of leaving a gap.
+for o in [o for o in list(scene.objects) if o.get("part") == "tip"]:
+    bpy.data.objects.remove(o, do_unlink=True)
+profile(
+    "Telescoping receiver leaf",
+    "tip",
+    [(0, -0.025), (0.603, -0.020), (0.603, 0.024), (0, 0.026)],
+    0.024,
+    "steel",
+    0.0009,
+)
+for sign in [-1, 1]:
+    box(
+        "Inner slide channel",
+        "tip",
+        (sign * 0.0126, 0.295, 0.006),
+        (0.0008, 0.55, 0.004),
+        "recess",
+        0,
+        True,
+    )
+
 # Convert/apply modelling modifiers once, record detail faces, then join each rigid part.
 near = {}
 for name, parent in PARTS.items():
@@ -437,16 +471,31 @@ for name, parent in PARTS.items():
     o = bpy.context.object
     o.name = "GAME_" + name
     o["part"] = name
+    # Rebase to the real hinge before changing proportions. Keep the original
+    # machined details, but slim the cutting assembly and narrow the linkage.
+    bpy.context.view_layer.update()
+    local = parent.matrix_world.inverted() @ o.matrix_world
+    o.data.transform(local)
+    o.matrix_parent_inverse = Matrix.Identity(4)
+    o.matrix_basis = Matrix.Identity(4)
+    proportions = {
+        "mount": (0.90, 0.80, 0.85),
+        "support": (0.55, 0.18 / 0.34, 0.50),
+        "blade": (0.55, 0.36, 0.40),
+        "tip": (0.55, 0.36, 0.40),
+        "edge": (0.42, 0.36, 0.30),
+    }
+    o.data.transform(Matrix.Diagonal((*proportions[name], 1)))
     near[name] = o
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=0.012)
     bpy.ops.object.mode_set(mode="OBJECT")
     index = list(PARTS).index(name)
-    ox = (index % 2) * 0.5
-    oy = (index // 2) * 0.5
+    ox = (index % 3) / 3
+    oy = (index // 3) * 0.5
     for uv in o.data.uv_layers.active.data:
-        uv.uv = (ox + 0.012 + uv.uv.x * 0.476, oy + 0.012 + uv.uv.y * 0.476)
+        uv.uv = (ox + 0.008 + uv.uv.x * (1 / 3 - 0.016), oy + 0.012 + uv.uv.y * 0.476)
 # One 512px diffuse+AO atlas shared by all four rigid groups and both LODs.
 color = bpy.data.images.new("Mantis colour bake", width=512, height=512, alpha=False)
 ao = bpy.data.images.new("Mantis AO bake", width=512, height=512, alpha=False)
@@ -525,7 +574,7 @@ for name, o in near.items():
     clone.select_set(True)
     bpy.context.view_layer.objects.active = clone
     mod = clone.modifiers.new("Near mesh optimization", "DECIMATE")
-    mod.ratio = 0.72
+    mod.ratio = 0.43
     mod.use_collapse_triangulate = True
     bpy.ops.object.modifier_apply(modifier=mod.name)
     clone.hide_render = True
@@ -614,9 +663,9 @@ def aim(o, point):
 
 bpy.ops.object.camera_add(location=(1.55, 2.1, 1.55))
 camera = bpy.context.object
-aim(camera, (0, 0.63, 0.37))
+aim(camera, (0, 0.55, 0.23))
 camera.data.type = "ORTHO"
-camera.data.ortho_scale = 1.6
+camera.data.ortho_scale = 0.95
 scene.camera = camera
 for loc, power, size in [
     ((2, 1, 3), 600, 3),

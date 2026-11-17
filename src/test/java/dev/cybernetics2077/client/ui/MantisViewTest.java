@@ -42,12 +42,12 @@ final class MantisViewTest {
 
   @Test
   void tipExtendsLastAndRetractsFirstIndependentlyOfTheSupport() {
-    var half = MantisMotion.sample(true, 20, 100, 0, false, 0, false);
+    var half = MantisMotion.sample(true, 24, 100, 0, false, 0, false);
     var open = MantisMotion.sample(true, 30, 100, 0, false, 0, false);
     assertTrue(half.extension() > .6f);
     assertEquals(0, half.tip());
     assertEquals(1, open.tip());
-    assertEquals(0, MantisMotion.sample(false, 10, 100, 0, false, 0, false).tip());
-    assertTrue(MantisMotion.sample(false, 10, 100, 0, false, 0, false).extension() > .6f);
+    assertEquals(0, MantisMotion.sample(false, 6, 100, 0, false, 0, false).tip());
+    assertTrue(MantisMotion.sample(false, 6, 100, 0, false, 0, false).extension() > .6f);
   }
 }

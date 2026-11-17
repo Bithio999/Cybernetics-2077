@@ -33,6 +33,10 @@ final class NativeArmSkin {
 
   private static final Map<Integer, List<List<V>>> CACHE = new HashMap<>();
 
+  private record Bounds(float x, float X, float y, float Y) {}
+
+  private static final Map<List<V>, Map<Bounds, List<V>>> PATCHES = new IdentityHashMap<>();
+
   static List<List<V>> mesh(
       AbstractClientPlayer player, boolean left, boolean sleeve, boolean slim) {
     int key = (left ? 1 : 0) | (sleeve ? 2 : 0) | (slim ? 4 : 0);
@@ -83,7 +87,20 @@ final class NativeArmSkin {
       float X,
       float y,
       float Y) {
-    var poly = clip(clip(clip(clip(face, 0, x, true), 0, X, false), 1, y, true), 1, Y, false);
+    // These rectangles only depend on arm width and hatch geometry, not on the
+    // animation. Do not clip skin polygons and allocate their vertices each frame.
+    var poly =
+        PATCHES
+            .computeIfAbsent(face, ignored -> new HashMap<>())
+            .computeIfAbsent(
+                new Bounds(x, X, y, Y),
+                ignored ->
+                    List.copyOf(
+                        clip(
+                            clip(clip(clip(face, 0, x, true), 0, X, false), 1, y, true),
+                            1,
+                            Y,
+                            false)));
     for (int i = 1; i + 1 < poly.size(); i++) {
       vertex(p, out, light, poly.getFirst());
       vertex(p, out, light, poly.get(i));

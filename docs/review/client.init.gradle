@@ -6,5 +6,7 @@ gradle.projectsEvaluated {
  rootProject.neoForge.runs.client.gameDirectory=rootProject.file(reviewRoot+'/client')
  rootProject.neoForge.runs.client.systemProperty('cybernetics2077.reviewRoot',reviewRoot.toString())
  if(rootProject.hasProperty('cyberContentOnly')) rootProject.neoForge.runs.client.systemProperty('cybernetics2077.contentOnly','true')
- rootProject.neoForge.runs.client.programArguments.addAll('--quickPlaySingleplayer','Cybernetics Review','--width','1280','--height','720')
+ if(rootProject.hasProperty('cyberRecording')) rootProject.neoForge.runs.client.systemProperty('cybernetics2077.recording','true')
+ def recording=rootProject.hasProperty('cyberRecording')
+ rootProject.neoForge.runs.client.programArguments.addAll('--quickPlaySingleplayer','Cybernetics Review','--width',recording?'960':'1280','--height',recording?'540':'720')
 }

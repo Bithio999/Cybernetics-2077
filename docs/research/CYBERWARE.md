@@ -47,3 +47,5 @@ The user's latest side-view image clarifies the two-link shape beyond the earlie
 ## Tier-one balance
 
 Tier-one Minecraft values: **4 RAM**, **2 program sockets**, **8 electrical damage**, **8/8/10 physical light damage**, **14 charged damage**. They are mod balance choices, not exact Cyberpunk statistics. No Relic, Overclock or broader perk system is included.
+
+The 0.5.3 revision keeps the same dorsal mechanism but narrows its housing and support. The uploaded reference’s separated forearm covers guide a wider, outward-spreading hatch. Minecraft’s shorter forearm needs nested sliding leaves to store the mechanism without passing through the hand; this is a mechanical adaptation, rather than a claim that the game model has identical joints. The hatch opens fully before the support unfolds, and the mesh lifts through the opening.

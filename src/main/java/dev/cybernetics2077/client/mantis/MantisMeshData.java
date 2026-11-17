@@ -14,7 +14,7 @@ public record MantisMeshData(Map<String, Part> parts) {
     if (in.readInt() != 0x43594d42 || in.readInt() != 1)
       throw new IOException("Unsupported Mantis mesh");
     int count = in.readInt();
-    if (count != 4) throw new IOException("Expected four rigid Mantis groups");
+    if (count != 5) throw new IOException("Expected five rigid Mantis groups");
     var parts = new LinkedHashMap<String, Part>();
     for (int p = 0; p < count; p++) {
       String name = in.readUTF();
@@ -26,13 +26,13 @@ public record MantisMeshData(Map<String, Part> parts) {
         raw[i] = in.readFloat();
         if (!Float.isFinite(raw[i])) throw new IOException("Non-finite vertex");
       }
-      var expanded = new float[indices / 3 * 4 * 8];
+      var expanded = new float[indices * 8];
       int offset = 0;
       for (int i = 0; i < indices; i += 3) {
         int[] tri = {in.readInt(), in.readInt(), in.readInt()};
         for (int index : tri)
           if (index < 0 || index >= vertices) throw new IOException("Invalid triangle index");
-        for (int corner : new int[] {0, 1, 2, 2}) {
+        for (int corner = 0; corner < 3; corner++) {
           System.arraycopy(raw, tri[corner] * 8, expanded, offset, 8);
           offset += 8;
         }
@@ -40,8 +40,8 @@ public record MantisMeshData(Map<String, Part> parts) {
       if (parts.put(name, new Part(expanded, indices / 3)) != null)
         throw new IOException("Duplicate rigid group");
     }
-    if (!parts.keySet().equals(Set.of("mount", "support", "blade", "tip")) || in.read() != -1)
-      throw new IOException("Invalid Mantis groups or trailing data");
+    if (!parts.keySet().equals(Set.of("mount", "support", "blade", "tip", "edge"))
+        || in.read() != -1) throw new IOException("Invalid Mantis groups or trailing data");
     return new MantisMeshData(Collections.unmodifiableMap(parts));
   }
 }

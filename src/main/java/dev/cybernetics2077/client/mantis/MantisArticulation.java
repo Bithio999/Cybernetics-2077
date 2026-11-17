@@ -6,10 +6,10 @@ import org.joml.Matrix4f;
  * Two real hinges: support goes back/up, cutting assembly counter-rotates to point past the hand.
  */
 public final class MantisArticulation {
-  public static final float SUPPORT_LENGTH = .34f;
+  public static final float SUPPORT_LENGTH = .18f;
 
   public static Matrix4f mount(float open) {
-    return new Matrix4f().translate(0, .40f, -.135f - .015f * open);
+    return new Matrix4f().translate(0, .455f, -.065f - .085f * open);
   }
 
   public static Matrix4f support(float hinge) {
@@ -24,7 +24,14 @@ public final class MantisArticulation {
   }
 
   public static Matrix4f tip(float extension) {
-    return new Matrix4f().translate(0, .02f + .49f * extension, 0);
+    return new Matrix4f()
+        .translate(0, .012f + .19f * MantisMotion.smooth(Math.clamp(extension / .7f, 0, 1)), 0);
+  }
+
+  public static Matrix4f edge(float extension) {
+    return new Matrix4f()
+        .translate(
+            0, .006f + .19f * MantisMotion.smooth(Math.clamp((extension - .3f) / .7f, 0, 1)), 0);
   }
 
   private MantisArticulation() {}

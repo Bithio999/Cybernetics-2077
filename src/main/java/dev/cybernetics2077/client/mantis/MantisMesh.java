@@ -26,7 +26,7 @@ public final class MantisMesh {
       var fixed = new java.util.LinkedHashMap<RenderType, ByteBufferBuilder>();
       fixed.put(RenderType.entityCutoutNoCull(skin), SKIN_MEMORY);
       fixed.put(RenderType.entityCutoutNoCull(METAL), METAL_MEMORY);
-      fixed.put(RenderType.entityCutoutNoCull(MantisBlenderMesh.ATLAS), MODEL_MEMORY);
+      fixed.put(MantisMaterial.TYPE, MODEL_MEMORY);
       isolated = MultiBufferSource.immediateWithBuffers(fixed, FALLBACK_MEMORY);
       currentSkin = skin;
     }
@@ -56,12 +56,12 @@ public final class MantisMesh {
     var local = source(player.getSkin().texture());
     var skin = local.getBuffer(RenderType.entityCutoutNoCull(player.getSkin().texture()));
     var metal = local.getBuffer(RenderType.entityCutoutNoCull(METAL));
-    var modelBuffer = local.getBuffer(RenderType.entityCutoutNoCull(MantisBlenderMesh.ATLAS));
+    var modelBuffer = local.getBuffer(MantisMaterial.TYPE);
     var sleeveFlag =
         left
             ? net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE
             : net.minecraft.world.entity.player.PlayerModelPart.RIGHT_SLEEVE;
-    float window = width * .32f;
+    float window = width * .44f;
     // Native outer faces are preserved everywhere except the shallow dorsal recess.
     for (int layer = 0; layer < 2; layer++) {
       if (layer == 1 && !player.isModelPartShown(sleeveFlag)) continue;
@@ -94,26 +94,26 @@ public final class MantisMesh {
         // Four strips retain the original arm silhouette around the hatch.
         NativeArmSkin.part(p, skin, light, face, -1, -window, .25f, 1);
         NativeArmSkin.part(p, skin, light, face, window, 1, .25f, 1);
-        NativeArmSkin.part(p, skin, light, face, -window, window, .25f, .29f);
-        NativeArmSkin.part(p, skin, light, face, -window, window, .48f, 1);
+        NativeArmSkin.part(p, skin, light, face, -window, window, .25f, .255f);
+        NativeArmSkin.part(p, skin, light, face, -window, window, .52f, 1);
         for (int flap : new int[] {-1, 1}) {
           float edge = flap * window;
           p.pushPose();
-          p.translate(edge, 0, z);
-          p.mulPose(Axis.YP.rotationDegrees(-flap * motion.panels() * 120));
+          p.translate(edge + flap * .018f * motion.panels(), 0, z - .018f * motion.panels());
+          p.mulPose(Axis.YP.rotationDegrees(-flap * motion.panels() * 105));
           p.translate(-edge, 0, -z);
           NativeArmSkin.part(
-              p, skin, light, face, flap < 0 ? -window : 0, flap < 0 ? 0 : window, .29f, .48f);
+              p, skin, light, face, flap < 0 ? -window : 0, flap < 0 ? 0 : window, .255f, .52f);
           if (layer == 0 && motion.panels() > .001f)
             box(
                 p,
                 metal,
                 light,
                 flap < 0 ? -window + .002f : .002f,
-                .293f,
+                .258f,
                 z + .0015f,
                 flap < 0 ? -.002f : window - .002f,
-                .477f,
+                .517f,
                 z + .004f,
                 0xff3a484e);
           p.popPose();
@@ -138,21 +138,21 @@ public final class MantisMesh {
 
   /** Backing stays opaque independently of model detail level. */
   private static void sealedRecess(PoseStack p, VertexConsumer out, int light, float width) {
-    float w = width * .32f;
+    float w = width * .44f;
     box(
         p,
         out,
         light,
         -width / 2 + .002f,
         .25f,
-        -.105f,
+        -.075f,
         width / 2 - .002f,
-        .50f,
+        .52f,
         .123f,
         0xff293840);
-    box(p, out, light, -w - .005f, .29f, -.123f, -w + .005f, .48f, -.105f, 0xff677d81);
-    box(p, out, light, w - .005f, .29f, -.123f, w + .005f, .48f, -.105f, 0xff677d81);
-    box(p, out, light, -w, .475f, -.123f, w, .49f, -.105f, 0xff677d81);
+    box(p, out, light, -w - .005f, .255f, -.123f, -w + .005f, .52f, -.075f, 0xff677d81);
+    box(p, out, light, w - .005f, .255f, -.123f, w + .005f, .52f, -.075f, 0xff677d81);
+    box(p, out, light, -w, .515f, -.123f, w, .53f, -.075f, 0xff677d81);
   }
 
   private static void box(

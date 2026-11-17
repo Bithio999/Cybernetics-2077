@@ -21,6 +21,12 @@ final class MantisMotionTest {
     for (float t = 0; t < CombatRules.DEPLOY; t += .05f) {
       var pose = MantisMotion.sample(true, t, 100, 0, false, 0, false);
       assertTrue(pose.panels() >= pose.blade());
+      if (pose.blade() > 0)
+        assertEquals(
+            1,
+            pose.panels(),
+            .00001,
+            "The support may only unfold after the hatch has completely opened");
     }
   }
 

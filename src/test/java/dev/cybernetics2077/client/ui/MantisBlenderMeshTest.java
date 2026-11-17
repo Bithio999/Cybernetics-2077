@@ -24,12 +24,12 @@ final class MantisBlenderMeshTest {
     var far = read("far");
     int n = near.parts().values().stream().mapToInt(MantisMeshData.Part::triangles).sum();
     int f = far.parts().values().stream().mapToInt(MantisMeshData.Part::triangles).sum();
-    assertTrue(n < 6000 && n > 1000);
-    assertTrue(f < 700 && f < n * .15);
+    assertTrue(n < 3300 && n > 1000);
+    assertTrue(f < 700 && f < n * .20);
     for (var model : new MantisMeshData[] {near, far})
       for (var part : model.parts().values()) {
         var v = part.vertices();
-        assertEquals(part.triangles() * 4 * 8, v.length);
+        assertEquals(part.triangles() * 3 * 8, v.length);
         for (int i = 0; i < v.length; i += 8) {
           assertTrue(v[i + 3] >= 0 && v[i + 3] <= 1 && v[i + 4] >= 0 && v[i + 4] <= 1);
           double normal = v[i + 5] * v[i + 5] + v[i + 6] * v[i + 6] + v[i + 7] * v[i + 7];
@@ -72,6 +72,47 @@ final class MantisBlenderMeshTest {
         () ->
             MantisMeshData.read(
                 new ByteArrayInputStream(java.util.Arrays.copyOf(data, data.length - 9))));
+  }
+
+  @Test
+  void mechanismStaysWithinTheOpenForearmFootprintUntilItClearsTheSkin() throws Exception {
+    // The actual baked Minecraft arm ends at Y=.625, not .75. Check real
+    // exported vertices, for both widths, through opening and closing.
+    for (String lod : new String[] {"near", "far"}) {
+      var model = read(lod);
+      for (float age = 0; age <= 30; age += .125f) {
+        var motion = MantisMotion.sample(true, age, 100, 0, false, 0, false);
+        var matrix = MantisArticulation.mount(motion.panels());
+        for (String name : new String[] {"mount", "support", "blade", "tip", "edge"}) {
+          if (name.equals("support")) matrix.mul(MantisArticulation.support(motion.blade()));
+          if (name.equals("blade"))
+            matrix.mul(MantisArticulation.blade(motion.blade(), motion.extension()));
+          if (name.equals("tip")) matrix.mul(MantisArticulation.tip(motion.tip()));
+          if (name.equals("edge")) matrix.mul(MantisArticulation.edge(motion.tip()));
+          float[] v = model.parts().get(name).vertices();
+          for (int i = 0; i < v.length; i += 8) {
+            var point = matrix.transformPosition(new Vector3f(v[i], v[i + 1], v[i + 2]));
+            for (float width : new float[] {3 / 16f, 4 / 16f}) {
+              boolean inArm =
+                  java.lang.Math.abs(point.x) < width / 2
+                      && point.y > .25f
+                      && point.y < .625f
+                      && point.z > -.125f
+                      && point.z < .125f;
+              boolean inOpening =
+                  java.lang.Math.abs(point.x) < width * .44f - .004f
+                      && point.y > .255f
+                      && point.y < .52f;
+              if (age == 0)
+                assertTrue(inArm, "The stowed blade must fit completely inside the actual arm");
+              assertFalse(
+                  inArm && !inOpening,
+                  () -> "Mechanism crosses intact arm skin: " + name + " " + point);
+            }
+          }
+        }
+      }
+    }
   }
 
   @Test

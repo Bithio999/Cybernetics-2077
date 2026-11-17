@@ -206,7 +206,13 @@ public final class CyberwareClientReview {
         });
   }
 
+  static final Map<String, Double> recordingMarks = new LinkedHashMap<>();
+
   static void shot(String name) throws Exception {
+    if (Boolean.getBoolean("cybernetics2077.recording")) {
+      recordingMarks.put(name, System.currentTimeMillis() / 1000.0);
+      return;
+    }
     Files.createDirectories(OUT);
     try (var image = Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget())) {
       image.writeToFile(OUT.resolve(name + ".png"));

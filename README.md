@@ -23,7 +23,7 @@ The scanner shows health, armor, attack damage, absorption and visible effects. 
 
 ![Short Circuit scanner](docs/images/short-circuit-scanner.png)
 
-Mantis Claws open a shallow hatch on the back of each forearm. The palm, wrist and sides remain solid; the recess exposes wiring and the mount. In the ready stance the mount faces up. The two-hinge mechanism has a support reaching backward and upward from the forearm, and a cutting assembly pointing forward past the hand. A separate distal tip slides out of its fixed blade sleeve. **Left-click** chains alternating slashes; **hold and release right-click** for a charged leap, from the ground or in midair. Aim at a visible target within **8 blocks** to stop at it; without a target, leap **6 blocks** in the look direction. The existing empty hand moves continuously into the armed pose, using Minecraft’s native hand transform and skin UVs. First- and third-person attacks follow the contact frames used for damage.
+Mantis Claws open a shallow hatch on the back of each forearm. The palm, wrist and sides remain solid; the recess exposes wiring and the mount. In the ready stance the mount faces up. The two-hinge mechanism has a support reaching backward and upward from the forearm, and a cutting assembly pointing forward past the hand. Nested blade leaves slide out of the slim receiver after the larger forearm hatch opens; the hand and wrist remain closed. **Left-click** chains alternating slashes; **hold and release right-click** for a charged leap, from the ground or in midair. Aim at a visible target within **8 blocks** to stop at it; without a target, leap **6 blocks** in the look direction. The existing empty hand moves continuously into the armed pose, using Minecraft’s native hand transform and skin UVs. First- and third-person attacks follow the contact frames used for damage.
 
 [Watch the claw animations](docs/media/mantis-claws.mp4) · [Blender model and build notes](art/mantis/README.md) · [Equipment, controls and recipes](docs/CYBERWARE.md)
 
@@ -39,7 +39,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.5.2.jar](releases/Cybernetics2077-0.5.2.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.5.3.jar](releases/Cybernetics2077-0.5.3.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

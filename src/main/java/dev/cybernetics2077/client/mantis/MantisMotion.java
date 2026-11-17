@@ -35,9 +35,9 @@ public final class MantisMotion {
     float t = Math.clamp(sinceChange / CombatRules.DEPLOY, 0, 1);
     if (!deployed) t = 1 - t;
     float ready = phase(t, 0, .40f),
-        panels = phase(t, .18f, .42f),
-        hinge = phase(t, .36f, .64f),
-        extension = phase(t, .52f, .76f);
+        panels = phase(t, .14f, .36f),
+        hinge = phase(t, .42f, .72f),
+        extension = phase(t, .64f, .84f);
     float side = left ? -1 : 1;
     float inspect = phase(t, .12f, .38f) * (1 - phase(t, .72f, 1));
     float pitch = -10 * inspect, yaw = side * 18 * inspect, roll = side * 12 * inspect;
@@ -85,7 +85,7 @@ public final class MantisMotion {
         extension,
         ready,
         twist,
-        phase(t, .72f, .98f));
+        phase(t, .82f, 1));
   }
 
   public static float smooth(float t) {

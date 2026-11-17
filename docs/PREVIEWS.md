@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.5.2. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.3; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -36,7 +36,7 @@ The review switches the local player's loaded skin to Minecraft's built-in Steve
 
 ![Mantis Claws in first person](images/mantis-first-person.png)
 
-The 0.5.2 blades use the [original Blender model](../art/mantis/README.md). The lower support angles backward and upward, then the upper cutting section points forward from its hinge. Both sections and the sliding tip move independently. The gameplay clips above use this model.
+The 0.5.3 blades use the [original Blender model](../art/mantis/README.md). The lower support angles backward and upward, then the slim cutting section points forward from its hinge. Nested sliding leaves retain reach while fitting the folded blade inside the forearm. The hatch opens first, with outward-spreading panels and a closed hand and wrist. The gameplay clips above use this model.
 
 ![Mantis Claws in third person](images/mantis-third-person.png)
 
@@ -59,3 +59,5 @@ Select your installed Operating System, then **Manage Quickhacks**. Implant inst
 [Watch the distal tip retract and extend in a native close-up](media/mantis-mechanism.mp4)
 
 ![Dorsal mounts and closed forearms](images/mantis-dorsal-ready.png)
+
+The current Mantis clips are native 960×540 recordings exported at 30 fps. They use a recording profile without per-tick screenshot capture, which caused stalls in the earlier preview. Full-size diagnostic screenshots are collected separately.

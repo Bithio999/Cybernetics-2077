@@ -55,6 +55,9 @@ final class ContentClientReview {
   }
 
   static void checkUploadLabel() throws Exception {
+    // The separate full-size diagnostic run validates pixels. Recording uses
+    // a smaller native framebuffer and avoids every GPU screenshot readback.
+    if (Boolean.getBoolean("cybernetics2077.recording")) return;
     try (var image = Screenshot.takeScreenshot(Minecraft.getInstance().getMainRenderTarget())) {
       int cyan = 0, red = 0;
       for (int y = 165; y < 230; y++)
@@ -524,6 +527,11 @@ final class ContentClientReview {
               + " and return; untargeted six-block leap; ground and airborne leaps travel 5.15"
               + " blocks and land one 14-damage hit each; solid-wall guard; dimension change"
               + " retains equipment state.\n");
+      if (Boolean.getBoolean("cybernetics2077.recording")) {
+        Files.writeString(
+            OUT.resolve("recording-marks.json"), new com.google.gson.Gson().toJson(recordingMarks));
+        RecordingFrames.finish();
+      }
       finished = true;
       m.stop();
     }

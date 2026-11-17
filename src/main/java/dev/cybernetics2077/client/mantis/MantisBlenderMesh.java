@@ -69,6 +69,8 @@ public final class MantisBlenderMesh {
     part(p, out, light, model, "blade");
     p.mulPose(MantisArticulation.tip(motion.tip()));
     part(p, out, light, model, "tip");
+    p.mulPose(MantisArticulation.edge(motion.tip()));
+    part(p, out, light, model, "edge");
     p.popPose();
   }
 
