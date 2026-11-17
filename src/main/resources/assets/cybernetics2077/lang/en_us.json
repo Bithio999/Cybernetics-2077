@@ -46,5 +46,19 @@
   "cybernetics2077.bench.circulatory_system": "Circulatory",
   "cybernetics2077.bench.integumentary_system": "Skin",
   "cybernetics2077.bench.legs": "Legs",
-  "cybernetics2077.button.all": "All cyberware"
+  "cybernetics2077.button.all": "All cyberware",
+  "item.cybernetics2077.cyberdeck_tier_1": "Cyberdeck",
+  "item.cybernetics2077.short_circuit_tier_1": "Short Circuit",
+  "item.cybernetics2077.mantis_claws_tier_1": "Mantis Claws",
+  "cybernetics2077.deck.title": "Cyberdeck",
+  "cybernetics2077.deck.manage": "Cyberdeck",
+  "cybernetics2077.deck.install_first": "Install a cyberdeck in the Operating System slot to manage quickhack chips.",
+  "cybernetics2077.deck.description": "4 RAM / 2 quickhack slots. Manage chips at a Cybernetics Bench.",
+  "cybernetics2077.quickhack.description": "Install in a tier 1 cyberdeck. Hold the scanner and click a target to upload.",
+  "cybernetics2077.short_circuit.stats": "2 RAM / 1 second upload / 8 electrical damage",
+  "cybernetics2077.mantis.description": "Empty hands: G to deploy. LMB: slash. Hold/release RMB: charged lunge.",
+  "cybernetics2077.mantis.empty_hands": "Empty both hands to deploy Mantis Claws.",
+  "key.cybernetics2077.mantis": "Deploy / Retract Mantis Claws",
+  "death.attack.short_circuit": "%1$s was short-circuited",
+  "death.attack.short_circuit.player": "%1$s was short-circuited by %2$s"
 }

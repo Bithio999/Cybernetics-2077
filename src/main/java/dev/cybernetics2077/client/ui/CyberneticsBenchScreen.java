@@ -18,8 +18,28 @@ public final class CyberneticsBenchScreen extends AbstractContainerScreen<Cybern
     titleLabelY = -1000;
   }
 
+  private net.minecraft.client.gui.components.AbstractButton deckButton;
+
+  @Override
+  protected void init() {
+    super.init();
+    deckButton =
+        addRenderableWidget(
+            new CyberActionButton(
+                leftPos + 10,
+                topPos + 200,
+                66,
+                20,
+                Component.translatable("cybernetics2077.deck.manage"),
+                () -> minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 0)));
+    deckButton.setTooltip(
+        net.minecraft.client.gui.components.Tooltip.create(
+            Component.translatable("cybernetics2077.deck.install_first")));
+  }
+
   @Override
   public void render(GuiGraphics g, int x, int y, float partial) {
+    deckButton.active = menu.hasDeck() && menu.getCarried().isEmpty();
     super.render(g, x, y, partial);
     renderTooltip(g, x, y);
   }

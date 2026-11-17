@@ -26,7 +26,7 @@ public final class CyberwareClientReview {
       Path.of(
           System.getProperty("cybernetics2077.reviewRoot", "/tmp/cybernetics2077-review"),
           "capture");
-  static int age, ticks;
+  static int age, ticks, contentTicks;
   static volatile boolean ready;
   static volatile String error;
   static boolean finished;
@@ -269,7 +269,7 @@ public final class CyberwareClientReview {
       } catch (Exception ex) {
         ex.printStackTrace();
       }
-    if (++age > 1200 || error != null) {
+    if (++age > 2300 || error != null) {
       try {
         Files.createDirectories(OUT);
         Files.writeString(OUT.resolve("failed.txt"), error == null ? "Timeout at " + ticks : error);
@@ -343,6 +343,10 @@ public final class CyberwareClientReview {
         return;
       }
       ticks++;
+      if (Boolean.getBoolean("cybernetics2077.contentOnly")) {
+        ContentClientReview.tick(contentTicks++);
+        return;
+      }
       if (ticks == 60) mc.setScreen(new InventoryScreen(mc.player));
       if (ticks == 70) shot("inventory-button");
       if (ticks == 75) openButton();
@@ -655,9 +659,8 @@ public final class CyberwareClientReview {
                 + " returns after release; live player skin textures, four/three-pixel arm"
                 + " geometry, all six skin-layer flags, rendered hat/jacket pixel comparison and"
                 + " resource reset; pixel-verified square head and centered full body passed.\n");
-        finished = true;
-        mc.stop();
       }
+      if (ticks >= 950) ContentClientReview.tick(ticks - 950);
     } catch (Throwable ex) {
       error = ex.toString();
       ex.printStackTrace();

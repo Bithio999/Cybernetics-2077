@@ -1,7 +1,9 @@
 package dev.cybernetics2077;
 
 import dev.cybernetics2077.bench.*;
+import dev.cybernetics2077.combat.CyberwareNetwork;
 import dev.cybernetics2077.cyberware.*;
+import dev.cybernetics2077.deck.*;
 import dev.cybernetics2077.network.OpenCyberware;
 import dev.cybernetics2077.scanner.ScannerNetwork;
 import java.util.function.Supplier;
@@ -52,6 +54,19 @@ public final class Cybernetics2077 {
                   CyberwareCategory.FACE,
                   4,
                   CyberwareTier.ONE));
+  public static final Supplier<CyberdeckItem> CYBERDECK =
+      ITEMS.register("cyberdeck_tier_1", CyberdeckItem::new);
+  public static final Supplier<QuickhackItem> SHORT_CIRCUIT =
+      ITEMS.register("short_circuit_tier_1", QuickhackItem::new);
+  public static final Supplier<CyberwareItem> MANTIS =
+      ITEMS.register(
+          "mantis_claws_tier_1",
+          () ->
+              new CyberwareItem(
+                  new net.minecraft.world.item.Item.Properties(),
+                  CyberwareCategory.ARMS,
+                  12,
+                  CyberwareTier.ONE));
   private static final DeferredRegister<MenuType<?>> MENUS =
       DeferredRegister.create(Registries.MENU, ID);
   private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
@@ -63,6 +78,9 @@ public final class Cybernetics2077 {
       MENUS.register(
           "cybernetics_bench",
           () -> new MenuType<>(CyberneticsBenchMenu::new, FeatureFlags.DEFAULT_FLAGS));
+  public static final Supplier<MenuType<CyberdeckMenu>> DECK_MENU =
+      MENUS.register(
+          "cyberdeck", () -> new MenuType<>(CyberdeckMenu::new, FeatureFlags.DEFAULT_FLAGS));
   public static final Supplier<AttachmentType<CyberwareInventory>> CYBERWARE =
       ATTACHMENTS.register(
           "cyberware",
@@ -82,14 +100,19 @@ public final class Cybernetics2077 {
     container.registerConfig(ModConfig.Type.SERVER, SPEC);
     bus.addListener(this::network);
     bus.addListener(ScannerNetwork::register);
+    bus.addListener(CyberwareNetwork::register);
     bus.addListener(this::creative);
   }
 
   private void creative(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent e) {
     if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.FUNCTIONAL_BLOCKS)
       e.accept(BENCH_ITEM.get());
-    if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES)
+    if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES) {
       e.accept(OPTICS.get());
+      e.accept(CYBERDECK.get());
+      e.accept(SHORT_CIRCUIT.get());
+      e.accept(MANTIS.get());
+    }
   }
 
   private void network(RegisterPayloadHandlersEvent e) {

@@ -139,4 +139,9 @@ public final class Geometry {
   }
 
   private Geometry() {}
+
+  /** Length of the transformed X basis, independent of its rotation in the GUI plane. */
+  static float poseScale(org.joml.Matrix4f matrix) {
+    return (float) Math.hypot(matrix.m00(), matrix.m01());
+  }
 }

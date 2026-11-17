@@ -46,7 +46,7 @@ final class CyberCanvas {
   private float strokeWidth(float requested) {
     var window = Minecraft.getInstance().getWindow();
     float physicalScale =
-        Math.abs(g.pose().last().pose().m00()) * window.getWidth() / window.getGuiScaledWidth();
+        Geometry.poseScale(g.pose().last().pose()) * window.getWidth() / window.getGuiScaledWidth();
     return Math.max(requested, 1 / Math.max(.0001f, physicalScale));
   }
 

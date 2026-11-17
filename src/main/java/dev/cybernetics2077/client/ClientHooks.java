@@ -44,12 +44,10 @@ public final class ClientHooks {
 
   private static void position() {
     if (inventory instanceof AbstractContainerScreen<?> screen && button != null) {
-      // Creative has a search field and scrollbar in the header's right corner.
-      int x =
-          screen.getGuiLeft()
-              + screen.getXSize()
-              + (screen instanceof CreativeModeInventoryScreen ? 4 : -23);
-      button.setPosition(x, screen.getGuiTop() + 5);
+      // Attach outside the inventory's left edge: recipe book is inside, effects are on the right.
+      // Creative category tabs occupy the top/bottom, so use the same side attachment there.
+      int x = Math.max(1, screen.getGuiLeft() - 19);
+      button.setPosition(x, screen.getGuiTop() + 32);
       var player = Minecraft.getInstance().player;
       boolean free = player != null && player.containerMenu.getCarried().isEmpty();
       button.active = free;
@@ -73,6 +71,7 @@ public final class ClientHooks {
           Cybernetics2077.MENU.get(), CyberwareScreen::new);
       e.<dev.cybernetics2077.bench.CyberneticsBenchMenu, CyberneticsBenchScreen>register(
           Cybernetics2077.BENCH_MENU.get(), CyberneticsBenchScreen::new);
+      e.register(Cybernetics2077.DECK_MENU.get(), CyberdeckScreen::new);
     }
 
     @SubscribeEvent

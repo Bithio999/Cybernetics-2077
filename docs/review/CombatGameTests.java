@@ -1,0 +1,193 @@
+package dev.cybernetics2077.review;
+
+import dev.cybernetics2077.Cybernetics2077;
+import dev.cybernetics2077.bench.CyberneticsBenchMenu;
+import dev.cybernetics2077.combat.*;
+import dev.cybernetics2077.cyberware.*;
+import dev.cybernetics2077.deck.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.*;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.item.*;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.gametest.*;
+
+@GameTestHolder(Cybernetics2077.ID)
+@PrefixGameTestTemplate(false)
+public final class CombatGameTests {
+  static void install(ServerPlayer p) {
+    var inv = p.getData(Cybernetics2077.CYBERWARE);
+    inv.setStackInSlot(
+        CyberwareCategory.FACE.firstSlot(), new ItemStack(Cybernetics2077.OPTICS.get()));
+    inv.setStackInSlot(
+        CyberwareCategory.OPERATING_SYSTEM.firstSlot(),
+        new ItemStack(Cybernetics2077.CYBERDECK.get()));
+    inv.setStackInSlot(
+        CyberwareCategory.ARMS.firstSlot(), new ItemStack(Cybernetics2077.MANTIS.get()));
+  }
+
+  static void chip(ServerPlayer p) {
+    p.getInventory().setItem(0, new ItemStack(Cybernetics2077.SHORT_CIRCUIT.get()));
+    var menu =
+        new CyberdeckMenu(2, p.getInventory(), ContainerLevelAccess.NULL, CyberwareRuntime.deck(p));
+    menu.quickMoveStack(p, 29);
+  }
+
+  static net.minecraft.world.entity.animal.Cow target(GameTestHelper h, ServerPlayer p) {
+    var pos = h.absolutePos(new BlockPos(2, 20, 2));
+    p.setPos(Vec3.atBottomCenterOf(pos));
+    var mob = h.spawn(EntityType.COW, new BlockPos(2, 20, 5));
+    mob.setNoAi(true);
+    mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH)
+        .setBaseValue(100);
+    mob.setHealth(100);
+    p.lookAt(
+        net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, mob.getEyePosition());
+    return mob;
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void benchAcceptsDeckAndArmsInTheirOwnCategories(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    var menu = new CyberneticsBenchMenu(1, p.getInventory());
+    p.getInventory().setItem(0, new ItemStack(Cybernetics2077.CYBERDECK.get()));
+    p.getInventory().setItem(1, new ItemStack(Cybernetics2077.MANTIS.get()));
+    h.assertTrue(!menu.getSlot(5).mayPlace(p.getInventory().getItem(0)), "Deck accepted in face");
+    menu.quickMoveStack(p, 48);
+    menu.quickMoveStack(p, 49);
+    h.assertTrue(
+        menu.hasDeck() && CyberwareRuntime.claws(p) && menu.capacityUsed() == 20,
+        "New implants failed to install or wrong capacity");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void chipStorageSurvivesDeckRemovalAndRejectsDuplicates(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    install(p);
+    chip(p);
+    var deck = CyberwareRuntime.deck(p);
+    h.assertTrue(CyberdeckItem.has(deck, Cybernetics2077.SHORT_CIRCUIT.get()), "Chip not saved");
+    var menu = new CyberdeckMenu(2, p.getInventory(), ContainerLevelAccess.NULL, deck);
+    h.assertTrue(
+        !menu.getSlot(1).mayPlace(new ItemStack(Cybernetics2077.SHORT_CIRCUIT.get())),
+        "Duplicate quickhack accepted");
+    h.assertTrue(!menu.getSlot(1).mayPlace(new ItemStack(Items.DIAMOND)), "Non-chip accepted");
+    var bench = new CyberneticsBenchMenu(1, p.getInventory());
+    bench.quickMoveStack(p, CyberwareCategory.OPERATING_SYSTEM.firstSlot());
+    h.assertTrue(!menu.stillValid(p), "Detached deck remains editable");
+    var removed =
+        p.getInventory().items.stream()
+            .filter(i -> i.getItem() instanceof CyberdeckItem)
+            .findFirst()
+            .orElseThrow();
+    h.assertTrue(
+        CyberdeckItem.has(removed, Cybernetics2077.SHORT_CIRCUIT.get()),
+        "Removing deck erased chip");
+    var serialized = removed.save(p.registryAccess());
+    var copy =
+        ItemStack.parseOptional(p.registryAccess(), (net.minecraft.nbt.CompoundTag) serialized);
+    h.assertTrue(
+        CyberdeckItem.has(copy, Cybernetics2077.SHORT_CIRCUIT.get()),
+        "Serialized deck lost its program");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void hacksRequireOpticsDeckChipAimAndReserveBoundedRam(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    var mob = target(h, p);
+    h.assertTrue(!CyberwareRuntime.queue(p, mob.getId()), "Hack works without equipment");
+    install(p);
+    h.assertTrue(!CyberwareRuntime.queue(p, mob.getId()), "Hack works without chip");
+    chip(p);
+    p.setYRot(p.getYRot() + 180);
+    h.assertTrue(!CyberwareRuntime.queue(p, mob.getId()), "Off-axis hack accepted");
+    p.lookAt(
+        net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, mob.getEyePosition());
+    h.assertTrue(CyberwareRuntime.queue(p, mob.getId()), "Valid hack rejected");
+    h.assertTrue(
+        Math.abs(CyberwareRuntime.state(p).ram - 2) < .001 && mob.getHealth() == 100,
+        "RAM not reserved or upload hit instantly");
+    h.assertTrue(
+        CyberwareRuntime.queue(p, mob.getId()) && !CyberwareRuntime.queue(p, mob.getId()),
+        "Queue/RAM bounds failed");
+    for (int i = 0; i < 800; i++) CyberwareRuntime.tick(p);
+    h.assertTrue(CyberwareRuntime.state(p).ram <= 4, "RAM regenerated above max");
+    h.runAfterDelay(
+        21,
+        () -> {
+          CyberwareRuntime.tick(p);
+          h.assertTrue(
+              Math.abs(mob.getHealth() - 92) < .001,
+              "First uploaded hack did not deal exactly 8 damage");
+          h.succeed();
+        });
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void removingDeckCancelsUploadsAndNeverDuplicatesChips(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    install(p);
+    chip(p);
+    var mob = target(h, p);
+    h.assertTrue(CyberwareRuntime.queue(p, mob.getId()), "Queue setup failed");
+    p.getData(Cybernetics2077.CYBERWARE)
+        .setStackInSlot(CyberwareCategory.OPERATING_SYSTEM.firstSlot(), ItemStack.EMPTY);
+    CyberwareRuntime.tick(p);
+    h.assertTrue(
+        CyberwareRuntime.state(p).uploads.isEmpty() && CyberwareRuntime.state(p).ram == 4,
+        "Removed deck left upload or failed refund");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 100)
+  public static void mantisRequiresInstallationEmptyHandsAndContactFrame(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    var mob = target(h, p);
+    CyberwareRuntime.action(p, 0);
+    h.assertTrue(!CyberwareRuntime.state(p).deployed, "Uninstalled claws deployed");
+    install(p);
+    p.getInventory().setItem(0, new ItemStack(Items.DIAMOND_SWORD));
+    CyberwareRuntime.action(p, 0);
+    h.assertTrue(!CyberwareRuntime.state(p).deployed, "Claws deployed over weapon");
+    p.getInventory().clearContent();
+    CyberwareRuntime.action(p, 0);
+    h.assertTrue(CyberwareRuntime.state(p).deployed, "Equipped empty-hand claws did not deploy");
+    CyberwareRuntime.action(p, 1);
+    h.assertTrue(!CyberwareRuntime.state(p).pendingHit, "Attack during deployment allowed");
+    h.runAfterDelay(
+        25,
+        () -> {
+          CyberwareRuntime.action(p, 1);
+          h.assertTrue(
+              CyberwareRuntime.state(p).pendingHit && mob.getHealth() == 100,
+              "Attack applied before contact");
+          h.runAfterDelay(
+              5,
+              () -> {
+                CyberwareRuntime.tick(p);
+                h.assertTrue(
+                    Math.abs(mob.getHealth() - 92) < .001,
+                    "Light contact damage incorrect: " + mob.getHealth());
+                p.getInventory().setItem(0, new ItemStack(Items.STICK));
+                CyberwareRuntime.tick(p);
+                h.assertTrue(!CyberwareRuntime.state(p).deployed, "Equipping item did not retract");
+                h.succeed();
+              });
+        });
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void bladeRayCannotHitThroughSolidTerrain(GameTestHelper h) {
+    var p = ImplantGameTests.player(h);
+    var mob = target(h, p);
+    h.assertTrue(CyberwareRuntime.bladeTarget(p, 4) == mob, "Valid blade ray failed");
+    for (int y = 20; y <= 23; y++)
+      h.setBlock(new BlockPos(2, y, 3), net.minecraft.world.level.block.Blocks.STONE);
+    h.assertTrue(CyberwareRuntime.bladeTarget(p, 4) == null, "Blade ray bypassed a wall");
+    h.succeed();
+  }
+}

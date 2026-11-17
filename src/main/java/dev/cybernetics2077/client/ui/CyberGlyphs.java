@@ -177,4 +177,28 @@ final class CyberGlyphs {
   }
 
   private CyberGlyphs() {}
+
+  public static void quickhack(CyberCanvas c, float x, float y, float size, int color) {
+    float z = size / 32;
+    c.g.pose().pushPose();
+    c.g.pose().translate(x, y, 0);
+    c.g.pose().scale(z, z, 1);
+    c.stroke(Geometry.panel(3, 3, 26, 26, 5), 1, color);
+    for (int k = 0; k < 4; k++) {
+      c.line(8 + k * 5, 0, 8 + k * 5, 3, 1, color);
+      c.line(8 + k * 5, 29, 8 + k * 5, 32, 1, color);
+      c.line(0, 8 + k * 5, 3, 8 + k * 5, 1, color);
+      c.line(29, 8 + k * 5, 32, 8 + k * 5, 1, color);
+    }
+    c.polygon(
+        java.util.List.of(
+            new Geometry.Point(18, 6),
+            new Geometry.Point(10, 17),
+            new Geometry.Point(16, 17),
+            new Geometry.Point(13, 26),
+            new Geometry.Point(23, 13),
+            new Geometry.Point(17, 13)),
+        color);
+    c.g.pose().popPose();
+  }
 }

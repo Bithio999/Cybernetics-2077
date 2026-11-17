@@ -16,7 +16,7 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
-/** Optical-only adaptation of the authored scanner. There are no quickhack or skill systems. */
+/** Optical data and server-authorized cyberdeck uploads share the held scanner overlay. */
 @EventBusSubscriber(modid = Cybernetics2077.ID, value = Dist.CLIENT)
 public final class ScannerClient {
   public static final KeyMapping KEY =
@@ -34,6 +34,21 @@ public final class ScannerClient {
   private static CompoundTag target = new CompoundTag();
   private static long received;
   private static int focus = -1, focusTicks;
+  private static long lastHack;
+
+  public static void quickhack() {
+    var own = dev.cybernetics2077.client.mantis.CyberwareClient.own();
+    long now = System.nanoTime();
+    if (active()
+        && frame.data() > .95
+        && focus >= 0
+        && own.getBoolean("shortCircuit")
+        && own.getFloat("ram") >= 2
+        && now - lastHack > 180_000_000L) {
+      lastHack = now;
+      PacketDistributor.sendToServer(new dev.cybernetics2077.combat.CyberwareNetwork.Hack(focus));
+    }
+  }
 
   @EventBusSubscriber(
       modid = Cybernetics2077.ID,
@@ -230,19 +245,59 @@ public final class ScannerClient {
     edge(chrome, f);
     var link = root.fade(f.resource());
     link.dots(695, 111, 3, 5, RED);
-    link.glowText("OPTICAL LINK", 720, 106, 23, CYAN);
-    link.right("TIER 1", 1255, 111, 16, 0xffb3dce2);
+    var equipment = dev.cybernetics2077.client.mantis.CyberwareClient.own();
+    boolean deck = equipment.getBoolean("deck"), chip = equipment.getBoolean("shortCircuit");
+    link.glowText(deck ? "CYBERDECK RAM" : "OPTICAL LINK", 720, 106, 23, CYAN);
+    if (deck) {
+      float ram = equipment.getFloat("ram");
+      for (int i = 0; i < 4; i++) {
+        float x = 997 + i * 38;
+        link.shape(Geometry.panel(x, 111, 29, 22, 4), 0xff10232b, 0xff4b8994);
+        link.rect(x + 3, 114, 23 * Math.clamp(ram - i, 0, 1), 16, 0xff74e2ed);
+        link.line(x + 8, 115, x + 8, 129, .8f, 0x9a142e39);
+        link.line(x + 20, 115, x + 20, 129, .8f, 0x9a142e39);
+      }
+      link.right(String.format(Locale.ROOT, "%.1f / 4", ram), 1255, 111, 16, 0xffb3dce2);
+    } else link.right("TIER 1", 1255, 111, 16, 0xffb3dce2);
     link.glowLine(695, 151, 1255, 151, 1, 0x89e72c38);
     var left = root.fade(f.layer(420, 230));
-    left.tracked("OPTICAL SCANNER", 200, 315, 19, CYAN, 1);
-    left.line(200, 352, 515, 352, 1, 0x99cf3c45);
-    left.body(
-        entity == null ? "SEARCHING FOR A TARGET" : "LIVE TARGET ACQUIRED",
-        200,
-        373,
-        16,
-        0xffc5898f);
-    left.tracked("RANGE / 32 m", 200, 405, 12, MUTED, .8f);
+    left.tracked(deck ? "AVAILABLE QUICKHACKS" : "OPTICAL SCANNER", 177, 315, 19, CYAN, 1);
+    left.line(177, 352, 552, 352, 1, 0x99cf3c45);
+    if (chip) {
+      boolean ready =
+          focus >= 0
+              && equipment.getFloat("ram") >= 2
+              && equipment.getList("uploads", 10).size() < 2;
+      left.shape(
+          Geometry.data(177, 370, 375, 77),
+          ready ? 0xd4371b28 : 0xd0141923,
+          ready ? 0xffe85565 : 0xff4c5963);
+      left.rect(177, 370, 4, 77, ready ? RED : 0xff64727a);
+      left.glowText("SHORT CIRCUIT", 245, 384, 24, ready ? 0xfff07983 : 0xff8799a5);
+      left.right("2", 532, 386, 23, CYAN);
+      left.tracked("RAM", 505, 417, 11, MUTED, .8f);
+      CyberGlyphs.quickhack(left, 194, 389, 33, ready ? 0xffff7882 : 0xff617889);
+      left.body("8 electrical damage  /  1 s upload", 177, 471, 17, 0xffa9c9d2);
+      left.body(
+          ready
+              ? "[LMB] UPLOAD SHORT CIRCUIT"
+              : focus < 0 ? "AIM AT A LIVING TARGET" : "RAM OR QUEUE UNAVAILABLE",
+          177,
+          501,
+          15,
+          ready ? CYAN : MUTED);
+      left.tracked("2 UPLOADS MAX  /  RAM REGENERATES", 177, 537, 11, MUTED, .7f);
+    } else {
+      left.body(
+          deck
+              ? "NO QUICKHACKS INSTALLED"
+              : entity == null ? "SEARCHING FOR A TARGET" : "LIVE TARGET ACQUIRED",
+          177,
+          373,
+          16,
+          0xffc5898f);
+      left.tracked(deck ? "MANAGE CHIPS AT THE BENCH" : "RANGE / 32 m", 177, 405, 12, MUTED, .8f);
+    }
     data(root.fade(f.data()), f, entity);
     var controls = root.fade(f.layer(550, 180));
     controls.right(

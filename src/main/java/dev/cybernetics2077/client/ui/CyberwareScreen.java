@@ -352,6 +352,25 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
             663,
             19,
             CYAN);
+      } else if (stack.is(Cybernetics2077.CYBERDECK.get())) {
+        c.glowText("CYBERDECK / RAM 4", 434, 548, 23, CYAN);
+        c.body("Two slots for tier 1 quickhack chips.", 434, 589, 19, WHITE);
+        c.body("Regenerates 1 RAM every 5 seconds.", 434, 617, 19, WHITE);
+        c.body("Manage chips at a Cybernetics Bench.", 434, 663, 19, CYAN);
+      } else if (stack.is(Cybernetics2077.MANTIS.get())) {
+        c.glowText("PAIRED ARM BLADES", 434, 548, 23, CYAN);
+        c.body("Alternating slashes: 8 / 8 / 10 damage.", 434, 589, 19, WHITE);
+        c.body("Hold RMB, then release: 14-damage lunge.", 434, 617, 19, WHITE);
+        c.body(
+            "Empty hands. Press "
+                + dev.cybernetics2077.client.mantis.CyberwareClient.DRAW
+                    .getTranslatedKeyMessage()
+                    .getString()
+                + " to deploy / retract.",
+            434,
+            663,
+            19,
+            CYAN);
       }
     } else {
       c.body("No implant installed in this socket.", 434, 510, 21, WHITE);

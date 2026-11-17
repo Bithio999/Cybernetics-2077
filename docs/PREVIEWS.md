@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.3.3. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. The tier 1 Optical Scanner, installation bench and category close-ups remain available.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077 0.4.0. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This release adds the tier 1 cyberdeck, Short Circuit chip and side-mounted Mantis Claws.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -23,3 +23,17 @@ The review switches the local player's loaded skin to Minecraft's built-in Steve
 | ![Classic Steve skin](images/player-skin-wide.png) | ![Slim Alex skin](images/player-skin-slim.png) |
 
 [Outer layers enabled](images/player-skin-layers-enabled.png) · [Outer layers disabled](images/player-skin-layers-disabled.png)
+
+## Cyberdeck and Mantis Claws
+
+[Deployment, combo, charged lunge and retraction](media/mantis-claws.mp4) · [Short Circuit upload](media/short-circuit.mp4)
+
+![Cyberdeck quickhack sockets](images/cyberdeck-loadout.png)
+
+![Short Circuit scanner](images/short-circuit-scanner.png)
+
+![Mantis Claws in first person](images/mantis-first-person.png)
+
+![Mantis Claws in third person](images/mantis-third-person.png)
+
+These are native Minecraft captures. The forearm hatch and mechanism open from the **outer side** of each arm. Player skin and sleeve pixels follow the articulated panels; the blade has a tapered mesh, separate bevels, fuller, serrated heel and articulated hinge.

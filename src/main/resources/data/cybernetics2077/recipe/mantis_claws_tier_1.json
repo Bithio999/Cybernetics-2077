@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "I I",
+    "PDP",
+    "CRC"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_sword"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "id": "cybernetics2077:mantis_claws_tier_1",
+    "count": 1
+  }
+}

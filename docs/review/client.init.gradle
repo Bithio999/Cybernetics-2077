@@ -5,5 +5,6 @@ gradle.projectsEvaluated {
  def reviewRoot=rootProject.findProperty('cyberReviewRoot') ?: '/tmp/cybernetics2077-review'
  rootProject.neoForge.runs.client.gameDirectory=rootProject.file(reviewRoot+'/client')
  rootProject.neoForge.runs.client.systemProperty('cybernetics2077.reviewRoot',reviewRoot.toString())
+ if(rootProject.hasProperty('cyberContentOnly')) rootProject.neoForge.runs.client.systemProperty('cybernetics2077.contentOnly','true')
  rootProject.neoForge.runs.client.programArguments.addAll('--quickPlaySingleplayer','Cybernetics Review','--width','1280','--height','720')
 }

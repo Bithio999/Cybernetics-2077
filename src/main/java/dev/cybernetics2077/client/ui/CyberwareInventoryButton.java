@@ -4,12 +4,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.network.chat.Component;
 
-/** Compact icon button in the inventory header, clear of slots, potion effects and recipe book. */
+/** Clockwise-rotated chip tab attached alongside the inventory. */
 public final class CyberwareInventoryButton extends AbstractButton {
   private final Runnable press;
 
   public CyberwareInventoryButton(Runnable press) {
-    super(0, 0, 20, 18, Component.translatable("cybernetics2077.button.open"));
+    super(0, 0, 18, 20, Component.translatable("cybernetics2077.button.open"));
     this.press = press;
   }
 
@@ -28,14 +28,17 @@ public final class CyberwareInventoryButton extends AbstractButton {
   protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partial) {
     CyberBatch.begin();
     try {
+      g.pose().pushPose();
+      g.pose().translate(getX() + 18, getY(), 0);
+      g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(90));
       var c = new CyberCanvas(g, active ? 1 : .4f);
-      var p = Geometry.panel(getX(), getY(), 20, 18, 3);
+      var p = Geometry.panel(0, 0, 20, 18, 3);
       c.shape(
           p,
           isHoveredOrFocused() ? 0xf0431720 : 0xed180f19,
           isHoveredOrFocused() ? 0xff6ee9f5 : 0xffd24651);
       if (isHoveredOrFocused()) c.halo(p, 0xffef5361);
-      float x = getX() + 10, y = getY() + 9;
+      float x = 10, y = 9;
       c.rect(x - 4, y - 4, 8, 8, 0x204ac8db);
       c.stroke(
           java.util.List.of(
@@ -55,6 +58,7 @@ public final class CyberwareInventoryButton extends AbstractButton {
       c.line(x, y + 2, x - 2, y, .8f, 0xff7ce7f4);
     } finally {
       CyberBatch.flush(g);
+      g.pose().popPose();
     }
   }
 }

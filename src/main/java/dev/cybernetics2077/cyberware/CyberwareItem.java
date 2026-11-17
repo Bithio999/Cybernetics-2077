@@ -51,6 +51,14 @@ public class CyberwareItem extends Item {
       lines.add(
           net.minecraft.network.chat.Component.translatable("cybernetics2077.optics.description")
               .withStyle(net.minecraft.ChatFormatting.AQUA));
+    if (this == dev.cybernetics2077.Cybernetics2077.CYBERDECK.get())
+      lines.add(
+          net.minecraft.network.chat.Component.translatable("cybernetics2077.deck.description")
+              .withStyle(net.minecraft.ChatFormatting.AQUA));
+    if (this == dev.cybernetics2077.Cybernetics2077.MANTIS.get())
+      lines.add(
+          net.minecraft.network.chat.Component.translatable("cybernetics2077.mantis.description")
+              .withStyle(net.minecraft.ChatFormatting.AQUA));
   }
 
   public int capacityCost() {

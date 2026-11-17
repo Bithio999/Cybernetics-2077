@@ -1,0 +1,6 @@
+{
+  "message_id": "short_circuit",
+  "exhaustion": 0.1,
+  "scaling": "never",
+  "effects": "hurt"
+}

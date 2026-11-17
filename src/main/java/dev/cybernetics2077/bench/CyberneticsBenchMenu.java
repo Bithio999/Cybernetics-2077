@@ -69,6 +69,26 @@ public final class CyberneticsBenchMenu extends AbstractContainerMenu {
         <= Cybernetics2077.CAPACITY.get();
   }
 
+  public boolean hasDeck() {
+    return implants.getStackInSlot(CyberwareCategory.OPERATING_SYSTEM.firstSlot()).getItem()
+        instanceof dev.cybernetics2077.deck.CyberdeckItem;
+  }
+
+  @Override
+  public boolean clickMenuButton(Player p, int button) {
+    if (button != 0
+        || !hasDeck()
+        || !stillValid(p)
+        || !getCarried().isEmpty()
+        || !(p instanceof ServerPlayer server)) return false;
+    var deck = implants.getStackInSlot(CyberwareCategory.OPERATING_SYSTEM.firstSlot());
+    server.openMenu(
+        new net.minecraft.world.SimpleMenuProvider(
+            (id, inv, owner) -> new dev.cybernetics2077.deck.CyberdeckMenu(id, inv, access, deck),
+            net.minecraft.network.chat.Component.translatable("cybernetics2077.deck.title")));
+    return true;
+  }
+
   @Override
   public boolean stillValid(Player player) {
     return player.isAlive() && stillValid(access, player, Cybernetics2077.BENCH.get());

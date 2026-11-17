@@ -11,17 +11,28 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 public abstract class ScannerInputMixin {
   @Inject(method = "startAttack", at = @At("HEAD"), cancellable = true)
   private void cybernetics$attack(CallbackInfoReturnable<Boolean> ci) {
-    if (ScannerClient.active()) ci.setReturnValue(false);
+    if (ScannerClient.active()) {
+      ScannerClient.quickhack();
+      ci.setReturnValue(false);
+    } else if (dev.cybernetics2077.client.mantis.CyberwareClient.active()) {
+      dev.cybernetics2077.client.mantis.CyberwareClient.attack();
+      ci.setReturnValue(false);
+    }
   }
 
   @Inject(method = "continueAttack", at = @At("HEAD"), cancellable = true)
   private void cybernetics$mine(boolean held, CallbackInfo ci) {
-    if (ScannerClient.active()) ci.cancel();
+    if (ScannerClient.active() || dev.cybernetics2077.client.mantis.CyberwareClient.active())
+      ci.cancel();
   }
 
   @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
   private void cybernetics$use(CallbackInfo ci) {
     if (ScannerClient.active()) ci.cancel();
+    else if (dev.cybernetics2077.client.mantis.CyberwareClient.active()) {
+      dev.cybernetics2077.client.mantis.CyberwareClient.charge();
+      ci.cancel();
+    }
   }
 
   @Inject(method = "shouldEntityAppearGlowing", at = @At("HEAD"), cancellable = true)
