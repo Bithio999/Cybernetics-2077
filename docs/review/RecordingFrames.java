@@ -25,7 +25,7 @@ public final class RecordingFrames {
   public static void frame(RenderFrameEvent.Post event) {
     if (!Boolean.getBoolean("cybernetics2077.recording")) return;
     int tick = CyberwareClientReview.contentTicks;
-    if (tick < 220 || tick > 402) {
+    if (tick < 220 || tick > 502) {
       previous = 0;
       return;
     }

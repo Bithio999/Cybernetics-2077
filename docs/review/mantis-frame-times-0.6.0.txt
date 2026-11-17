@@ -1,0 +1,9 @@
+Native 0.6.0 preview capture; 960x540; software OpenGL (llvmpipe); 6-chunk render distance; 60 FPS cap; 30 FPS capture; no per-tick screenshots.
+The animation sampling window includes the added first-person idle hold.
+This describes the preview run, not a hardware FPS guarantee.
+
+Combat render frames: 788
+Mean frame time: 17.940 ms (55.7 FPS)
+Median: 17.506 ms
+P95: 22.577 ms
+P99: 29.136 ms

@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.5.14 uses the local player’s skin in the hologram. All 44 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+Release 0.6.0 uses the local player’s skin in the hologram. All 53 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
 
 ## Automated checks
 
@@ -85,7 +85,7 @@ python3 docs/review/trim-native-recording.py recording.mp4 /path/to/capture RECO
 
 For desktop recording, match the capture rectangle to the actual game window; a 1280×720 review window can otherwise be centered inside a larger virtual display. The current Mantis clips were recorded with both the desktop and game window at 960×540 and visually checked after trimming.
 
-Release 0.5.14 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
+Release 0.6.0 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
 
 The 0.5.8 revision also checks ordered cover/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
 
@@ -112,7 +112,7 @@ The recording profile (`-PcyberRecording -PcyberContentOnly`) stores capture tim
 
 The model now uses actual triangle rendering, a shared atlas and cached skin patches. It submits about 50% fewer blade vertices than 0.5.2. These changes reduce CPU/geometry work; they do not guarantee a particular FPS on a modded client.
 
-The final recording run measured **55.3 mean rendered FPS**, with **22.985 ms P95** and **27.984 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.5.14.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
+The final recording run, including the added idle hold, measured **55.7 mean rendered FPS**, with **22.577 ms P95** and **29.136 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.6.0.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
 
 
 ## Whole implant and segmented covers
@@ -155,3 +155,7 @@ The first-person resting forearm roll moves another 30° inward. The orientation
 ### Slight ready-pose height adjustment (0.5.14)
 
 A small camera-space downward offset blends with the ready channel and is applied after shoulder anchoring. Existing continuity, native rest-hand matching, idle hand bounds and shoulder-cap clipping tests cover the adjustment. The native client review and preview recording are repeated.
+
+### Combat and idle choreography (0.6.0)
+
+New tests cover continuous cut velocity through contact, per-attack blade extension, mirrored left-handed attacks, bounded idle movement and suppression during actions, flight-to-contact pose continuity, rendered wrist pullback/reach in both views, and exported-mesh torso clearance across both arm widths. Existing shoulder/elbow attachment, deployment clearance, skin basis, projection, camera bounds and combat timing tests remain. The third-person orientation check now accepts the wider downward guard while still requiring the knuckle face to point upward. The native review adds five seconds of idle in each view, plus captures of the three cuts and charged lunge. Dedicated server combat checks verify the existing damage and movement behavior. Review fixtures remain excluded from the release JAR.

@@ -39,7 +39,8 @@ encode('mantis-claws', [
     ('mantis-ground-leap-000', 'mantis-ground-leap-017'),
     ('mantis-air-leap-000', 'mantis-air-leap-019'),
     ('mantis-free-leap-000', 'mantis-free-leap-023'),
-    ('mantis-connected-idle', 'mantis-connected-cut-013')])
+    ('mantis-connected-idle', 'mantis-connected-cut-013'),
+    ('mantis-third-person', 'mantis-third-023')])
 if not a.mantis_only:
     encode('short-circuit', [('short-circuit-scanner', 'short-circuit-frame-025')])
 
@@ -50,3 +51,7 @@ encode('mantis-mechanism', [('mantis-dorsal-open', 'mantis-dorsal-closed'), ('ma
 
 if 'mantis-forearm-quarter' in marks:
     encode('mantis-forearm-panels', [('mantis-forearm-quarter','mantis-forearm-closed'), ('mantis-forearm-deploy-000','mantis-forearm-open')])
+
+if 'mantis-idle-first-start' in marks:
+    encode('mantis-idle', [('mantis-idle-first-start', 'mantis-idle-first-end'), ('mantis-idle-third-start', 'mantis-idle-third-end')])
+    encode('mantis-attacks', [('mantis-combo-000', 'mantis-combo-052'), ('mantis-heavy-000', 'mantis-heavy-040'), ('mantis-third-person','mantis-third-023')])

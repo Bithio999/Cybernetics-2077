@@ -65,7 +65,9 @@ Deployment takes **1.5 seconds**: the original Minecraft hand moves into positio
 
 ID: `cybernetics2077:mantis_claws_tier_1`
 
-[Watch deployment and attacks](media/mantis-claws.mp4)
+Light attacks alternate hands with a quick cross-body cut and a rising third hit. The free hand stays in guard. The sliding blade compacts during wind-up and extends for contact. Holding a charged attack reels both arms back; releasing drives them forward. The ready pose has subtle breathing and balance motion.
+
+[Watch deployment and attacks](media/mantis-claws.mp4) · [Combat close-up](media/mantis-attacks.mp4) · [Idle movement](media/mantis-idle.mp4)
 
 ![Side-mounted Mantis Claws](images/mantis-first-person.png)
 

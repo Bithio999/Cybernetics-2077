@@ -19,6 +19,77 @@ final class MantisBlenderMeshTest {
   }
 
   @Test
+  void forehandBladesSweepAcrossTheScreenCentreAtContact() throws Exception {
+    var model = read("near");
+    for (int combo = 0; combo < 2; combo++) {
+      boolean left = combo == 1;
+      var pose = MantisMotion.sample(true, 100, 4, combo, false, 0, left);
+      var bone =
+          MantisView.frame(left, !left, false, 0, 0, pose)
+              .mul(MantisRig.elbow(pose))
+              .mul(MantisArticulation.mount(1))
+              .mul(MantisArticulation.carriage(1))
+              .mul(MantisArticulation.support(1, 1))
+              .mul(MantisArticulation.blade(1, 1));
+      var projection =
+          new Matrix4f()
+              .perspective(
+                  (float) java.lang.Math.toRadians(MantisView.WEAPON_FOV), 16f / 9, .05f, 1000);
+      float min = Float.POSITIVE_INFINITY, max = -min;
+      for (String name : new String[] {"blade", "tip", "edge"}) {
+        if (name.equals("tip")) bone.mul(MantisArticulation.tip(pose.tip()));
+        if (name.equals("edge")) bone.mul(MantisArticulation.edge(pose.tip()));
+        var matrix = new Matrix4f(projection).mul(bone);
+        var vertices = model.parts().get(name).vertices();
+        for (int j = 0; j < vertices.length; j += 8) {
+          var point =
+              matrix.transformProject(new Vector3f(vertices[j], vertices[j + 1], vertices[j + 2]));
+          min = java.lang.Math.min(min, point.x);
+          max = java.lang.Math.max(max, point.x);
+        }
+      }
+      assertTrue(
+          min < -.02f && max > .02f, "The forehand must cross the aim line: " + min + "/" + max);
+    }
+  }
+
+  @Test
+  void thirdPersonIdleMechanismsStayOnTheirOwnSidesOfTheTorso() throws Exception {
+    var model = read("near");
+    for (boolean left : new boolean[] {false, true})
+      for (boolean slim : new boolean[] {false, true})
+        for (float clock : new float[] {0, 20, 40, 80, 120}) {
+          var pose = MantisMotion.sample(true, 100, 100, 0, false, 0, left, clock, -1, false);
+          var bone =
+              new Matrix4f()
+                  .translate(left ? 5 / 16f : -5 / 16f, 0, 0)
+                  .mul(MantisRig.shoulder(left, slim, pose))
+                  .mul(MantisRig.elbow(pose));
+          for (String name :
+              new String[] {"mount", "carriage", "support", "blade", "tip", "edge"}) {
+            bone.mul(
+                switch (name) {
+                  case "mount" -> MantisArticulation.mount(1, slim ? 3 / 16f : 4 / 16f);
+                  case "carriage" -> MantisArticulation.carriage(1);
+                  case "support" -> MantisArticulation.support(1, 1);
+                  case "blade" -> MantisArticulation.blade(1, 1);
+                  case "tip" -> MantisArticulation.tip(1);
+                  default -> MantisArticulation.edge(1);
+                });
+            var vertices = model.parts().get(name).vertices();
+            for (int j = 0; j < vertices.length; j += 8) {
+              var point =
+                  bone.transformPosition(
+                      new Vector3f(vertices[j], vertices[j + 1], vertices[j + 2]));
+              assertTrue(
+                  (left ? point.x : -point.x) > .20f,
+                  "Third-person mechanism crowds the torso: " + name + " " + point);
+            }
+          }
+        }
+  }
+
+  @Test
   void idleBladeMeshLeavesTheCentralAimLaneClear() throws Exception {
     var model = read("near");
     for (boolean left : new boolean[] {false, true}) {

@@ -29,9 +29,10 @@ public final class MantisRig {
   public static Matrix4f shoulder(boolean left, boolean slim, MantisMotion.Pose motion) {
     float side = left ? -1 : 1;
     return new Matrix4f()
-        .rotateZ((float) Math.toRadians(-side * 8 * motion.ready() + motion.roll()))
-        .rotateY((float) Math.toRadians(-side * 25 * motion.ready() + motion.yaw()))
-        .rotateX((float) Math.toRadians(-67 * motion.ready() + motion.pitch()))
+        .rotateZ((float) Math.toRadians(side * 10 * motion.ready() - motion.roll()))
+        .rotateY((float) Math.toRadians(side * 12 * motion.ready() + motion.yaw()))
+        .rotateX((float) Math.toRadians(-60 * motion.ready() + motion.pitch()))
+        .rotateY((float) Math.toRadians(side * 40 * motion.ready()))
         // Rebase the native pivot offset together with the skin. Keep this after
         // shoulder rotation so the arm stays attached throughout a slash.
         .rotateY((float) Math.toRadians((left ? -90 : 90) * (1 - motion.ready())))

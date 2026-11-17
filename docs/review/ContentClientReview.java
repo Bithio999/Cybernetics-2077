@@ -126,7 +126,20 @@ final class ContentClientReview {
         });
   }
 
-  static void tick(int t) throws Exception {
+  static void tick(int rawTick) throws Exception {
+    int t = rawTick;
+    if (t >= 255 && t < 355) {
+      if (t == 255) shot("mantis-idle-first-start");
+      if (t == 354) shot("mantis-idle-first-end");
+      return;
+    }
+    if (t >= 355) t -= 100;
+    if (t >= 481 && t < 581) {
+      if (t == 481) shot("mantis-idle-third-start");
+      if (t == 580) shot("mantis-idle-third-end");
+      return;
+    }
+    if (t >= 581) t -= 100;
     var m = Minecraft.getInstance();
     if (t == 0) {
       m.setScreen(null);

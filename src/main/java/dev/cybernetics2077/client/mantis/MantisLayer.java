@@ -31,7 +31,8 @@ public final class MantisLayer
       var arm = left ? getParentModel().leftArm : getParentModel().rightArm;
       var motion = CyberwareClient.pose(player, left, partial);
       p.pushPose();
-      arm.translateAndRotate(p);
+      // Keep the actual shoulder socket without adding vanilla walk/swing angles twice.
+      p.translate(arm.x / 16, arm.y / 16, arm.z / 16);
       p.mulPose(
           MantisRig.shoulder(
               left,

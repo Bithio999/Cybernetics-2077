@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.14; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.6.0; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -93,3 +93,17 @@ Both forearms roll another 30° inward from 0.5.12. The tops of the forearms and
 ## Slightly lower ready pose (0.5.14)
 
 The first-person ready pose sits a little lower. A 0.025-block downward offset blends in with deployment after the shoulder-visibility correction, preserving the selected inward roll and weapon lens. The current clips and screenshots show this position.
+
+## Combat, lunge and idle motion (0.6.0)
+
+[Attack and lunge preview](media/mantis-attacks.mp4) · [First- and third-person idle preview](media/mantis-idle.mp4)
+
+Light attacks alternate cross-body cuts, then use a rising third strike. The other hand guards; sliding blade sections change length through each action. The lunge has a rearward pull, a forward drive and recovery timed to contact. Idle motion is deliberately small. The third-person guard places each mechanism outside the chest and keeps the shoulders attached. The existing first-person ready framing remains the baseline beneath the idle movement.
+
+![Reworked cross-body cut](images/mantis-first-person-cut.png)
+
+![Reeled-back lunge wind-up](images/mantis-windup.png)
+
+![Forward lunge strike](images/mantis-lunge.png)
+
+![Wider third-person guard](images/mantis-detail.png)

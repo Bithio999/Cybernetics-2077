@@ -8,6 +8,33 @@ import org.junit.jupiter.api.Test;
 
 final class MantisViewTest {
   @Test
+  void lungeMovesTheRenderedHandsBackAndThenForward() {
+    for (boolean left : new boolean[] {false, true})
+      for (boolean slim : new boolean[] {false, true}) {
+        var rest = MantisMotion.sample(true, 100, 100, 3, false, 0, left);
+        var held = MantisMotion.sample(true, 100, 100, 3, true, 8, left);
+        var strike = MantisMotion.sample(true, 100, 7, 3, false, 0, left);
+        float restZ =
+            MantisView.frame(left, true, slim, 0, 0, rest)
+                .mul(MantisRig.elbow(rest))
+                .transformPosition(new Vector3f(0, .56f, 0))
+                .z;
+        float heldZ =
+            MantisView.frame(left, true, slim, 0, 0, held)
+                .mul(MantisRig.elbow(held))
+                .transformPosition(new Vector3f(0, .56f, 0))
+                .z;
+        float strikeZ =
+            MantisView.frame(left, true, slim, 0, 0, strike)
+                .mul(MantisRig.elbow(strike))
+                .transformPosition(new Vector3f(0, .56f, 0))
+                .z;
+        assertTrue(heldZ > restZ + .12f, "The actual rendered hand must reel toward the body");
+        assertTrue(strikeZ < restZ - .10f, "The actual hand must drive forward at contact");
+      }
+  }
+
+  @Test
   void shoulderEndsStayOutsideTheScreenThroughoutDeploymentAndCombat() {
     for (boolean left : new boolean[] {false, true})
       for (boolean slim : new boolean[] {false, true}) {
@@ -130,7 +157,10 @@ final class MantisViewTest {
                 .mul(MantisRig.elbow(pose))
                 .mul(MantisRig.nativeToMount(left));
         var knuckles = third.transformDirection(new Vector3f(left ? 1 : -1, 0, 0)).normalize();
-        assertTrue(knuckles.y > .85, "Native back-of-hand face must be upward in third person");
+        assertTrue(
+            knuckles.y > .75,
+            "Native back-of-hand face must face upward in the wider third-person guard: "
+                + knuckles);
         assertTrue(towardHand.z < -.85, "Blade does not point past hand: " + towardHand);
         assertTrue(
             java.lang.Math.abs(towardHand.y) < .35,

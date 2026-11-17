@@ -71,6 +71,15 @@ public final class CyberwareClient {
     var track = DEPLOYMENT.get(p.getId());
     float progress =
         track == null ? (t.getBoolean("deployed") ? 1 : 0) : track.sample(now + partial);
+    var lunge = t.getCompound("lunge");
+    float flight =
+        lunge.contains("started")
+            ? Math.clamp(
+                (now - lunge.getLong("started") + partial) / Math.max(1f, lunge.getInt("ticks")),
+                0,
+                1)
+            : -1;
+    float clock = now % 24000 + partial + (p.getId() % 256) * 17;
     return MantisMotion.sample(
         true,
         progress * CombatRules.DEPLOY,
@@ -78,7 +87,10 @@ public final class CyberwareClient {
         t.getInt("combo"),
         t.getLong("charge") >= 0,
         now - t.getLong("charge") + partial,
-        p.getMainArm() == HumanoidArm.LEFT ? !left : left);
+        left,
+        clock,
+        flight,
+        p.getMainArm() == HumanoidArm.LEFT);
   }
 
   private static long lungeId = Long.MIN_VALUE;

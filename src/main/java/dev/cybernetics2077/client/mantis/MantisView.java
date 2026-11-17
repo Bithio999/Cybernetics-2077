@@ -44,7 +44,10 @@ public final class MantisView {
     }
     var goal =
         new Matrix4f()
-            .translate(side * (main ? .59f : .43f), main ? -.72f : -.68f, main ? -.73f : -.78f)
+            .translate(
+                side * (main ? .59f : .43f) + pose.x(),
+                (main ? -.72f : -.68f) + pose.y(),
+                (main ? -.73f : -.78f) + pose.z())
             .rotateZ((float) Math.PI)
             .scale(.9f)
             .mul(shoulder(left, slim, pose));

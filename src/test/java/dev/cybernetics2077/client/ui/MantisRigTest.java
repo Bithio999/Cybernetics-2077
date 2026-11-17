@@ -8,6 +8,32 @@ import org.junit.jupiter.api.Test;
 
 final class MantisRigTest {
   @Test
+  void thirdPersonHandsReelBackThroughTheirJointsInsteadOfTranslatingTheShoulder() {
+    for (boolean left : new boolean[] {false, true}) {
+      var rest = MantisMotion.sample(true, 100, 100, 3, false, 0, left);
+      var held = MantisMotion.sample(true, 100, 100, 3, true, 8, left);
+      var strike = MantisMotion.sample(true, 100, 7, 3, false, 0, left);
+      float restZ =
+          MantisRig.shoulder(left, false, rest)
+              .mul(MantisRig.elbow(rest))
+              .transformPosition(new Vector3f(0, .56f, 0))
+              .z;
+      float heldZ =
+          MantisRig.shoulder(left, false, held)
+              .mul(MantisRig.elbow(held))
+              .transformPosition(new Vector3f(0, .56f, 0))
+              .z;
+      float strikeZ =
+          MantisRig.shoulder(left, false, strike)
+              .mul(MantisRig.elbow(strike))
+              .transformPosition(new Vector3f(0, .56f, 0))
+              .z;
+      assertTrue(heldZ > restZ + .15f, "Hands should come back toward the torso");
+      assertTrue(strikeZ < restZ - .01f, "Hands should reach forward on contact");
+    }
+  }
+
+  @Test
   void shoulderSocketNeverLeavesItsParentAndBothSegmentsShareTheElbow() {
     for (boolean left : new boolean[] {false, true})
       for (boolean slim : new boolean[] {false, true})
@@ -23,9 +49,6 @@ final class MantisRigTest {
                     .mul(MantisRig.elbow(motion))
                     .transformPosition(new Vector3f(0, MantisRig.ELBOW_Y, 0));
             assertEquals(0, upperEnd.distance(lowerStart), .00001, "Elbow disconnected");
-            assertEquals(0, motion.x());
-            assertEquals(0, motion.y());
-            assertEquals(0, motion.z());
           }
   }
 
