@@ -23,7 +23,7 @@ The scanner shows health, armor, attack damage, absorption and visible effects. 
 
 ![Short Circuit scanner](docs/images/short-circuit-scanner.png)
 
-Mantis Claws deploy from the top/back-of-hand face of the forearm through multiple moving skin and sleeve sections. As the covers open, the folded support and blade rise together; the support/housing slides backward before the blade pivots forward and the cutting tip extends. The palm and hand remain closed. The Blender model uses separate rigid pivots and near/far meshes, with cached geometry and textures. The original Minecraft hand transitions continuously into the ready stance, with first-person framing adjusted against the supplied reference video. First- and third-person attacks follow the contact frames used for damage.
+Mantis Claws deploy from the top/back-of-hand face of the forearm through multiple moving skin and sleeve sections. As the covers open, the folded support and blade rise together; the support/housing slides backward before the blade pivots forward and the cutting tip extends. The palm and hand remain closed. The Blender model uses separate rigid pivots and near/far meshes, with cached geometry and textures. The original Minecraft hand transitions continuously into the ready stance, with the hands held low and the upper arms continuing below the screen, following the supplied reference video. First- and third-person attacks follow the contact frames used for damage.
 
 [Watch the claw animations](docs/media/mantis-claws.mp4) · [Blender model and build notes](art/mantis/README.md) · [Equipment, controls and recipes](docs/CYBERWARE.md)
 
@@ -39,7 +39,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.5.8.jar](releases/Cybernetics2077-0.5.8.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.5.9.jar](releases/Cybernetics2077-0.5.9.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

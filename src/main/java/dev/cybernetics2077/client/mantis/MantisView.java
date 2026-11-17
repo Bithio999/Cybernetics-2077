@@ -42,8 +42,10 @@ public final class MantisView {
     }
     var goal =
         new Matrix4f()
-            .translate(side * .52f, -.12f, -.90f)
+            .translate(side * .62f, -.55f, -.60f)
             .rotateZ((float) Math.PI)
+            // Keep the shoulder below the viewport while the forearm reaches forward.
+            .rotateX(rad(-30))
             .scale(.9f)
             .mul(MantisRig.shoulder(left, slim, pose));
     return blend(start, goal, blend);

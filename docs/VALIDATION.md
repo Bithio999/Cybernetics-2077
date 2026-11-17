@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.5.8 uses the local player’s skin in the hologram. All 41 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+Release 0.5.9 uses the local player’s skin in the hologram. All 43 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
 
 ## Automated checks
 
@@ -85,7 +85,7 @@ python3 docs/review/trim-native-recording.py recording.mp4 /path/to/capture RECO
 
 For desktop recording, match the capture rectangle to the actual game window; a 1280×720 review window can otherwise be centered inside a larger virtual display. The current Mantis clips were recorded with both the desktop and game window at 960×540 and visually checked after trimming.
 
-Release 0.5.8 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
+Release 0.5.9 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
 
 The 0.5.8 revision also checks ordered cover/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
 
@@ -112,7 +112,7 @@ The recording profile (`-PcyberRecording -PcyberContentOnly`) stores capture tim
 
 The model now uses actual triangle rendering, a shared atlas and cached skin patches. It submits about 50% fewer blade vertices than 0.5.2. These changes reduce CPU/geometry work; they do not guarantee a particular FPS on a modded client.
 
-The final recording run measured **52.8 mean rendered FPS**, with **24.494 ms P95** and **32.470 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.5.8.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
+The final recording run measured **53.3 mean rendered FPS**, with **24.017 ms P95** and **29.128 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.5.9.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
 
 
 ## Whole implant and segmented covers
@@ -131,3 +131,7 @@ The native review checks both baked arm models, both sides and sleeves, and comp
 ### Shared lift, sliding housing and weapon framing
 
 Release 0.5.8 adds a separate carriage bone to the Blender asset and runtime renderer. Tests check that the folded upper hinge remains locked during the shared lift and that the carriage translates backward before unfolding. A dedicated first-person projection blends to a 52° vertical weapon lens; tests check the initial native projection, final angle, aspect ratio and unchanged depth terms at 4:3, 16:9 and 21:9. Rendering restores the original projection in `finally`. This is framing tuned from the supplied video, not a claim to measure Cyberpunk’s exact camera lens. The player’s world FOV setting and combat values are unchanged.
+
+### Lower first-person arms (0.5.9)
+
+The elevated 0.5.8 first-person shoulder anchors exposed the proximal ends of the native arm meshes. Version 0.5.9 lowers those anchors and pitches the forearms forward so the upper arms continue beyond the bottom of the viewport. The supplied Cyberpunk physical-blade idle holds guide the lower hand placement and clear centre. Two regression checks project the shoulder-cap corners (including the sleeve margin) through deployment, every light/charged stroke and charging, on both arm widths/sides and main/off-hand handovers, and check that idle wrists remain low and outside the crosshair. Existing continuity, dorsal-face and forward-blade checks remain intact. The native client review and recording were repeated with the new first-person placement. The world camera, third-person rig, implant dimensions and combat values are unchanged; server gameplay checks from 0.5.8 remain applicable.

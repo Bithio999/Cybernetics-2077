@@ -8,6 +8,57 @@ import org.junit.jupiter.api.Test;
 
 final class MantisViewTest {
   @Test
+  void shoulderEndsStayBelowTheScreenThroughoutDeploymentAndCombat() {
+    for (boolean left : new boolean[] {false, true})
+      for (boolean slim : new boolean[] {false, true}) {
+        for (int combo = 0; combo < 4; combo++)
+          for (float age = 0; age <= 30; age += .25f) {
+            checkShoulderBelowScreen(
+                left, slim, MantisMotion.sample(true, 100, age, combo, false, 0, left));
+          }
+        for (float age = 0; age <= 30; age += .25f) {
+          checkShoulderBelowScreen(
+              left, slim, MantisMotion.sample(true, age, 100, 0, false, 0, left));
+          checkShoulderBelowScreen(
+              left, slim, MantisMotion.sample(true, 100, 100, 0, true, age, left));
+        }
+      }
+  }
+
+  private static void checkShoulderBelowScreen(boolean left, boolean slim, MantisMotion.Pose pose) {
+    var nativeProjection =
+        new Matrix4f().perspective((float) java.lang.Math.toRadians(70), 16f / 9, .05f, 1000);
+    var projection = MantisView.projection(nativeProjection, pose.ready());
+    for (boolean main : new boolean[] {false, true}) {
+      var view = MantisView.frame(left, main, slim, 0, 0, pose);
+      var matrix = new Matrix4f(projection).mul(view);
+      float depth = slim ? 3 / 16f : 4 / 16f;
+      float sleeve = .25f / 16;
+      for (float x : new float[] {-.125f - sleeve, .125f + sleeve})
+        for (float z : new float[] {-depth / 2 - sleeve, depth / 2 + sleeve}) {
+          var point = matrix.transformProject(new Vector3f(x, -.125f - sleeve, z));
+          assertTrue(point.y < -1, "Exposed shoulder cap in first person: " + point);
+        }
+    }
+  }
+
+  @Test
+  void idleHandsSitLowAndLeaveTheCrosshairClear() {
+    for (boolean left : new boolean[] {false, true})
+      for (boolean slim : new boolean[] {false, true}) {
+        var pose = MantisMotion.sample(true, 100, 100, 0, false, 0, left);
+        var projection =
+            new Matrix4f().perspective((float) java.lang.Math.toRadians(52), 16f / 9, .05f, 1000);
+        var view = MantisView.frame(left, true, slim, 0, 0, pose).mul(MantisRig.elbow(pose));
+        var wrist = projection.mul(view).transformProject(new Vector3f(0, .56f, 0));
+        assertTrue(
+            wrist.y < -.6f && wrist.y > -.95f,
+            "Wrist should stay in the lower part of the view: " + wrist);
+        assertTrue(java.lang.Math.abs(wrist.x) > .2f && java.lang.Math.abs(wrist.x) < .6f);
+      }
+  }
+
+  @Test
   void weaponLensPreservesAspectDepthAndNativeHandAtTheStart() {
     for (float aspect : new float[] {4f / 3, 16f / 9, 21f / 9}) {
       var original =

@@ -1,6 +1,6 @@
 # Native previews
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.8; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
+These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.5.9; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
 
 [Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
 
@@ -67,3 +67,7 @@ The current Mantis clips are native 960×540 recordings exported at 30 fps. They
 ![Separate forearm covers and exposed wiring](images/mantis-forearm-quarter.png)
 
 The 0.5.8 captures show overlapping cover opening and shared support/receiver rise, a backward carriage slide, then forward blade unfolding. The first-person weapon lens and hand framing are adjusted against the supplied Cyberpunk video. World FOV remains unchanged.
+
+## Lower first-person stance (0.5.9)
+
+The ready hands sit near the bottom corners rather than floating in the centre of the view. The upper arms continue below the bottom edge, with the forearms angled forward. The supplied Cyberpunk physical-blade video guides the idle framing; deployment still lifts into view for inspection. This changes only first-person placement, retaining the segmented covers, shared lift and backward housing slide from 0.5.8.
