@@ -2,7 +2,7 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.5.11 uses the local player’s skin in the hologram. All 44 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+Release 0.5.12 uses the local player’s skin in the hologram. All 44 JVM tests and the native client review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
 
 ## Automated checks
 
@@ -85,7 +85,7 @@ python3 docs/review/trim-native-recording.py recording.mp4 /path/to/capture RECO
 
 For desktop recording, match the capture rectangle to the actual game window; a 1280×720 review window can otherwise be centered inside a larger virtual display. The current Mantis clips were recorded with both the desktop and game window at 960×540 and visually checked after trimming.
 
-Release 0.5.11 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
+Release 0.5.12 uses network protocol 6. Update clients and server together. The release JAR is built after a clean, without the review profiles.
 
 The 0.5.8 revision also checks ordered cover/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
 
@@ -112,7 +112,7 @@ The recording profile (`-PcyberRecording -PcyberContentOnly`) stores capture tim
 
 The model now uses actual triangle rendering, a shared atlas and cached skin patches. It submits about 50% fewer blade vertices than 0.5.2. These changes reduce CPU/geometry work; they do not guarantee a particular FPS on a modded client.
 
-The final recording run measured **54.8 mean rendered FPS**, with **23.110 ms P95** and **33.522 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.5.11.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
+The final recording run measured **53.6 mean rendered FPS**, with **23.799 ms P95** and **42.813 ms P99** combat frame times at 960×540, six-chunk render distance and a 60 FPS cap using llvmpipe. [Raw frame-time summary](review/mantis-frame-times-0.5.12.txt). This describes preview pacing, not a performance comparison to the earlier 1280×720 run or a hardware guarantee.
 
 
 ## Whole implant and segmented covers
@@ -143,3 +143,7 @@ The client review was repeated with a dedicated first-person stance, outward/upw
 ### Inward arm-roll adjustment (0.5.11)
 
 The first-person resting arm roll is reduced by 7°. Existing projection, central aim-lane, shoulder-cap visibility and hand-continuity tests cover the change. The native client review and preview recording are repeated; this adjustment does not change gameplay or the third-person rig.
+
+### Further inward arm roll (0.5.12)
+
+Both first-person arms rotate another 10° inward. The existing 44 tests cover the new pose, including anatomical orientation, hand continuity, idle aim-lane clearance and shoulder-cap clipping. The native client review and recording are repeated. This is a first-person visual adjustment only.

@@ -39,7 +39,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.5.11.jar](releases/Cybernetics2077-0.5.11.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.5.12.jar](releases/Cybernetics2077-0.5.12.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

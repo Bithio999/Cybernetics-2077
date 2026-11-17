@@ -1,0 +1,8 @@
+Native 0.5.12 preview capture; 960x540; software OpenGL (llvmpipe); 6-chunk render distance; 60 FPS cap; 30 FPS capture; no per-tick screenshots.
+This describes the preview run, not a hardware FPS guarantee.
+
+Combat render frames: 489
+Mean frame time: 18.646 ms (53.6 FPS)
+Median: 17.810 ms
+P95: 23.799 ms
+P99: 42.813 ms
