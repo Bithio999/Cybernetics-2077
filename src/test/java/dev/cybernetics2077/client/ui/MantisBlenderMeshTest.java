@@ -19,6 +19,28 @@ final class MantisBlenderMeshTest {
   }
 
   @Test
+  void foldedReceiverRisesWithTheSupportThenSlidesBackBeforeUnfolding() {
+    for (float rise = 0; rise <= 1; rise += .025f) {
+      var upper = MantisArticulation.blade(rise, 0);
+      var folded = upper.transformDirection(new Vector3f(0, 1, 0));
+      assertEquals(-1, folded.y, .00001, "Relative fold must stay locked during the shared lift");
+      assertEquals(0, folded.z, .00001);
+    }
+    var fixed = MantisArticulation.mount(1);
+    var before = new Matrix4f(fixed).mul(MantisArticulation.carriage(0));
+    var after = new Matrix4f(fixed).mul(MantisArticulation.carriage(1));
+    assertEquals(-.06f, after.m31() - before.m31(), .00001);
+    assertEquals(before.m30(), after.m30());
+    assertEquals(before.m32(), after.m32());
+    var raised = MantisMotion.sample(true, 15, 100, 0, false, 0, false);
+    var slid = MantisMotion.sample(true, 21, 100, 0, false, 0, false);
+    assertEquals(1, raised.blade());
+    assertEquals(0, raised.extension());
+    assertEquals(1, slid.slide());
+    assertEquals(0, slid.extension());
+  }
+
+  @Test
   void optimizedMeshesFitBudgetsAndHaveValidUVsAndNormals() throws Exception {
     var near = read("near");
     var far = read("far");
@@ -81,9 +103,12 @@ final class MantisBlenderMeshTest {
       for (float depth : new float[] {3 / 16f, 4 / 16f})
         for (float age = 0; age <= 30; age += .125f) {
           var motion = MantisMotion.sample(true, age, 100, 0, false, 0, false);
-          var matrix = MantisArticulation.mount(motion.panels(), depth);
-          for (String name : new String[] {"mount", "support", "blade", "tip", "edge"}) {
-            if (name.equals("support")) matrix.mul(MantisArticulation.support(motion.blade()));
+          var matrix = MantisArticulation.mount(motion.blade(), depth);
+          for (String name :
+              new String[] {"mount", "carriage", "support", "blade", "tip", "edge"}) {
+            if (name.equals("carriage")) matrix.mul(MantisArticulation.carriage(motion.slide()));
+            if (name.equals("support"))
+              matrix.mul(MantisArticulation.support(motion.blade(), motion.extension()));
             if (name.equals("blade"))
               matrix.mul(MantisArticulation.blade(motion.blade(), motion.extension()));
             if (name.equals("tip")) matrix.mul(MantisArticulation.tip(motion.tip()));
@@ -163,9 +188,11 @@ final class MantisBlenderMeshTest {
       for (float age = 0; age <= 30; age += .5f) {
         var pose = MantisMotion.sample(true, age, 100, 0, false, 0, false);
         var elbow = MantisRig.elbow(pose);
-        var bone = new Matrix4f(elbow).mul(MantisArticulation.mount(pose.panels(), width));
-        for (String name : new String[] {"mount", "support", "blade", "tip", "edge"}) {
-          if (name.equals("support")) bone.mul(MantisArticulation.support(pose.blade()));
+        var bone = new Matrix4f(elbow).mul(MantisArticulation.mount(pose.blade(), width));
+        for (String name : new String[] {"mount", "carriage", "support", "blade", "tip", "edge"}) {
+          if (name.equals("carriage")) bone.mul(MantisArticulation.carriage(pose.slide()));
+          if (name.equals("support"))
+            bone.mul(MantisArticulation.support(pose.blade(), pose.extension()));
           if (name.equals("blade"))
             bone.mul(MantisArticulation.blade(pose.blade(), pose.extension()));
           if (name.equals("tip")) bone.mul(MantisArticulation.tip(pose.tip()));

@@ -14,7 +14,7 @@ public record MantisMeshData(Map<String, Part> parts) {
     if (in.readInt() != 0x43594d42 || in.readInt() != 1)
       throw new IOException("Unsupported Mantis mesh");
     int count = in.readInt();
-    if (count != 5) throw new IOException("Expected five rigid Mantis groups");
+    if (count != 6) throw new IOException("Expected six rigid Mantis groups");
     var parts = new LinkedHashMap<String, Part>();
     for (int p = 0; p < count; p++) {
       String name = in.readUTF();
@@ -40,7 +40,7 @@ public record MantisMeshData(Map<String, Part> parts) {
       if (parts.put(name, new Part(expanded, indices / 3)) != null)
         throw new IOException("Duplicate rigid group");
     }
-    if (!parts.keySet().equals(Set.of("mount", "support", "blade", "tip", "edge"))
+    if (!parts.keySet().equals(Set.of("mount", "carriage", "support", "blade", "tip", "edge"))
         || in.read() != -1) throw new IOException("Invalid Mantis groups or trailing data");
     return new MantisMeshData(Collections.unmodifiableMap(parts));
   }

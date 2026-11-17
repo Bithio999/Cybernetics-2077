@@ -18,7 +18,8 @@ public final class MantisMotion {
       float extension,
       float ready,
       float twist,
-      float tip) {}
+      float tip,
+      float slide) {}
 
   private static float phase(float t, float a, float b) {
     return smooth(Math.clamp((t - a) / (b - a), 0, 1));
@@ -35,9 +36,10 @@ public final class MantisMotion {
     float t = Math.clamp(sinceChange / CombatRules.DEPLOY, 0, 1);
     if (!deployed) t = 1 - t;
     float ready = phase(t, 0, .40f),
-        panels = phase(t, .14f, .44f),
-        hinge = phase(t, .50f, .78f),
-        extension = phase(t, .70f, .88f);
+        panels = phase(t, .06f, .36f),
+        hinge = phase(t, .16f, .48f),
+        slide = phase(t, .50f, .68f),
+        extension = phase(t, .70f, .92f);
     float side = left ? -1 : 1;
     float inspect = phase(t, .12f, .38f) * (1 - phase(t, .72f, 1));
     float pitch = -10 * inspect, yaw = side * 18 * inspect, roll = side * 12 * inspect;
@@ -60,7 +62,6 @@ public final class MantisMotion {
         elbow += -14 * anticipation + 5 * follow;
         twist += side * reverse * (12 * anticipation - 35 * follow);
       }
-      extension -= .08f * follow;
       trail = (float) Math.sin(Math.PI * Math.clamp((a - .2f) / .35f, 0, 1));
     }
     if (charging) {
@@ -85,7 +86,8 @@ public final class MantisMotion {
         extension,
         ready,
         twist,
-        phase(t, .84f, 1));
+        phase(t, .88f, 1),
+        slide);
   }
 
   public static float smooth(float t) {

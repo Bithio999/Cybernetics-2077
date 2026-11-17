@@ -21,12 +21,10 @@ final class MantisMotionTest {
     for (float t = 0; t < CombatRules.DEPLOY; t += .05f) {
       var pose = MantisMotion.sample(true, t, 100, 0, false, 0, false);
       assertTrue(pose.panels() >= pose.blade());
-      if (pose.blade() > 0)
-        assertEquals(
-            1,
-            pose.panels(),
-            .00001,
-            "The support may only unfold after the covers have completely opened");
+      if (pose.blade() > 0 && pose.blade() < 1) {
+        assertEquals(0, pose.slide());
+        assertEquals(0, pose.extension());
+      }
     }
   }
 
@@ -39,11 +37,15 @@ final class MantisMotionTest {
       assertEquals(a.blade(), b.blade(), .00001);
       assertEquals(a.extension(), b.extension(), .00001);
       assertEquals(a.tip(), b.tip(), .00001);
+      assertEquals(a.slide(), b.slide(), .00001);
+      assertTrue(a.blade() >= a.slide() && a.slide() >= a.extension());
       assertTrue(a.extension() >= a.tip());
       assertTrue(a.panels() >= a.blade());
       assertTrue(a.blade() >= a.extension());
       assertTrue(a.elbow() >= -65 && a.elbow() <= 0);
     }
+    var emerging = MantisMotion.sample(true, 8, 100, 0, false, 0, false);
+    assertTrue(emerging.blade() > 0 && emerging.panels() < 1);
     assertEquals(0, MantisMotion.sample(true, 8, 100, 0, false, 0, false).extension());
     assertEquals(1, MantisMotion.sample(true, 30, 100, 0, false, 0, false).extension());
   }

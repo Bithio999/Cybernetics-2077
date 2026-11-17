@@ -57,3 +57,7 @@ For 0.5.5, the user’s side-view image and the uploaded physical-blade sequence
 In 0.5.6 the user requested a thicker implant and shorter blade portion. The model therefore keeps its support length, increases housing and linkage cross sections, and reduces sliding-leaf length and extension. The segmented skin opening and its timing are retained.
 
 The 0.5.7 correction distinguishes anatomical mounting from screen orientation: native hanging arms have their outward knuckle face on opposite X sides. The old mapping treated native front −Z as dorsal. A handed skin basis and a compensated wrist/arm roll now put the actual back-of-hand face on top, with the mechanism emerging from it. Geometry proportions stay as in 0.5.6.
+
+## Mantis shared lift and housing slide (0.5.8)
+
+The uploaded physical-blade sequence and the user’s side-profile reference guide this pass. Covers start opening, then the still-folded assembly rises as one unit. Only the implant’s support/housing carriage slides backward along fixed guides; the forearm mount stays anchored. The upper receiver then pivots forward and the nested cutting leaves extend. The shared lift holds the relative upper/lower angle at 180°, replacing the old continuously counter-rotating receiver. The sequence reverses for stowing. First-person hand spacing, height and weapon projection are tuned against the supplied video while preserving the world-camera FOV setting. No exact Cyberpunk FOV can be inferred from the cropped reference, so the 52° vertical weapon lens is a composition choice.

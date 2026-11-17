@@ -66,9 +66,11 @@ public final class MantisBlenderMesh {
       float depth) {
     var model = model(distant);
     p.pushPose();
-    p.mulPose(MantisArticulation.mount(motion.panels(), depth));
+    p.mulPose(MantisArticulation.mount(motion.blade(), depth));
     part(p, out, light, model, "mount");
-    p.mulPose(MantisArticulation.support(motion.blade()));
+    p.mulPose(MantisArticulation.carriage(motion.slide()));
+    part(p, out, light, model, "carriage");
+    p.mulPose(MantisArticulation.support(motion.blade(), motion.extension()));
     part(p, out, light, model, "support");
     p.mulPose(MantisArticulation.blade(motion.blade(), motion.extension()));
     part(p, out, light, model, "blade");

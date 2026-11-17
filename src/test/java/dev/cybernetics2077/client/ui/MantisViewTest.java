@@ -8,6 +8,21 @@ import org.junit.jupiter.api.Test;
 
 final class MantisViewTest {
   @Test
+  void weaponLensPreservesAspectDepthAndNativeHandAtTheStart() {
+    for (float aspect : new float[] {4f / 3, 16f / 9, 21f / 9}) {
+      var original =
+          new Matrix4f().perspective((float) java.lang.Math.toRadians(70), aspect, .05f, 1000);
+      assertEquals(original, MantisView.projection(original, 0));
+      var lens = MantisView.projection(original, 1);
+      assertEquals(52, java.lang.Math.toDegrees(2 * java.lang.Math.atan(1 / lens.m11())), .0001);
+      assertEquals(aspect, lens.m11() / lens.m00(), .00001);
+      assertEquals(original.m22(), lens.m22());
+      assertEquals(original.m32(), lens.m32());
+      assertEquals(original.m23(), lens.m23());
+    }
+  }
+
+  @Test
   void nativeKnuckleFaceIsUpInFirstAndThirdPersonWhileBladePointsPastTheHand() {
     for (boolean left : new boolean[] {false, true})
       for (boolean slim : new boolean[] {false, true}) {
@@ -78,12 +93,12 @@ final class MantisViewTest {
 
   @Test
   void tipExtendsLastAndRetractsFirstIndependentlyOfTheSupport() {
-    var half = MantisMotion.sample(true, 24, 100, 0, false, 0, false);
+    var half = MantisMotion.sample(true, 26, 100, 0, false, 0, false);
     var open = MantisMotion.sample(true, 30, 100, 0, false, 0, false);
     assertTrue(half.extension() > .6f);
     assertEquals(0, half.tip());
     assertEquals(1, open.tip());
-    assertEquals(0, MantisMotion.sample(false, 6, 100, 0, false, 0, false).tip());
-    assertTrue(MantisMotion.sample(false, 6, 100, 0, false, 0, false).extension() > .6f);
+    assertEquals(0, MantisMotion.sample(false, 4, 100, 0, false, 0, false).tip());
+    assertTrue(MantisMotion.sample(false, 4, 100, 0, false, 0, false).extension() > .6f);
   }
 }

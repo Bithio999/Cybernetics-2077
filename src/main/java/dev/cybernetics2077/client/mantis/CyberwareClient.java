@@ -218,22 +218,31 @@ public final class CyberwareClient {
     if (m.player == null || !visible(m.player)) return;
     e.setCanceled(true);
     if (e.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
-    for (boolean left : new boolean[] {false, true}) {
-      var pose = pose(m.player, left, e.getPartialTick());
-      float sign = left ? -1 : 1;
-      var p = e.getPoseStack();
-      p.pushPose();
-      p.mulPose(
-          MantisView.frame(
-              left,
-              left == (m.player.getMainArm() == HumanoidArm.LEFT),
-              m.player.getSkin().model() == net.minecraft.client.resources.PlayerSkin.Model.SLIM,
-              e.getEquipProgress(),
-              e.getSwingProgress(),
-              pose));
-      MantisMesh.render(
-          p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose, true);
-      p.popPose();
+    var projection =
+        new org.joml.Matrix4f(com.mojang.blaze3d.systems.RenderSystem.getProjectionMatrix());
+    var sorting = com.mojang.blaze3d.systems.RenderSystem.getVertexSorting();
+    com.mojang.blaze3d.systems.RenderSystem.setProjectionMatrix(
+        MantisView.projection(projection, pose(m.player, false, e.getPartialTick()).ready()),
+        sorting);
+    try {
+      for (boolean left : new boolean[] {false, true}) {
+        var pose = pose(m.player, left, e.getPartialTick());
+        var p = e.getPoseStack();
+        p.pushPose();
+        p.mulPose(
+            MantisView.frame(
+                left,
+                left == (m.player.getMainArm() == HumanoidArm.LEFT),
+                m.player.getSkin().model() == net.minecraft.client.resources.PlayerSkin.Model.SLIM,
+                e.getEquipProgress(),
+                e.getSwingProgress(),
+                pose));
+        MantisMesh.render(
+            p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose, true);
+        p.popPose();
+      }
+    } finally {
+      com.mojang.blaze3d.systems.RenderSystem.setProjectionMatrix(projection, sorting);
     }
   }
 

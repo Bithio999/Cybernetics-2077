@@ -59,7 +59,8 @@ def empty(name, parent=None, loc=(0, 0, 0), angle=0):
 
 base = empty("DORSAL_MOUNT", loc=(0, 0.43, 0.17))
 PARTS["mount"] = base
-PARTS["support"] = empty("SUPPORT_PIVOT", base, angle=145)
+PARTS["carriage"] = empty("CARRIAGE_SLIDE", base, loc=(0, -0.06, 0))
+PARTS["support"] = empty("SUPPORT_PIVOT", PARTS["carriage"], angle=145)
 PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.405, 0), angle=-137)
 PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.2926125, 0))
 PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.2845125, 0))
@@ -214,8 +215,25 @@ for k in range(4):
 for x in [-0.058, 0.058]:
     for y in [-0.076, 0.052]:
         bolt("Chassis fastener", "mount", (x, y, -0.002), 0.0045)
-cyl("Proximal hinge barrel", "mount", (0, 0, 0.007), 0.030, 0.119, "gunmetal")
-cyl("Proximal hinge spindle", "mount", (0, 0, 0.007), 0.021, 0.130, "steel")
+cyl("Proximal hinge barrel", "carriage", (0, 0, 0.007), 0.030, 0.119, "gunmetal")
+cyl("Proximal hinge spindle", "carriage", (0, 0, 0.007), 0.021, 0.130, "steel")
+box(
+    "Sliding hinge shoe",
+    "carriage",
+    (0, -0.009, -0.009),
+    (0.097, 0.034, 0.018),
+    "gunmetal",
+    0.002,
+)
+for sign in [-1, 1]:
+    box(
+        "Carriage guide",
+        "mount",
+        (sign * 0.041, -0.031, -0.008),
+        (0.008, 0.103, 0.012),
+        "steel",
+        0.001,
+    )
 # Lower section: two load-bearing cheek plates lead BACK and UP to the second hinge.
 lower = [
     (0, -0.027),
@@ -250,12 +268,17 @@ for sign in [-1, 1]:
     for y in [0.052, 0.278]:
         bolt("Linkage fastener", "support", (sign * 0.051, y, 0.006), 0.006)
 box(
-    "Support bridge", "support", (0, 0.073, 0), (0.071, 0.025, 0.035), "gunmetal", 0.002
+    "Support bridge",
+    "support",
+    (0, 0.073, 0.075),
+    (0.071, 0.025, 0.035),
+    "gunmetal",
+    0.002,
 )
 box(
     "Piston housing",
     "support",
-    (0, 0.155, -0.005),
+    (0, 0.155, 0.075),
     (0.022, 0.130, 0.021),
     "recess",
     0.001,
@@ -263,7 +286,7 @@ box(
 box(
     "Piston chrome rod",
     "support",
-    (0, 0.235, -0.005),
+    (0, 0.235, 0.075),
     (0.010, 0.145, 0.010),
     "steel",
     0.0006,
@@ -534,6 +557,7 @@ for name, parent in PARTS.items():
     o.matrix_basis = Matrix.Identity(4)
     proportions = {
         "mount": (0.936, 0.80, 1.0625),
+        "carriage": (0.936, 0.80, 1.0625),
         "support": (0.66, 0.30 / 0.34, 0.675),
         "blade": (0.715, 0.55, 0.56),
         "tip": (0.66, 0.44, 0.84),

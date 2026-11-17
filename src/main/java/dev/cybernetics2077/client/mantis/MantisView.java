@@ -1,6 +1,7 @@
 package dev.cybernetics2077.client.mantis;
 
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -41,11 +42,21 @@ public final class MantisView {
     }
     var goal =
         new Matrix4f()
-            .translate(side * .72f, -.35f, -.65f)
+            .translate(side * .52f, -.12f, -.90f)
             .rotateZ((float) Math.PI)
             .scale(.9f)
             .mul(MantisRig.shoulder(left, slim, pose));
     return blend(start, goal, blend);
+  }
+
+  /** Dedicated weapon lens; never modifies the player's world FOV setting. */
+  public static Matrix4f projection(Matrix4fc current, float ready) {
+    var result = new Matrix4f(current);
+    float focal = Math.abs(current.m11());
+    if (ready <= 0 || !Float.isFinite(focal) || focal < .0001f) return result;
+    float target = 1f / (float) Math.tan(Math.toRadians(52) / 2);
+    float ratio = (focal + (target - focal) * Math.clamp(ready, 0, 1)) / focal;
+    return result.m00(current.m00() * ratio).m11(current.m11() * ratio);
   }
 
   public static Matrix4f blend(Matrix4f a, Matrix4f b, float t) {
