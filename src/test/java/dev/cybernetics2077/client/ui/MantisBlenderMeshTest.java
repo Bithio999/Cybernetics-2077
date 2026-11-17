@@ -24,7 +24,7 @@ final class MantisBlenderMeshTest {
     var far = read("far");
     int n = near.parts().values().stream().mapToInt(MantisMeshData.Part::triangles).sum();
     int f = far.parts().values().stream().mapToInt(MantisMeshData.Part::triangles).sum();
-    assertTrue(n < 3300 && n > 1000);
+    assertTrue(n < 3800 && n > 1000);
     assertTrue(f < 700 && f < n * .20);
     for (var model : new MantisMeshData[] {near, far})
       for (var part : model.parts().values()) {
@@ -95,14 +95,14 @@ final class MantisBlenderMeshTest {
             for (float width : new float[] {3 / 16f, 4 / 16f}) {
               boolean inArm =
                   java.lang.Math.abs(point.x) < width / 2
-                      && point.y > MantisRig.ELBOW_Y
+                      && point.y > -.125f
                       && point.y < .625f
                       && point.z > -.125f
                       && point.z < .125f;
               boolean inOpening =
-                  java.lang.Math.abs(point.x) < width * .44f - .004f
-                      && point.y > .11f
-                      && point.y < .52f;
+                  java.lang.Math.abs(point.x) < width * MantisSkinPanels.WIDTH - .004f
+                      && point.y > MantisSkinPanels.START
+                      && point.y < MantisSkinPanels.END;
               if (age == 0)
                 assertTrue(inArm, "The stowed blade must fit completely inside the actual arm");
               assertFalse(
@@ -132,14 +132,83 @@ final class MantisBlenderMeshTest {
               reach,
               origin.distance(
                   axis.transformPosition(new Vector3f(edge[i], edge[i + 1], edge[i + 2]))));
-    assertTrue(reach >= .95f, "Do not shrink the deployed blade to solve storage clearance");
+    assertTrue(reach >= 1.28f, "Do not shrink the deployed blade to solve storage clearance");
+    // The larger implant includes the base, linkage and receiver, not only the edge.
+    var mount = model.parts().get("mount").vertices();
+    float mx = 0;
+    for (int i = 0; i < mount.length; i += 8)
+      mx = java.lang.Math.max(mx, java.lang.Math.abs(mount[i]));
+    assertTrue(mx * 2 >= .16f, "The mount must grow with the complete implant");
+    assertTrue(MantisArticulation.SUPPORT_LENGTH >= .40f, "Keep the support full size");
     var receiver = model.parts().get("blade").vertices();
     float low = Float.POSITIVE_INFINITY, high = Float.NEGATIVE_INFINITY;
     for (int i = 2; i < receiver.length; i += 8) {
       low = java.lang.Math.min(low, receiver[i]);
       high = java.lang.Math.max(high, receiver[i]);
     }
-    assertTrue(high - low < .06f, "Keep the housing shallow without shortening the cutting blade");
+    assertTrue(high - low < .08f, "Keep the housing shallow without shortening the cutting blade");
+  }
+
+  @Test
+  void emergingMechanismDoesNotCutThroughMovingDermalPlates() throws Exception {
+    var model = read("near");
+    for (float width : new float[] {3 / 16f, 4 / 16f}) {
+      for (float age = 0; age <= 30; age += .5f) {
+        var pose = MantisMotion.sample(true, age, 100, 0, false, 0, false);
+        var elbow = MantisRig.elbow(pose);
+        var bone = new Matrix4f(elbow).mul(MantisArticulation.mount(pose.panels()));
+        for (String name : new String[] {"mount", "support", "blade", "tip", "edge"}) {
+          if (name.equals("support")) bone.mul(MantisArticulation.support(pose.blade()));
+          if (name.equals("blade"))
+            bone.mul(MantisArticulation.blade(pose.blade(), pose.extension()));
+          if (name.equals("tip")) bone.mul(MantisArticulation.tip(pose.tip()));
+          if (name.equals("edge")) bone.mul(MantisArticulation.edge(pose.tip()));
+          var data = model.parts().get(name).vertices();
+          for (var panel : MantisSkinPanels.ALL) {
+            var plate =
+                panel == MantisSkinPanels.Panel.PROXIMAL ? new Matrix4f() : new Matrix4f(elbow);
+            plate.mul(MantisSkinPanels.transform(panel, width, pose.panels(), false));
+            var relative = plate.invert().mul(bone);
+            var region = MantisSkinPanels.region(panel, width);
+            boolean side =
+                panel == MantisSkinPanels.Panel.SIDE_LEFT
+                    || panel == MantisSkinPanels.Panel.SIDE_RIGHT;
+            float plane =
+                side
+                    ? (panel == MantisSkinPanels.Panel.SIDE_LEFT ? -width / 2 : width / 2)
+                    : -.125f;
+            var a = new Vector3f();
+            var b = new Vector3f();
+            var c = new Vector3f();
+            var q = new Vector3f();
+            for (int i = 0; i < data.length; i += 24) {
+              relative.transformPosition(a.set(data[i], data[i + 1], data[i + 2]));
+              relative.transformPosition(b.set(data[i + 8], data[i + 9], data[i + 10]));
+              relative.transformPosition(c.set(data[i + 16], data[i + 17], data[i + 18]));
+              for (int edge = 0; edge < 3; edge++) {
+                var u = edge == 0 ? a : edge == 1 ? b : c;
+                var v = edge == 0 ? b : edge == 1 ? c : a;
+                float du = (side ? u.x : u.z) - plane, dv = (side ? v.x : v.z) - plane;
+                if (du * dv >= 0
+                    || java.lang.Math.abs(du) < .00001
+                    || java.lang.Math.abs(dv) < .00001) continue;
+                q.set(u).lerp(v, du / (du - dv));
+                assertFalse(
+                    region.contains(q.x, q.y, q.z),
+                    "Moving cover collision: "
+                        + panel
+                        + " / "
+                        + name
+                        + " at "
+                        + age
+                        + " local "
+                        + q);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   @Test

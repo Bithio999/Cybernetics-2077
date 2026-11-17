@@ -10,6 +10,13 @@ import net.neoforged.neoforge.client.event.RenderFrameEvent;
 /** Test-only frame pacing evidence, with no readback or disk writes during combat. */
 @EventBusSubscriber(modid = "cybernetics2077", value = Dist.CLIENT)
 public final class RecordingFrames {
+  public static boolean quarter;
+
+  @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST)
+  public static void hideHands(net.neoforged.neoforge.client.event.RenderHandEvent event) {
+    if (quarter) event.setCanceled(true);
+  }
+
   private static final double[] times = new double[16384];
   private static int count;
   private static long previous;

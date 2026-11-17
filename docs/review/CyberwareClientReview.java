@@ -280,7 +280,7 @@ public final class CyberwareClientReview {
       } catch (Exception ex) {
         ex.printStackTrace();
       }
-    if (++age > 2300 || error != null) {
+    if (++age > 2700 || error != null) {
       try {
         Files.createDirectories(OUT);
         Files.writeString(OUT.resolve("failed.txt"), error == null ? "Timeout at " + ticks : error);

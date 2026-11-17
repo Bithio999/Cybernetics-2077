@@ -2,7 +2,7 @@ package dev.cybernetics2077.client.mantis;
 
 import dev.cybernetics2077.combat.CombatRules;
 
-/** Joint animation and independent hatch, folding hinge and telescoping carriage channels. */
+/** Joint animation and independent skin covers, folding hinge and telescoping carriage channels. */
 public final class MantisMotion {
   public record Pose(
       float panels,
@@ -35,9 +35,9 @@ public final class MantisMotion {
     float t = Math.clamp(sinceChange / CombatRules.DEPLOY, 0, 1);
     if (!deployed) t = 1 - t;
     float ready = phase(t, 0, .40f),
-        panels = phase(t, .14f, .36f),
-        hinge = phase(t, .42f, .72f),
-        extension = phase(t, .64f, .84f);
+        panels = phase(t, .14f, .44f),
+        hinge = phase(t, .50f, .78f),
+        extension = phase(t, .70f, .88f);
     float side = left ? -1 : 1;
     float inspect = phase(t, .12f, .38f) * (1 - phase(t, .72f, 1));
     float pitch = -10 * inspect, yaw = side * 18 * inspect, roll = side * 12 * inspect;
@@ -85,7 +85,7 @@ public final class MantisMotion {
         extension,
         ready,
         twist,
-        phase(t, .82f, 1));
+        phase(t, .84f, 1));
   }
 
   public static float smooth(float t) {

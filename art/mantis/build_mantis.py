@@ -57,12 +57,12 @@ def empty(name, parent=None, loc=(0, 0, 0), angle=0):
     return o
 
 
-base = empty("DORSAL_MOUNT", loc=(0, 0.45, 0.15))
+base = empty("DORSAL_MOUNT", loc=(0, 0.43, 0.17))
 PARTS["mount"] = base
 PARTS["support"] = empty("SUPPORT_PIVOT", base, angle=145)
-PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.30, 0), angle=-137)
-PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.327, 0))
-PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.321, 0))
+PARTS["blade"] = empty("BLADE_PIVOT", PARTS["support"], loc=(0, 0.405, 0), angle=-137)
+PARTS["tip"] = empty("TIP_SLIDE", PARTS["blade"], loc=(0, 0.44145, 0))
+PARTS["edge"] = empty("EDGE_SLIDE", PARTS["tip"], loc=(0, 0.43335, 0))
 
 
 def finish(o, name, part, mat="gunmetal", bevel=0, detail=False):
@@ -445,6 +445,60 @@ for sign in [-1, 1]:
         True,
     )
 
+# Exposed subdermal harness: long service bundles occupy the opened arm,
+# instead of leaving an empty rectangular cavity under the mechanism.
+box(
+    "Subdermal harness spine",
+    "mount",
+    (0, -0.16, -0.055),
+    (0.020, 0.41, 0.012),
+    "recess",
+    0.001,
+)
+for side in [-1, 1]:
+    box(
+        "Harness rail",
+        "mount",
+        (side * 0.048, -0.16, -0.05),
+        (0.008, 0.40, 0.009),
+        "steel",
+        0.0006,
+    )
+    for k in range(3):
+        x = side * (0.049 + k * 0.005)
+        cable(
+            "Long flex tendon",
+            [
+                (x, -0.36, -0.045),
+                (x + side * 0.005, -0.25, -0.036),
+                (x - side * 0.003, -0.11, -0.040),
+                (x, 0.035, -0.043),
+            ],
+            "red" if k != 1 else "cable",
+        )
+
+for side in [-1, 1]:
+    cable(
+        "Inner hydraulic conduit",
+        [
+            (side * 0.025, -0.355, -0.044),
+            (side * 0.020, -0.23, -0.034),
+            (side * 0.029, -0.10, -0.04),
+            (side * 0.025, 0.025, -0.046),
+        ],
+        "cable",
+    )
+for y in [-0.30, -0.18, -0.055]:
+    box(
+        "Harness control bridge",
+        "mount",
+        (0, y, -0.048),
+        (0.10, 0.014, 0.007),
+        "pcb",
+        0.0005,
+        True,
+    )
+
 # Convert/apply modelling modifiers once, record detail faces, then join each rigid part.
 near = {}
 for name, parent in PARTS.items():
@@ -485,7 +539,7 @@ for name, parent in PARTS.items():
         "tip": (0.55, 0.55, 0.70),
         "edge": (0.42, 0.55, 0.65),
     }
-    o.data.transform(Matrix.Diagonal((*proportions[name], 1)))
+    o.data.transform(Matrix.Diagonal((*(v * 1.35 for v in proportions[name]), 1)))
     near[name] = o
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
@@ -496,7 +550,7 @@ for name, parent in PARTS.items():
     oy = (index // 3) * 0.5
     for uv in o.data.uv_layers.active.data:
         uv.uv = (ox + 0.008 + uv.uv.x * (1 / 3 - 0.016), oy + 0.012 + uv.uv.y * 0.476)
-# One 512px diffuse+AO atlas shared by all four rigid groups and both LODs.
+# One 512px diffuse+AO atlas shared by all five rigid groups and both LODs.
 color = bpy.data.images.new("Mantis colour bake", width=512, height=512, alpha=False)
 ao = bpy.data.images.new("Mantis AO bake", width=512, height=512, alpha=False)
 ao.colorspace_settings.name = "Non-Color"
@@ -663,9 +717,9 @@ def aim(o, point):
 
 bpy.ops.object.camera_add(location=(1.55, 2.1, 1.55))
 camera = bpy.context.object
-aim(camera, (0, 0.73, 0.30))
+aim(camera, (0, 0.82, 0.32))
 camera.data.type = "ORTHO"
-camera.data.ortho_scale = 1.35
+camera.data.ortho_scale = 1.7
 scene.camera = camera
 for loc, power, size in [
     ((2, 1, 3), 600, 3),

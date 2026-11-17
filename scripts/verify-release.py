@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.5.4.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.5.5.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.5.4'
+    assert metadata['mods'][0]['version']=='0.5.5'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -35,6 +35,7 @@ with ZipFile(jar) as z:
                      'dev/cybernetics2077/client/mantis/MantisMeshData.class',
                      'dev/cybernetics2077/client/mantis/MantisBlenderMesh.class',
                      'dev/cybernetics2077/client/mantis/MantisMaterial.class',
+                     'dev/cybernetics2077/client/mantis/MantisSkinPanels.class',
                      'assets/cybernetics2077/meshes/mantis/near.cymesh',
                      'assets/cybernetics2077/meshes/mantis/far.cymesh',
                      'assets/cybernetics2077/textures/entity/mantis_blender.png',

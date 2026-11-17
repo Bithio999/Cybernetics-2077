@@ -47,3 +47,6 @@ if not a.mantis_only:
     encode('quickhack-management', [('cyberware-quickhack-entry', 'cyberware-quickhack-return')])
 
 encode('mantis-mechanism', [('mantis-dorsal-open', 'mantis-dorsal-closed'), ('mantis-dorsal-deploy-000', 'mantis-dorsal-ready')])
+
+if 'mantis-forearm-quarter' in marks:
+    encode('mantis-forearm-panels', [('mantis-forearm-quarter','mantis-forearm-closed'), ('mantis-forearm-deploy-000','mantis-forearm-open')])

@@ -26,7 +26,7 @@ final class MantisMotionTest {
             1,
             pose.panels(),
             .00001,
-            "The support may only unfold after the hatch has completely opened");
+            "The support may only unfold after the covers have completely opened");
     }
   }
 

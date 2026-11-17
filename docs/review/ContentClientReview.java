@@ -490,7 +490,41 @@ final class ContentClientReview {
       m.options.fov().set(70);
       m.player.setXRot(0);
     }
-    if (t == 1120)
+    if (t == 1060) {
+      var observer =
+          new net.minecraft.world.entity.decoration.ArmorStand(
+              m.level, m.player.getX() + 1.15, m.player.getY() + .10, m.player.getZ() + 1.25);
+      var focus = m.player.position().add(0, 1.1, .15).subtract(observer.getEyePosition());
+      float yaw = (float) Math.toDegrees(Math.atan2(-focus.x, focus.z));
+      float pitch = (float) -Math.toDegrees(Math.atan2(focus.y, Math.hypot(focus.x, focus.z)));
+      observer.setYRot(yaw);
+      observer.setYHeadRot(yaw);
+      observer.yHeadRotO = yaw;
+      observer.setYBodyRot(yaw);
+      observer.yBodyRotO = yaw;
+      observer.yRotO = yaw;
+      observer.setXRot(pitch);
+      observer.xRotO = pitch;
+      observer.xo = observer.getX();
+      observer.yo = observer.getY();
+      observer.zo = observer.getZ();
+      m.setCameraEntity(observer);
+      RecordingFrames.quarter = true;
+      m.options.fov().set(40);
+    }
+    if (t == 1066) shot("mantis-forearm-quarter");
+    if (t == 1070) draw();
+    if (t >= 1070 && t <= 1105) shot("mantis-forearm-retract-" + String.format("%03d", t - 1070));
+    if (t == 1108) shot("mantis-forearm-closed");
+    if (t == 1110) draw();
+    if (t >= 1110 && t <= 1145) shot("mantis-forearm-deploy-" + String.format("%03d", t - 1110));
+    if (t == 1150) shot("mantis-forearm-open");
+    if (t == 1155) {
+      m.setCameraEntity(m.player);
+      RecordingFrames.quarter = false;
+      m.options.fov().set(70);
+    }
+    if (t == 1190)
       server(
           p -> {
             var nether = p.server.getLevel(net.minecraft.world.level.Level.NETHER);
@@ -508,7 +542,7 @@ final class ContentClientReview {
               }
             p.teleportTo(nether, .5, 80, .5, java.util.Set.of(), 0, 0);
           });
-    if (t == 1160) {
+    if (t == 1230) {
       check(
           m.level.dimension() == net.minecraft.world.level.Level.NETHER
               && CyberwareClient.own().getBoolean("deck")
