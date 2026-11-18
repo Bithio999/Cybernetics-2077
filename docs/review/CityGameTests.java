@@ -515,10 +515,21 @@ public final class CityGameTests {
               && p.getInventory().isEmpty(),
           "Unqualified buy packet accepted");
       wallet.reputation(1);
+      // Unlock permits this tier to enter the daily pool; it does not stock every item.
+      int available = -1;
+      for (int day = 0; day < 200 && available < 0; day++) {
+        h.getLevel().getServer().overworld().setDayTime(day * 24000L);
+        for (int i = 0; i < offers.size(); i++)
+          if (offers.get(i).tier() == wanted && m.stocked(i)) {
+            available = i;
+            break;
+          }
+      }
+      h.assertTrue(available >= 0, "Unlocked tier never entered stock");
       h.assertTrue(
-          m.clickMenuButton(p, 1000 + index)
-              && wallet.eddies() == before - offers.get(index).price(),
-          "Unlocked tier rejected");
+          m.clickMenuButton(p, 1000 + available)
+              && wallet.eddies() == before - offers.get(available).price(),
+          "Unlocked stocked tier rejected");
       p.getInventory().clearContent();
     }
     wallet.reputation(Integer.MAX_VALUE);
@@ -661,6 +672,98 @@ public final class CityGameTests {
     h.assertTrue(
         completed.deliveryStage() == 2 && completed.eddies() == 1000 && completed.streetCred() == 5,
         "Completion/reward did not persist");
+    h.succeed();
+  }
+
+  private static java.util.BitSet assortment(RipperdocMenu menu) {
+    var set = new java.util.BitSet();
+    for (int i = 0; i < CyberwareCatalogue.offers().size(); i++) if (menu.stocked(i)) set.set(i);
+    return set;
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void dailyStockHidesLockedTiersAndKeepsStarterEye(GameTestHelper h) {
+    var p = player(h);
+    var npc = resident(h, p, false);
+    var menu = new RipperdocMenu(1, p.getInventory(), npc.getId());
+    var offers = CyberwareCatalogue.offers();
+    for (int cred = 0; cred <= 50; cred++) {
+      if (cred > 0) p.getData(CityContent.ACCOUNT).reputation(1);
+      for (int day = 0; day < 8; day++) {
+        p.server.overworld().setDayTime(day * 24000L + 123);
+        var items = assortment(menu);
+        h.assertTrue(
+            items.cardinality() > 0 && items.cardinality() <= DailyStock.LIMIT,
+            "Invalid assortment size");
+        for (int i = items.nextSetBit(0); i >= 0; i = items.nextSetBit(i + 1))
+          h.assertTrue(offers.get(i).requiredStreetCred() <= cred, "Locked tier appeared in stock");
+        if (cred <= 10) h.assertTrue(menu.stocked(0), "Starter Kiroshi missing at SC " + cred);
+      }
+    }
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void stockStaysStableAcrossReopenButRotatesAtDawn(GameTestHelper h) {
+    var p = player(h);
+    var npc = resident(h, p, false);
+    p.getData(CityContent.ACCOUNT).reputation(50);
+    p.server.overworld().setDayTime(23999);
+    var menu = new RipperdocMenu(1, p.getInventory(), npc.getId());
+    var yesterday = assortment(menu);
+    h.assertTrue(
+        yesterday.equals(assortment(new RipperdocMenu(2, p.getInventory(), npc.getId()))),
+        "Reopening rerolled stock");
+    menu.broadcastChanges();
+    h.assertTrue(menu.stockDay() == 0 && menu.restockTicks() == 1, "Wrong pre-dawn countdown");
+    p.server.overworld().setDayTime(24000);
+    menu.broadcastChanges();
+    var today = assortment(menu);
+    h.assertTrue(
+        !yesterday.equals(today) && menu.stockDay() == 1 && menu.restockTicks() == 24000,
+        "Open menu did not rotate at dawn");
+    h.assertTrue(
+        today.equals(assortment(new RipperdocMenu(3, p.getInventory(), npc.getId()))),
+        "Reopen did not preserve the new day");
+    // The clock follows the Overworld calendar, including sleep/time commands and large days.
+    p.server.overworld().setDayTime(24000L * 100000 + 12000);
+    menu.broadcastChanges();
+    h.assertTrue(
+        menu.stockDay() == 100000 && menu.restockTicks() == 12000,
+        "Large calendar day was truncated");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void staleOrForgedStockPurchasesNeverCharge(GameTestHelper h) {
+    var p = player(h);
+    var npc = resident(h, p, false);
+    var wallet = p.getData(CityContent.ACCOUNT);
+    wallet.credit(1_000_000);
+    wallet.reputation(50);
+    p.server.overworld().setDayTime(0);
+    var menu = new RipperdocMenu(1, p.getInventory(), npc.getId());
+    p.containerMenu = menu;
+    var yesterday = assortment(menu);
+    p.server.overworld().setDayTime(24000);
+    var today = assortment(menu);
+    var removed = (java.util.BitSet) yesterday.clone();
+    removed.andNot(today);
+    int stale = removed.nextSetBit(0);
+    h.assertTrue(stale >= 0, "No rotated offer to test");
+    h.assertTrue(
+        !menu.clickMenuButton(p, 1000 + stale)
+            && menu.result() == 5
+            && wallet.eddies() == 1_000_000
+            && p.getInventory().isEmpty(),
+        "Stale purchase was accepted or charged");
+    int fresh = today.nextSetBit(0);
+    h.assertTrue(
+        menu.clickMenuButton(p, 1000 + fresh)
+            && wallet.eddies() == 1_000_000 - CyberwareCatalogue.offers().get(fresh).price(),
+        "Fresh offer could not be bought");
+    var before = assortment(menu);
+    h.assertTrue(before.equals(today), "Purchase rerolled daily selection");
     h.succeed();
   }
 }

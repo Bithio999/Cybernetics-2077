@@ -101,7 +101,9 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
     String query = search == null ? "" : search.getValue().strip().toLowerCase(Locale.ROOT);
     for (int n = 0; n < all.size(); n++) {
       var o = all.get(n);
-      if ((category < 0 || o.category() == CyberwareCategory.values()[category])
+      if (menu.stocked(n)
+          && menu.streetCred() >= o.requiredStreetCred()
+          && (category < 0 || o.category() == CyberwareCategory.values()[category])
           && (tier == 0 || o.tier() == tier)
           && o.item().getDescription().getString().toLowerCase(Locale.ROOT).contains(query))
         out.add(n);
@@ -193,7 +195,18 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
         c.center(
             rows.isEmpty()
                 ? "NO MATCHING CYBERWARE"
-                : (page + 1) + " / " + Math.max(1, (rows.size() + 4) / 5),
+                : "DAY "
+                    + (menu.stockDay() + 1)
+                    + "  /  "
+                    + (page + 1)
+                    + " OF "
+                    + Math.max(1, (rows.size() + 4) / 5)
+                    + "  /  "
+                    + String.format(
+                        Locale.ROOT,
+                        "%02d:%02d",
+                        (menu.restockTicks() + 19) / 20 / 60,
+                        (menu.restockTicks() + 19) / 20 % 60),
             159,
             209,
             10,
@@ -204,7 +217,8 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
               case 2 -> "FREE AN INVENTORY SLOT";
               case 3 -> "PURCHASE ADDED TO INVENTORY";
               case 4 -> "HIGHER STREET CRED REQUIRED";
-              default -> "Hover an implant for its effects. Installation is free.";
+              case 5 -> "STOCK CHANGED. CHECK TODAY'S SELECTION.";
+              default -> "Hover for effects. New stock each dawn. Installation is free.";
             };
         c.center(result, 159, 225, 8, menu.result() == 3 ? 0xff80e8bd : 0xffb6b2a7);
         CyberBatch.flush(g);

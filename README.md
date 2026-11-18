@@ -49,13 +49,13 @@ Visit a ripperdoc and select **Install**, or craft and place a **Cybernetics Ben
 
 ![Cybernetics Bench installation menu](docs/images/bench.png)
 
-**Fixer contracts and Street Cred:** take the one-time delivery job at the Afterlife, follow its contract shard to a ripperdoc, and earn €$1,000 plus 5 Street Cred. Ripperdocs unlock tiers 2–5 at Street Cred 10 / 20 / 30 / 40. [Village services and contracts](docs/VILLAGE-SERVICES.md).
+**Fixer contracts and Street Cred:** take the one-time delivery job at the Afterlife, follow its contract shard to a ripperdoc, and earn €$1,000 plus 5 Street Cred. Ripperdocs rotate up to 10 daily offers, unlocking tiers 2–5 at Street Cred 10 / 20 / 30 / 40. Higher tiers become more common with reputation; tier 1 Kiroshi Optics stay guaranteed at Street Cred 0–10. [Village services and contracts](docs/VILLAGE-SERVICES.md).
 
 [Recipes and item IDs](docs/CYBERWARE.md) · [In-game screenshots and clips](docs/PREVIEWS.md)
 
 ## Install the mod
 
-Use [Cybernetics2077-0.10.0.jar](releases/Cybernetics2077-0.10.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.11.0.jar](releases/Cybernetics2077-0.11.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

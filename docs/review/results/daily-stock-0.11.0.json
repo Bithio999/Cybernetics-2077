@@ -1,0 +1,25 @@
+{
+  "release": "0.11.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvmTestsPassed": 58,
+  "serverGameTestsPassed": 64,
+  "nativeStockReview": "PASS: full delivery and first-optics purchase/install, starter eye at SC5, daily stock and countdown updated in an open menu at dawn, live SC19/50 stock eligibility, all client/server stock masks equal, stale purchase rejected without payment.",
+  "dailyOfferLimit": 10,
+  "tierUnlockStreetCred": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "guaranteedStarterOpticsStreetCred": [
+    0,
+    10
+  ],
+  "rotation": "Overworld calendar, 24000 ticks; distinct selection each day for the same clinic/reputation",
+  "persistence": "Deterministic world seed + persistent NPC UUID + dimension + calendar day + Street Cred",
+  "qualityWeighting": "Tier buckets, normalized for catalogue size; statistical assortment tests cover each unlock band",
+  "cleanReleaseVerifier": "passed",
+  "sha256": "87ff39bc53f7adb92d898f953467d7f18744e97d942b578be3ed961f3d591ec0"
+}

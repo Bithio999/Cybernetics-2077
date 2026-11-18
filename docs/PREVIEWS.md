@@ -14,6 +14,16 @@ These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Ma
 
 [Cortex category](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory entry](images/creative.png)
 
+## Daily ripperdoc stock (0.11.0)
+
+Daily selection, live restock countdown and Street Cred quality weighting, captured in Minecraft. Locked tiers are hidden. The starter eye remains guaranteed at SC 0–10.
+
+![Starter stock](images/ripperdoc-daily-stock-starter.png)
+![Street Cred 19](images/ripperdoc-daily-stock-sc19.png)
+![Street Cred 50](images/ripperdoc-daily-stock-sc50.png)
+
+[Next dawn](images/ripperdoc-daily-stock-dawn.png) · [Rotated-out purchase rejected](images/ripperdoc-daily-stock-stale.png)
+
 ## Fixer contract and Street Cred (0.10.0)
 
 Actual native menu, item tooltip and scanner captures from the one-time **First Impressions** delivery. Cargo is digital; the shard authorizes delivery. The scanner route works before optics are installed, without revealing target data. [How to play](VILLAGE-SERVICES.md#first-impressions).

@@ -6,10 +6,10 @@ These buildings can appear in newly generated **plains, desert, savanna, snowy a
 
 Talk to **Dr. Vale** (small clinic) or **Dr. Iris** (large clinic) to open the clinic's two tabs:
 
-- **Purchase:** search cyberware, filter by body system and tier, inspect an implant's tooltip, then buy it with eddies. Purchases go into your inventory. Both clinic sizes share the same catalogue and prices, including cyberdecks, Short Circuit chips and Mantis Blades starting at tier 2. Locked stock shows the Street Cred needed to buy it.
+- **Purchase:** search cyberware, filter by body system and tier, inspect an implant's tooltip, then buy it with eddies. Purchases go into your inventory. Both clinic sizes draw from the same catalogue and prices, including cyberdecks, Short Circuit chips and Mantis Blades starting at tier 2. Each doctor offers their own daily assortment based on your Street Cred; tiers you have not unlocked are hidden.
 - **Install:** move implants into their matching sockets, or shift-click to install/remove them. Existing capacity and duplicate-implant restrictions apply. Installation and removal are free.
 
-Purchase access follows your saved **Street Cred**:
+Tiers enter the daily stock pool at these saved **Street Cred** levels:
 
 | Tier | Required Street Cred |
 | --- | ---: |
@@ -21,11 +21,22 @@ Purchase access follows your saved **Street Cred**:
 
 The requirement applies to implants and quickhack chips. It gates purchases; you can still install equipment you already own. Existing installations are preserved.
 
+### Daily stock
+
+- Each ripperdoc offers **up to 10 different items** each Minecraft day. Starter inventories are smaller because fewer items are eligible.
+- **Tier 1 Basic Kiroshi Optics are always available at Street Cred 0–10 inclusive**, ensuring the introductory delivery reward can buy your first scanner.
+- A newly unlocked tier starts uncommon and appears more often as your Street Cred increases. At high reputation, higher tiers dominate the selection; lower tiers can still appear.
+- Stock changes at **Overworld dawn** every 24,000 ticks, including after sleeping. All dimensions use that calendar. The purchase page shows the stock day and time until the next refresh.
+- Reopening the menu, unloading the clinic or restarting the world does not reroll the day's selection. Different doctors can carry different items; players at the same Street Cred see the same assortment at that doctor. Gaining Street Cred updates your assortment immediately.
+- The server rechecks stock before payment. Clicking an offer that rotated out takes no money. Purchases do not deplete quantities or reroll the selection.
+
+![Starter daily stock](images/ripperdoc-daily-stock-starter.png)
+![High-reputation daily stock](images/ripperdoc-daily-stock-sc50.png)
+
 The small clinic has one treatment chair. The larger clinic has three treatment bays across two floors, with a supported staircase and upper-floor guardrail. Doctors stay at reception.
 
 ![Small clinic](images/clinic-small-exterior.png)
 ![Large clinic treatment floor](images/clinic-large-surgery.png)
-![Purchase cyberware](images/ripperdoc-purchase.png)
 ![Install cyberware](images/ripperdoc-install.png)
 
 ## Eddies
@@ -61,7 +72,7 @@ Lost the shard? Return to a fixer and choose **Reissue Contract**. This invalida
 ![Delivery offer](images/contract-offer.png)
 ![Contract details](images/contract-shard-tooltip.png)
 ![Scanner route before installing optics](images/contract-scanner-route.png)
-![Street Cred stock locks](images/ripperdoc-street-cred.png)
+![Daily stock at Street Cred 19](images/ripperdoc-daily-stock-sc19.png)
 
 ![Afterlife bar](images/afterlife-bar.png)
 ![Fixer](images/afterlife-fixer.png)

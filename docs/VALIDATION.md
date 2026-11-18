@@ -4,6 +4,22 @@ Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without 
 
 The previous 0.9.1 village-services release passed **53 JVM tests**, **55 server GameTests**, the expanded native village-services review and clean-release verification. The client verifies all 25 furniture items in GUI, both first-person hands, both third-person hands, ground and frame contexts. The local player’s skin remains in the hologram.
 
+## Daily ripperdoc stock (0.11.0)
+
+Release 0.11.0 passes **58 JVM tests**, **64 dedicated-server GameTests**, native daily-stock/contract testing and clean-release verification.
+
+- Statistical checks sample thousands of daily assortments to verify increasing high-tier availability, including a catalogue with 100 tier-2 items and only seven tier-1 items to detect catalogue-size bias.
+- Starter optics are checked at every Street Cred from 0 through 10. Every offered tier must meet its reputation requirement.
+- Selection stays stable on reopen and changes at every dawn. Server checks cover the last tick before dawn, an open menu crossing dawn, large day values, forged/stale purchases without payment, and successful purchases of actual stock.
+- Native review first completes the delivery, purchases and installs the starter eye, then verifies live stock and countdown synchronization, reputation changes from SC 5 to 19 to 50, equality of the complete client/server stock masks, and rejection of a stale purchase.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PstockReview
+```
+
+Use the disposable review save below. The extended review writes `capture/stock-passed.txt` and `contract-passed.txt`, or `failed.txt`. Clean before packaging. [Daily-stock results](review/results/daily-stock-0.11.0.json).
+
 ## Street Cred and delivery contracts (0.10.0)
 
 Release 0.10.0 passes **53 JVM tests**, **61 dedicated-server GameTests**, the native contract review and clean-release verification.

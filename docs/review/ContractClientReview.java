@@ -156,8 +156,10 @@ final class ContractClientReview {
               + " optics, use-on-ripperdoc turn-in, dialogue, one-time 1000 eddies/+5 Street Cred,"
               + " locked stock, purchase and installation of first scanner, completed dossier at"
               + " 320x240.\n");
-      finished = true;
-      mc.stop();
+      if (!Boolean.getBoolean("cybernetics2077.stockReview")) {
+        finished = true;
+        mc.stop();
+      }
     }
   }
 }
