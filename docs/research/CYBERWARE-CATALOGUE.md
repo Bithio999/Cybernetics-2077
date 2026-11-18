@@ -226,3 +226,5 @@ The current sections above contain **121 entries**. They include elemental arm v
 The catalogue page was accessible. Its individual item pages returned 403 during this review, and Fandom returned 402; no inaccessible page was treated as freshly reviewed. The catalogue itself supplies the names, systems, tier ranges and effect summaries used here.
 
 [CD PROJEKT RED Update 2.0 notes](https://www.cyberpunk.net/en/news/49060/update-2-0) confirm cyberware capacity, ripperdoc upgrading and the switch to tiers. Minecraft ranges, costs and damage in this mod are adaptation values, not Cyberpunk damage conversions.
+
+[Additional 14 implant families, source links and adaptations for 0.14.0](CYBERWARE-EXPANSION-0.14.0.md).

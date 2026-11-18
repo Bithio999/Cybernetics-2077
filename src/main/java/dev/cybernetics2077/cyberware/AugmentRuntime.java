@@ -60,7 +60,11 @@ public final class AugmentRuntime {
   public static int maxRam(Player p) {
     if (!(CyberwareRuntime.deck(p).getItem()
         instanceof dev.cybernetics2077.deck.CyberdeckItem deck)) return 0;
-    return deck.ram() + tier(p, EX_DISK) + (tier(p, MEMORY_BOOST) > 0 ? 1 : 0);
+    return deck.ram()
+        + tier(p, EX_DISK)
+        + (tier(p, MEMORY_BOOST) > 0 ? 1 : 0)
+        + (tier(p, RAM_UPGRADE) > 0 ? 1 + tier(p, RAM_UPGRADE) / 3 : 0)
+        + (tier(p, SELF_ICE) > 0 ? 2 : 0);
   }
 
   public static int uploadTicks(Player p) {
@@ -124,12 +128,46 @@ public final class AugmentRuntime {
       s.pumpCharges++;
       s.pumpNext = s.pumpCharges < 2 ? s.pumpNext + s.pumpPeriod : 0;
     }
-    if (p.isAlive() && pump > 0 && time < s.pumpEnd && time % 20 == 0)
-      p.heal(p.getMaxHealth() * pump * .005f);
-    int epi = tier(p, EPIMORPHIC_SKELETON), joints = tier(p, BIONIC_JOINTS);
-    double armor =
-        (joints == 0 ? 0 : joints + 1) + (epi == 0 ? 0 : epi * 2 - 2) + tier(p, SUBDERMAL_ARMOR);
+    if (p.isAlive() && pump > 0 && time <= s.pumpEnd && s.pumpEnd > 0) {
+      if (s.pumpPulse == 0) s.pumpPulse = time + 20;
+      if (time >= s.pumpPulse) {
+        s.pumpPulse = time + 20;
+        p.heal(p.getMaxHealth() * pump * .005f);
+      }
+    }
+    AugmentExpansion.tick(p);
+    int epi = tier(p, EPIMORPHIC_SKELETON);
+    double armor = 0, toughness = 0;
+    for (var kind : Augment.values()) {
+      int t = tier(p, kind);
+      armor += kind.armor(t);
+      toughness += kind.toughness(t);
+    }
     attribute(p, Attributes.ARMOR, "implant_armor", armor, AttributeModifier.Operation.ADD_VALUE);
+    attribute(
+        p,
+        Attributes.ARMOR_TOUGHNESS,
+        "implant_toughness",
+        toughness,
+        AttributeModifier.Operation.ADD_VALUE);
+    attribute(
+        p,
+        Attributes.ARMOR,
+        "para_bellum_armor",
+        tier(p, PARA_BELLUM) * .04,
+        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    attribute(
+        p,
+        Attributes.SNEAKING_SPEED,
+        "lynx_speed",
+        tier(p, LYNX_PAWS) * .04,
+        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    attribute(
+        p,
+        Attributes.MOVEMENT_SPEED,
+        "jenkins_speed",
+        AugmentExpansion.sprintBonus(p),
+        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     attribute(
         p,
         Attributes.MAX_HEALTH,
@@ -158,22 +196,7 @@ public final class AugmentRuntime {
         .entrySet()
         .removeIf(
             entry -> entry.getValue() <= time || p.serverLevel().getEntity(entry.getKey()) == null);
-    if (tier(p, CLAIRVOYANT) == 0) s.highlights.clear();
-    if (s.scanUntil > time
-        && tier(p, CLAIRVOYANT) > 0
-        && CyberwareRuntime.usable(p)
-        && time % 4 == 0) {
-      int radius = tier(p, CLAIRVOYANT) * 4;
-      for (var target :
-          p.serverLevel()
-              .getEntitiesOfClass(
-                  LivingEntity.class, p.getBoundingBox().inflate(radius), e -> hostile(p, e)))
-        if (p.distanceToSqr(target) <= radius * radius
-            && !target.isInvisibleTo(p)
-            && p.hasLineOfSight(target)
-            && (s.highlights.containsKey(target.getId()) || s.highlights.size() < 64))
-          s.highlights.put(target.getId(), time + 1200);
-    }
+    scanHighlights(p, time);
     boolean camoNow = camouflaged(p), berserkNow = berserk(p);
     if (camoNow != s.wasCamo || berserkNow != s.wasBerserk) {
       s.wasCamo = camoNow;
@@ -220,25 +243,7 @@ public final class AugmentRuntime {
                 .65f);
       }
       case 6 -> {
-        int t = tier(p, BLOOD_PUMP);
-        if (t == 0 || s.pumpCharges <= 0 || p.getHealth() >= p.getMaxHealth()) return false;
-        s.pumpCharges--;
-        if (s.pumpNext == 0) {
-          s.pumpPeriod = (50 - t * 5) * 20;
-          s.pumpNext = time + s.pumpPeriod;
-        }
-        s.pumpEnd = time + 120;
-        p.heal(p.getMaxHealth() * (.1f + t * .05f));
-        p.serverLevel()
-            .sendParticles(ParticleTypes.HEART, p.getX(), p.getY() + 1, p.getZ(), 5, .3, .4, .3, 0);
-        p.level()
-            .playSound(
-                null,
-                p.blockPosition(),
-                SoundEvents.BEACON_POWER_SELECT,
-                SoundSource.PLAYERS,
-                .5f,
-                1.3f);
+        if (!usePump(p)) return false;
       }
       case 7 -> {
         int t = tier(p, OPTICAL_CAMO);
@@ -299,6 +304,84 @@ public final class AugmentRuntime {
     return true;
   }
 
+  public static boolean usePump(ServerPlayer p) {
+    var s = state(p);
+    int t = tier(p, BLOOD_PUMP);
+    if (!p.isAlive()
+        || p.isSpectator()
+        || t == 0
+        || s.pumpCharges <= 0
+        || p.getHealth() >= p.getMaxHealth()) return false;
+    s.pumpCharges--;
+    if (s.pumpNext == 0) {
+      s.pumpPeriod = (50 - t * 5) * 20;
+      s.pumpNext = now(p) + s.pumpPeriod;
+    }
+    s.pumpEnd = now(p) + 120;
+    s.pumpPulse = now(p) + 20;
+    p.heal(p.getMaxHealth() * (.1f + t * .05f));
+    p.serverLevel()
+        .sendParticles(ParticleTypes.HEART, p.getX(), p.getY() + 1, p.getZ(), 5, .3, .4, .3, 0);
+    p.level()
+        .playSound(
+            null,
+            p.blockPosition(),
+            SoundEvents.BEACON_POWER_SELECT,
+            SoundSource.PLAYERS,
+            .5f,
+            1.3f);
+    return true;
+  }
+
+  private static void scanHighlights(ServerPlayer p, long time) {
+    var s = state(p);
+    Augment optic = null;
+    for (var kind : Augment.values())
+      if (kind.optics() && tier(p, kind) > 0) {
+        optic = kind;
+        break;
+      }
+    if (s.scanProfile != optic) {
+      s.highlights.clear();
+      s.scanProfile = optic;
+    }
+    if (optic == null) {
+      s.highlights.clear();
+      return;
+    }
+    if (s.scanUntil <= time || !CyberwareRuntime.usable(p) || time % 4 != 0) return;
+    int t = tier(p, optic);
+    int radius = optic == CLAIRVOYANT ? t * 4 : (optic == DOOMSAYER ? 8 : 12) + t * 4;
+    for (var target : p.serverLevel().getEntities(p, p.getBoundingBox().inflate(radius))) {
+      if (!target.isAlive() || target.isInvisibleTo(p) || p.distanceToSqr(target) > radius * radius)
+        continue;
+      boolean eligible;
+      if (optic == DOOMSAYER)
+        eligible =
+            target instanceof net.minecraft.world.entity.monster.Creeper
+                || target instanceof net.minecraft.world.entity.item.PrimedTnt
+                || target instanceof net.minecraft.world.entity.projectile.Fireball;
+      else {
+        eligible = target instanceof LivingEntity living && hostile(p, living);
+        if (optic == STALKER && target instanceof ServerPlayer other)
+          eligible = CyberwareRuntime.canAttack(p, other);
+        if (optic == CLAIRVOYANT) eligible &= p.hasLineOfSight(target);
+        else
+          eligible &=
+              p.getLookAngle()
+                      .dot(
+                          target
+                              .getBoundingBox()
+                              .getCenter()
+                              .subtract(p.getEyePosition())
+                              .normalize())
+                  >= .866;
+      }
+      if (eligible && (s.highlights.containsKey(target.getId()) || s.highlights.size() < 64))
+        s.highlights.put(target.getId(), time + (optic == STALKER ? 60 : 1200));
+    }
+  }
+
   private static void jump(ServerPlayer p, double power) {
     var velocity = p.getDeltaMovement();
     p.setDeltaMovement(velocity.x, power, velocity.z);
@@ -326,6 +409,11 @@ public final class AugmentRuntime {
     t.putInt("pumpTier", tier(p, BLOOD_PUMP));
     t.putInt("berserkTier", tier(p, BIODYNE_BERSERK));
     t.putInt("camoTier", tier(p, OPTICAL_CAMO));
+    t.putInt("iceTier", tier(p, SELF_ICE));
+    t.putLong("iceReady", s.iceReady);
+    t.putInt("heartTier", tier(p, SECOND_HEART));
+    t.putLong("heartReady", s.heartReady);
+    t.putInt("lynxTier", tier(p, LYNX_PAWS));
     t.putInt("legTier", Math.max(tier(p, REINFORCED_TENDONS), tier(p, FORTIFIED_ANKLES)));
     t.putBoolean("ankles", tier(p, FORTIFIED_ANKLES) > 0);
     var list = new ListTag();
@@ -362,6 +450,8 @@ public final class AugmentRuntime {
     float amount = e.getNewDamage();
     int neo = tier(p, NEOFIBER);
     if (neo > 0 && p.getRandom().nextFloat() < neo * .02f) amount *= 1 - (.5f + neo * .02f);
+    amount *= 1 - tier(p, PAIN_EDITOR) * .02f;
+    if (e.getSource().is(DamageTypeTags.IS_FALL)) amount *= 1 - tier(p, LYNX_PAWS) * .04f;
     if (berserk(p)) {
       amount *= 1 - tier(p, BIODYNE_BERSERK) * .1f;
       amount = Math.min(amount, Math.max(0, p.getHealth() - p.getMaxHealth() * .25f));
@@ -378,18 +468,20 @@ public final class AugmentRuntime {
 
   @SubscribeEvent
   public static void critical(CriticalHitEvent e) {
-    if (!(e.getEntity() instanceof ServerPlayer p) || !berserk(p)) return;
-    int t = tier(p, BIODYNE_BERSERK);
-    if (e.isCriticalHit() || p.getRandom().nextFloat() < (t - 1) * .05f) {
+    if (!(e.getEntity() instanceof ServerPlayer p)) return;
+    boolean blade = p.getMainHandItem().getItem() instanceof net.minecraft.world.item.SwordItem;
+    if (e.isCriticalHit()
+        || p.getRandom().nextFloat() < AugmentExpansion.weaponCritChance(p, e.getTarget(), blade)) {
       e.setCriticalHit(true);
-      e.setDamageMultiplier(Math.max(1.5f, e.getDamageMultiplier()) * (1 + (t - 1) * .25f));
+      float multiplier = Math.max(1.5f, e.getDamageMultiplier());
+      if (berserk(p)) multiplier *= 1 + (tier(p, BIODYNE_BERSERK) - 1) * .25f;
+      e.setDamageMultiplier(multiplier);
     }
   }
 
-  public static float bladeDamage(ServerPlayer p, float damage) {
-    int t = tier(p, BIODYNE_BERSERK);
-    return berserk(p) && p.getRandom().nextFloat() < (t - 1) * .05f
-        ? damage * 1.5f * (1 + (t - 1) * .25f)
+  public static float bladeDamage(ServerPlayer p, LivingEntity target, float damage) {
+    return p.getRandom().nextFloat() < AugmentExpansion.weaponCritChance(p, target, true)
+        ? damage * AugmentExpansion.critMultiplier(p)
         : damage;
   }
 

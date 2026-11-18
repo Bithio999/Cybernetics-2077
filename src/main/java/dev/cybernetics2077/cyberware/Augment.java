@@ -18,7 +18,21 @@ public enum Augment {
   SUBDERMAL_ARMOR("subdermal_armor", CyberwareCategory.INTEGUMENTARY_SYSTEM, 1, 4),
   OPTICAL_CAMO("optical_camo", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 16),
   REINFORCED_TENDONS("reinforced_tendons", CyberwareCategory.LEGS, 2, 8),
-  FORTIFIED_ANKLES("fortified_ankles", CyberwareCategory.LEGS, 2, 6);
+  FORTIFIED_ANKLES("fortified_ankles", CyberwareCategory.LEGS, 2, 6),
+  RAM_UPGRADE("ram_upgrade", CyberwareCategory.FRONTAL_CORTEX, 1, 8),
+  SELF_ICE("self_ice", CyberwareCategory.FRONTAL_CORTEX, 3, 5),
+  DOOMSAYER("kiroshi_doomsayer_optics", CyberwareCategory.FACE, 1, 6),
+  STALKER("kiroshi_stalker_optics", CyberwareCategory.FACE, 1, 6),
+  DENSE_MARROW("dense_marrow", CyberwareCategory.SKELETON, 2, 16),
+  PARA_BELLUM("para_bellum", CyberwareCategory.SKELETON, 3, 25),
+  STABBER("stabber", CyberwareCategory.NERVOUS_SYSTEM, 2, 12),
+  VISUAL_CORTEX_SUPPORT("visual_cortex_support", CyberwareCategory.NERVOUS_SYSTEM, 1, 16),
+  BIOMONITOR("biomonitor", CyberwareCategory.CIRCULATORY_SYSTEM, 1, 14),
+  SECOND_HEART("second_heart", CyberwareCategory.CIRCULATORY_SYSTEM, 4, 30),
+  SHOCK_N_AWE("shock_n_awe", CyberwareCategory.INTEGUMENTARY_SYSTEM, 1, 25),
+  PAIN_EDITOR("pain_editor", CyberwareCategory.INTEGUMENTARY_SYSTEM, 4, 35),
+  LYNX_PAWS("lynx_paws", CyberwareCategory.LEGS, 2, 5),
+  JENKINS_TENDONS("jenkins_tendons", CyberwareCategory.LEGS, 2, 6);
 
   public final String id;
   public final CyberwareCategory category;
@@ -37,6 +51,37 @@ public enum Augment {
 
   public boolean active() {
     return this == BIODYNE_BERSERK || this == BLOOD_PUMP || this == OPTICAL_CAMO;
+  }
+
+  public boolean optics() {
+    return category == CyberwareCategory.FACE;
+  }
+
+  public int scanRange(int tier) {
+    return this == DOOMSAYER || this == STALKER
+        ? 24 + 4 * tier
+        : CyberwareTier.of(tier).scanRange();
+  }
+
+  public double armor(int tier) {
+    if (tier == 0) return 0;
+    return switch (this) {
+      case BIONIC_JOINTS -> tier + 1;
+      case EPIMORPHIC_SKELETON -> tier * 2 - 2;
+      case SUBDERMAL_ARMOR, PAIN_EDITOR -> tier;
+      case SHOCK_N_AWE -> (tier + 1) / 2;
+      default -> 0;
+    };
+  }
+
+  public double toughness(int tier) {
+    return tier
+        * switch (this) {
+          case BIONIC_JOINTS, PARA_BELLUM -> .3;
+          case EPIMORPHIC_SKELETON, PAIN_EDITOR -> .4;
+          case SUBDERMAL_ARMOR, SHOCK_N_AWE -> .2;
+          default -> 0;
+        };
   }
 
   public static String number(double value) {
@@ -67,10 +112,11 @@ public enum Augment {
               "Enables optical scanning (" + CyberwareTier.of(t).scanRange() + " blocks).",
               "Scanning marks visible enemies within " + (t * 4) + " blocks.",
               "Marks remain highlighted for 60 seconds.");
-      case BIONIC_JOINTS -> List.of("+" + (t + 1) + " armor while installed.");
+      case BIONIC_JOINTS ->
+          List.of("+" + (t + 1) + " armor and +" + number(toughness(t)) + " armor toughness.");
       case EPIMORPHIC_SKELETON ->
           List.of(
-              "+" + (t * 2 - 2) + " armor while installed.",
+              "+" + (t * 2 - 2) + " armor and +" + number(toughness(t)) + " armor toughness.",
               "+" + ((t - 2) * 5) + "% maximum health.");
       case NEOFIBER ->
           List.of(
@@ -87,7 +133,8 @@ public enum Augment {
               "Then heal " + number(t * .5) + "% HP/s for 6 seconds.",
               "2 charges; recharge: " + (50 - t * 5) + " seconds.");
       case HEAL_ON_KILL -> List.of("Kills restore " + (t + 1) + "% maximum HP.");
-      case SUBDERMAL_ARMOR -> List.of("+" + t + " armor while installed.");
+      case SUBDERMAL_ARMOR ->
+          List.of("+" + t + " armor and +" + number(toughness(t)) + " armor toughness.");
       case OPTICAL_CAMO ->
           List.of(
               "C: cloak for " + (3 + t) + " seconds.",
@@ -103,6 +150,76 @@ public enum Augment {
               "Hold jump on ground, then release to launch.",
               "Full charge: 1 second. Maximum impulse: " + number(.6 + t * .08) + ".",
               "Normal jumps work with a quick tap.");
+      case RAM_UPGRADE ->
+          List.of(
+              "+" + (1 + t / 3) + " maximum RAM with a cyberdeck.",
+              "+" + String.format(Locale.ROOT, "%.2f", .06 * t) + " RAM recovered per second.");
+      case SELF_ICE ->
+          List.of(
+              "Automatically blocks one incoming quickhack, including controls.",
+              "+2 maximum RAM with a cyberdeck.",
+              "Recharge: " + (50 - 6 * t) + " seconds. Reinstallation does not reset it.");
+      case DOOMSAYER ->
+          List.of(
+              "Enables optical scanning (" + scanRange(t) + " blocks).",
+              "Scanning marks creepers, primed TNT and fireballs within "
+                  + (8 + t * 4)
+                  + " blocks.",
+              "Danger marks persist for 60 seconds; maximum 64 marks.");
+      case STALKER ->
+          List.of(
+              "Enables optical scanning (" + scanRange(t) + " blocks).",
+              "Scanning reveals enemies through cover in a forward cone, up to "
+                  + (12 + t * 4)
+                  + " blocks.",
+              "Marks fade 3 seconds after losing focus. Hacking still needs line of sight.");
+      case DENSE_MARROW ->
+          List.of(
+              "+" + (t * 6) + "% melee damage, including Mantis Blades.",
+              "Melee hits add "
+                  + String.format(Locale.ROOT, "%.3f", t * .004)
+                  + " hunger exhaustion.");
+      case PARA_BELLUM ->
+          List.of(
+              "+" + (t * 4) + "% total armor.", "+" + number(toughness(t)) + " armor toughness.");
+      case STABBER ->
+          List.of(
+              "+" + (t * 4) + "% critical chance with swords, Mantis Blades and thrown tridents.",
+              "Weapon criticals deal 1.5x damage before Berserk bonuses.");
+      case VISUAL_CORTEX_SUPPORT ->
+          List.of(
+              "Weapon critical chance increases with distance.",
+              "Up to +" + (t * 6) + "% at 32 blocks. Does not affect quickhacks.");
+      case BIOMONITOR ->
+          List.of(
+              "Below 50% HP, automatically uses a Blood Pump charge or a healing potion.",
+              "+" + (t * 4) + "% healing received. Checks health every half-second.",
+              "Consumes real charges/items; at most once every 2 seconds.");
+      case SECOND_HEART ->
+          List.of(
+              "A fatal hit restores 100% maximum HP.",
+              "Recharge: " + (400 - t * 40) + " seconds; survives logout/reinstallation.",
+              "Does not protect against the void or /kill.");
+      case SHOCK_N_AWE ->
+          List.of(
+              "+" + number(armor(t)) + " armor and +" + number(toughness(t)) + " armor toughness.",
+              (t * 2)
+                  + "% chance when hurt to discharge "
+                  + (2 + 2 * t)
+                  + " electrical damage within 4 blocks.",
+              "Maximum 8 enemies; 2-second internal cooldown; no chain reactions.");
+      case PAIN_EDITOR ->
+          List.of(
+              "+" + t + " armor and +" + number(toughness(t)) + " armor toughness.",
+              "Reduces incoming damage by " + (t * 2) + "%, including damaging quickhacks.");
+      case LYNX_PAWS ->
+          List.of(
+              "50% quieter footsteps; +" + (t * 4) + "% crouching speed.",
+              "Reduces fall damage by " + (t * 4) + "%. Does not silence sculk vibrations.");
+      case JENKINS_TENDONS ->
+          List.of(
+              "Sprinting starts at +" + (t * 12) + "% movement speed.",
+              "Tapers to +" + (t * 2) + "% over 5 seconds; recovers while not sprinting.");
     };
   }
 }

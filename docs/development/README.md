@@ -13,9 +13,11 @@ python3 scripts/verify-release.py
 
 Run `./gradlew runClient` for development. [Native/server review instructions](../VALIDATION.md) include disposable test-save setup. Research lives in [research](../research/CYBERWARE-CATALOGUE.md); model work in [art](../../art/mantis/README.md); older captures in the [preview archive](../PREVIEWS.md).
 
+[0.14.0 implant research and adaptation notes](../research/CYBERWARE-EXPANSION-0.14.0.md) · Original pixel sprites: `python3 art/expansion/build.py`.
+
 ## Edit the wiki
 
-The 40 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
+The 55 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
 
 ```sh
 python3 -m venv .venv-docs

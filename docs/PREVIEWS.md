@@ -2,6 +2,14 @@
 
 Older captures and implementation history are kept here for contributors. **[Current player wiki](wiki/index.md)** pages include the relevant screenshots and videos beside the item they describe.
 
+## Cyberware expansion (0.14.0)
+
+Fourteen new implant families, captured with Minecraft’s native item renderer. The review installs both loadouts using real bench transactions, opens Self-ICE’s detail page, and confirms a fatal hit restores the actual integrated-server player’s HP and synchronizes Second Heart’s cooldown.
+
+![Fourteen new implants](images/cyberware-0.14-catalogue.png)
+
+[Installation](images/cyberware-0.14-bench.png) · [Self-ICE](images/cyberware-0.14-self-ice.png) · [Medical loadout](images/cyberware-0.14-medical.png) · [Revival](images/cyberware-0.14-second-heart.png) · [Player guide](wiki/cyberware.md)
+
 ## Enhanced mobs and salvage (0.13.0)
 
 Actual native entity models with the new animated plating/circuit layers, all five part item models, and real ripperdoc stock with separate normal and salvage purchases.

@@ -8,14 +8,14 @@
 | --- | --- | --- |
 | Skeleton | 1–5 | 4 |
 
-Adds armor while installed. Armor uses Minecraft's normal damage calculations.
+Adds armor and toughness while installed. Armor uses Minecraft's normal damage calculations.
 
-| Tier | Added armor |
-| --- | ---: |
-| 1 | 2 |
-| 2 | 3 |
-| 3 | 4 |
-| 4 | 5 |
-| 5 | 6 |
+| Tier | Added armor | Added toughness |
+| --- | ---: | ---: |
+| 1 | 2 | 0.3 |
+| 2 | 3 | 0.6 |
+| 3 | 4 | 0.9 |
+| 4 | 5 | 1.2 |
+| 5 | 6 | 1.5 |
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

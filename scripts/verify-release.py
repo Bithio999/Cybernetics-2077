@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.13.1.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.14.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.13.1'
+    assert metadata['mods'][0]['version']=='0.14.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -61,6 +61,8 @@ with ZipFile(jar) as z:
                      'dev/cybernetics2077/cyberware/MantisBladesItem.class',
                      'dev/cybernetics2077/cyberware/CyberwareTier.class',
                      'dev/cybernetics2077/cyberware/Augment.class',
+                     'dev/cybernetics2077/cyberware/AugmentExpansion.class',
+                     'data/cybernetics2077/damage_type/cybernetic_discharge.json',
                      'dev/cybernetics2077/cyberware/AugmentItem.class',
                      'dev/cybernetics2077/cyberware/AugmentState.class',
                      'dev/cybernetics2077/cyberware/AugmentRuntime.class',
@@ -124,7 +126,22 @@ with ZipFile(jar) as z:
         'ex_disk': 3, 'memory_boost': 2, 'biodyne_berserk': 2, 'kiroshi_clairvoyant_optics': 3,
         'bionic_joints': 1, 'epimorphic_skeleton': 4, 'neofiber': 3, 'adrenaline_converter': 1,
         'blood_pump': 2, 'heal_on_kill': 1, 'subdermal_armor': 1, 'optical_camo': 2,
-        'reinforced_tendons': 2, 'fortified_ankles': 2}
+        'reinforced_tendons': 2, 'fortified_ankles': 2,
+        'ram_upgrade': 1,
+        'self_ice': 3,
+        'kiroshi_doomsayer_optics': 1,
+        'kiroshi_stalker_optics': 1,
+        'dense_marrow': 2,
+        'para_bellum': 3,
+        'stabber': 2,
+        'visual_cortex_support': 1,
+        'biomonitor': 1,
+        'second_heart': 4,
+        'shock_n_awe': 1,
+        'pain_editor': 4,
+        'lynx_paws': 2,
+        'jenkins_tendons': 2,
+    }
     assert 'data/cybernetics2077/recipe/mantis_claws_tier_1.json' not in names
     assert not any('microgenerator' in n or 'CrossbowReloadMixin' in n for n in names), 'Withdrawn hands content shipped'
     for implant, first in augment_starts.items():

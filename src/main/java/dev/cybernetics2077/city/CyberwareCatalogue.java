@@ -25,12 +25,17 @@ public final class CyberwareCatalogue {
               Cybernetics2077.CYBERDECK_TIERS,
               Cybernetics2077.MANTIS_TIERS,
               Cybernetics2077.SHORT_CIRCUIT_TIERS)) for (var entry : family) add(list, entry.get());
-      for (var family : Cybernetics2077.AUGMENTS.values())
-        for (var entry : family) add(list, entry.get());
+      for (var kind : Augment.values())
+        if (kind.ordinal() <= Augment.FORTIFIED_ANKLES.ordinal())
+          for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
       for (var entry : Cybernetics2077.RAVEN_TIERS) add(list, entry.get());
       for (var kind : dev.cybernetics2077.deck.QuickhackKind.values())
         if (kind != dev.cybernetics2077.deck.QuickhackKind.SHORT_CIRCUIT)
           for (var entry : Cybernetics2077.QUICKHACKS.get(kind)) add(list, entry.get());
+      // Append new families: saved daily stock IDs keep referring to the same original offers.
+      for (var kind : Augment.values())
+        if (kind.ordinal() > Augment.FORTIFIED_ANKLES.ordinal())
+          for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
       offers = List.copyOf(list);
     }
     return offers;

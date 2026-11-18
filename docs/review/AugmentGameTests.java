@@ -37,6 +37,12 @@ public final class AugmentGameTests {
           }
 
           @Override
+          public void die(net.minecraft.world.damagesource.DamageSource source) {
+            // FakePlayer normally suppresses death hooks; restore the native cancellation hook.
+            net.neoforged.neoforge.common.CommonHooks.onLivingDeath(this, source);
+          }
+
+          @Override
           public boolean canHarmPlayer(net.minecraft.world.entity.player.Player target) {
             return true;
           }
@@ -81,7 +87,7 @@ public final class AugmentGameTests {
                 == Items.AIR,
             "Unavailable lower tier registered");
     }
-    h.assertTrue(Augment.values().length == 14 && count == 55, "Wrong expansion size");
+    h.assertTrue(Augment.values().length == 28 && count == 111, "Wrong expansion size");
     h.assertTrue(
         Cybernetics2077.LEGACY_MANTIS.get().tier() == CyberwareTier.TWO
             && Cybernetics2077.MANTIS_TIERS.size() == 4,
@@ -242,7 +248,7 @@ public final class AugmentGameTests {
     p.setHealth(10);
     h.assertTrue(
         AugmentRuntime.action(p, 6) && Math.abs(p.getHealth() - 45) < .01,
-        "Pump burst heal missing");
+        "Pump burst hp=" + p.getHealth() + ", bio=" + AugmentRuntime.tier(p, BIOMONITOR));
     p.setHealth(10);
     h.assertTrue(
         AugmentRuntime.action(p, 6) && !AugmentRuntime.action(p, 6), "Pump charge limit failed");

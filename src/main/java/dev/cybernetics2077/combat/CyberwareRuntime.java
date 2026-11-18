@@ -358,7 +358,13 @@ public final class CyberwareRuntime {
     }
     reconcileUploads(p);
     if (deck(p).getItem() instanceof CyberdeckItem item)
-      s.ram = Math.min(AugmentRuntime.maxRam(p), s.ram + item.ramPerSecond() / 20);
+      s.ram =
+          Math.min(
+              AugmentRuntime.maxRam(p),
+              s.ram
+                  + (item.ramPerSecond()
+                          + dev.cybernetics2077.cyberware.AugmentExpansion.ramRecovery(p))
+                      / 20);
     if (!s.uploads.isEmpty() && s.uploads.getFirst().finish <= now) {
       var upload = s.uploads.removeFirst();
       var target = p.serverLevel().getEntity(upload.target);
@@ -478,7 +484,8 @@ public final class CyberwareRuntime {
     if (tier != null
         && target.hurt(
             p.damageSources().playerAttack(p),
-            AugmentRuntime.bladeDamage(p, CombatRules.damage(combo) * tier.bladeMultiplier()))) {
+            AugmentRuntime.bladeDamage(
+                p, target, CombatRules.damage(combo) * tier.bladeMultiplier()))) {
       target.knockback(combo == 3 ? .55 : .2, p.getX() - target.getX(), p.getZ() - target.getZ());
       p.serverLevel()
           .sendParticles(

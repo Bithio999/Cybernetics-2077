@@ -2,7 +2,7 @@
 
 [Wiki home](index.md) · [Cyberware](cyberware.md) · [Quickhacks](quickhacks.md) · [Village services](ripperdocs.md)
 
-Install **[Basic Kiroshi Optics](kiroshi-optics.md)** or **[Clairvoyant Optics](clairvoyant-optics.md)**, then hold **V**. Release V to close the scanner.
+Install **[Basic Kiroshi Optics](kiroshi-optics.md)**, **[Clairvoyant](clairvoyant-optics.md)**, **[Doomsayer](doomsayer-optics.md)** or **[Stalker Optics](stalker-optics.md)**, then hold **V**. Release V to close the scanner.
 
 Aim at a living target with clear line of sight to see its health, armor, attack damage, absorption and visible effects. The scan range depends on the installed optics.
 

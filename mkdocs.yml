@@ -49,6 +49,8 @@ nav:
       - Frontal Cortex:
           - Ex-Disk: ex-disk.md
           - Memory Boost: memory-boost.md
+          - RAM Upgrade: ram-upgrade.md
+          - Self-ICE: self-ice.md
       - Operating System:
           - Compare cyberdecks: cyberdecks.md
           - Militech Paraline: militech-paraline.md
@@ -59,21 +61,33 @@ nav:
       - Face:
           - Basic Kiroshi Optics: kiroshi-optics.md
           - Clairvoyant Optics: clairvoyant-optics.md
+          - Kiroshi “Doomsayer” Optics: doomsayer-optics.md
+          - Kiroshi “Stalker” Optics: stalker-optics.md
       - Skeleton:
           - Bionic Joints: bionic-joints.md
           - Epimorphic Skeleton: epimorphic-skeleton.md
+          - Dense Marrow: dense-marrow.md
+          - Para Bellum: para-bellum.md
       - Nervous System:
           - NeoFiber: neofiber.md
           - Adrenaline Converter: adrenaline-converter.md
+          - Stabber: stabber.md
+          - Visual Cortex Support: visual-cortex-support.md
       - Circulatory System:
           - Blood Pump: blood-pump.md
           - Heal-On-Kill: heal-on-kill.md
+          - Biomonitor: biomonitor.md
+          - Second Heart: second-heart.md
       - Integumentary System:
           - Subdermal Armor: subdermal-armor.md
           - Optical Camo: optical-camo.md
+          - Shock-n-Awe: shock-n-awe.md
+          - Pain Editor: pain-editor.md
       - Legs:
           - Reinforced Tendons: reinforced-tendons.md
           - Fortified Ankles: fortified-ankles.md
+          - Lynx Paws: lynx-paws.md
+          - Jenkins’ Tendons: jenkins-tendons.md
   - Quickhacks:
       - All quickhacks: quickhacks.md
       - Scanning and queues: scanning.md

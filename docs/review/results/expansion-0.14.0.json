@@ -1,0 +1,43 @@
+{
+  "version": "0.14.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "newFamilies": 14,
+  "newTierVariants": 56,
+  "jvmTests": 61,
+  "serverGameTests": 93,
+  "status": "passed",
+  "nativeStatus": "PASS: all 56 new item models/translations resolve in native renderer; fourteen-family catalogue; real bench shift-click installation; client Self-ICE snapshot; native implant detail menu and medical loadout; real integrated-player fatal hit cancelled by Second Heart, full HP and cooldown HUD synchronized.",
+  "releaseVerifier": "passed",
+  "wikiPages": 55,
+  "jarSha256": "bfc7fd1a84e228871f77b91f6aafe4fd1bc5acb59a206682b00afd42092c6bf8",
+  "checks": [
+    "Two new families in each requested category; no Hands, Arms or OS additions",
+    "All 111 augment variants install and reject duplicates; all 56 new models and names render",
+    "Canonical old catalogue offer indices retained; all new variants use daily stock and tier Street Cred gates",
+    "Real RAM capacity/recovery; no free hacking without a deck",
+    "Armor/toughness, percentage armor and reversible attributes",
+    "Self-ICE damage/control blocking, saved recharge and reinstall protection; PvP-off targeting prevention",
+    "Pain Editor against armor-bypassing quickhacks",
+    "Biomonitor real charge/potion consumption, harmful-potion exclusion and debounce",
+    "Second Heart fatal-hit cancellation, recharge persistence and void exclusion; real integrated-player native revival",
+    "Dense Marrow once-only melee scaling; weapon critical chance and Mantis critical outputs; quickhacks excluded",
+    "Stalker through-cover cone and Doomsayer hazard-only scan; optic-switch cleanup",
+    "Lynx audio/crouching/fall damage and Jenkins sprint taper",
+    "Shock damage and internal cooldown; no recursive discharges",
+    "Blood Pump healing starts after one second, with saved pulse timing",
+    "Clean package excludes review classes and cyberware recipes"
+  ],
+  "captures": [
+    "cyberware-0.14-catalogue.png",
+    "cyberware-0.14-bench.png",
+    "cyberware-0.14-self-ice.png",
+    "cyberware-0.14-medical.png",
+    "cyberware-0.14-cooldown-hud.png",
+    "cyberware-0.14-second-heart.png"
+  ],
+  "limits": [
+    "Native check uses an integrated server; not a two-client internet latency test.",
+    "Minecraft adaptations differ from exact Cyberpunk numerical effects; documented with source links."
+  ]
+}

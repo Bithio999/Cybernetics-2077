@@ -174,14 +174,18 @@ public final class EnhancedMobs {
         "power",
         power * .08,
         AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-    int joints = tier(mob, Augment.BIONIC_JOINTS);
+    double armor = 0, toughness = 0;
+    for (var kind : Augment.values()) {
+      int t = tier(mob, kind);
+      armor += kind.armor(t);
+      toughness += kind.toughness(t);
+    }
+    modifier(mob, Attributes.ARMOR, "plating", armor, AttributeModifier.Operation.ADD_VALUE);
     modifier(
         mob,
-        Attributes.ARMOR,
-        "plating",
-        tier(mob, Augment.SUBDERMAL_ARMOR)
-            + (joints == 0 ? 0 : joints + 1)
-            + (skeleton == 0 ? 0 : skeleton * 2 - 2),
+        Attributes.ARMOR_TOUGHNESS,
+        "toughness",
+        toughness,
         AttributeModifier.Operation.ADD_VALUE);
     if (fill) mob.setHealth(mob.getMaxHealth());
     mob.setCustomName(

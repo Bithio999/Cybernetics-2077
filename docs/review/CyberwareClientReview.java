@@ -325,6 +325,7 @@ public final class CyberwareClientReview {
           Files.deleteIfExists(OUT.resolve("stock-passed.txt"));
           Files.deleteIfExists(OUT.resolve("hacks-passed.txt"));
           Files.deleteIfExists(OUT.resolve("enhanced-passed.txt"));
+          Files.deleteIfExists(OUT.resolve("expansion-passed.txt"));
           mc.options.pauseOnLostFocus = false;
           mc.options.guiScale().set(2);
           mc.options.enableVsync().set(false);
@@ -334,6 +335,12 @@ public final class CyberwareClientReview {
           server(
               p -> {
                 p.setGameMode(GameType.SURVIVAL);
+                if (Boolean.getBoolean("cybernetics2077.expansionReview")) {
+                  p.setHealth(p.getMaxHealth());
+                  p.deathTime = 0;
+                  p.setPose(net.minecraft.world.entity.Pose.STANDING);
+                  p.setData(Cybernetics2077.AUGMENT_STATE, new AugmentState());
+                }
                 p.getInventory().clearContent();
                 p.setItemSlot(
                     net.minecraft.world.entity.EquipmentSlot.CHEST,
@@ -360,6 +367,10 @@ public final class CyberwareClientReview {
         return;
       }
       ticks++;
+      if (Boolean.getBoolean("cybernetics2077.expansionReview")) {
+        ExpansionClientReview.tick(contentTicks++);
+        return;
+      }
       if (Boolean.getBoolean("cybernetics2077.enhancedReview")) {
         EnhancedClientReview.tick(contentTicks++);
         return;

@@ -34,6 +34,10 @@ Visit a clinic in the same dimension, then return. A lost active contract can be
 
 Both hands must be empty when pressing **G**. Once deployed, changing your selected item keeps them active, but held items remain inactive until you retract.
 
+## Can player quickhacks be stopped?
+
+Yes. PvP/team rules can prevent targeting. [Self-ICE](self-ice.md) blocks one incoming hack before recharging; [Pain Editor](pain-editor.md) reduces hack damage. Most damaging hacks bypass armor and toughness. See [quickhack defenses](quickhacks.md#defending-against-player-quickhacks) for details.
+
 ## Where is the download?
 
 Start at [Getting started](getting-started.md). Use the same mod version on server and clients.

@@ -113,6 +113,7 @@ public final class QuickhackEffects {
   private static boolean apply(
       ServerPlayer p, LivingEntity t, QuickhackItem q, float damage, float durationScale) {
     if (!CyberwareRuntime.canAttack(p, t)) return false;
+    if (dev.cybernetics2077.cyberware.AugmentExpansion.blockHack(p, t)) return false;
     long now = t.level().getGameTime();
     switch (q.kind()) {
       case SHORT_CIRCUIT, SYNAPSE_BURNOUT -> {

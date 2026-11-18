@@ -6,9 +6,9 @@ A standalone **Minecraft 1.21.1 / NeoForge** mod inspired by Cyberpunk 2077. Ins
 
 **[Open the wiki →](docs/wiki/index.md)**
 
-Individual item pages, tier stats, controls, recipes and village guides.
+Individual item pages, tier stats, controls, acquisition and village guides.
 
-**[Download version 0.13.1](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.13.1.jar)**
+**[Download version 0.14.0](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.14.0.jar)**
 
 Requires Minecraft **1.21.1**, NeoForge **21.1.248+ for 1.21.1**, and Java **21**. Install the same version on server and clients. Replace an older JAR instead of keeping both.
 

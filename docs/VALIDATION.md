@@ -2,6 +2,21 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Fourteen-family expansion (0.14.0)
+
+**61 JVM tests, 93 dedicated-server GameTests, the native client review, clean build, package audit and 55-page wiki validation pass.** [Results](review/results/expansion-0.14.0.json) · [Sources and adaptation notes](research/CYBERWARE-EXPANSION-0.14.0.md).
+
+The eleven new server scenarios cover category counts and saved shop indices, all tiered offers, real RAM recovery, armor/toughness and removal, Self-ICE damage/control interception and saved cooldown, PvP rules, Pain Editor against quickhacks, medical supply consumption, Second Heart fatal damage/recharge/void exclusion, once-only melee bonuses and weapon crits, different leg movement effects, cover-aware specialized optics, and bounded Shock-n-Awe retaliation. The original variant-installation test now covers all 111 augment variants. Blood Pump now schedules its first regeneration pulse one second after casting, preventing an extra immediate pulse on globally aligned ticks.
+
+The native review resolves all 56 new item models/translations, shift-clicks actual bench installations, opens the real Self-ICE detail page and verifies the synchronized medical loadout. A fatal hit on the actual integrated-server player is cancelled by Second Heart, restores full HP, and updates the visible recharge indicator. Native captures are in the [preview archive](PREVIEWS.md#cyberware-expansion-0140). This is not a two-client network-latency test.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PexpansionReview
+```
+
+Use the disposable **Cybernetics Review** save. Native success writes `capture/expansion-passed.txt`; failure writes `capture/failed.txt`. Clean before packaging to exclude review classes.
+
 ## Cyberware recipe removal (0.13.1)
 
 Removed all 18 implant, cyberdeck and quickhack crafting/smithing recipes and their 18 recipe-book advancements. The Cybernetics Bench recipe and its redstone unlock remain. Cyberware is obtained from ripperdoc stock; installed items and inventories retain their existing IDs and data.

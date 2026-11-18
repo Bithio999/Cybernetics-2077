@@ -5,7 +5,7 @@
 ## Install the mod
 
 1. Install **Minecraft 1.21.1** with **NeoForge 21.1.248 or newer for 1.21.1** and **Java 21**.
-2. Download [Cybernetics2077-0.13.1.jar](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.13.1.jar) and place it in your instance's `mods` folder.
+2. Download [Cybernetics2077-0.14.0.jar](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.14.0.jar) and place it in your instance's `mods` folder.
 3. Replace older Cybernetics 2077 JARs. For multiplayer, install the same version on **both server and clients**.
 
 This is a standalone mod. Existing saves remain compatible.

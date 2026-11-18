@@ -17,10 +17,14 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
       pumpEnd,
       adrenalineEnd,
       adrenalineReady;
+  public long pumpPulse;
+  public long iceReady, heartReady, biomonitorReady, shockReady, jenkinsClock;
+  public int jenkinsFatigue;
   public int pumpCharges = 2, berserkKills;
   public int pumpPeriod = 800;
   public long lastCombat = -10000;
   public long scanUntil, ankleStart = -1;
+  public Augment scanProfile;
   public boolean airJumped;
   public boolean wasCamo, wasBerserk;
   public final Map<Integer, Long> highlights = new HashMap<>();
@@ -33,6 +37,7 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
     t.putLong("camoEnd", camoEnd);
     t.putLong("camoReady", camoReady);
     t.putLong("pumpNext", pumpNext);
+    t.putLong("pumpPulse", pumpPulse);
     t.putLong("pumpEnd", pumpEnd);
     t.putInt("pumpCharges", pumpCharges);
     t.putInt("pumpPeriod", pumpPeriod);
@@ -40,16 +45,29 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
     t.putInt("berserkKills", berserkKills);
     t.putLong("adrenalineEnd", adrenalineEnd);
     t.putLong("adrenalineReady", adrenalineReady);
+    t.putLong("iceReady", iceReady);
+    t.putLong("heartReady", heartReady);
+    t.putLong("biomonitorReady", biomonitorReady);
+    t.putLong("shockReady", shockReady);
+    t.putLong("jenkinsClock", jenkinsClock);
+    t.putInt("jenkinsFatigue", jenkinsFatigue);
     return t;
   }
 
   @Override
   public void deserializeNBT(HolderLookup.Provider registries, CompoundTag t) {
+    iceReady = t.getLong("iceReady");
+    heartReady = t.getLong("heartReady");
+    biomonitorReady = t.getLong("biomonitorReady");
+    shockReady = t.getLong("shockReady");
+    jenkinsClock = t.getLong("jenkinsClock");
+    jenkinsFatigue = Math.clamp(t.getInt("jenkinsFatigue"), 0, 100);
     berserkEnd = t.getLong("berserkEnd");
     berserkReady = t.getLong("berserkReady");
     camoEnd = t.getLong("camoEnd");
     camoReady = t.getLong("camoReady");
     pumpNext = t.getLong("pumpNext");
+    pumpPulse = t.getLong("pumpPulse");
     pumpEnd = t.getLong("pumpEnd");
     pumpCharges = t.contains("pumpCharges") ? Math.clamp(t.getInt("pumpCharges"), 0, 2) : 2;
     pumpPeriod = t.contains("pumpPeriod") ? Math.clamp(t.getInt("pumpPeriod"), 500, 800) : 800;

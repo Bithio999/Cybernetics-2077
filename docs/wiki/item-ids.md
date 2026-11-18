@@ -41,6 +41,21 @@ Replace `<tier>` only with a tier listed in the table.
 | Reinforced Tendons | `cybernetics2077:reinforced_tendons_tier_<tier>` | 2–5 |
 | Fortified Ankles | `cybernetics2077:fortified_ankles_tier_<tier>` | 2–5 |
 
+| RAM Upgrade | `cybernetics2077:ram_upgrade_tier_<tier>` | 1–5 |
+| Self-ICE | `cybernetics2077:self_ice_tier_<tier>` | 3–5 |
+| Kiroshi “Doomsayer” Optics | `cybernetics2077:kiroshi_doomsayer_optics_tier_<tier>` | 1–5 |
+| Kiroshi “Stalker” Optics | `cybernetics2077:kiroshi_stalker_optics_tier_<tier>` | 1–5 |
+| Dense Marrow | `cybernetics2077:dense_marrow_tier_<tier>` | 2–5 |
+| Para Bellum | `cybernetics2077:para_bellum_tier_<tier>` | 3–5 |
+| Stabber | `cybernetics2077:stabber_tier_<tier>` | 2–5 |
+| Visual Cortex Support | `cybernetics2077:visual_cortex_support_tier_<tier>` | 1–5 |
+| Biomonitor | `cybernetics2077:biomonitor_tier_<tier>` | 1–5 |
+| Second Heart | `cybernetics2077:second_heart_tier_<tier>` | 4–5 |
+| Shock-n-Awe | `cybernetics2077:shock_n_awe_tier_<tier>` | 1–5 |
+| Pain Editor | `cybernetics2077:pain_editor_tier_<tier>` | 4–5 |
+| Lynx Paws | `cybernetics2077:lynx_paws_tier_<tier>` | 2–5 |
+| Jenkins’ Tendons | `cybernetics2077:jenkins_tendons_tier_<tier>` | 2–5 |
+
 ## Quickhack IDs
 
 | Program | Item ID | Tiers |

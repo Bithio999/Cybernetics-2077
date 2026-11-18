@@ -97,8 +97,11 @@ public final class AugmentClient {
         || ScannerClient.hudMotion().lens() > 0) return;
     var s = CyberwareClient.own();
     long time = m.level.getGameTime();
-    if (s.getInt("pumpTier") == 0 && s.getInt("berserkTier") == 0 && s.getInt("camoTier") == 0)
-      return;
+    if (s.getInt("pumpTier") == 0
+        && s.getInt("berserkTier") == 0
+        && s.getInt("camoTier") == 0
+        && s.getInt("iceTier") == 0
+        && s.getInt("heartTier") == 0) return;
     var g = e.getGuiGraphics();
     CyberBatch.begin();
     try {
@@ -129,7 +132,7 @@ public final class AugmentClient {
             false);
         y -= 21;
       }
-      if (s.getInt("camoTier") > 0)
+      if (s.getInt("camoTier") > 0) {
         badge(
             c,
             5,
@@ -139,6 +142,14 @@ public final class AugmentClient {
                 ? "CLOAK " + seconds(s.getLong("camoEnd"), time)
                 : "CAMO " + ready(s.getLong("camoReady"), time),
             s.getBoolean("camo"));
+        y -= 21;
+      }
+      if (s.getInt("iceTier") > 0) {
+        badge(c, 5, y, "ICE", "SELF-ICE " + ready(s.getLong("iceReady"), time), false);
+        y -= 21;
+      }
+      if (s.getInt("heartTier") > 0)
+        badge(c, 5, y, "HP", "HEART " + ready(s.getLong("heartReady"), time), false);
     } finally {
       CyberBatch.flush(g);
     }
@@ -176,6 +187,8 @@ public final class AugmentClient {
     public static void setup(FMLClientSetupEvent e) {
       e.enqueueWork(
           () -> {
+            dev.cybernetics2077.cyberware.AugmentExpansion.clientLynx =
+                p -> CyberwareClient.state(p.getId()).getInt("lynxTier");
             AugmentRuntime.clientCamo =
                 p ->
                     CyberwareClient.state(p.getId()).getBoolean("camo")

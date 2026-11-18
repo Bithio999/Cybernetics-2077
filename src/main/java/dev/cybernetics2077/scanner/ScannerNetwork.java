@@ -58,14 +58,22 @@ public final class ScannerNetwork {
     return stack.getItem() instanceof dev.cybernetics2077.cyberware.OpticsItem item
         ? item.tier()
         : stack.getItem() instanceof dev.cybernetics2077.cyberware.AugmentItem item
-                && item.augment() == dev.cybernetics2077.cyberware.Augment.CLAIRVOYANT
+                && item.augment().optics()
             ? item.tier()
             : null;
   }
 
   public static int range(net.minecraft.world.entity.player.Player player) {
     var tier = tier(player);
-    return tier == null ? 0 : tier.scanRange();
+    if (tier == null) return 0;
+    var item =
+        player
+            .getData(Cybernetics2077.CYBERWARE)
+            .getStackInSlot(CyberwareCategory.FACE.firstSlot())
+            .getItem();
+    return item instanceof dev.cybernetics2077.cyberware.AugmentItem optic
+        ? optic.augment().scanRange(tier.level)
+        : tier.scanRange();
   }
 
   public static void register(RegisterPayloadHandlersEvent e) {

@@ -8,12 +8,12 @@
 | --- | --- | --- |
 | Skeleton | 4–5 | 32 |
 
-Increases armor and maximum health while installed.
+Increases armor, toughness and maximum health while installed.
 
-| Tier | Added armor | Maximum HP bonus |
-| --- | ---: | --- |
-| 4 | 6 | +10% |
-| 5 | 8 | +15% |
+| Tier | Added armor | Added toughness | Maximum HP bonus |
+| --- | ---: | ---: | ---: |
+| 4 | 6 | 1.6 | +10% |
+| 5 | 8 | 2.0 | +15% |
 
 Unequipping clamps current HP to the resulting maximum.
 

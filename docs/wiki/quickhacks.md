@@ -39,3 +39,11 @@ The scanner displays the selected program's actual cost, damage, duration and up
 Ex-Disk then reduces the time; no upload can be shorter than 6 ticks. Twenty ticks equal one second at normal game speed.
 
 Buy chips from [daily ripperdoc stock](ripperdocs.md#daily-stock) for **300 × tier² eddies**. All quickhack chips are purchased; none have crafting or smithing upgrade recipes.
+
+## Defending against player quickhacks
+
+- Server **PvP off** and team friendly-fire protection prevent hostile player targeting.
+- Walls, invisibility and distance can prevent the initial scanner lock. After upload starts, cover alone does not cancel it; moving beyond the attacker’s scan range **plus 16 blocks** prevents delivery.
+- **[Self-ICE](self-ice.md)** automatically blocks one incoming program, including control effects, then recharges for **20–32 seconds** depending on tier. It does not remove an already active hack.
+- **[Pain Editor](pain-editor.md)** reduces damaging hacks by **8–10%**. Applicable Resistance, enchantments, shields and invulnerability also use Minecraft’s normal damage handling.
+- Armor and toughness help against **Synapse Burnout**; **Short Circuit, Overheat and Contagion bypass both**. Control hacks are not damage and cannot be reduced by armor.

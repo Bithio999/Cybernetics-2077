@@ -5,7 +5,8 @@
   "mixins": [
     "MantisHandsMixin",
     "OpticalCamoMixin",
-    "VillagePoolAccess"
+    "VillagePoolAccess",
+    "LynxStepsMixin"
   ],
   "injectors": {
     "defaultRequire": 1
