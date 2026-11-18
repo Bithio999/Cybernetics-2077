@@ -1,0 +1,14 @@
+{
+  "version": "0.13.1",
+  "removedRecipes": 18,
+  "removedRecipeUnlocks": 18,
+  "remainingRecipes": [
+    "cybernetics2077:cybernetics_bench"
+  ],
+  "jvmTests": 61,
+  "serverGameTests": 82,
+  "status": "passed",
+  "releaseVerifier": "passed",
+  "jarSha256": "5f4b6ef2c37d5c1479df3e4d437ea6b164d5738f1f04bb452029837acaf573cb",
+  "scope": "Removed cyberware/chip crafting and smithing recipes and their unlocks. Retained the bench, all item IDs and ripperdoc acquisition. Removed the obsolete smithing-upgrade GameTest."
+}

@@ -2,9 +2,9 @@
 
 A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod inspired by Cyberpunk 2077.
 
-**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.13.0**
+**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.13.1**
 
-[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.13.0.jar)
+[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.13.1.jar)
 [Start playing](getting-started.md)
 
 ## Find what you need
@@ -45,6 +45,6 @@ A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod 
 
 ## Quick reference
 
-[Controls](controls.md) · [Recipes and upgrades](recipes.md) · [Item IDs](item-ids.md) · [Common questions](faq.md)
+[Controls](controls.md) · [Crafting and acquisition](recipes.md) · [Item IDs](item-ids.md) · [Common questions](faq.md)
 
 [Search these pages on GitHub](https://github.com/search?q=repo%3ABithio999%2FCybernetics-2077+path%3Adocs%2Fwiki&type=code), or browse the topics above. Every implant and quickhack has its own page.

@@ -90,6 +90,6 @@ nav:
       - Fixer contracts: contracts.md
       - Eddies and Street Cred: street-cred.md
       - Blocks and decorations: blocks.md
-  - Crafting:
-      - Recipes and upgrades: recipes.md
+  - Items:
+      - Crafting and acquisition: recipes.md
       - Item IDs and commands: item-ids.md

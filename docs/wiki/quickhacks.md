@@ -38,4 +38,4 @@ The scanner displays the selected program's actual cost, damage, duration and up
 
 Ex-Disk then reduces the time; no upload can be shorter than 6 ticks. Twenty ticks equal one second at normal game speed.
 
-Buy chips from [daily ripperdoc stock](ripperdocs.md#daily-stock) for **300 × tier² eddies**. New programs have no crafting recipes; Short Circuit retains its [original recipes](recipes.md).
+Buy chips from [daily ripperdoc stock](ripperdocs.md#daily-stock) for **300 × tier² eddies**. All quickhack chips are purchased; none have crafting or smithing upgrade recipes.

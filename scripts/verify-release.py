@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.13.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.13.1.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.13.0'
+    assert metadata['mods'][0]['version']=='0.13.1'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -80,6 +80,14 @@ with ZipFile(jar) as z:
     for icon in ('optical_scanner','cyberdeck_tier_1','mantis_claws_tier_1','short_circuit_tier_1'):
         png=z.read('assets/cybernetics2077/textures/item/'+icon+'.png')
         assert struct.unpack('>II',png[16:24]) == (32,32), 'Equipment sprite is not 32px pixel art: '+icon
+    recipes = {n for n in names if n.startswith('data/cybernetics2077/recipe/') and n.endswith('.json')}
+    unlocks = {n for n in names if n.startswith('data/cybernetics2077/advancement/recipes/') and n.endswith('.json')}
+    assert recipes == {'data/cybernetics2077/recipe/cybernetics_bench.json'}, 'Cyberware crafting/upgrade recipes shipped'
+    assert unlocks == {'data/cybernetics2077/advancement/recipes/cybernetics_bench.json'}, 'Removed recipe unlocks shipped'
+    bench = json.loads(z.read(next(iter(recipes))))
+    assert bench['type'] == 'minecraft:crafting_shaped' and bench['result']['id'] == 'cybernetics2077:cybernetics_bench'
+    advancement = json.loads(z.read(next(iter(unlocks))))
+    assert advancement['rewards']['recipes'] == ['cybernetics2077:cybernetics_bench']
     lang = json.loads(z.read('assets/cybernetics2077/lang/en_us.json'))
     for tier in range(1,6):
         part=f'damaged_cybernetic_part_tier_{tier}'
@@ -96,17 +104,9 @@ with ZipFile(jar) as z:
         assert lang['item.cybernetics2077.' + original] == title
         for tier in range(2, 6):
             item = f'{prefix}_tier_{tier}'
-            previous = original if tier == 2 else f'{prefix}_tier_{tier - 1}'
             assert lang['item.cybernetics2077.' + item] == title
             model = json.loads(z.read(f'assets/cybernetics2077/models/item/{item}.json'))
             assert model['parent'] == 'cybernetics2077:item/' + original
-            if prefix == 'mantis_blades' and tier == 2:
-                assert f'data/cybernetics2077/recipe/{item}.json' not in names
-                continue
-            recipe = json.loads(z.read(f'data/cybernetics2077/recipe/{item}.json'))
-            assert recipe['type'] == 'minecraft:smithing_transform'
-            assert recipe['base']['item'] == 'cybernetics2077:' + previous
-            assert recipe['result']['id'] == 'cybernetics2077:' + item
     for tier in range(3,6):
         item=f'raven_microcyber_tier_{tier}'
         assert lang['item.cybernetics2077.'+item]=='Raven Microcyber'

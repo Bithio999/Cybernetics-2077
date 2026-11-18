@@ -34,4 +34,4 @@ Player documentation now lives in the **[Cybernetics 2077 Wiki](wiki/index.md)**
 
 ## Tier upgrades
 
-[Open the tier upgrades guide](wiki/recipes.md).
+[Obtaining higher tiers from ripperdocs](wiki/recipes.md).

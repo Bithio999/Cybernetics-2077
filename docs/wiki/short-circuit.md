@@ -16,7 +16,7 @@ A fast electrical burst. Damage bypasses armor.
 | 4 | 5 | 18 |
 | 5 | 6 | 22 |
 
-A tier-5 chip in tier-5 Paraline deals **26.4 electrical damage** for **6 RAM**, with a **0.6-second** upload before Ex-Disk. Raven relays deal half damage. Short Circuit has [crafting and upgrade recipes](recipes.md).
+A tier-5 chip in tier-5 Paraline deals **26.4 electrical damage** for **6 RAM**, with a **0.6-second** upload before Ex-Disk. Raven relays deal half damage. Buy chips of the desired tier from [ripperdocs](ripperdocs.md); they have no crafting or upgrade recipes.
 
 ![Short Circuit uploading above the target](../images/short-circuit-upload.png)
 

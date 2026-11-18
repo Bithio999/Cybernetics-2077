@@ -19,7 +19,7 @@ Hold **V** to scan a living target with clear line of sight. Shows health, armor
 | 4 | 7 | 56 blocks |
 | 5 | 8 | 64 blocks |
 
-Tier 1 costs **€$1,000** and is **always stocked at Street Cred 0–10 inclusive**. The first delivery contract pays enough to buy it. The original optics have [crafting and smithing recipes](recipes.md).
+Tier 1 costs **€$1,000** and is **always stocked at Street Cred 0–10 inclusive**. The first delivery contract pays enough to buy it. Buy higher tiers from [ripperdocs](ripperdocs.md); optics have no crafting or smithing recipes.
 
 ![Optics in the cyberware viewer](../images/optics-detail.png)
 

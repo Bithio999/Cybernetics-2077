@@ -2,6 +2,14 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Cyberware recipe removal (0.13.1)
+
+Removed all 18 implant, cyberdeck and quickhack crafting/smithing recipes and their 18 recipe-book advancements. The Cybernetics Bench recipe and its redstone unlock remain. Cyberware is obtained from ripperdoc stock; installed items and inventories retain their existing IDs and data.
+
+**61 JVM tests and all 82 remaining dedicated-server GameTests pass.** The clean release build and package audit pass.
+
+The obsolete smithing-upgrade GameTest was removed. The release verifier now requires the packaged recipe and recipe-unlock directories to contain only the bench, checks its result/unlock, and continues verifying every tier's item model and metadata. [Results](review/results/recipes-0.13.1.json).
+
 ## Enhanced mobs and salvage (0.13.0)
 
 Release 0.13.0 passes **61 JVM tests**, **83 dedicated-server GameTests**, and the native enhanced-mob/shop review.

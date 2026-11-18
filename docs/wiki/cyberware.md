@@ -22,4 +22,4 @@ Tiers run from **1–5**: white, green, blue, purple and orange. Each family sta
 
 Buy implants from [daily ripperdoc stock](ripperdocs.md#daily-stock). Tiers 1–5 enter the pool at Street Cred **0 / 10 / 20 / 30 / 40**. Owning equipment allows you to install it regardless of its purchase requirement.
 
-[Compare cyberdecks](cyberdecks.md) · [Quickhack programs](quickhacks.md) · [Upgrade recipes](recipes.md)
+[Compare cyberdecks](cyberdecks.md) · [Quickhack programs](quickhacks.md) · [Obtaining higher tiers](recipes.md)

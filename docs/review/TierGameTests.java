@@ -12,7 +12,6 @@ import net.minecraft.gametest.framework.*;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemContainerContents;
-import net.minecraft.world.item.crafting.*;
 import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder(Cybernetics2077.ID)
@@ -92,49 +91,6 @@ public final class TierGameTests {
     h.assertTrue(
         CyberdeckItem.quickhack(loaded(1, 5)) == null,
         "Imported over-tier chip bypassed runtime guard");
-    h.succeed();
-  }
-
-  @GameTest(template = "empty", timeoutTicks = 60)
-  public static void smithingUpgradesPreserveProgramsAndCustomComponents(GameTestHelper h) {
-    var p = ImplantGameTests.player(h);
-    var materials =
-        new Item[] {Items.GOLD_BLOCK, Items.DIAMOND, Items.NETHERITE_INGOT, Items.NETHER_STAR};
-    for (var family :
-        java.util.List.of(
-            Cybernetics2077.OPTICS_TIERS,
-            Cybernetics2077.CYBERDECK_TIERS,
-            Cybernetics2077.MANTIS_TIERS,
-            Cybernetics2077.SHORT_CIRCUIT_TIERS)) {
-      ItemStack base =
-          family.get(0).get() instanceof CyberdeckItem
-              ? loaded(1, 1)
-              : new ItemStack(family.get(0).get());
-      base.set(
-          DataComponents.CUSTOM_NAME,
-          net.minecraft.network.chat.Component.literal("Preserved serial"));
-      int firstTier = base.getItem() instanceof MantisBladesItem ? 2 : 1;
-      for (int tier = firstTier + 1; tier <= 5; tier++) {
-        var input =
-            new SmithingRecipeInput(
-                new ItemStack(Items.REDSTONE), base, new ItemStack(materials[tier - 2]));
-        var recipe =
-            p.serverLevel().getRecipeManager().getRecipeFor(RecipeType.SMITHING, input, p.level());
-        h.assertTrue(recipe.isPresent(), "Missing upgrade recipe at tier " + tier);
-        var result = recipe.orElseThrow().value().assemble(input, p.registryAccess());
-        h.assertTrue(
-            result.getItem() == family.get(tier - firstTier).get() && result.getCount() == 1,
-            "Wrong upgrade output");
-        h.assertTrue(
-            base.get(DataComponents.CUSTOM_NAME).equals(result.get(DataComponents.CUSTOM_NAME)),
-            "Upgrade lost custom name");
-        if (result.getItem() instanceof CyberdeckItem)
-          h.assertTrue(
-              CyberdeckItem.has(result, Cybernetics2077.SHORT_CIRCUIT.get()),
-              "Upgrade erased loaded chip");
-        base = result;
-      }
-    }
     h.succeed();
   }
 

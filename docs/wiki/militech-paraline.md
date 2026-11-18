@@ -21,7 +21,7 @@ A general-purpose cyberdeck with a larger RAM pool and increasing direct quickha
 
 The damage bonus applies to direct quickhack hits and damage-over-time totals. [Ex-Disk](ex-disk.md) and [Memory Boost](memory-boost.md) add benefits to the equipped deck.
 
-[Load programs](cyberdecks.md#load-programs) · [Craft and upgrade Paraline](recipes.md)
+[Load programs](cyberdecks.md#load-programs) · [Buy Paraline](ripperdocs.md)
 
 ![Tier 5 Paraline program slots](../images/tier-five-cyberdeck.png)
 
