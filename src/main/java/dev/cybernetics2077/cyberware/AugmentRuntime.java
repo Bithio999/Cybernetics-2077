@@ -58,16 +58,23 @@ public final class AugmentRuntime {
   }
 
   public static int maxRam(Player p) {
-    if (!(CyberwareRuntime.deck(p).getItem() instanceof dev.cybernetics2077.deck.CyberdeckItem))
-      return 0;
-    return CyberwareRuntime.deckTier(p).ram()
-        + tier(p, EX_DISK)
-        + (tier(p, MEMORY_BOOST) > 0 ? 1 : 0);
+    if (!(CyberwareRuntime.deck(p).getItem()
+        instanceof dev.cybernetics2077.deck.CyberdeckItem deck)) return 0;
+    return deck.ram() + tier(p, EX_DISK) + (tier(p, MEMORY_BOOST) > 0 ? 1 : 0);
   }
 
   public static int uploadTicks(Player p) {
-    return Math.max(
-        6, Math.round(CyberwareRuntime.deckTier(p).uploadTicks() / (1 + tier(p, EX_DISK) * .05f)));
+    return uploadTicks(p, null);
+  }
+
+  public static int uploadTicks(Player p, dev.cybernetics2077.deck.QuickhackItem program) {
+    int base = CyberwareRuntime.deckTier(p).uploadTicks();
+    if (program != null) {
+      if (program.kind().control()) base = Math.max(6, base / 2);
+      else if (program.kind() == dev.cybernetics2077.deck.QuickhackKind.SYNAPSE_BURNOUT) base += 12;
+      else if (program.kind() != dev.cybernetics2077.deck.QuickhackKind.SHORT_CIRCUIT) base += 6;
+    }
+    return Math.max(6, Math.round(base / (1 + tier(p, EX_DISK) * .05f)));
   }
 
   public static float meleeRate(Player p) {

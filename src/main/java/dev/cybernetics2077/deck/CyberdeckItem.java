@@ -8,16 +8,62 @@ import net.minecraft.world.item.component.ItemContainerContents;
 
 /** Quickhacks belong to the physical deck, including when it is removed from the bench. */
 public final class CyberdeckItem extends CyberwareItem {
+  public enum Model {
+    PARALINE,
+    RAVEN
+  }
+
+  private final Model model;
+
   public CyberdeckItem() {
     this(CyberwareTier.ONE);
   }
 
   public CyberdeckItem(CyberwareTier tier) {
+    this(tier, Model.PARALINE);
+  }
+
+  public CyberdeckItem(CyberwareTier tier, Model model) {
     super(
         new Item.Properties().component(DataComponents.CONTAINER, ItemContainerContents.EMPTY),
         CyberwareCategory.OPERATING_SYSTEM,
-        tier.deckCapacity(),
+        capacity(tier, model),
         tier);
+    this.model = model;
+  }
+
+  private static int capacity(CyberwareTier tier, Model model) {
+    if (model == null || tier == null || model == Model.RAVEN && tier.level < 3)
+      throw new IllegalArgumentException("Unavailable cyberdeck model/tier");
+    return model == Model.RAVEN ? 10 + tier.level * 2 : tier.deckCapacity();
+  }
+
+  public Model model() {
+    return model;
+  }
+
+  public int ram() {
+    return model == Model.RAVEN ? tier().level + 4 : tier().ram();
+  }
+
+  public float ramPerSecond() {
+    return tier().ramPerSecond();
+  }
+
+  public float damageBonus() {
+    return model == Model.RAVEN ? 0 : tier().quickhackBonus();
+  }
+
+  public int relayTargets() {
+    return model == Model.RAVEN ? tier().level - 2 : 0;
+  }
+
+  public int relayRange() {
+    return model == Model.RAVEN ? 2 * tier().level - 2 : 0;
+  }
+
+  public float relayDamage() {
+    return .5f;
   }
 
   public static int slots(ItemStack deck) {
@@ -38,10 +84,16 @@ public final class CyberdeckItem extends CyberwareItem {
 
   /** Ignore malformed/imported programs that exceed the installed deck's tier. */
   public static QuickhackItem quickhack(ItemStack deck) {
-    if (!(deck.getItem() instanceof CyberdeckItem item)) return null;
+    return programs(deck).stream().findFirst().orElse(null);
+  }
+
+  public static java.util.List<QuickhackItem> programs(ItemStack deck) {
+    var result = new java.util.ArrayList<QuickhackItem>();
+    if (!(deck.getItem() instanceof CyberdeckItem item)) return java.util.List.of();
     for (int i = 0; i < slots(deck); i++)
       if (chip(deck, i).getItem() instanceof QuickhackItem program
-          && program.tier().level <= item.tier().level) return program;
-    return null;
+          && program.tier().level <= item.tier().level
+          && result.stream().noneMatch(p -> p.kind() == program.kind())) result.add(program);
+    return java.util.List.copyOf(result);
   }
 }

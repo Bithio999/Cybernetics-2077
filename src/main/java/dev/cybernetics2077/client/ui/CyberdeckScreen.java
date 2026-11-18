@@ -52,13 +52,22 @@ public final class CyberdeckScreen extends AbstractContainerScreen<CyberdeckMenu
       c.right("TIER " + menu.tier().level, 263, 15, 11, menu.tier().color);
       c.line(12, 35, 264, 35, 1, 0xff693642);
       c.tracked("RAM", 15, 48, 9, 0xff70e1ee, .5f);
-      for (int i = 0; i < menu.tier().ram(); i++) {
+      for (int i = 0; i < menu.cyberdeck().ram(); i++) {
         int x = 15 + i % 4 * 18, y = 61 + i / 4 * 13;
         c.panel(x, y, 14, 9, 2, 0xff235163, 0xff63cadd);
         c.line(x + 3, y + 3, x + 9, y + 3, .5f, 0xff9aebf4);
       }
-      c.body(menu.tier().ram() + " units", 15, 103, 9, 0xffa0b9c4);
-      c.text("QUICKHACK SLOTS", 106, 42, 12, 0xff7ce4ee);
+      c.body(menu.cyberdeck().ram() + " units", 15, 103, 9, 0xffa0b9c4);
+      c.text(
+          c.fit(
+              menu.cyberdeck().getDescription().getString().toUpperCase(java.util.Locale.ROOT),
+              158,
+              12,
+              true),
+          106,
+          42,
+          12,
+          0xff7ce4ee);
       for (int i = 0; i < menu.programSlots(); i++) {
         int x = CyberdeckMenu.slotX(i), y = CyberdeckMenu.slotY(i);
         c.panel(x - 6, y - 6, 28, 28, 4, 0xff101b29, 0xff66868e);

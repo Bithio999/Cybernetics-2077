@@ -24,10 +24,19 @@ public final class CyberwareNetwork {
     }
   }
 
-  public record Hack(int target) implements CustomPacketPayload {
+  public record Hack(int target, int kind) implements CustomPacketPayload {
+    public Hack(int target) {
+      this(target, dev.cybernetics2077.deck.QuickhackKind.SHORT_CIRCUIT.ordinal());
+    }
+
     public static final Type<Hack> TYPE = new Type<>(Cybernetics2077.id("quickhack"));
     public static final StreamCodec<RegistryFriendlyByteBuf, Hack> CODEC =
-        StreamCodec.of((b, p) -> b.writeVarInt(p.target), b -> new Hack(b.readVarInt()));
+        StreamCodec.of(
+            (b, p) -> {
+              b.writeVarInt(p.target);
+              b.writeVarInt(p.kind);
+            },
+            b -> new Hack(b.readVarInt(), b.readVarInt()));
 
     @Override
     public Type<Hack> type() {
@@ -58,7 +67,7 @@ public final class CyberwareNetwork {
   }
 
   public static void register(RegisterPayloadHandlersEvent e) {
-    var r = e.registrar("9");
+    var r = e.registrar("10");
     r.playToServer(
         Action.TYPE,
         Action.CODEC,
@@ -73,7 +82,8 @@ public final class CyberwareNetwork {
         (p, c) ->
             c.enqueueWork(
                 () -> {
-                  if (c.player() instanceof ServerPlayer s) CyberwareRuntime.queue(s, p.target);
+                  if (c.player() instanceof ServerPlayer s)
+                    CyberwareRuntime.queue(s, p.target, p.kind);
                 }));
     r.playToClient(
         State.TYPE,

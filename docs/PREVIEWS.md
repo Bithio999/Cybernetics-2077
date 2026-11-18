@@ -14,6 +14,15 @@ These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Ma
 
 [Cortex category](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory entry](images/creative.png)
 
+## Raven and six quickhacks (0.12.0)
+
+Captured from the actual game: installation through the bench, the Raven-specific chip editor, Operating System page, all six scanner entries and program-specific uploads. [Costs and effects](CYBERWARE.md#additional-quickhacks).
+
+![Six loaded programs](images/raven-six-program-loadout.png)
+![Scanner selection](images/scanner-six-quickhacks.png)
+
+[Raven OS page](images/raven-operating-system.png) · [Overheat upload](images/quickhack-overheat-upload.png) · [Contagion spread](images/raven-contagion-spread.png) · [Synapse upload](images/quickhack-synapse-upload.png) · [Raven daily stock](images/raven-ripperdoc-stock.png)
+
 ## Daily ripperdoc stock (0.11.0)
 
 Daily selection, live restock countdown and Street Cred quality weighting, captured in Minecraft. Locked tiers are hidden. The starter eye remains guaranteed at SC 0–10.

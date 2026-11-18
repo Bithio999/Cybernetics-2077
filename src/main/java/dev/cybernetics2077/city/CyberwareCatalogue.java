@@ -27,6 +27,10 @@ public final class CyberwareCatalogue {
               Cybernetics2077.SHORT_CIRCUIT_TIERS)) for (var entry : family) add(list, entry.get());
       for (var family : Cybernetics2077.AUGMENTS.values())
         for (var entry : family) add(list, entry.get());
+      for (var entry : Cybernetics2077.RAVEN_TIERS) add(list, entry.get());
+      for (var kind : dev.cybernetics2077.deck.QuickhackKind.values())
+        if (kind != dev.cybernetics2077.deck.QuickhackKind.SHORT_CIRCUIT)
+          for (var entry : Cybernetics2077.QUICKHACKS.get(kind)) add(list, entry.get());
       offers = List.copyOf(list);
     }
     return offers;

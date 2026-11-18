@@ -1,0 +1,35 @@
+{
+  "release": "0.12.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvmTestsPassed": 58,
+  "serverGameTestsPassed": 73,
+  "nativeQuickhackReview": "PASS: native bench installation, Raven identity and RAM, six distinct program sockets, OS return, scanner scroll selection, all six uploads, three Raven relays, DOT/control/Synapse effects, and daily ripperdoc Raven stock.",
+  "cyberdeck": "Raven Microcyber, tiers 3\u20135",
+  "newQuickhacks": {
+    "overheat": [
+      1,
+      5
+    ],
+    "contagion": [
+      2,
+      5
+    ],
+    "reboot_optics": [
+      1,
+      5
+    ],
+    "cripple_movement": [
+      2,
+      5
+    ],
+    "synapse_burnout": [
+      3,
+      5
+    ]
+  },
+  "totalProgramKinds": 6,
+  "newItemVariants": 24,
+  "cleanReleaseVerifier": "passed",
+  "sha256": "1cfc1612c7f96cca3e9a84f04f2bf04cbd1369c5826f392f6ef4645fe7711650"
+}

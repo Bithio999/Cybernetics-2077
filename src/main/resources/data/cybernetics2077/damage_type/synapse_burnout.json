@@ -1,0 +1,6 @@
+{
+  "message_id": "synapse_burnout",
+  "exhaustion": 0.1,
+  "scaling": "never",
+  "effects": "hurt"
+}

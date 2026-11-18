@@ -303,6 +303,9 @@ public final class CombatGameTests {
       h.setBlock(new BlockPos(2, y, 3), net.minecraft.world.level.block.Blocks.AIR);
     mob.setPos(mob.getX(), mob.getY(), mob.getZ() + 9);
     h.assertTrue(CyberwareRuntime.lungeTarget(p) == null, "Leap acquired beyond eight blocks");
+    // Restore a valid nearby target before testing an active leap; the deliberately distant
+    // position can lie outside the fixture's entity-tracking chunks.
+    mob.setPos(mob.getX(), mob.getY(), mob.getZ() - 9);
     var s = CyberwareRuntime.state(p);
     s.deployed = true;
     s.lunge =

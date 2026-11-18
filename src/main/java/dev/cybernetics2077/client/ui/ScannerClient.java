@@ -37,6 +37,7 @@ public final class ScannerClient {
   private static long received;
   private static int focus = -1, focusTicks;
   private static long lastHack;
+  private static int selectedProgram;
   private static final org.joml.Matrix4f worldView = new org.joml.Matrix4f(),
       worldProjection = new org.joml.Matrix4f();
   private static net.minecraft.world.phys.Vec3 worldCamera = net.minecraft.world.phys.Vec3.ZERO;
@@ -54,15 +55,19 @@ public final class ScannerClient {
 
   public static void quickhack() {
     var own = dev.cybernetics2077.client.mantis.CyberwareClient.own();
+    var programs = own.getList("programs", 10);
+    if (programs.isEmpty()) return;
+    selectedProgram = Math.clamp(selectedProgram, 0, programs.size() - 1);
+    var program = programs.getCompound(selectedProgram);
     long now = System.nanoTime();
     if (active()
         && frame.data() > .95
         && focus >= 0
-        && own.getBoolean("shortCircuit")
-        && own.getFloat("ram") >= own.getInt("hackCost")
+        && own.getFloat("ram") >= program.getInt("cost")
         && now - lastHack > 180_000_000L) {
       lastHack = now;
-      PacketDistributor.sendToServer(new dev.cybernetics2077.combat.CyberwareNetwork.Hack(focus));
+      PacketDistributor.sendToServer(
+          new dev.cybernetics2077.combat.CyberwareNetwork.Hack(focus, program.getInt("kind")));
     }
   }
 
@@ -188,7 +193,14 @@ public final class ScannerClient {
 
   @SubscribeEvent
   public static void scroll(net.neoforged.neoforge.client.event.InputEvent.MouseScrollingEvent e) {
-    if (active()) e.setCanceled(true);
+    if (active()) {
+      var programs =
+          dev.cybernetics2077.client.mantis.CyberwareClient.own().getList("programs", 10);
+      if (!programs.isEmpty())
+        selectedProgram =
+            Math.floorMod(selectedProgram + (e.getScrollDeltaY() < 0 ? 1 : -1), programs.size());
+      e.setCanceled(true);
+    }
   }
 
   @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.HIGHEST)
@@ -275,7 +287,8 @@ public final class ScannerClient {
         RED);
     edge(chrome, f);
     var equipment = dev.cybernetics2077.client.mantis.CyberwareClient.own();
-    boolean deck = equipment.getBoolean("deck"), chip = equipment.getBoolean("shortCircuit");
+    boolean deck = equipment.getBoolean("deck"),
+        chip = !equipment.getList("programs", 10).isEmpty();
     // A delivery shard provides navigation, never the optical/deck functions.
     deck &= installed;
     chip &= installed;
@@ -342,56 +355,57 @@ public final class ScannerClient {
           MUTED);
       return;
     }
-    var c = root.fade(f.row(0));
-    float x = 210, y = 379, w = 410;
-    boolean poor = equipment.getFloat("ram") < equipment.getInt("hackCost"),
-        queued = !equipment.getList("uploads", 10).isEmpty();
-    int tint = poor ? 0xffff565c : CYAN;
-    var path = Geometry.chip(x, y, w, 57);
-    c.halo(path, poor ? RED : CYAN);
-    c.shape(path, poor ? 0xf0421117 : 0xf2123c4f, poor ? 0xffd7414c : 0xff70f2ff);
-    c.glowText("SHORT CIRCUIT  /  T" + equipment.getInt("hackTier"), x + 23, y + 7, 22, tint);
-    String status = queued ? "QUEUED" : poor ? "LOW RAM" : "READY";
-    float badge = c.width(status, 12, true) + 8;
-    c.stroke(Geometry.panel(x + 23, y + 35, badge, 16, 0), .7f, tint);
-    c.text(status, x + 27, y + 37, 12, tint);
-    c.stroke(Geometry.panel(x + 28 + badge, y + 35, 58, 16, 0), .7f, 0xfff7b05e);
-    c.text("COMBAT", x + 32 + badge, y + 37, 11, 0xfff7b05e);
-    float iconX = x + w - 49;
-    c.stroke(
-        List.of(
-            new Point(iconX, y + 4.5f),
-            new Point(iconX + 45, y + 4.5f),
-            new Point(iconX + 45, y + 52.5f),
-            new Point(iconX, y + 52.5f)),
-        .75f,
-        tint);
-    c.image(
-        Cybernetics2077.id("textures/item/short_circuit_tier_1.png"),
-        iconX + 5.5f,
-        y + 10.5f,
-        34,
-        36,
-        0xffffffff);
-    c.right("" + equipment.getInt("hackCost"), iconX - 35, y + 10, 31, tint);
-    c.line(iconX - 29, y + 16, iconX - 29, y + 38, .75f, tint);
-    c.line(iconX - 9, y + 16, iconX - 9, y + 38, .75f, tint);
-    c.text("RAM", iconX - 26, y + 23, 9, tint);
+    var programs = equipment.getList("programs", 10);
+    selectedProgram = Math.clamp(selectedProgram, 0, Math.max(0, programs.size() - 1));
+    for (int i = 0; i < programs.size(); i++) {
+      var q = programs.getCompound(i);
+      boolean selected = i == selectedProgram;
+      var c = root.fade(f.row(i));
+      float x = 210, y = 379 + i * 65, w = 410;
+      boolean poor = equipment.getFloat("ram") < q.getInt("cost");
+      int tint = poor ? 0xffff565c : selected ? CYAN : 0xff91bfc6;
+      var path = Geometry.chip(x, y, w, 57);
+      if (selected) c.halo(path, poor ? RED : CYAN);
+      c.shape(path, selected ? 0xf2123c4f : 0xe30b1723, tint);
+      if (selected) c.rect(x + 5, y + 8, 3, 39, tint);
+      String name = q.getString("name").toUpperCase(Locale.ROOT) + " / T" + q.getInt("tier");
+      c.text(c.fit(name, 255, 20, true), x + 23, y + 8, 20, tint);
+      String status = poor ? "LOW RAM" : selected ? "SELECTED" : "READY";
+      c.text(status + " / " + q.getString("category"), x + 23, y + 37, 12, tint);
+      float iconX = x + w - 49;
+      c.stroke(Geometry.panel(iconX, y + 5, 44, 47, 4), .75f, tint);
+      c.image(
+          Cybernetics2077.id("textures/item/" + q.getString("icon") + ".png"),
+          iconX + 5,
+          y + 11,
+          34,
+          34,
+          0xffffffff);
+      c.right("" + q.getInt("cost"), iconX - 18, y + 10, 28, tint);
+      c.text("RAM", iconX - 39, y + 38, 9, tint);
+    }
+    var q = programs.getCompound(selectedProgram);
+    float helpY = 379 + programs.size() * 65 + 14;
     var help = root.fade(f.layer(570, 180));
-    help.g.pose().pushPose();
-    help.g.pose().translate(231, 466, 0);
-    help.g.pose().scale(.65f, .65f, 1);
-    help.mouse(0, 0, 0);
-    help.g.pose().popPose();
-    help.tracked("CLICK TO UPLOAD", 252, 468, 13, 0xffd35a60, .6f);
+    help.tracked("SCROLL TO SELECT / CLICK TO UPLOAD", 230, helpY, 13, 0xffd35a60, .5f);
+    String effect =
+        q.getFloat("damage") > 0
+            ? String.format(
+                Locale.ROOT,
+                "%.1f %s DAMAGE",
+                q.getFloat("damage"),
+                q.getString("type").toUpperCase(Locale.ROOT))
+            : (q.getInt("duration") / 20) + " s CONTROL";
+    if (q.getInt("duration") > 0 && q.getFloat("damage") > 0)
+      effect += " OVER " + (q.getInt("duration") / 20) + " s";
     help.body(
-        String.format(
-            Locale.ROOT,
-            "%.1f ELECTRICAL DAMAGE / %.1f s UPLOAD",
-            equipment.getFloat("hackDamage"),
-            equipment.getInt("uploadTicks") / 20f),
+        help.fit(
+            effect + String.format(Locale.ROOT, " / %.1f s UPLOAD", q.getInt("uploadTicks") / 20f),
+            405,
+            14,
+            false),
         230,
-        503,
+        helpY + 31,
         14,
         MUTED);
   }
@@ -434,14 +448,20 @@ public final class ScannerClient {
       for (int k = 0; k < queue.size(); k++) {
         var q = queue.get(k);
         float x = -queue.size() * 25 + 4 + k * 50, y = -98;
-        float progress = (float) Math.clamp((now - q.getLong("start")) / 20, 0, 1);
+        float progress =
+            (float)
+                Math.clamp(
+                    (now - q.getLong("start"))
+                        / Math.max(1, q.getLong("finish") - q.getLong("start")),
+                    0,
+                    1);
         var tile = Geometry.data(x, y, 42, 42);
         c.halo(tile, RED);
         c.shape(tile, 0xde3d131a, 0xfffa3b46);
         if (now >= q.getLong("start"))
           c.rect(x + 1, y + 41 - 40 * progress, 40, 40 * progress, 0x807c323d);
         c.image(
-            Cybernetics2077.id("textures/item/short_circuit_tier_1.png"),
+            Cybernetics2077.id("textures/item/" + q.getString("icon") + ".png"),
             x + 6,
             y + 5,
             30,

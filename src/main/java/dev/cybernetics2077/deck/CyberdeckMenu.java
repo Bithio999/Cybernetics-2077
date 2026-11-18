@@ -22,14 +22,7 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
   private final int programSlots;
 
   public CyberdeckMenu(int id, Inventory inv, net.minecraft.network.RegistryFriendlyByteBuf data) {
-    this(
-        id,
-        inv,
-        ContainerLevelAccess.NULL,
-        new ItemStack(
-            Cybernetics2077.CYBERDECK_TIERS
-                .get(CyberwareTier.of(data.readVarInt()).ordinal())
-                .get()));
+    this(id, inv, ContainerLevelAccess.NULL, ItemStack.STREAM_CODEC.decode(data));
   }
 
   public CyberdeckMenu(int id, Inventory inv, ContainerLevelAccess access, ItemStack deck) {
@@ -47,7 +40,10 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
                 && program.tier().level <= tier.level
                 && !java.util.stream.IntStream.range(0, programSlots)
                     .anyMatch(
-                        i -> i != slot && getStackInSlot(i).getItem() instanceof QuickhackItem);
+                        i ->
+                            i != slot
+                                && getStackInSlot(i).getItem() instanceof QuickhackItem existing
+                                && existing.kind() == program.kind());
           }
 
           @Override
@@ -95,6 +91,10 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
 
   public CyberwareTier tier() {
     return tier;
+  }
+
+  public CyberdeckItem cyberdeck() {
+    return (CyberdeckItem) deck.getItem();
   }
 
   public int programSlots() {

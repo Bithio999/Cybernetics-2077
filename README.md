@@ -53,9 +53,11 @@ Visit a ripperdoc and select **Install**, or craft and place a **Cybernetics Ben
 
 [Recipes and item IDs](docs/CYBERWARE.md) · [In-game screenshots and clips](docs/PREVIEWS.md)
 
+**Raven Microcyber and six quickhacks:** Raven starts at tier 3 and relays hacks to nearby enemies. Equip Short Circuit, Overheat, Contagion, Reboot Optics, Cripple Movement and Synapse Burnout through Manage Quickhacks. Hold **V**, scroll to select a loaded program, then left-click to queue it. [Decks, costs and effects](docs/CYBERWARE.md#raven-microcyber).
+
 ## Install the mod
 
-Use [Cybernetics2077-0.11.0.jar](releases/Cybernetics2077-0.11.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.12.0.jar](releases/Cybernetics2077-0.12.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

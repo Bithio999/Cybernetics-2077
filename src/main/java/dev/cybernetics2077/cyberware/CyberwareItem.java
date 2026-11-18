@@ -57,18 +57,26 @@ public class CyberwareItem extends Item {
           net.minecraft.network.chat.Component.translatable(
                   "cybernetics2077.optics.description", tier.scanRange())
               .withStyle(net.minecraft.ChatFormatting.AQUA));
-    if (this instanceof dev.cybernetics2077.deck.CyberdeckItem) {
+    if (this instanceof dev.cybernetics2077.deck.CyberdeckItem deck) {
       lines.add(
           net.minecraft.network.chat.Component.translatable(
-                  "cybernetics2077.deck.description", tier.ram(), tier.programSlots())
+                  "cybernetics2077.deck.description", deck.ram(), tier.programSlots())
               .withStyle(net.minecraft.ChatFormatting.AQUA));
       lines.add(
           net.minecraft.network.chat.Component.translatable(
                   "cybernetics2077.deck.stats",
-                  String.format(java.util.Locale.ROOT, "%.1f", tier.ramPerSecond()),
+                  String.format(java.util.Locale.ROOT, "%.1f", deck.ramPerSecond()),
                   tier.queueLimit(),
-                  Math.round(tier.quickhackBonus() * 100))
+                  Math.round(deck.damageBonus() * 100))
               .withStyle(net.minecraft.ChatFormatting.GRAY));
+      if (deck.relayTargets() > 0)
+        lines.add(
+            net.minecraft.network.chat.Component.translatable(
+                    "cybernetics2077.deck.raven.relay",
+                    deck.relayTargets(),
+                    deck.relayRange(),
+                    Math.round(deck.relayDamage() * 100))
+                .withStyle(net.minecraft.ChatFormatting.AQUA));
     }
     if (this instanceof MantisBladesItem) {
       lines.add(

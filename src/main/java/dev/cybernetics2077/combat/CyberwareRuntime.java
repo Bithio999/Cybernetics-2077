@@ -72,18 +72,25 @@ public final class CyberwareRuntime {
   }
 
   public static float quickhackDamage(Player p, QuickhackItem program) {
-    return program.tier().shortCircuitDamage() * (1 + deckTier(p).quickhackBonus());
+    float bonus = deck(p).getItem() instanceof CyberdeckItem item ? item.damageBonus() : 0;
+    float damage = program.damage() * (1 + bonus);
+    if (program.kind() == dev.cybernetics2077.deck.QuickhackKind.SYNAPSE_BURNOUT
+        && p instanceof ServerPlayer server) {
+      float spent = Math.max(0, AugmentRuntime.maxRam(p) - state(server).ram + program.cost());
+      damage *= 1 + Math.min(1, spent * .1f);
+    }
+    return damage;
   }
 
   /** Equipment changes cancel only affected reservations; swapping decks cannot amplify uploads. */
   private static void reconcileUploads(ServerPlayer p) {
     var s = state(p);
     var deck = deck(p);
-    var program = CyberdeckItem.quickhack(deck);
+    var programs = CyberdeckItem.programs(deck);
     var it = s.uploads.iterator();
     while (it.hasNext()) {
       var upload = it.next();
-      if (!p.isAlive() || upload.sourceDeck != deck || upload.program != program) {
+      if (!p.isAlive() || upload.sourceDeck != deck || !programs.contains(upload.program)) {
         s.ram += upload.cost;
         it.remove();
       }
@@ -105,15 +112,21 @@ public final class CyberwareRuntime {
     t.putInt("entity", p.getId());
     t.putBoolean("deck", deck(p).getItem() instanceof CyberdeckItem);
     var program = CyberdeckItem.quickhack(deck(p));
-    t.putBoolean("shortCircuit", program != null);
+    t.putBoolean(
+        "shortCircuit",
+        CyberdeckItem.programs(deck(p)).stream()
+            .anyMatch(q -> q.kind() == dev.cybernetics2077.deck.QuickhackKind.SHORT_CIRCUIT));
+    var programs = new ListTag();
+    for (var q : CyberdeckItem.programs(deck(p))) programs.add(programData(p, q));
+    t.put("programs", programs);
     t.putInt("deckTier", deckTier(p).level);
     t.putInt("ramMax", AugmentRuntime.maxRam(p));
     t.putInt("programSlots", deckTier(p).programSlots());
     t.putInt("queueLimit", deckTier(p).queueLimit());
     t.putInt("hackTier", program == null ? 0 : program.tier().level);
-    t.putInt("hackCost", program == null ? 0 : program.tier().shortCircuitCost());
+    t.putInt("hackCost", program == null ? 0 : program.cost());
     t.putFloat("hackDamage", program == null ? 0 : quickhackDamage(p, program));
-    t.putInt("uploadTicks", AugmentRuntime.uploadTicks(p));
+    t.putInt("uploadTicks", program == null ? 0 : AugmentRuntime.uploadTicks(p, program));
     AugmentRuntime.snapshot(p, t);
     t.putBoolean("claws", claws(p));
     t.putBoolean("deployed", s.deployed);
@@ -144,9 +157,26 @@ public final class CyberwareRuntime {
       q.putInt("target", upload.id);
       q.putLong("start", upload.start);
       q.putLong("finish", upload.finish);
+      q.putString("icon", upload.program.kind().icon());
+      q.putString("name", upload.program.getDescription().getString());
       queue.add(q);
     }
     t.put("uploads", queue);
+    return t;
+  }
+
+  public static CompoundTag programData(ServerPlayer p, QuickhackItem program) {
+    var t = new CompoundTag();
+    t.putInt("kind", program.kind().ordinal());
+    t.putString("name", program.getDescription().getString());
+    t.putString("icon", program.kind().icon());
+    t.putString("category", program.kind().category);
+    t.putString("type", program.kind().damageType);
+    t.putInt("tier", program.tier().level);
+    t.putInt("cost", program.cost());
+    t.putFloat("damage", quickhackDamage(p, program));
+    t.putInt("duration", program.duration());
+    t.putInt("uploadTicks", AugmentRuntime.uploadTicks(p, program));
     return t;
   }
 
@@ -156,6 +186,8 @@ public final class CyberwareRuntime {
     var compare = t.copy();
     compare.remove("time");
     compare.remove("augmentTime");
+    compare.remove("hackDamage");
+    for (var value : compare.getList("programs", 10)) ((CompoundTag) value).remove("damage");
     // RAM and countdown are quantized for UI; at most 5 updates/sec while regenerating.
     compare.putFloat("ram", Math.round(s.ram * 10) / 10f);
     if (!compare.equals(s.sent)) {
@@ -251,32 +283,42 @@ public final class CyberwareRuntime {
   }
 
   public static boolean queue(ServerPlayer p, int id) {
+    var program = CyberdeckItem.quickhack(deck(p));
+    return program != null && queue(p, id, program.kind().ordinal());
+  }
+
+  public static boolean queue(ServerPlayer p, int id, int kind) {
     var s = state(p);
     reconcileUploads(p);
-    var program = CyberdeckItem.quickhack(deck(p));
+    var program =
+        CyberdeckItem.programs(deck(p)).stream()
+            .filter(q -> q.kind().ordinal() == kind)
+            .findFirst()
+            .orElse(null);
     if (!usable(p)
         || !ScannerNetwork.installed(p)
         || !(deck(p).getItem() instanceof CyberdeckItem)
         || program == null
         || s.uploads.size() >= deckTier(p).queueLimit()
-        || s.ram + .0001f < program.tier().shortCircuitCost()
+        || s.ram + .0001f < program.cost()
         || !ScannerNetwork.inspect(p, id).contains("id")) return false;
     var target = p.serverLevel().getEntity(id);
     if (!(target instanceof LivingEntity living) || !canAttack(p, living)) return false;
     long now = p.serverLevel().getGameTime();
     long start = s.uploads.isEmpty() ? now : Math.max(now, s.uploads.getLast().finish);
-    int cost = program.tier().shortCircuitCost();
+    int cost = program.cost();
+    float damage = quickhackDamage(p, program);
     s.ram -= cost;
     s.uploads.add(
         new Upload(
             target.getUUID(),
             start,
-            start + AugmentRuntime.uploadTicks(p),
+            start + AugmentRuntime.uploadTicks(p, program),
             id,
             deck(p),
             program,
             cost,
-            quickhackDamage(p, program)));
+            damage));
     syncIfChanged(p);
     return true;
   }
@@ -315,47 +357,15 @@ public final class CyberwareRuntime {
       if (usable(p) && claws(p)) bladeHit(p, s.combo);
     }
     reconcileUploads(p);
-    if (deck(p).getItem() instanceof CyberdeckItem)
-      s.ram = Math.min(AugmentRuntime.maxRam(p), s.ram + deckTier(p).ramPerSecond() / 20);
+    if (deck(p).getItem() instanceof CyberdeckItem item)
+      s.ram = Math.min(AugmentRuntime.maxRam(p), s.ram + item.ramPerSecond() / 20);
     if (!s.uploads.isEmpty() && s.uploads.getFirst().finish <= now) {
       var upload = s.uploads.removeFirst();
       var target = p.serverLevel().getEntity(upload.target);
       if (target instanceof LivingEntity living
           && canAttack(p, living)
           && p.distanceToSqr(living) <= Math.pow(ScannerNetwork.range(p) + 16, 2)) {
-        if (living.hurt(
-            new net.minecraft.world.damagesource.DamageSource(
-                p.registryAccess()
-                    .registryOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE)
-                    .getHolderOrThrow(
-                        net.minecraft.resources.ResourceKey.create(
-                            net.minecraft.core.registries.Registries.DAMAGE_TYPE,
-                            Cybernetics2077.id("short_circuit"))),
-                p,
-                p),
-            upload.damage)) {
-          p.serverLevel()
-              .sendParticles(
-                  ParticleTypes.ELECTRIC_SPARK,
-                  living.getX(),
-                  living.getY() + living.getBbHeight() * .55,
-                  living.getZ(),
-                  35,
-                  living.getBbWidth() * .5,
-                  living.getBbHeight() * .3,
-                  living.getBbWidth() * .5,
-                  .15);
-          p.level()
-              .playSound(
-                  null,
-                  living.blockPosition(),
-                  SoundEvents.TRIDENT_THUNDER.value(),
-                  SoundSource.PLAYERS,
-                  .3f,
-                  1.8f);
-          PacketDistributor.sendToPlayersTrackingEntityAndSelf(
-              p, new CyberwareNetwork.Impact(living.getId()));
-        }
+        QuickhackEffects.land(p, living, upload.program, upload.damage, upload.sourceDeck);
       }
     }
     if (now % 4 == 0) syncIfChanged(p);

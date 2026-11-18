@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.11.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.12.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.11.0'
+    assert metadata['mods'][0]['version']=='0.12.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -25,6 +25,8 @@ with ZipFile(jar) as z:
                 json.loads(z.read(entry))
     for required in ('dev/cybernetics2077/Cybernetics2077.class',
                      'dev/cybernetics2077/city/DeliveryContracts.class',
+                     'dev/cybernetics2077/combat/QuickhackEffects.class',
+                     'dev/cybernetics2077/deck/QuickhackKind.class',
                      'dev/cybernetics2077/city/DailyStock.class',
                      'dev/cybernetics2077/city/DeliveryContract.class',
                      'dev/cybernetics2077/city/ClinicDirectory.class',
@@ -94,6 +96,19 @@ with ZipFile(jar) as z:
             assert recipe['type'] == 'minecraft:smithing_transform'
             assert recipe['base']['item'] == 'cybernetics2077:' + previous
             assert recipe['result']['id'] == 'cybernetics2077:' + item
+    for tier in range(3,6):
+        item=f'raven_microcyber_tier_{tier}'
+        assert lang['item.cybernetics2077.'+item]=='Raven Microcyber'
+        assert f'assets/cybernetics2077/models/item/{item}.json' in names
+    for kind, first in {'overheat':1,'contagion':2,'reboot_optics':1,'cripple_movement':2,'synapse_burnout':3}.items():
+        png=z.read(f'assets/cybernetics2077/textures/item/{kind}.png')
+        assert struct.unpack('>II',png[16:24])==(32,32)
+        for tier in range(first,6):
+            item=f'{kind}_tier_{tier}'
+            assert 'item.cybernetics2077.'+item in lang
+            assert f'assets/cybernetics2077/models/item/{item}.json' in names
+        for tier in range(1,first):
+            assert f'assets/cybernetics2077/models/item/{kind}_tier_{tier}.json' not in names
     augment_starts = {
         'ex_disk': 3, 'memory_boost': 2, 'biodyne_berserk': 2, 'kiroshi_clairvoyant_optics': 3,
         'bionic_joints': 1, 'epimorphic_skeleton': 4, 'neofiber': 3, 'adrenaline_converter': 1,

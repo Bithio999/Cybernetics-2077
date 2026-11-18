@@ -4,6 +4,21 @@ Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without 
 
 The previous 0.9.1 village-services release passed **53 JVM tests**, **55 server GameTests**, the expanded native village-services review and clean-release verification. The client verifies all 25 furniture items in GUI, both first-person hands, both third-person hands, ground and frame contexts. The local player’s skin remains in the hologram.
 
+## Raven and additional quickhacks (0.12.0)
+
+Release 0.12.0 passes **58 JVM tests**, **73 dedicated-server GameTests**, the native six-program review and clean-release verification.
+
+The nine new server scenarios cover Raven's three profiles and all new chip tiers; mixed-loadout serialization and menu-wire identity; duplicate/over-tier rejection; selection of owned kinds and selective refunds; Raven's relay strength and bystander protection; DOT totals and expiry; coexistence/expiry of controls; Contagion ignition; Synapse's spent-RAM formula; and brain-target, team and wall protection. A pre-existing leap fixture now restores its nearby target after checking out-of-range targeting, so its active-leap assertion stays inside the fixture's tracking chunks.
+
+The native review installs Raven and optics at the bench, loads six distinct chips using actual inventory transactions, returns to the OS page, scroll-selects and uploads all six programs through the scanner, verifies three Raven relays and each hack's effect, then searches Raven in a real ripperdoc's daily stock. Screenshots are linked in [previews](PREVIEWS.md#raven-and-six-quickhacks-0120).
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PhacksReview
+```
+
+Use the disposable review save below. Success writes `capture/hacks-passed.txt`; failure writes `capture/failed.txt`. Clean before packaging. [Results](review/results/raven-quickhacks-0.12.0.json).
+
 ## Daily ripperdoc stock (0.11.0)
 
 Release 0.11.0 passes **58 JVM tests**, **64 dedicated-server GameTests**, native daily-stock/contract testing and clean-release verification.
@@ -110,7 +125,7 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The inventory cyberware screen remains read-only; install through a ripperdoc's Install tab or the Cybernetics Bench. Release 0.5.8 includes the tier 1 deck and Short Circuit; other quickhacks and operating systems are not implemented. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+The inventory cyberware screen remains read-only; install through a ripperdoc's Install tab or the Cybernetics Bench. Release 0.5.8 introduced the tier 1 deck and Short Circuit. The current release adds Raven Microcyber and five more quickhacks; BioDyne Berserk is also available. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
 
 The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed.
 

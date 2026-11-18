@@ -380,20 +380,31 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
             663,
             19,
             CYAN);
-      } else if (stack.getItem() instanceof dev.cybernetics2077.deck.CyberdeckItem) {
+      } else if (stack.getItem() instanceof dev.cybernetics2077.deck.CyberdeckItem deck) {
         var tier = item.tier();
-        c.glowText("CYBERDECK / RAM " + tier.ram(), 434, 548, 23, CYAN);
+        c.glowText("CYBERDECK / RAM " + deck.ram(), 434, 548, 23, CYAN);
         c.body(
             String.format(
                 Locale.ROOT,
                 "%d SLOTS / %.1f RAM PER SECOND / +%d%% HACK DAMAGE",
                 tier.programSlots(),
-                tier.ramPerSecond(),
-                Math.round(tier.quickhackBonus() * 100)),
+                deck.ramPerSecond(),
+                Math.round(deck.damageBonus() * 100)),
             434,
-            584,
+            deck.relayTargets() > 0 ? 573 : 584,
             14,
             WHITE);
+        if (deck.relayTargets() > 0)
+          c.body(
+              "Relays to "
+                  + deck.relayTargets()
+                  + " enemies / "
+                  + deck.relayRange()
+                  + " blocks / 50% strength",
+              434,
+              591,
+              12,
+              CYAN);
         for (int i = 0; i < tier.programSlots(); i++) {
           var chip = dev.cybernetics2077.deck.CyberdeckItem.chip(stack, i);
           c.panel(434 + i * 42, 606, 30, 26, 4, 0xff14232c, 0xff5c8c96);

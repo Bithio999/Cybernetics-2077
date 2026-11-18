@@ -50,8 +50,41 @@ public final class Cybernetics2077 {
       tiers("optical_scanner", "kiroshi_optics", OpticsItem::new);
   public static final java.util.List<Supplier<CyberdeckItem>> CYBERDECK_TIERS =
       tiers("cyberdeck_tier_1", "militech_paraline", CyberdeckItem::new);
+  public static final java.util.List<Supplier<CyberdeckItem>> RAVEN_TIERS =
+      java.util.stream.IntStream.rangeClosed(3, 5)
+          .<Supplier<CyberdeckItem>>mapToObj(
+              t ->
+                  ITEMS.register(
+                      "raven_microcyber_tier_" + t,
+                      () -> new CyberdeckItem(CyberwareTier.of(t), CyberdeckItem.Model.RAVEN)))
+          .toList();
   public static final java.util.List<Supplier<QuickhackItem>> SHORT_CIRCUIT_TIERS =
       tiers("short_circuit_tier_1", "short_circuit", QuickhackItem::new);
+  public static final java.util.Map<QuickhackKind, java.util.List<Supplier<QuickhackItem>>>
+      QUICKHACKS = registerQuickhacks();
+
+  private static java.util.Map<QuickhackKind, java.util.List<Supplier<QuickhackItem>>>
+      registerQuickhacks() {
+    var result =
+        new java.util.EnumMap<QuickhackKind, java.util.List<Supplier<QuickhackItem>>>(
+            QuickhackKind.class);
+    result.put(QuickhackKind.SHORT_CIRCUIT, SHORT_CIRCUIT_TIERS);
+    for (var kind : QuickhackKind.values()) {
+      if (kind == QuickhackKind.SHORT_CIRCUIT) continue;
+      var family = new java.util.ArrayList<Supplier<QuickhackItem>>();
+      for (int t = kind.firstTier; t <= 5; t++) {
+        var tier = CyberwareTier.of(t);
+        family.add(ITEMS.register(kind.id + "_tier_" + t, () -> new QuickhackItem(tier, kind)));
+      }
+      result.put(kind, java.util.List.copyOf(family));
+    }
+    return java.util.Collections.unmodifiableMap(result);
+  }
+
+  public static QuickhackItem quickhack(QuickhackKind kind, int tier) {
+    return QUICKHACKS.get(kind).get(tier - kind.firstTier).get();
+  }
+
   public static final java.util.List<Supplier<MantisBladesItem>> MANTIS_TIERS =
       java.util.stream.IntStream.rangeClosed(2, 5)
           .<Supplier<MantisBladesItem>>mapToObj(
@@ -150,14 +183,18 @@ public final class Cybernetics2077 {
       e.accept(BENCH_ITEM.get());
     if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES) {
       for (var family :
-          java.util.List.of(OPTICS_TIERS, CYBERDECK_TIERS, SHORT_CIRCUIT_TIERS, MANTIS_TIERS))
+          java.util.List.of(
+              OPTICS_TIERS, CYBERDECK_TIERS, RAVEN_TIERS, SHORT_CIRCUIT_TIERS, MANTIS_TIERS))
         for (var item : family) e.accept(item.get());
       for (var family : AUGMENTS.values()) for (var item : family) e.accept(item.get());
+      for (var kind : QuickhackKind.values())
+        if (kind != QuickhackKind.SHORT_CIRCUIT)
+          for (var item : QUICKHACKS.get(kind)) e.accept(item.get());
     }
   }
 
   private void network(RegisterPayloadHandlersEvent e) {
-    e.registrar("1")
+    e.registrar("2")
         .playToServer(
             OpenCyberware.TYPE,
             OpenCyberware.CODEC,
