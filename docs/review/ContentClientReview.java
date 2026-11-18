@@ -324,7 +324,7 @@ final class ContentClientReview {
           p -> {
             var mob = (LivingEntity) p.serverLevel().getEntity(target);
             check(
-                Math.abs(mob.getHealth() - (health - 26)) < .01 && !mob.isOnFire(),
+                Math.abs(mob.getHealth() - (health - 32.5f)) < .01 && !mob.isOnFire(),
                 "Selected weapon changed Mantis damage or added fire: " + mob.getHealth());
             check(
                 CyberwareRuntime.state(p).deployed
@@ -431,7 +431,7 @@ final class ContentClientReview {
           p -> {
             check(p.getZ() > 4.5, "Server did not receive ground leap travel");
             check(
-                ((LivingEntity) p.serverLevel().getEntity(target)).getHealth() == 86,
+                ((LivingEntity) p.serverLevel().getEntity(target)).getHealth() == 82.5f,
                 "Ground leap did not land exactly one heavy hit");
             System.out.println("Ground leap native travel: " + (p.getZ() - .5) + " blocks");
           });
@@ -459,7 +459,7 @@ final class ContentClientReview {
           p -> {
             check(p.getZ() > 4.5, "Server did not receive air leap travel");
             check(
-                ((LivingEntity) p.serverLevel().getEntity(target)).getHealth() == 86,
+                ((LivingEntity) p.serverLevel().getEntity(target)).getHealth() == 82.5f,
                 "Air leap did not land exactly one heavy hit");
             System.out.println(
                 "Air leap native travel: " + (p.getZ() - .5) + " blocks; release Y=" + airStart);
@@ -615,8 +615,9 @@ final class ContentClientReview {
       RecordingFrames.quarter = false;
       m.options.fov().set(70);
     }
-    if (t >= 1160 && t <= 1340) tierReview(t);
-    if (t == 1360)
+    if (t >= 1160 && t <= 1325) tierReview(t);
+    if (t >= 1340 && t <= 1750) AugmentClientReview.tick(t);
+    if (t == 1810)
       server(
           p -> {
             var nether = p.server.getLevel(net.minecraft.world.level.Level.NETHER);
@@ -634,13 +635,11 @@ final class ContentClientReview {
               }
             p.teleportTo(nether, .5, 80, .5, java.util.Set.of(), 0, 0);
           });
-    if (t == 1400) {
+    if (t == 1850) {
       check(
           m.level.dimension() == net.minecraft.world.level.Level.NETHER
-              && CyberwareClient.own().getBoolean("deck")
-              && CyberwareClient.own().getBoolean("shortCircuit")
-              && CyberwareClient.own().getBoolean("claws")
-              && ScannerClient.available(),
+              && CyberwareClient.own().getInt("berserkTier") == 5
+              && CyberwareClient.own().getInt("pumpTier") == 5,
           "Equipment state lost on dimension change");
       Files.writeString(
           OUT.resolve("content-passed.txt"),
@@ -651,11 +650,13 @@ final class ContentClientReview {
               + " render and animation captures; actual native hand transform reference; dorsal"
               + " model closeup and independent tip extension; viewer quickhack removal/reinstall"
               + " and return; untargeted six-block leap; ground and airborne leaps travel 5.15"
-              + " blocks and land one 14-damage hit each; solid-wall guard; dimension change"
+              + " blocks and land one 17.5-damage hit each; solid-wall guard; dimension change"
               + " retains equipment state; selected enchanted weapons remain inactive and restore"
               + " after retraction; lunge momentum carries into normal movement; tier-five bench"
               + " installation, real eight-slot deck layout, chip persistence in last socket,"
-              + " tier-aware viewer, 12-cell scanner RAM and 26.4 electrical-damage upload.\n");
+              + " tier-aware viewer, 12-cell scanner RAM and 26.4 electrical-damage upload;"
+              + " expansion loadouts, implant details, 18 RAM, retained highlights, Blood Pump,"
+              + " Berserk fatal-hit survival, Camo, real double jump and charged ankle jump.\n");
       if (Boolean.getBoolean("cybernetics2077.recording")) {
         Files.writeString(
             OUT.resolve("recording-marks.json"), new com.google.gson.Gson().toJson(recordingMarks));
@@ -680,7 +681,7 @@ final class ContentClientReview {
             p.getInventory().setItem(0, new ItemStack(Cybernetics2077.OPTICS_TIERS.get(4).get()));
             p.getInventory()
                 .setItem(1, new ItemStack(Cybernetics2077.CYBERDECK_TIERS.get(4).get()));
-            p.getInventory().setItem(2, new ItemStack(Cybernetics2077.MANTIS_TIERS.get(4).get()));
+            p.getInventory().setItem(2, new ItemStack(Cybernetics2077.MANTIS_TIERS.get(3).get()));
             p.getInventory()
                 .setItem(3, new ItemStack(Cybernetics2077.SHORT_CIRCUIT_TIERS.get(4).get()));
             p.openMenu(

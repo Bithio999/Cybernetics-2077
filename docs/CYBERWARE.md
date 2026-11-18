@@ -1,14 +1,14 @@
 # Cyberware reference
 
-Install implants at a **Cybernetics Bench**. The tab beside your inventory views your equipment and manages quickhack chips. All three implant families and Short Circuit have **tiers 1–5**, shown in white, green, blue, purple and orange. Higher tiers improve their actual effects.
+Install implants at a **Cybernetics Bench**. The tab beside your inventory views your equipment and manages quickhack chips. Basic Kiroshi Optics, Paraline and Short Circuit have **tiers 1–5**; Mantis Blades start at **tier 2**, shown in white, green, blue, purple and orange. Higher tiers improve their actual effects.
 
 | Implant | System | Capacity, tier 1 → 5 |
 | --- | --- | --- |
 | Basic Kiroshi Optics | Face | 4 / 5 / 6 / 7 / 8 |
 | Militech Paraline | Operating System | 8 / 12 / 16 / 20 / 24 |
-| Mantis Blades | Arms | 12 / 15 / 18 / 21 / 24 |
+| Mantis Blades | Arms | 15 / 18 / 21 / 24 (tiers 2–5) |
 
-[Cyberpunk 2077 cyberware catalogue](research/CYBERWARE-CATALOGUE.md) · [Upgrade recipes](#tier-upgrades)
+[14 new implant families and their starting tiers](IMPLANTS.md) · [Cyberpunk 2077 cyberware catalogue](research/CYBERWARE-CATALOGUE.md) · [Upgrade recipes](#tier-upgrades)
 
 ## Basic Kiroshi Optics
 
@@ -76,7 +76,6 @@ Install in **Arms** and press **G** with both hands empty to deploy. Press **G**
 
 | Tier | Slash 1 / 2 | Rising cut | Lunge |
 | --- | --- | --- | --- |
-| 1 | 8 | 10 | 14 |
 | 2 | 10 | 12.5 | 17.5 |
 | 3 | 12 | 15 | 21 |
 | 4 | 14 | 17.5 | 24.5 |
@@ -84,7 +83,7 @@ Install in **Arms** and press **G** with both hands empty to deploy. Press **G**
 
 Deployment takes **1.5 seconds**: the original Minecraft hand moves into position, the covers start opening, the folded support and blade rise together, the support/housing slides backward, then the blade pivots forward and the nested tip extends. Retraction pulls the tip in first and returns the same hand to its normal pose. Damage lands on the animated contact frame and requires aim, range and line of sight. Aim at a visible living target within **8 blocks** to leap toward it, including from midair. With no target, leap **6 blocks in the direction you are looking**. Both use normal collision and stop at solid obstacles. When the guided leap ends, its remaining velocity passes into normal movement with ordinary gravity and friction. Aimed leaps deal damage at contact; free leaps can hit an enemy at their endpoint. Selected items stay stored and inactive while the claws are out: their attack attributes, enchantments, use actions and durability do not contribute to Mantis attacks. Both hands must be empty to deploy. Retracting the claws restores ordinary item use. Keys can be rebound under **Options → Controls → Cybernetics 2077**.
 
-Tier 1 ID: `cybernetics2077:mantis_claws_tier_1`. Tiers 2–5: `cybernetics2077:mantis_blades_tier_2` through `_5`.
+Tiers 2–5: `cybernetics2077:mantis_blades_tier_2` through `_5`.
 
 Light attacks alternate hands with a quick cross-body cut and a rising third hit. The free hand stays in guard. The sliding blade compacts during wind-up and extends for contact. Holding a charged attack reels both arms back; releasing drives them forward. The ready pose has subtle breathing and balance motion.
 
@@ -123,6 +122,6 @@ Remove the item at the Cybernetics Bench, then use a **vanilla smithing table**.
 | Tier 3 → 4 | Netherite ingot |
 | Tier 4 → 5 | Nether star |
 
-These recipes apply to optics, Paraline, Mantis Blades and Short Circuit chips. Loaded deck programs, custom names and other item components carry over. New recipes unlock after obtaining the preceding tier. Install the upgraded implant back at the bench; merely carrying it gives no effects.
+These earlier recipes apply to optics, Paraline and Short Circuit chips, and upgrade Mantis Blades from tier 2 onward. The new implant families have no recipes yet. Loaded deck programs, custom names and other item components carry over. New recipes unlock after obtaining the preceding tier. Install the upgraded implant back at the bench; merely carrying it gives no effects.
 
-Existing worlds keep their installed tier-1 implants and loaded chips. Their original IDs and gameplay values are retained; their displayed names change to the Cyberpunk names. Tier stats are Minecraft adaptations. Older tier-1 screenshots show the same interfaces with the earlier display names.
+Existing worlds keep their installed tier-1 implants and loaded chips. Existing tier-1 Mantis Blades now function as tier 2; other original IDs and values are retained. Tier stats are Minecraft adaptations. Older tier-1 screenshots show the same interfaces with the earlier display names.

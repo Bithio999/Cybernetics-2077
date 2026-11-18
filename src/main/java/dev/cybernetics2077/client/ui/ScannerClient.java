@@ -107,7 +107,8 @@ public final class ScannerClient {
   }
 
   public static boolean outlined(Entity e) {
-    return active() && frame.data() >= .98 && e.getId() == focus;
+    return active() && frame.data() >= .98 && e.getId() == focus
+        || dev.cybernetics2077.client.ui.AugmentClient.highlighted(e);
   }
 
   private static void held() {
@@ -121,6 +122,7 @@ public final class ScannerClient {
             && !m.options.hideGui;
     if (down != value) {
       down = value;
+      if (m.player != null) dev.cybernetics2077.client.ui.AugmentClient.action(down ? 10 : 11);
       motion.setHeld(value, System.nanoTime());
       if (!down) {
         while (m.options.keyAttack.consumeClick()) {}
@@ -145,6 +147,7 @@ public final class ScannerClient {
     }
     held();
     if (!active() || m.level == null) return;
+    if (m.player.tickCount % 8 == 0) dev.cybernetics2077.client.ui.AugmentClient.action(10);
     var eye = m.player.getEyePosition();
     var end = eye.add(m.player.getLookAngle().scale(scanRange));
     LivingEntity hit = null;

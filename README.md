@@ -16,10 +16,14 @@ All implants have a strength tier from **1–5**, shown in their tooltip and soc
 | --- | --- | --- | --- |
 | Basic Kiroshi Optics | 1–5 | Face | Scan range: 32 → 64 blocks. |
 | Militech Paraline | 1–5 | Operating System | 4 → 12 RAM; 2 → 8 program sockets; faster recovery and uploads. |
-| Mantis Blades | 1–5 | Arms | Physical slashes: 8 → 16; charged lunge: 14 → 28. |
+| Mantis Blades | 2–5 | Arms | Physical slashes: 10 → 16; charged lunge: 17.5 → 28. |
 | Short Circuit chip | 1–5 | Cyberdeck | 8 → 22 base electrical damage, plus the deck’s damage bonus. |
 
-Upgrade the previous tier at a smithing table with redstone and progressively rarer materials. Loaded chips and custom item data are preserved. [Tier stats and upgrade recipes](docs/CYBERWARE.md#tier-upgrades) · [Cyberpunk cyberware catalogue: 121 current entries](docs/research/CYBERWARE-CATALOGUE.md)
+The original implant/chip families retain their earlier smithing upgrades; the new expansion implants have no recipes yet. Loaded chips and custom item data are preserved. [Tier stats and upgrade recipes](docs/CYBERWARE.md#tier-upgrades) · [Cyberpunk cyberware catalogue: 121 current entries](docs/research/CYBERWARE-CATALOGUE.md)
+
+**14 more implant families** cover the cortex, operating system, face, skeleton, nerves, circulation, skin and legs. They include Berserk, Blood Pump, Optical Camo, retained enemy highlights, defensive implants, a double jump and a charged jump. Each starts at its researched Cyberpunk tier and continues through tier 5. [Full implant list, starting tiers and effects](docs/IMPLANTS.md).
+
+Active controls: **I** for BioDyne Berserk, **H** for Blood Pump, **C** for Optical Camo. Leg abilities use **jump**. Bindings can be changed in Controls. New implants have no recipes yet and are available in Creative or through commands. Existing tier-1 Mantis Blades become tier 2 automatically.
 
 The scanner shows health, armor, attack damage, absorption and visible effects. With a loaded cyberdeck, **left-click** to upload Short Circuit to the target; upload progress appears over its head. The overlay opens and closes with an animated transition from Minecraft’s HUD.
 
@@ -41,7 +45,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.7.0.jar](releases/Cybernetics2077-0.7.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.8.0.jar](releases/Cybernetics2077-0.8.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

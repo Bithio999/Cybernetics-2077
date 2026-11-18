@@ -83,7 +83,7 @@ public final class CyberwareClient {
     return MantisMotion.sample(
         true,
         progress * CombatRules.DEPLOY,
-        now - t.getLong("attack") + partial,
+        (now - t.getLong("attack") + partial) * Math.max(1, t.getFloat("meleeRate")),
         t.getInt("combo"),
         t.getLong("charge") >= 0,
         now - t.getLong("charge") + partial,

@@ -58,7 +58,7 @@ public final class CyberwareNetwork {
   }
 
   public static void register(RegisterPayloadHandlersEvent e) {
-    var r = e.registrar("8");
+    var r = e.registrar("9");
     r.playToServer(
         Action.TYPE,
         Action.CODEC,

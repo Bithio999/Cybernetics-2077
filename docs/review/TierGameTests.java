@@ -35,7 +35,7 @@ public final class TierGameTests {
       var menu = new CyberneticsBenchMenu(1, p.getInventory());
       var eye = Cybernetics2077.OPTICS_TIERS.get(tier).get();
       var deck = Cybernetics2077.CYBERDECK_TIERS.get(tier).get();
-      var arms = Cybernetics2077.MANTIS_TIERS.get(tier).get();
+      var arms = Cybernetics2077.MANTIS_TIERS.get(Math.max(0, tier - 1)).get();
       p.getInventory().setItem(0, new ItemStack(eye));
       p.getInventory().setItem(1, new ItemStack(deck));
       p.getInventory().setItem(2, new ItemStack(arms));
@@ -113,7 +113,8 @@ public final class TierGameTests {
       base.set(
           DataComponents.CUSTOM_NAME,
           net.minecraft.network.chat.Component.literal("Preserved serial"));
-      for (int tier = 2; tier <= 5; tier++) {
+      int firstTier = base.getItem() instanceof MantisBladesItem ? 2 : 1;
+      for (int tier = firstTier + 1; tier <= 5; tier++) {
         var input =
             new SmithingRecipeInput(
                 new ItemStack(Items.REDSTONE), base, new ItemStack(materials[tier - 2]));
@@ -122,7 +123,7 @@ public final class TierGameTests {
         h.assertTrue(recipe.isPresent(), "Missing upgrade recipe at tier " + tier);
         var result = recipe.orElseThrow().value().assemble(input, p.registryAccess());
         h.assertTrue(
-            result.getItem() == family.get(tier - 1).get() && result.getCount() == 1,
+            result.getItem() == family.get(tier - firstTier).get() && result.getCount() == 1,
             "Wrong upgrade output");
         h.assertTrue(
             base.get(DataComponents.CUSTOM_NAME).equals(result.get(DataComponents.CUSTOM_NAME)),
@@ -141,7 +142,10 @@ public final class TierGameTests {
   public static void scanningRangeUsesInstalledOpticsTier(GameTestHelper h) {
     var p = ImplantGameTests.player(h);
     var target = CombatGameTests.target(h, p);
-    target.setPos(p.position().add(0, 0, 55));
+    target.setNoGravity(true);
+    p.setNoGravity(true);
+    // Keep the entity in the GameTest's tracked chunk. A FakePlayer does not load remote chunks.
+    p.setPos(target.position().add(0, 55, 0));
     p.lookAt(
         net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, target.getEyePosition());
     var inv = p.getData(Cybernetics2077.CYBERWARE);
@@ -152,7 +156,9 @@ public final class TierGameTests {
     h.assertTrue(
         ScannerNetwork.inspect(p, target.getId()).contains("id"),
         "Tier-five long-range scan failed");
-    target.setPos(p.position().add(0, 0, 70));
+    p.setPos(target.position().add(0, 70, 0));
+    p.lookAt(
+        net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, target.getEyePosition());
     h.assertTrue(
         !ScannerNetwork.inspect(p, target.getId()).contains("id"), "Tier-five range exceeded");
     h.succeed();
@@ -164,7 +170,7 @@ public final class TierGameTests {
     var target = CombatGameTests.target(h, p);
     var s = CyberwareRuntime.state(p);
     s.deployed = true;
-    for (int tier = 0; tier < 5; tier++) {
+    for (int tier = 0; tier < 4; tier++) {
       p.getData(Cybernetics2077.CYBERWARE)
           .setStackInSlot(4, new ItemStack(Cybernetics2077.MANTIS_TIERS.get(tier).get()));
       for (int combo : new int[] {0, 2, 3}) {
@@ -174,7 +180,7 @@ public final class TierGameTests {
         s.attack = p.serverLevel().getGameTime() - 8;
         s.pendingHit = true;
         CyberwareRuntime.tick(p);
-        float expected = CombatRules.damage(combo) * CyberwareTier.of(tier + 1).bladeMultiplier();
+        float expected = CombatRules.damage(combo) * CyberwareTier.of(tier + 2).bladeMultiplier();
         h.assertTrue(
             Math.abs(100 - target.getHealth() - expected) < .001,
             "Wrong Mantis damage: tier " + (tier + 1) + " combo " + combo);

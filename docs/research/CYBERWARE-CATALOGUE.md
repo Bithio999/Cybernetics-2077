@@ -2,7 +2,7 @@
 
 Research reference for the current 2.x game, including Phantom Liberty, reviewed 17 November 2026. Entries are grouped as in the [Gamestegy cyberware database](https://gamestegy.com/cyberpunk-2077/wiki/cyberware). Each name links to its database entry. This is a reference list, not a list of implants implemented in this mod. Tier and “+” upgrades do not count as separate implant models.
 
-Our existing items map to **Basic Kiroshi Optics**, **Militech Paraline** and **Mantis Blades**. **Short Circuit** is a quickhack program, not body cyberware. The mod currently implements those three implant families and that program at tiers 1–5. [Minecraft effects and upgrade recipes](../CYBERWARE.md).
+Our existing items map to **Basic Kiroshi Optics**, **Militech Paraline** and **Mantis Blades**. **Short Circuit** is a quickhack program, not body cyberware. The mod implements those three families plus [14 more implants](../IMPLANTS.md). Mantis Blades start at tier 2; every family continues through tier 5 from its researched starting tier. [Minecraft effects and upgrade recipes](../CYBERWARE.md).
 
 ## Operating System: Cyberdecks
 

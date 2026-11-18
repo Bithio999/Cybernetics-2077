@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.7.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.8.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.7.0'
+    assert metadata['mods'][0]['version']=='0.8.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -48,6 +48,12 @@ with ZipFile(jar) as z:
                      'dev/cybernetics2077/cyberware/OpticsItem.class',
                      'dev/cybernetics2077/cyberware/MantisBladesItem.class',
                      'dev/cybernetics2077/cyberware/CyberwareTier.class',
+                     'dev/cybernetics2077/cyberware/Augment.class',
+                     'dev/cybernetics2077/cyberware/AugmentItem.class',
+                     'dev/cybernetics2077/cyberware/AugmentState.class',
+                     'dev/cybernetics2077/cyberware/AugmentRuntime.class',
+                     'dev/cybernetics2077/client/ui/AugmentClient.class',
+                     'dev/cybernetics2077/mixin/OpticalCamoMixin.class',
                      'dev/cybernetics2077/mixin/MantisHandsMixin.class',
                      'cybernetics2077.common.mixins.json',
                      'dev/cybernetics2077/mixin/client/MantisTravelMixin.class',
@@ -75,10 +81,31 @@ with ZipFile(jar) as z:
             assert lang['item.cybernetics2077.' + item] == title
             model = json.loads(z.read(f'assets/cybernetics2077/models/item/{item}.json'))
             assert model['parent'] == 'cybernetics2077:item/' + original
+            if prefix == 'mantis_blades' and tier == 2:
+                assert f'data/cybernetics2077/recipe/{item}.json' not in names
+                continue
             recipe = json.loads(z.read(f'data/cybernetics2077/recipe/{item}.json'))
             assert recipe['type'] == 'minecraft:smithing_transform'
             assert recipe['base']['item'] == 'cybernetics2077:' + previous
             assert recipe['result']['id'] == 'cybernetics2077:' + item
+    augment_starts = {
+        'ex_disk': 3, 'memory_boost': 2, 'biodyne_berserk': 2, 'kiroshi_clairvoyant_optics': 3,
+        'bionic_joints': 1, 'epimorphic_skeleton': 4, 'neofiber': 3, 'adrenaline_converter': 1,
+        'blood_pump': 2, 'heal_on_kill': 1, 'subdermal_armor': 1, 'optical_camo': 2,
+        'reinforced_tendons': 2, 'fortified_ankles': 2}
+    assert 'data/cybernetics2077/recipe/mantis_claws_tier_1.json' not in names
+    assert not any('microgenerator' in n or 'CrossbowReloadMixin' in n for n in names), 'Withdrawn hands content shipped'
+    for implant, first in augment_starts.items():
+        png = z.read(f'assets/cybernetics2077/textures/item/{implant}.png')
+        assert struct.unpack('>II', png[16:24]) == (32, 32)
+        for tier in range(first, 6):
+            item = f'{implant}_tier_{tier}'
+            assert lang['item.cybernetics2077.' + item] == lang['cybernetics2077.augment.' + implant]
+            model = json.loads(z.read(f'assets/cybernetics2077/models/item/{item}.json'))
+            assert model['textures']['layer0'] == 'cybernetics2077:item/' + implant
+            assert f'data/cybernetics2077/recipe/{item}.json' not in names, 'Unrequested expansion recipe'
+        if first > 1:
+            assert f'assets/cybernetics2077/models/item/{implant}_tier_{first - 1}.json' not in names
     for mixin in json.loads(z.read('cybernetics2077.mixins.json'))['client']:
         assert 'dev/cybernetics2077/mixin/client/'+mixin+'.class' in names
     for mixin in json.loads(z.read('cybernetics2077.common.mixins.json'))['mixins']:

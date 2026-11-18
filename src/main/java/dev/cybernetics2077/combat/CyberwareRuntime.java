@@ -88,7 +88,7 @@ public final class CyberwareRuntime {
         it.remove();
       }
     }
-    s.ram = Math.clamp(s.ram, 0, deckTier(p).ram());
+    s.ram = Math.clamp(s.ram, 0, Math.max(CombatRules.RAM_MAX, AugmentRuntime.maxRam(p)));
   }
 
   public static boolean emptyHands(Player p) {
@@ -107,13 +107,14 @@ public final class CyberwareRuntime {
     var program = CyberdeckItem.quickhack(deck(p));
     t.putBoolean("shortCircuit", program != null);
     t.putInt("deckTier", deckTier(p).level);
-    t.putInt("ramMax", deckTier(p).ram());
+    t.putInt("ramMax", AugmentRuntime.maxRam(p));
     t.putInt("programSlots", deckTier(p).programSlots());
     t.putInt("queueLimit", deckTier(p).queueLimit());
     t.putInt("hackTier", program == null ? 0 : program.tier().level);
     t.putInt("hackCost", program == null ? 0 : program.tier().shortCircuitCost());
     t.putFloat("hackDamage", program == null ? 0 : quickhackDamage(p, program));
-    t.putInt("uploadTicks", deckTier(p).uploadTicks());
+    t.putInt("uploadTicks", AugmentRuntime.uploadTicks(p));
+    AugmentRuntime.snapshot(p, t);
     t.putBoolean("claws", claws(p));
     t.putBoolean("deployed", s.deployed);
     t.putFloat("ram", s.ram);
@@ -154,6 +155,7 @@ public final class CyberwareRuntime {
     var t = snapshot(p);
     var compare = t.copy();
     compare.remove("time");
+    compare.remove("augmentTime");
     // RAM and countdown are quantized for UI; at most 5 updates/sec while regenerating.
     compare.putFloat("ram", Math.round(s.ram * 10) / 10f);
     if (!compare.equals(s.sent)) {
@@ -169,6 +171,10 @@ public final class CyberwareRuntime {
   }
 
   public static void action(ServerPlayer p, int action) {
+    if (action >= 5) {
+      AugmentRuntime.action(p, action);
+      return;
+    }
     var s = state(p);
     long now = p.serverLevel().getGameTime();
     if (action == 4) {
@@ -222,7 +228,8 @@ public final class CyberwareRuntime {
     if (!CombatRules.ready(
         now,
         s.lastAttack,
-        s.combo == 3 ? CombatRules.HEAVY_INTERVAL : CombatRules.LIGHT_INTERVAL)) {
+        AugmentRuntime.interval(
+            p, s.combo == 3 ? CombatRules.HEAVY_INTERVAL : CombatRules.LIGHT_INTERVAL))) {
       broadcast(p);
       return;
     }
@@ -264,7 +271,7 @@ public final class CyberwareRuntime {
         new Upload(
             target.getUUID(),
             start,
-            start + deckTier(p).uploadTicks(),
+            start + AugmentRuntime.uploadTicks(p),
             id,
             deck(p),
             program,
@@ -283,6 +290,7 @@ public final class CyberwareRuntime {
   }
 
   public static void tick(ServerPlayer p) {
+    AugmentRuntime.tick(p);
     var s = state(p);
     long now = p.serverLevel().getGameTime();
     if (s.charge >= 0 && (!usable(p) || !s.deployed)) {
@@ -302,13 +310,13 @@ public final class CyberwareRuntime {
     if (s.deployed
         && s.lunge == null
         && s.pendingHit
-        && now - s.attack >= CombatRules.impactTick(s.combo)) {
+        && now - s.attack >= AugmentRuntime.interval(p, CombatRules.impactTick(s.combo))) {
       s.pendingHit = false;
       if (usable(p) && claws(p)) bladeHit(p, s.combo);
     }
     reconcileUploads(p);
     if (deck(p).getItem() instanceof CyberdeckItem)
-      s.ram = Math.min(deckTier(p).ram(), s.ram + deckTier(p).ramPerSecond() / 20);
+      s.ram = Math.min(AugmentRuntime.maxRam(p), s.ram + deckTier(p).ramPerSecond() / 20);
     if (!s.uploads.isEmpty() && s.uploads.getFirst().finish <= now) {
       var upload = s.uploads.removeFirst();
       var target = p.serverLevel().getEntity(upload.target);
@@ -421,7 +429,8 @@ public final class CyberwareRuntime {
       s.lunge = null;
       if (contact) {
         s.pendingHit = false;
-        s.attack = p.serverLevel().getGameTime() - CombatRules.impactTick(3);
+        s.attack =
+            p.serverLevel().getGameTime() - AugmentRuntime.interval(p, CombatRules.impactTick(3));
         if (target == null) bladeHit(p, 3);
         else if (p.hasLineOfSight(target)) hit(p, (LivingEntity) target, 3);
       } else s.pendingHit = false;
@@ -459,7 +468,7 @@ public final class CyberwareRuntime {
     if (tier != null
         && target.hurt(
             p.damageSources().playerAttack(p),
-            CombatRules.damage(combo) * tier.bladeMultiplier())) {
+            AugmentRuntime.bladeDamage(p, CombatRules.damage(combo) * tier.bladeMultiplier()))) {
       target.knockback(combo == 3 ? .55 : .2, p.getX() - target.getX(), p.getZ() - target.getZ());
       p.serverLevel()
           .sendParticles(
@@ -509,6 +518,11 @@ public final class CyberwareRuntime {
     if (e.getEntity() instanceof ServerPlayer p) {
       var s = state(p);
       s.uploads.clear();
+      var augments = AugmentRuntime.state(p);
+      augments.highlights.clear();
+      augments.scanUntil = 0;
+      augments.ankleStart = -1;
+      augments.airJumped = false;
       s.deployed = false;
       s.changed = p.serverLevel().getGameTime() - CombatRules.DEPLOY;
       s.charge = -1;

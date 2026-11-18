@@ -57,7 +57,10 @@ public final class ScannerNetwork {
             .getStackInSlot(CyberwareCategory.FACE.firstSlot());
     return stack.getItem() instanceof dev.cybernetics2077.cyberware.OpticsItem item
         ? item.tier()
-        : null;
+        : stack.getItem() instanceof dev.cybernetics2077.cyberware.AugmentItem item
+                && item.augment() == dev.cybernetics2077.cyberware.Augment.CLAIRVOYANT
+            ? item.tier()
+            : null;
   }
 
   public static int range(net.minecraft.world.entity.player.Player player) {

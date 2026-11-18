@@ -53,11 +53,41 @@ public final class Cybernetics2077 {
   public static final java.util.List<Supplier<QuickhackItem>> SHORT_CIRCUIT_TIERS =
       tiers("short_circuit_tier_1", "short_circuit", QuickhackItem::new);
   public static final java.util.List<Supplier<MantisBladesItem>> MANTIS_TIERS =
-      tiers("mantis_claws_tier_1", "mantis_blades", MantisBladesItem::new);
+      java.util.stream.IntStream.rangeClosed(2, 5)
+          .<Supplier<MantisBladesItem>>mapToObj(
+              t ->
+                  ITEMS.register(
+                      "mantis_blades_tier_" + t, () -> new MantisBladesItem(CyberwareTier.of(t))))
+          .toList();
+  // Compatibility alias: existing stacks are tier TWO immediately, never tier one.
+  public static final Supplier<MantisBladesItem> LEGACY_MANTIS =
+      ITEMS.register("mantis_claws_tier_1", () -> new MantisBladesItem(CyberwareTier.TWO));
+  public static final java.util.Map<Augment, java.util.List<Supplier<AugmentItem>>> AUGMENTS =
+      registerAugments();
   public static final Supplier<OpticsItem> OPTICS = OPTICS_TIERS.get(0);
   public static final Supplier<CyberdeckItem> CYBERDECK = CYBERDECK_TIERS.get(0);
   public static final Supplier<QuickhackItem> SHORT_CIRCUIT = SHORT_CIRCUIT_TIERS.get(0);
   public static final Supplier<MantisBladesItem> MANTIS = MANTIS_TIERS.get(0);
+
+  private static java.util.Map<Augment, java.util.List<Supplier<AugmentItem>>> registerAugments() {
+    var result =
+        new java.util.EnumMap<Augment, java.util.List<Supplier<AugmentItem>>>(Augment.class);
+    for (var kind : Augment.values()) {
+      var entries = new java.util.ArrayList<Supplier<AugmentItem>>();
+      for (int t = kind.firstTier; t <= 5; t++) {
+        var tier = CyberwareTier.of(t);
+        entries.add(ITEMS.register(kind.id + "_tier_" + t, () -> new AugmentItem(kind, tier)));
+      }
+      result.put(kind, java.util.List.copyOf(entries));
+    }
+    return java.util.Collections.unmodifiableMap(result);
+  }
+
+  public static AugmentItem augment(Augment kind, int tier) {
+    if (tier < kind.firstTier || tier > 5)
+      throw new IllegalArgumentException("Unavailable implant tier");
+    return AUGMENTS.get(kind).get(tier - kind.firstTier).get();
+  }
 
   private static <T extends net.minecraft.world.item.Item> java.util.List<Supplier<T>> tiers(
       String originalId, String prefix, java.util.function.Function<CyberwareTier, T> factory) {
@@ -91,6 +121,10 @@ public final class Cybernetics2077 {
       ATTACHMENTS.register(
           "cyberware",
           () -> AttachmentType.serializable(CyberwareInventory::new).copyOnDeath().build());
+  public static final Supplier<AttachmentType<AugmentState>> AUGMENT_STATE =
+      ATTACHMENTS.register(
+          "augment_state",
+          () -> AttachmentType.serializable(AugmentState::new).copyOnDeath().build());
   private static final ModConfigSpec.Builder CONFIG = new ModConfigSpec.Builder();
   public static final ModConfigSpec.IntValue CAPACITY =
       CONFIG
@@ -117,6 +151,7 @@ public final class Cybernetics2077 {
       for (var family :
           java.util.List.of(OPTICS_TIERS, CYBERDECK_TIERS, SHORT_CIRCUIT_TIERS, MANTIS_TIERS))
         for (var item : family) e.accept(item.get());
+      for (var family : AUGMENTS.values()) for (var item : family) e.accept(item.get());
     }
   }
 

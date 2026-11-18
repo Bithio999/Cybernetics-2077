@@ -107,7 +107,7 @@ public final class CombatGameTests {
               () -> {
                 CyberwareRuntime.tick(p);
                 h.assertTrue(
-                    Math.abs(mob.getHealth() - 92) < .001 && !mob.isOnFire(),
+                    Math.abs(mob.getHealth() - 90) < .001 && !mob.isOnFire(),
                     "Weapon affected Mantis damage or added fire");
                 h.assertTrue(
                     ItemStack.matches(saved, p.getInventory().getSelected()),
@@ -149,7 +149,7 @@ public final class CombatGameTests {
     menu.quickMoveStack(p, 48);
     menu.quickMoveStack(p, 49);
     h.assertTrue(
-        menu.hasDeck() && CyberwareRuntime.claws(p) && menu.capacityUsed() == 20,
+        menu.hasDeck() && CyberwareRuntime.claws(p) && menu.capacityUsed() == 23,
         "New implants failed to install or wrong capacity");
     h.succeed();
   }
@@ -261,7 +261,7 @@ public final class CombatGameTests {
               () -> {
                 CyberwareRuntime.tick(p);
                 h.assertTrue(
-                    Math.abs(mob.getHealth() - 92) < .001,
+                    Math.abs(mob.getHealth() - 90) < .001,
                     "Light contact damage incorrect: " + mob.getHealth());
                 p.getInventory().setItem(0, new ItemStack(Items.STICK));
                 CyberwareRuntime.tick(p);

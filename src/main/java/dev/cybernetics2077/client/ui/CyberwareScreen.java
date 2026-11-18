@@ -353,7 +353,17 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     if (stack.getItem() instanceof CyberwareItem item) {
       c.text("TIER " + item.tier().level, 434, 499, 23, item.tier().color);
       c.right(item.capacityCost() + " CAPACITY", 900, 505, 17, 0xffe3b76f);
-      if (stack.getItem() instanceof OpticsItem) {
+      if (stack.getItem() instanceof AugmentItem implant) {
+        c.glowText(
+            implant.augment().active() ? "ACTIVE CYBERWARE" : "IMPLANT EFFECTS",
+            434,
+            546,
+            23,
+            CYAN);
+        var lines = implant.augment().details(implant.tier().level);
+        for (int i = 0; i < lines.size(); i++)
+          c.body(c.fit(lines.get(i), 465, 16, false), 434, 580 + i * 16, 16, WHITE);
+      } else if (stack.getItem() instanceof OpticsItem) {
         c.glowText("OPTICAL SCANNER", 434, 548, 23, CYAN);
         c.body(
             "Identify living targets within " + item.tier().scanRange() + " blocks.",

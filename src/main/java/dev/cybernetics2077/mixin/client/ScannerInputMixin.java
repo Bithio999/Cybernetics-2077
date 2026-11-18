@@ -35,7 +35,9 @@ public abstract class ScannerInputMixin {
       if (dev.cybernetics2077.client.mantis.CyberwareClient.active())
         dev.cybernetics2077.client.mantis.CyberwareClient.charge();
       ci.cancel();
-    }
+    } else if (Minecraft.getInstance().player != null
+        && dev.cybernetics2077.cyberware.AugmentRuntime.berserk(Minecraft.getInstance().player))
+      ci.cancel();
   }
 
   @Inject(method = "shouldEntityAppearGlowing", at = @At("HEAD"), cancellable = true)

@@ -15,6 +15,11 @@ public final class CyberwareInventory extends ItemStackHandler {
 
   @Override
   public boolean isItemValid(int slot, ItemStack stack) {
+    if (stack.getItem() instanceof AugmentItem candidate)
+      for (int i = 0; i < getSlots(); i++)
+        if (i != slot
+            && getStackInSlot(i).getItem() instanceof AugmentItem existing
+            && candidate.augment() == existing.augment()) return false;
     return stack.isEmpty()
         || stack.getItem() instanceof CyberwareItem item
             && item.category() == CyberwareCategory.forSlot(slot);

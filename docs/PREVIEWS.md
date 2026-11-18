@@ -123,3 +123,27 @@ Basic Kiroshi Optics, Militech Paraline and Mantis Blades now support tiers 1–
 ![Tier-5 Paraline detail](images/tier-five-viewer.png)
 
 ![Tier-5 scanner](images/tier-five-scanner.png)
+
+## Cyberware expansion (0.8.0)
+
+Fourteen new families use their researched starting tiers and continue through tier 5. [Controls and tier values](IMPLANTS.md). The native review installs a netrunner loadout at exactly 100 capacity and a Berserk loadout at 97, then exercises retained enemy highlights, healing, Berserk’s health floor, Camo and both leg implants. The hands system remains empty.
+
+[Watch the native expansion preview](media/cyberware-expansion.mp4)
+
+![Netrunner loadout](images/expansion-netrunner-overview.png)
+
+![Ex-Disk details](images/expansion-ex-disk.png)
+
+![Epimorphic Skeleton details](images/expansion-epimorphic-details.png)
+
+![Clairvoyant scanner with 18 RAM](images/expansion-clairvoyance.png)
+
+![Retained highlight after closing scanner](images/expansion-retained-highlight.png)
+
+![Berserk implant details](images/expansion-berserk-details.png)
+
+![Blood Pump and active-implant HUD](images/expansion-blood-pump.png)
+
+![Optical Camo active](images/expansion-optical-camo.png)
+
+![Charged ankle jump](images/expansion-charged-jump.png)
