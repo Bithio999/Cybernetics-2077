@@ -39,4 +39,10 @@ Stock rotates at **Overworld dawn**, every 24,000 ticks, including after sleepin
 
 A full inventory, insufficient eddies, or an offer rotating out prevents purchase without payment.
 
+## Salvage discount
+
+Rare [cybernetically enhanced mobs](enhanced-mobs.md) drop **Tier 1–5 damaged cybernetic parts**. Choose **−30%** beside an available implant to trade **one matching-tier part plus 70% of the normal price**. Hover to see the discounted price and your part count. **BUY** keeps your parts and pays full price.
+
+Stock and Street Cred requirements still apply. Parts work for implants and cyberdecks, not quickhack chips. Failed purchases consume neither eddies nor parts. A single part can free its inventory slot for the new implant.
+
 [Installing cyberware](installation.md) · [Eddies and Street Cred](street-cred.md) · [First delivery](contracts.md)

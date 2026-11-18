@@ -535,6 +535,13 @@ public final class ScannerClient {
             : entity instanceof net.minecraft.world.entity.monster.Enemy
                 ? "HOSTILE"
                 : "LIVING ENTITY";
+    if (has && target.getInt("implants") > 0)
+      kind =
+          String.format(
+              Locale.ROOT,
+              "CHROMED // %d IMPLANTS // AVG T%.1f",
+              target.getInt("implants"),
+              target.getDouble("averageTier"));
     c.tracked(has ? kind : "AIM AT A LIVING TARGET", 1410, 414, 14, 0xffb4e1eb, .8f);
     c.body(
         has ? c.fit(target.getString("type"), 378, 16, false) : "Line of sight required",

@@ -1,6 +1,8 @@
 package dev.cybernetics2077.city;
 
 import dev.cybernetics2077.bench.CyberneticsBenchMenu;
+import dev.cybernetics2077.cyberware.CyberwareItem;
+import dev.cybernetics2077.mob.DamagedCyberneticPart;
 import java.util.*;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -104,6 +106,23 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     return data.get(4);
   }
 
+  public int parts(int tier) {
+    int count = 0;
+    for (int i = 0; i < 36; i++) {
+      var stack = owner.getInventory().getItem(i);
+      if (stack.getItem() instanceof DamagedCyberneticPart part && part.tier().level == tier)
+        count += stack.getCount();
+    }
+    return count;
+  }
+
+  private int partSlot(Player p, int tier) {
+    for (int i = 0; i < 36; i++)
+      if (p.getInventory().getItem(i).getItem() instanceof DamagedCyberneticPart part
+          && part.tier().level == tier) return i;
+    return -1;
+  }
+
   @Override
   protected boolean installationActive() {
     return tab() == 1;
@@ -137,36 +156,52 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
       broadcastChanges();
       return true;
     }
-    if (tab() != 0 || button < 1000 || button >= 1000 + CyberwareCatalogue.offers().size())
-      return false;
-    var offer = CyberwareCatalogue.offers().get(button - 1000);
+    boolean salvage = button >= 2000;
+    int index = button - (salvage ? 2000 : 1000);
+    if (tab() != 0 || index < 0 || index >= CyberwareCatalogue.offers().size()) return false;
+    var offer = CyberwareCatalogue.offers().get(index);
     var wallet = p.getData(CityContent.ACCOUNT);
     if (wallet.streetCred() < offer.requiredStreetCred()) {
       data.set(6, 4);
       broadcastChanges();
       return false;
     }
-    if (!stocked(button - 1000)) {
+    if (!stocked(index)) {
       data.set(6, 5);
       broadcastChanges();
       return false;
     }
-    if (wallet.eddies() < offer.price()) {
+    int partSlot = salvage ? partSlot(p, offer.tier()) : -1;
+    if (salvage && (!(offer.item() instanceof CyberwareItem) || partSlot < 0)) {
+      data.set(6, 6);
+      broadcastChanges();
+      return false;
+    }
+    int price = salvage ? DamagedCyberneticPart.price(offer) : offer.price();
+    if (wallet.eddies() < price) {
       data.set(6, 1);
       broadcastChanges();
       return false;
     }
     // All catalogue entries stack to one; reserve a free slot before charging.
-    if (p.getInventory().getFreeSlot() < 0) {
+    boolean partFreesSlot = salvage && p.getInventory().getItem(partSlot).getCount() == 1;
+    if (p.getInventory().getFreeSlot() < 0 && !partFreesSlot) {
       data.set(6, 2);
       broadcastChanges();
       return false;
     }
     var item = new ItemStack(offer.item());
-    if (!wallet.spend(offer.price())) return false;
+    if (!wallet.spend(price)) return false;
+    ItemStack payment = salvage ? p.getInventory().removeItem(partSlot, 1) : ItemStack.EMPTY;
     if (!p.getInventory().add(item)) {
-      wallet.credit(offer.price());
+      wallet.credit(price);
+      if (!payment.isEmpty()) {
+        var rest = p.getInventory().getItem(partSlot);
+        if (rest.isEmpty()) p.getInventory().setItem(partSlot, payment);
+        else rest.grow(1);
+      }
       data.set(6, 2);
+      broadcastChanges();
       return false;
     }
     data.set(6, 3);

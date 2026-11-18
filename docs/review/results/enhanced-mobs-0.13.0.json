@@ -1,0 +1,28 @@
+{
+  "version": "0.13.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvm_tests": 61,
+  "jvm_failures": 0,
+  "server_game_tests": 83,
+  "server_status": "passed",
+  "native_status": "PASS: real integrated-server chromed loadouts, synchronized variant names, native animated mob layers and all five part models; daily-stock shop; hover trade terms; actual mouse purchase consumes exactly one T1 part and 700 eddies; minimum 320x240 layout bounds.",
+  "release_verifier": "passed",
+  "jar_sha256": "82c4005c20f87e82e643d664e6ff274f8beb8e30acd74bc371dc941a64adc83a",
+  "checks": [
+    "2% default natural spawn rate; structure-generated hostiles supported; other spawn sources excluded",
+    "Actual tiered loadouts and combat attributes; ranged bonus; healing and speed effects",
+    "Saved inventory, health, modifiers and cooldowns; vanilla water conversion",
+    "Exactly one tiered salvage drop; no duplicate rewards; doMobLoot respected",
+    "Loot probability normalization and monotonic improvement by both average tier and implant count",
+    "Discount transaction, matching-tier validation, daily stock and Street Cred checks",
+    "Quickhacks excluded; failed purchases preserve both resources; last part can free an inventory slot",
+    "Native synchronized wallet/inventory purchase and 320x240 layout bounds"
+  ],
+  "captures": [
+    "chromed-mobs-and-salvage.png",
+    "ripperdoc-salvage-discount.png",
+    "ripperdoc-salvage-tooltip.png",
+    "ripperdoc-salvage-small.png"
+  ]
+}

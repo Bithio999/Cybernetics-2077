@@ -8,7 +8,7 @@ A standalone **Minecraft 1.21.1 / NeoForge** mod inspired by Cyberpunk 2077. Ins
 
 Individual item pages, tier stats, controls, recipes and village guides.
 
-**[Download version 0.12.0](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.12.0.jar)**
+**[Download version 0.13.0](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.13.0.jar)**
 
 Requires Minecraft **1.21.1**, NeoForge **21.1.248+ for 1.21.1**, and Java **21**. Install the same version on server and clients. Replace an older JAR instead of keeping both.
 
@@ -19,6 +19,7 @@ Requires Minecraft **1.21.1**, NeoForge **21.1.248+ for 1.21.1**, and Java **21*
 | Decks, RAM and program slots | [Cyberdecks](docs/wiki/cyberdecks.md) |
 | Quickhack costs and damage types | [Quickhacks](docs/wiki/quickhacks.md) |
 | Daily shops, currency and contracts | [Village services](docs/wiki/ripperdocs.md) |
+| Rare enhanced mobs and implant discounts | [Chromed mobs and salvage](docs/wiki/enhanced-mobs.md) |
 | Keybindings or a problem | [Controls](docs/wiki/controls.md) · [Common questions](docs/wiki/faq.md) |
 
 Existing worlds are supported; new village buildings require new chunks.

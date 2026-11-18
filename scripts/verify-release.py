@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.12.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.13.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.12.0'
+    assert metadata['mods'][0]['version']=='0.13.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -24,6 +24,10 @@ with ZipFile(jar) as z:
             if path.suffix == '.json':
                 json.loads(z.read(entry))
     for required in ('dev/cybernetics2077/Cybernetics2077.class',
+                     'dev/cybernetics2077/mob/EnhancedMobs.class',
+                     'dev/cybernetics2077/mob/SalvageOdds.class',
+                     'dev/cybernetics2077/mob/DamagedCyberneticPart.class',
+                     'dev/cybernetics2077/client/EnhancedMobLayer.class',
                      'dev/cybernetics2077/city/DeliveryContracts.class',
                      'dev/cybernetics2077/combat/QuickhackEffects.class',
                      'dev/cybernetics2077/deck/QuickhackKind.class',
@@ -77,6 +81,13 @@ with ZipFile(jar) as z:
         png=z.read('assets/cybernetics2077/textures/item/'+icon+'.png')
         assert struct.unpack('>II',png[16:24]) == (32,32), 'Equipment sprite is not 32px pixel art: '+icon
     lang = json.loads(z.read('assets/cybernetics2077/lang/en_us.json'))
+    for tier in range(1,6):
+        part=f'damaged_cybernetic_part_tier_{tier}'
+        assert lang['item.cybernetics2077.'+part].endswith(f'Tier {tier}')
+        model=json.loads(z.read(f'assets/cybernetics2077/models/item/{part}.json'))
+        assert model['textures']['layer0']=='cybernetics2077:item/'+part
+        png=z.read(f'assets/cybernetics2077/textures/item/{part}.png')
+        assert struct.unpack('>II',png[16:24])==(32,32)
     for original, prefix, title in (
         ('optical_scanner', 'kiroshi_optics', 'Basic Kiroshi Optics'),
         ('cyberdeck_tier_1', 'militech_paraline', 'Militech Paraline'),

@@ -14,6 +14,8 @@ Useful for server setup and Creative testing. Commands require cheats or operato
 
 ## Cyberware IDs
 
+Damaged salvage: `cybernetics2077:damaged_cybernetic_part_tier_<tier>` (tiers **1–5**). See [enhanced mobs](enhanced-mobs.md) for drops and discounts.
+
 Replace `<tier>` only with a tier listed in the table.
 
 | Implant | Item ID | Tiers |

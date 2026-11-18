@@ -101,6 +101,15 @@ public final class Cybernetics2077 {
   public static final Supplier<CyberdeckItem> CYBERDECK = CYBERDECK_TIERS.get(0);
   public static final Supplier<QuickhackItem> SHORT_CIRCUIT = SHORT_CIRCUIT_TIERS.get(0);
   public static final Supplier<MantisBladesItem> MANTIS = MANTIS_TIERS.get(0);
+  public static final java.util.List<Supplier<dev.cybernetics2077.mob.DamagedCyberneticPart>>
+      DAMAGED_PARTS =
+          java.util.Arrays.stream(CyberwareTier.values())
+              .<Supplier<dev.cybernetics2077.mob.DamagedCyberneticPart>>map(
+                  t ->
+                      ITEMS.register(
+                          "damaged_cybernetic_part_tier_" + t.level,
+                          () -> new dev.cybernetics2077.mob.DamagedCyberneticPart(t)))
+              .toList();
 
   private static java.util.Map<Augment, java.util.List<Supplier<AugmentItem>>> registerAugments() {
     var result =
@@ -163,6 +172,12 @@ public final class Cybernetics2077 {
       CONFIG
           .comment("Maximum total capacity available for installed cyberware.")
           .defineInRange("baseCapacity", 100, 1, 100000);
+  public static final ModConfigSpec.DoubleValue ENHANCED_SPAWN_CHANCE =
+      CONFIG
+          .comment(
+              "Chance per eligible natural hostile spawn to receive cyberware. 0 disables new"
+                  + " variants.")
+          .defineInRange("enhancedMobSpawnChance", .02, 0, 1);
   private static final ModConfigSpec SPEC = CONFIG.build();
 
   public Cybernetics2077(IEventBus bus, ModContainer container) {
@@ -187,6 +202,7 @@ public final class Cybernetics2077 {
               OPTICS_TIERS, CYBERDECK_TIERS, RAVEN_TIERS, SHORT_CIRCUIT_TIERS, MANTIS_TIERS))
         for (var item : family) e.accept(item.get());
       for (var family : AUGMENTS.values()) for (var item : family) e.accept(item.get());
+      for (var part : DAMAGED_PARTS) e.accept(part.get());
       for (var kind : QuickhackKind.values())
         if (kind != QuickhackKind.SHORT_CIRCUIT)
           for (var item : QUICKHACKS.get(kind)) e.accept(item.get());

@@ -237,5 +237,14 @@
   "death.attack.overheat": "%1$s was neutralized by a quickhack from %2$s",
   "death.attack.contagion": "%1$s was neutralized by a quickhack from %2$s",
   "death.attack.synapse_burnout": "%1$s was neutralized by a quickhack from %2$s",
-  "cybernetics2077.hack.control_cost": "Cost: %s RAM"
+  "cybernetics2077.hack.control_cost": "Cost: %s RAM",
+  "cybernetics2077.enhanced.name": "Chromed %s [T%s / %s implants]",
+  "cybernetics2077.salvage.discount": "Trade at a ripperdoc: %s%% off a Tier %s implant.",
+  "cybernetics2077.salvage.requirements": "Requires matching tier, daily stock and Street Cred. Not for quickhacks.",
+  "cybernetics2077.salvage.consumed": "One part is consumed per discounted purchase. Use the -30% button.",
+  "item.cybernetics2077.damaged_cybernetic_part_tier_1": "Damaged Cybernetic Part — Tier 1",
+  "item.cybernetics2077.damaged_cybernetic_part_tier_2": "Damaged Cybernetic Part — Tier 2",
+  "item.cybernetics2077.damaged_cybernetic_part_tier_3": "Damaged Cybernetic Part — Tier 3",
+  "item.cybernetics2077.damaged_cybernetic_part_tier_4": "Damaged Cybernetic Part — Tier 4",
+  "item.cybernetics2077.damaged_cybernetic_part_tier_5": "Damaged Cybernetic Part — Tier 5"
 }

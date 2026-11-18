@@ -160,6 +160,11 @@ public final class ScannerNetwork {
         if (effects.size() >= 8) break;
       }
     t.put("effects", effects);
+    if (target instanceof Mob mob && dev.cybernetics2077.mob.EnhancedMobs.enhanced(mob)) {
+      var loadout = dev.cybernetics2077.mob.EnhancedMobs.loadout(mob);
+      t.putInt("implants", loadout.count());
+      t.putDouble("averageTier", loadout.averageTier());
+    }
     return t;
   }
 

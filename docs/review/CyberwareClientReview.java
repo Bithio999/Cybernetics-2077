@@ -324,6 +324,7 @@ public final class CyberwareClientReview {
           Files.deleteIfExists(OUT.resolve("contract-passed.txt"));
           Files.deleteIfExists(OUT.resolve("stock-passed.txt"));
           Files.deleteIfExists(OUT.resolve("hacks-passed.txt"));
+          Files.deleteIfExists(OUT.resolve("enhanced-passed.txt"));
           mc.options.pauseOnLostFocus = false;
           mc.options.guiScale().set(2);
           mc.options.enableVsync().set(false);
@@ -359,6 +360,10 @@ public final class CyberwareClientReview {
         return;
       }
       ticks++;
+      if (Boolean.getBoolean("cybernetics2077.enhancedReview")) {
+        EnhancedClientReview.tick(contentTicks++);
+        return;
+      }
       if (Boolean.getBoolean("cybernetics2077.hacksReview")) {
         HacksClientReview.tick(contentTicks++);
         return;

@@ -2,9 +2,9 @@
 
 A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod inspired by Cyberpunk 2077.
 
-**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.12.0**
+**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.13.0**
 
-[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.12.0.jar)
+[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.13.0.jar)
 [Start playing](getting-started.md)
 
 ## Find what you need
@@ -34,6 +34,12 @@ A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod 
     Ripperdocs, daily stock, the Afterlife, contracts and currency.
 
     [Ripperdocs](ripperdocs.md) · [Contracts](contracts.md) · [Street Cred](street-cred.md)
+
+- **Chromed hostiles**
+
+    Rare enhanced mobs, tiered salvage and matching-tier implant discounts.
+
+    [Mobs and salvage](enhanced-mobs.md)
 
 </div>
 

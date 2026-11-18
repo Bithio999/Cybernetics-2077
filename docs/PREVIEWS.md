@@ -2,6 +2,14 @@
 
 Older captures and implementation history are kept here for contributors. **[Current player wiki](wiki/index.md)** pages include the relevant screenshots and videos beside the item they describe.
 
+## Enhanced mobs and salvage (0.13.0)
+
+Actual native entity models with the new animated plating/circuit layers, all five part item models, and real ripperdoc stock with separate normal and salvage purchases.
+
+![Chromed mobs and salvage](images/chromed-mobs-and-salvage.png)
+
+[Discount menu](images/ripperdoc-salvage-discount.png) · [Trade tooltip](images/ripperdoc-salvage-tooltip.png) · [Minimum-size shop](images/ripperdoc-salvage-small.png) · [Player guide](wiki/enhanced-mobs.md)
+
 ## Raven and six quickhacks (0.12.0)
 
 Captured from the actual game: installation through the bench, the Raven-specific chip editor, Operating System page, all six scanner entries and program-specific uploads. [Costs and effects](CYBERWARE.md#additional-quickhacks).

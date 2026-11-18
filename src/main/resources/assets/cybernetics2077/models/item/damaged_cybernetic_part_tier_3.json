@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "cybernetics2077:item/damaged_cybernetic_part_tier_3"
+  }
+}

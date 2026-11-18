@@ -2,6 +2,21 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Enhanced mobs and salvage (0.13.0)
+
+Release 0.13.0 passes **61 JVM tests**, **83 dedicated-server GameTests**, and the native enhanced-mob/shop review.
+
+The new checks cover rare spawn probability and spawn-source exclusions; real installed loadouts; combat attributes and ranged damage; save/load without modifier stacking or free healing; Blood Pump/Adrenaline activation and saved cooldowns; vanilla water conversion; actual death drops, duplicate-drop protection and `doMobLoot`; matching-tier payment; normal purchases keeping parts; quickhack/Street Cred/stock exclusions; full inventories; and insufficient funds. Probability tests verify that increasing either average implant tier or implant count improves every higher-tier drop threshold.
+
+The native review renders the actual enhanced mob layers and all five part item models, opens a real doctor menu, reads the discount tooltip and uses the mouse to purchase €$1,000 optics for €$700 and exactly one Tier 1 part. The client confirms the synchronized wallet, part count and purchased item. It also checks every visible shop widget at **320×240**. This uses an integrated server, not two separate computers.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PenhancedReview
+```
+
+Native success writes `capture/enhanced-passed.txt`; failure writes `capture/failed.txt`. Clean before packaging. [Results](review/results/enhanced-mobs-0.13.0.json) · [Player guide and screenshots](wiki/enhanced-mobs.md).
+
 The previous 0.9.1 village-services release passed **53 JVM tests**, **55 server GameTests**, the expanded native village-services review and clean-release verification. The client verifies all 25 furniture items in GUI, both first-person hands, both third-person hands, ground and frame contexts. The local player’s skin remains in the hologram.
 
 ## Raven and additional quickhacks (0.12.0)

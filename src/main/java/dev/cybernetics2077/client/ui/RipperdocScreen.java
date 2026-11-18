@@ -4,6 +4,7 @@ import dev.cybernetics2077.Cybernetics2077;
 import dev.cybernetics2077.bench.CyberneticsBenchMenu;
 import dev.cybernetics2077.city.*;
 import dev.cybernetics2077.cyberware.*;
+import dev.cybernetics2077.mob.DamagedCyberneticPart;
 import java.util.*;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
@@ -18,6 +19,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
   private EditBox search;
   private CyberActionButton purchase, install, filter, tierButton, prev, next;
   private final java.util.List<CyberActionButton> buys = new ArrayList<>();
+  private final java.util.List<CyberActionButton> trades = new ArrayList<>();
 
   public RipperdocScreen(RipperdocMenu m, Inventory i, Component title) {
     super(m, i, title);
@@ -34,6 +36,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
   protected void init() {
     super.init();
     buys.clear();
+    trades.clear();
     purchase = button(10, 26, 92, "PURCHASE", () -> send(10));
     install = button(108, 26, 92, "INSTALL", () -> send(11));
     search =
@@ -68,14 +71,25 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
       final int row = n;
       buys.add(
           button(
-              249,
+              221,
               77 + n * 25,
-              58,
+              40,
               "BUY",
               () -> {
                 var offers = filtered();
                 int idx = page * 5 + row;
                 if (idx < offers.size()) send(1000 + offers.get(idx));
+              }));
+      trades.add(
+          button(
+              264,
+              77 + n * 25,
+              43,
+              "-30%",
+              () -> {
+                var offers = filtered();
+                int idx = page * 5 + row;
+                if (idx < offers.size()) send(2000 + offers.get(idx));
               }));
     }
     prev = button(12, 204, 30, "<", () -> page = Math.max(0, page - 1));
@@ -139,9 +153,37 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
                   >= CyberwareCatalogue.offers().get(offers.get(i)).requiredStreetCred()
               && menu.eddies() >= CyberwareCatalogue.offers().get(offers.get(i)).price();
       if (b.visible) {
-        int required = CyberwareCatalogue.offers().get(offers.get(i)).requiredStreetCred();
+        var offer = CyberwareCatalogue.offers().get(offers.get(i));
+        int required = offer.requiredStreetCred();
         b.setMessage(Component.literal(menu.streetCred() < required ? "SC " + required : "BUY"));
-        b.setTooltip(Tooltip.create(Component.literal("Requires Street Cred " + required)));
+        b.setTooltip(
+            Tooltip.create(
+                Component.literal(
+                    "Buy for €$ "
+                        + offer.price()
+                        + ". Requires Street Cred "
+                        + required
+                        + ". Keeps your damaged parts.")));
+      }
+      var trade = trades.get(n);
+      trade.visible =
+          b.visible
+              && CyberwareCatalogue.offers().get(offers.get(i)).item() instanceof CyberwareItem;
+      trade.active = false;
+      if (trade.visible) {
+        var offer = CyberwareCatalogue.offers().get(offers.get(i));
+        int price = DamagedCyberneticPart.price(offer), parts = menu.parts(offer.tier());
+        trade.active = menu.getCarried().isEmpty() && parts > 0 && menu.eddies() >= price;
+        trade.setTooltip(
+            Tooltip.create(
+                Component.literal(
+                    "TRADE: €$ "
+                        + price
+                        + " + 1 Tier "
+                        + offer.tier()
+                        + " damaged cybernetic part ("
+                        + parts
+                        + " owned). 30% off; consumes one part.")));
       }
     }
     super.render(g, mx, my, partial);
@@ -149,7 +191,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
     if (shop)
       for (int n = 0; n < 5 && page * 5 + n < offers.size(); n++)
         if (mx >= leftPos + 12
-            && mx < leftPos + 244
+            && mx < leftPos + 218
             && my >= topPos + 74 + n * 25
             && my < topPos + 98 + n * 25)
           g.renderTooltip(
@@ -179,7 +221,12 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
           float y = 74 + n * 25;
           c.panel(11, y, 297, 23, 3, 0xff11232b, 0xff31515d);
           c.rect(12, y + 1, 2, 21, CyberwareTier.of(o.tier()).color);
-          c.text(o.item().getDescription().getString(), 38, y + 4, 10, 0xffd6e2df);
+          c.text(
+              c.fit(o.item().getDescription().getString(), 179, 10, false),
+              38,
+              y + 4,
+              10,
+              0xffd6e2df);
           c.text(
               "T"
                   + o.tier()
@@ -218,7 +265,8 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
               case 3 -> "PURCHASE ADDED TO INVENTORY";
               case 4 -> "HIGHER STREET CRED REQUIRED";
               case 5 -> "STOCK CHANGED. CHECK TODAY'S SELECTION.";
-              default -> "Hover for effects. New stock each dawn. Installation is free.";
+              case 6 -> "REQUIRES A MATCHING-TIER PART AND AN IMPLANT.";
+              default -> "BUY: full price. -30%: trade a matching damaged part.";
             };
         c.center(result, 159, 225, 8, menu.result() == 3 ? 0xff80e8bd : 0xffb6b2a7);
         CyberBatch.flush(g);
