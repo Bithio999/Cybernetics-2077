@@ -14,3 +14,7 @@ __pycache__/
 
 # Locally downloaded gameplay references and extracted frame sheets.
 /references-local/
+
+# Documentation build output and local preview environment.
+site/
+.venv-docs/

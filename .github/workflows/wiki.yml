@@ -1,0 +1,63 @@
+name: Publish wiki
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/wiki/**'
+      - 'docs/images/**'
+      - 'docs/media/**'
+      - 'docs/site_hooks.py'
+      - 'docs/requirements.txt'
+      - 'scripts/check-wiki.py'
+      - 'mkdocs.yml'
+      - '.github/workflows/wiki.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: read
+concurrency:
+  group: wiki-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      publish: ${{ steps.pages.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: docs/requirements.txt
+      - run: pip install -r docs/requirements.txt
+      - run: python scripts/check-wiki.py
+      - run: mkdocs build --strict
+      - name: Check GitHub Pages availability
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type' > "${RUNNER_TEMP}/wiki-pages-type" 2>/dev/null && test "$(cat "${RUNNER_TEMP}/wiki-pages-type")" = workflow; then
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+            echo '::notice::GitHub Pages is not configured. The repository wiki is available; the searchable site is attached as an artifact.'
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  deploy:
+    needs: build
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish wiki
+        id: deployment
+        uses: actions/deploy-pages@v4

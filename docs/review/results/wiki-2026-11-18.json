@@ -1,0 +1,24 @@
+{
+  "sourcePages": 40,
+  "renderedHtmlFilesChecked": 41,
+  "brokenLocalLinks": 0,
+  "desktopSearch": "Synapse Burnout found",
+  "mobileSearch": "Blood Pump found",
+  "mobileWidthsChecked": [
+    390
+  ],
+  "overflowChecks": [
+    "home",
+    "cyberware",
+    "Raven",
+    "contracts",
+    "controls"
+  ],
+  "javascriptErrors": [],
+  "scope": "Documentation only; mod code and releases unchanged",
+  "navigationCheck": "40 pages, 24 implant/program entries, current damage types, all source links/anchors valid",
+  "strictSiteBuild": "passed",
+  "githubMarkdownRender": "Home page rendered through GitHub Markdown API; navigation links preserved",
+  "hosting": "Repository wiki is the primary published entry",
+  "githubPagesEnableAttempt": "403 Resource not accessible by integration; website deployment is optional and skipped until configured"
+}

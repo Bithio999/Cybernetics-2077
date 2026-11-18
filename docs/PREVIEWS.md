@@ -1,18 +1,6 @@
-# Native previews
+# Development preview archive
 
-These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Mantis previews are updated for 0.6.1; the interface images show the same features in earlier builds. The hologram displays the local player’s current Minecraft skin with translucent cyan shading, scanlines, an animated scan sweep and a subtle edge glow. The body retains its normal Minecraft proportions and is centered in the overview; close-ups track the selected region. This review includes the corrected shoulder/elbow rig, ground/air lunge movement, Minecraft-style pixel icons native-hand pose handover and independent dorsal hatch/hinge/carriage/tip deployment, free leaps, chip-shaped quickhack/upload display and viewer-based quickhack installation.
-
-[Body-area zoom](media/face-zoom.mp4) · [Scanner opening](media/scanner-opening.mp4)
-
-![Current player skin as a hologram](images/cyberware.png)
-
-![Face category with installed optics](images/optics-detail.png)
-
-![Optical scanner](images/scanner.png)
-
-![Installation bench](images/bench.png)
-
-[Cortex category](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory entry](images/creative.png)
+Older captures and implementation history are kept here for contributors. **[Current player wiki](wiki/index.md)** pages include the relevant screenshots and videos beside the item they describe.
 
 ## Raven and six quickhacks (0.12.0)
 

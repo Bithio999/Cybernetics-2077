@@ -1,0 +1,94 @@
+site_name: Cybernetics 2077 Wiki
+site_description: Player guides, cyberware stats, quickhacks and village services for the Minecraft mod.
+site_url: https://bithio999.github.io/Cybernetics-2077/
+docs_dir: docs/wiki
+site_dir: site
+strict: true
+hooks:
+  - docs/site_hooks.py
+theme:
+  name: material
+  language: en
+  font: false
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  palette:
+    scheme: slate
+    primary: black
+    accent: cyan
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+plugins:
+  - search:
+      lang: en
+markdown_extensions:
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+extra_css:
+  - assets/stylesheets/wiki.css
+extra:
+  generator: false
+nav:
+  - Home: index.md
+  - Start here:
+      - Getting started: getting-started.md
+      - Installing cyberware: installation.md
+      - Controls: controls.md
+      - Common questions: faq.md
+  - Cyberware:
+      - All cyberware: cyberware.md
+      - Frontal Cortex:
+          - Ex-Disk: ex-disk.md
+          - Memory Boost: memory-boost.md
+      - Operating System:
+          - Compare cyberdecks: cyberdecks.md
+          - Militech Paraline: militech-paraline.md
+          - Raven Microcyber: raven-microcyber.md
+          - BioDyne Berserk: biodyne-berserk.md
+      - Arms:
+          - Mantis Blades: mantis-blades.md
+      - Face:
+          - Basic Kiroshi Optics: kiroshi-optics.md
+          - Clairvoyant Optics: clairvoyant-optics.md
+      - Skeleton:
+          - Bionic Joints: bionic-joints.md
+          - Epimorphic Skeleton: epimorphic-skeleton.md
+      - Nervous System:
+          - NeoFiber: neofiber.md
+          - Adrenaline Converter: adrenaline-converter.md
+      - Circulatory System:
+          - Blood Pump: blood-pump.md
+          - Heal-On-Kill: heal-on-kill.md
+      - Integumentary System:
+          - Subdermal Armor: subdermal-armor.md
+          - Optical Camo: optical-camo.md
+      - Legs:
+          - Reinforced Tendons: reinforced-tendons.md
+          - Fortified Ankles: fortified-ankles.md
+  - Quickhacks:
+      - All quickhacks: quickhacks.md
+      - Scanning and queues: scanning.md
+      - Short Circuit: short-circuit.md
+      - Overheat: overheat.md
+      - Contagion: contagion.md
+      - Reboot Optics: reboot-optics.md
+      - Cripple Movement: cripple-movement.md
+      - Synapse Burnout: synapse-burnout.md
+  - Village services:
+      - Ripperdocs and daily stock: ripperdocs.md
+      - The Afterlife: afterlife.md
+      - Fixer contracts: contracts.md
+      - Eddies and Street Cred: street-cred.md
+      - Blocks and decorations: blocks.md
+  - Crafting:
+      - Recipes and upgrades: recipes.md
+      - Item IDs and commands: item-ids.md
