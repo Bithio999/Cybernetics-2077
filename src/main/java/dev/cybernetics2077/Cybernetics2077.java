@@ -45,28 +45,31 @@ public final class Cybernetics2077 {
           () ->
               new net.minecraft.world.item.BlockItem(
                   BENCH.get(), new net.minecraft.world.item.Item.Properties()));
-  public static final Supplier<CyberwareItem> OPTICS =
-      ITEMS.register(
-          "optical_scanner",
-          () ->
-              new CyberwareItem(
-                  new net.minecraft.world.item.Item.Properties(),
-                  CyberwareCategory.FACE,
-                  4,
-                  CyberwareTier.ONE));
-  public static final Supplier<CyberdeckItem> CYBERDECK =
-      ITEMS.register("cyberdeck_tier_1", CyberdeckItem::new);
-  public static final Supplier<QuickhackItem> SHORT_CIRCUIT =
-      ITEMS.register("short_circuit_tier_1", QuickhackItem::new);
-  public static final Supplier<CyberwareItem> MANTIS =
-      ITEMS.register(
-          "mantis_claws_tier_1",
-          () ->
-              new CyberwareItem(
-                  new net.minecraft.world.item.Item.Properties(),
-                  CyberwareCategory.ARMS,
-                  12,
-                  CyberwareTier.ONE));
+  // Keep the original tier-one registry IDs for existing saves and installed item components.
+  public static final java.util.List<Supplier<OpticsItem>> OPTICS_TIERS =
+      tiers("optical_scanner", "kiroshi_optics", OpticsItem::new);
+  public static final java.util.List<Supplier<CyberdeckItem>> CYBERDECK_TIERS =
+      tiers("cyberdeck_tier_1", "militech_paraline", CyberdeckItem::new);
+  public static final java.util.List<Supplier<QuickhackItem>> SHORT_CIRCUIT_TIERS =
+      tiers("short_circuit_tier_1", "short_circuit", QuickhackItem::new);
+  public static final java.util.List<Supplier<MantisBladesItem>> MANTIS_TIERS =
+      tiers("mantis_claws_tier_1", "mantis_blades", MantisBladesItem::new);
+  public static final Supplier<OpticsItem> OPTICS = OPTICS_TIERS.get(0);
+  public static final Supplier<CyberdeckItem> CYBERDECK = CYBERDECK_TIERS.get(0);
+  public static final Supplier<QuickhackItem> SHORT_CIRCUIT = SHORT_CIRCUIT_TIERS.get(0);
+  public static final Supplier<MantisBladesItem> MANTIS = MANTIS_TIERS.get(0);
+
+  private static <T extends net.minecraft.world.item.Item> java.util.List<Supplier<T>> tiers(
+      String originalId, String prefix, java.util.function.Function<CyberwareTier, T> factory) {
+    var result = new java.util.ArrayList<Supplier<T>>();
+    for (var tier : CyberwareTier.values())
+      result.add(
+          ITEMS.register(
+              tier == CyberwareTier.ONE ? originalId : prefix + "_tier_" + tier.level,
+              () -> factory.apply(tier)));
+    return java.util.List.copyOf(result);
+  }
+
   private static final DeferredRegister<MenuType<?>> MENUS =
       DeferredRegister.create(Registries.MENU, ID);
   private static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
@@ -80,7 +83,10 @@ public final class Cybernetics2077 {
           () -> new MenuType<>(CyberneticsBenchMenu::new, FeatureFlags.DEFAULT_FLAGS));
   public static final Supplier<MenuType<CyberdeckMenu>> DECK_MENU =
       MENUS.register(
-          "cyberdeck", () -> new MenuType<>(CyberdeckMenu::new, FeatureFlags.DEFAULT_FLAGS));
+          "cyberdeck",
+          () ->
+              net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
+                  CyberdeckMenu::new));
   public static final Supplier<AttachmentType<CyberwareInventory>> CYBERWARE =
       ATTACHMENTS.register(
           "cyberware",
@@ -108,10 +114,9 @@ public final class Cybernetics2077 {
     if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.FUNCTIONAL_BLOCKS)
       e.accept(BENCH_ITEM.get());
     if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES) {
-      e.accept(OPTICS.get());
-      e.accept(CYBERDECK.get());
-      e.accept(SHORT_CIRCUIT.get());
-      e.accept(MANTIS.get());
+      for (var family :
+          java.util.List.of(OPTICS_TIERS, CYBERDECK_TIERS, SHORT_CIRCUIT_TIERS, MANTIS_TIERS))
+        for (var item : family) e.accept(item.get());
     }
   }
 

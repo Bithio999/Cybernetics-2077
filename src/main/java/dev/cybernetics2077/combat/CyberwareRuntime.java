@@ -3,6 +3,7 @@ package dev.cybernetics2077.combat;
 import dev.cybernetics2077.Cybernetics2077;
 import dev.cybernetics2077.cyberware.*;
 import dev.cybernetics2077.deck.CyberdeckItem;
+import dev.cybernetics2077.deck.QuickhackItem;
 import dev.cybernetics2077.scanner.ScannerNetwork;
 import java.util.*;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,7 +34,15 @@ public final class CyberwareRuntime {
     private CompoundTag sent;
   }
 
-  public record Upload(UUID target, long start, long finish, int id) {}
+  public record Upload(
+      UUID target,
+      long start,
+      long finish,
+      int id,
+      net.minecraft.world.item.ItemStack sourceDeck,
+      QuickhackItem program,
+      float cost,
+      float damage) {}
 
   public record Lunge(UUID target, LungePath path, long started) {}
 
@@ -49,9 +58,37 @@ public final class CyberwareRuntime {
   }
 
   public static boolean claws(Player p) {
-    return p.getData(Cybernetics2077.CYBERWARE)
-        .getStackInSlot(CyberwareCategory.ARMS.firstSlot())
-        .is(Cybernetics2077.MANTIS.get());
+    return bladeTier(p) != null;
+  }
+
+  public static CyberwareTier bladeTier(Player p) {
+    var stack =
+        p.getData(Cybernetics2077.CYBERWARE).getStackInSlot(CyberwareCategory.ARMS.firstSlot());
+    return stack.getItem() instanceof MantisBladesItem item ? item.tier() : null;
+  }
+
+  public static CyberwareTier deckTier(Player p) {
+    return deck(p).getItem() instanceof CyberdeckItem item ? item.tier() : CyberwareTier.ONE;
+  }
+
+  public static float quickhackDamage(Player p, QuickhackItem program) {
+    return program.tier().shortCircuitDamage() * (1 + deckTier(p).quickhackBonus());
+  }
+
+  /** Equipment changes cancel only affected reservations; swapping decks cannot amplify uploads. */
+  private static void reconcileUploads(ServerPlayer p) {
+    var s = state(p);
+    var deck = deck(p);
+    var program = CyberdeckItem.quickhack(deck);
+    var it = s.uploads.iterator();
+    while (it.hasNext()) {
+      var upload = it.next();
+      if (!p.isAlive() || upload.sourceDeck != deck || upload.program != program) {
+        s.ram += upload.cost;
+        it.remove();
+      }
+    }
+    s.ram = Math.clamp(s.ram, 0, deckTier(p).ram());
   }
 
   public static boolean emptyHands(Player p) {
@@ -67,7 +104,16 @@ public final class CyberwareRuntime {
     var t = new CompoundTag();
     t.putInt("entity", p.getId());
     t.putBoolean("deck", deck(p).getItem() instanceof CyberdeckItem);
-    t.putBoolean("shortCircuit", CyberdeckItem.has(deck(p), Cybernetics2077.SHORT_CIRCUIT.get()));
+    var program = CyberdeckItem.quickhack(deck(p));
+    t.putBoolean("shortCircuit", program != null);
+    t.putInt("deckTier", deckTier(p).level);
+    t.putInt("ramMax", deckTier(p).ram());
+    t.putInt("programSlots", deckTier(p).programSlots());
+    t.putInt("queueLimit", deckTier(p).queueLimit());
+    t.putInt("hackTier", program == null ? 0 : program.tier().level);
+    t.putInt("hackCost", program == null ? 0 : program.tier().shortCircuitCost());
+    t.putFloat("hackDamage", program == null ? 0 : quickhackDamage(p, program));
+    t.putInt("uploadTicks", deckTier(p).uploadTicks());
     t.putBoolean("claws", claws(p));
     t.putBoolean("deployed", s.deployed);
     t.putFloat("ram", s.ram);
@@ -199,19 +245,31 @@ public final class CyberwareRuntime {
 
   public static boolean queue(ServerPlayer p, int id) {
     var s = state(p);
+    reconcileUploads(p);
+    var program = CyberdeckItem.quickhack(deck(p));
     if (!usable(p)
         || !ScannerNetwork.installed(p)
         || !(deck(p).getItem() instanceof CyberdeckItem)
-        || !CyberdeckItem.has(deck(p), Cybernetics2077.SHORT_CIRCUIT.get())
-        || s.uploads.size() >= 2
-        || s.ram + .0001f < CombatRules.RAM_COST
+        || program == null
+        || s.uploads.size() >= deckTier(p).queueLimit()
+        || s.ram + .0001f < program.tier().shortCircuitCost()
         || !ScannerNetwork.inspect(p, id).contains("id")) return false;
     var target = p.serverLevel().getEntity(id);
     if (!(target instanceof LivingEntity living) || !canAttack(p, living)) return false;
     long now = p.serverLevel().getGameTime();
     long start = s.uploads.isEmpty() ? now : Math.max(now, s.uploads.getLast().finish);
-    s.ram -= CombatRules.RAM_COST;
-    s.uploads.add(new Upload(target.getUUID(), start, start + CombatRules.UPLOAD, id));
+    int cost = program.tier().shortCircuitCost();
+    s.ram -= cost;
+    s.uploads.add(
+        new Upload(
+            target.getUUID(),
+            start,
+            start + deckTier(p).uploadTicks(),
+            id,
+            deck(p),
+            program,
+            cost,
+            quickhackDamage(p, program)));
     syncIfChanged(p);
     return true;
   }
@@ -248,22 +306,15 @@ public final class CyberwareRuntime {
       s.pendingHit = false;
       if (usable(p) && claws(p)) bladeHit(p, s.combo);
     }
-    if (!(deck(p).getItem() instanceof CyberdeckItem)
-        || !CyberdeckItem.has(deck(p), Cybernetics2077.SHORT_CIRCUIT.get())
-        || !p.isAlive()) {
-      if (!s.uploads.isEmpty()) {
-        s.ram = Math.min(CombatRules.RAM_MAX, s.ram + s.uploads.size() * CombatRules.RAM_COST);
-        s.uploads.clear();
-      }
-    }
+    reconcileUploads(p);
     if (deck(p).getItem() instanceof CyberdeckItem)
-      s.ram = Math.min(CombatRules.RAM_MAX, s.ram + CombatRules.RAM_PER_TICK);
+      s.ram = Math.min(deckTier(p).ram(), s.ram + deckTier(p).ramPerSecond() / 20);
     if (!s.uploads.isEmpty() && s.uploads.getFirst().finish <= now) {
       var upload = s.uploads.removeFirst();
       var target = p.serverLevel().getEntity(upload.target);
       if (target instanceof LivingEntity living
           && canAttack(p, living)
-          && p.distanceToSqr(living) <= 48 * 48) {
+          && p.distanceToSqr(living) <= Math.pow(ScannerNetwork.range(p) + 16, 2)) {
         if (living.hurt(
             new net.minecraft.world.damagesource.DamageSource(
                 p.registryAccess()
@@ -274,7 +325,7 @@ public final class CyberwareRuntime {
                             Cybernetics2077.id("short_circuit"))),
                 p,
                 p),
-            CombatRules.SHORT_CIRCUIT_DAMAGE)) {
+            upload.damage)) {
           p.serverLevel()
               .sendParticles(
                   ParticleTypes.ELECTRIC_SPARK,
@@ -404,7 +455,11 @@ public final class CyberwareRuntime {
   }
 
   private static void hit(ServerPlayer p, LivingEntity target, int combo) {
-    if (target.hurt(p.damageSources().playerAttack(p), CombatRules.damage(combo))) {
+    var tier = bladeTier(p);
+    if (tier != null
+        && target.hurt(
+            p.damageSources().playerAttack(p),
+            CombatRules.damage(combo) * tier.bladeMultiplier())) {
       target.knockback(combo == 3 ? .55 : .2, p.getX() - target.getX(), p.getZ() - target.getZ());
       p.serverLevel()
           .sendParticles(

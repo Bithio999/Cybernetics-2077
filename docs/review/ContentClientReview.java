@@ -615,7 +615,8 @@ final class ContentClientReview {
       RecordingFrames.quarter = false;
       m.options.fov().set(70);
     }
-    if (t == 1190)
+    if (t >= 1160 && t <= 1340) tierReview(t);
+    if (t == 1360)
       server(
           p -> {
             var nether = p.server.getLevel(net.minecraft.world.level.Level.NETHER);
@@ -633,7 +634,7 @@ final class ContentClientReview {
               }
             p.teleportTo(nether, .5, 80, .5, java.util.Set.of(), 0, 0);
           });
-    if (t == 1230) {
+    if (t == 1400) {
       check(
           m.level.dimension() == net.minecraft.world.level.Level.NETHER
               && CyberwareClient.own().getBoolean("deck")
@@ -652,7 +653,9 @@ final class ContentClientReview {
               + " and return; untargeted six-block leap; ground and airborne leaps travel 5.15"
               + " blocks and land one 14-damage hit each; solid-wall guard; dimension change"
               + " retains equipment state; selected enchanted weapons remain inactive and restore"
-              + " after retraction; lunge momentum carries into normal movement.\n");
+              + " after retraction; lunge momentum carries into normal movement; tier-five bench"
+              + " installation, real eight-slot deck layout, chip persistence in last socket,"
+              + " tier-aware viewer, 12-cell scanner RAM and 26.4 electrical-damage upload.\n");
       if (Boolean.getBoolean("cybernetics2077.recording")) {
         Files.writeString(
             OUT.resolve("recording-marks.json"), new com.google.gson.Gson().toJson(recordingMarks));
@@ -661,5 +664,139 @@ final class ContentClientReview {
       finished = true;
       m.stop();
     }
+  }
+
+  static void tierReview(int t) throws Exception {
+    var m = Minecraft.getInstance();
+    if (t == 1160) draw();
+    if (t == 1180)
+      server(
+          p -> {
+            var implants = p.getData(Cybernetics2077.CYBERWARE);
+            for (int i = 0; i < implants.getSlots(); i++)
+              implants.setStackInSlot(i, ItemStack.EMPTY);
+            p.getInventory().clearContent();
+            p.getInventory().selected = 0;
+            p.getInventory().setItem(0, new ItemStack(Cybernetics2077.OPTICS_TIERS.get(4).get()));
+            p.getInventory()
+                .setItem(1, new ItemStack(Cybernetics2077.CYBERDECK_TIERS.get(4).get()));
+            p.getInventory().setItem(2, new ItemStack(Cybernetics2077.MANTIS_TIERS.get(4).get()));
+            p.getInventory()
+                .setItem(3, new ItemStack(Cybernetics2077.SHORT_CIRCUIT_TIERS.get(4).get()));
+            p.openMenu(
+                new net.minecraft.world.SimpleMenuProvider(
+                    (id, inv, owner) -> new CyberneticsBenchMenu(id, inv),
+                    net.minecraft.network.chat.Component.literal("Cybernetics Bench")));
+          });
+    if (t == 1190) {
+      check(
+          m.player.containerMenu instanceof CyberneticsBenchMenu, "Tier review bench did not open");
+      quick(48);
+      quick(49);
+      quick(50);
+    }
+    if (t == 1200) {
+      var menu = m.player.containerMenu;
+      check(
+          menu.getSlot(5).getItem().getHoverName().getString().equals("Basic Kiroshi Optics"),
+          "Optics name not localized");
+      check(
+          menu.getSlot(3).getItem().getHoverName().getString().equals("Militech Paraline"),
+          "Deck name not localized");
+      check(
+          menu.getSlot(4).getItem().getHoverName().getString().equals("Mantis Blades"),
+          "Blade name not localized");
+      shot("tier-five-bench");
+      m.gameMode.handleInventoryButtonClick(menu.containerId, 0);
+    }
+    if (t == 1210) {
+      check(
+          m.player.containerMenu instanceof CyberdeckMenu deck
+              && deck.programSlots() == 8
+              && deck.tier().level == 5
+              && deck.slots.size() == 44,
+          "Client did not receive eight-slot tier-five menu");
+      quick(38);
+    }
+    if (t == 1220) {
+      check(
+          m.player
+              .containerMenu
+              .getSlot(0)
+              .getItem()
+              .is(Cybernetics2077.SHORT_CIRCUIT_TIERS.get(4).get()),
+          "Tier-five chip failed native install");
+      var menu = m.player.containerMenu;
+      m.gameMode.handleInventoryMouseClick(menu.containerId, 0, 0, ClickType.PICKUP, m.player);
+      m.gameMode.handleInventoryMouseClick(menu.containerId, 7, 0, ClickType.PICKUP, m.player);
+    }
+    if (t == 1230) {
+      check(
+          m.player
+              .containerMenu
+              .getSlot(7)
+              .getItem()
+              .is(Cybernetics2077.SHORT_CIRCUIT_TIERS.get(4).get()),
+          "Last quickhack socket not usable");
+      server(
+          p ->
+              check(
+                  CyberdeckItem.chip(CyberwareRuntime.deck(p), 7)
+                      .is(Cybernetics2077.SHORT_CIRCUIT_TIERS.get(4).get()),
+                  "Last socket not persisted on server"));
+      shot("tier-five-cyberdeck");
+    }
+    if (t == 1235) m.screen.onClose();
+    if (t == 1245) {
+      check(m.screen instanceof CyberwareScreen, "Tier-five editor return failed");
+      shot("tier-five-viewer");
+    }
+    if (t == 1248) {
+      m.setScreen(null);
+      m.player.closeContainer();
+    }
+    if (t == 1255)
+      server(
+          p -> {
+            p.teleportTo(p.serverLevel(), .5, 64, .5, java.util.Set.of(), 0, 0);
+            p.getInventory().selected = 8;
+            var mob = net.minecraft.world.entity.EntityType.HUSK.create(p.serverLevel());
+            mob.setPos(.5, 64, 5.5);
+            mob.setNoAi(true);
+            mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH)
+                .setBaseValue(100);
+            mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR)
+                .setBaseValue(0);
+            mob.setHealth(100);
+            p.serverLevel().addFreshEntity(mob);
+            target = mob.getId();
+            CyberwareRuntime.state(p).ram = 12;
+            CyberwareRuntime.syncIfChanged(p);
+          });
+    if (t == 1265) {
+      m.player.setYRot(0);
+      m.player.setXRot(0);
+      ScannerClient.KEY.setDown(true);
+    }
+    if (t == 1290) {
+      var state = CyberwareClient.own();
+      check(
+          ScannerClient.available()
+              && state.getInt("ramMax") == 12
+              && state.getInt("hackTier") == 5
+              && Math.abs(state.getFloat("hackDamage") - 26.4f) < .001,
+          "Tier-five scanner stats incorrect");
+      shot("tier-five-scanner");
+    }
+    if (t == 1300) attack();
+    if (t == 1320)
+      server(
+          p -> {
+            var mob = (LivingEntity) p.serverLevel().getEntity(target);
+            check(
+                Math.abs(mob.getHealth() - 73.6f) < .01,
+                "Tier-five native upload damage mismatch: " + mob.getHealth());
+          });
+    if (t == 1325) ScannerClient.KEY.setDown(false);
   }
 }

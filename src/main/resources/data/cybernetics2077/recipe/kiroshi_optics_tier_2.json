@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": {
+    "item": "minecraft:redstone"
+  },
+  "base": {
+    "item": "cybernetics2077:optical_scanner"
+  },
+  "addition": {
+    "item": "minecraft:gold_block"
+  },
+  "result": {
+    "id": "cybernetics2077:kiroshi_optics_tier_2",
+    "count": 1
+  }
+}

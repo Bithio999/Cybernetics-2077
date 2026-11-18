@@ -105,7 +105,9 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     }
     previous.visible = next.visible = selected >= 0;
     loadout.visible =
-        selected >= 0 && menu.getSlot(selected).getItem().is(Cybernetics2077.CYBERDECK.get());
+        selected >= 0
+            && menu.getSlot(selected).getItem().getItem()
+                instanceof dev.cybernetics2077.deck.CyberdeckItem;
     for (var r : renderables) r.render(g, mouseX, mouseY, partial);
     int hovered = -1;
     for (var b : sockets)
@@ -351,9 +353,14 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     if (stack.getItem() instanceof CyberwareItem item) {
       c.text("TIER " + item.tier().level, 434, 499, 23, item.tier().color);
       c.right(item.capacityCost() + " CAPACITY", 900, 505, 17, 0xffe3b76f);
-      if (stack.is(Cybernetics2077.OPTICS.get())) {
+      if (stack.getItem() instanceof OpticsItem) {
         c.glowText("OPTICAL SCANNER", 434, 548, 23, CYAN);
-        c.body("Identify living targets within 32 blocks.", 434, 589, 19, WHITE);
+        c.body(
+            "Identify living targets within " + item.tier().scanRange() + " blocks.",
+            434,
+            589,
+            19,
+            WHITE);
         c.body("View health, armor and combat data.", 434, 617, 19, WHITE);
         c.body(
             "Hold "
@@ -363,19 +370,25 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
             663,
             19,
             CYAN);
-      } else if (stack.is(Cybernetics2077.CYBERDECK.get())) {
-        c.glowText("CYBERDECK / RAM 4", 434, 548, 23, CYAN);
-        c.body("2 QUICKHACK SLOTS / 1 RAM PER 5s", 434, 584, 16, WHITE);
-        var chips = net.minecraft.core.NonNullList.withSize(2, ItemStack.EMPTY);
-        stack
-            .getOrDefault(
-                net.minecraft.core.component.DataComponents.CONTAINER,
-                net.minecraft.world.item.component.ItemContainerContents.EMPTY)
-            .copyInto(chips);
-        for (int i = 0; i < 2; i++) {
-          c.panel(764 + i * 66, 536, 54, 54, 5, 0xff14232c, 0xff5c8c96);
-          if (!chips.get(i).isEmpty()) drawItem(c, chips.get(i), 772 + i * 66, 544, 2.4f);
-          else c.center("+", 791 + i * 66, 550, 23, MUTED);
+      } else if (stack.getItem() instanceof dev.cybernetics2077.deck.CyberdeckItem) {
+        var tier = item.tier();
+        c.glowText("CYBERDECK / RAM " + tier.ram(), 434, 548, 23, CYAN);
+        c.body(
+            String.format(
+                Locale.ROOT,
+                "%d SLOTS / %.1f RAM PER SECOND / +%d%% HACK DAMAGE",
+                tier.programSlots(),
+                tier.ramPerSecond(),
+                Math.round(tier.quickhackBonus() * 100)),
+            434,
+            584,
+            14,
+            WHITE);
+        for (int i = 0; i < tier.programSlots(); i++) {
+          var chip = dev.cybernetics2077.deck.CyberdeckItem.chip(stack, i);
+          c.panel(434 + i * 42, 606, 30, 26, 4, 0xff14232c, 0xff5c8c96);
+          if (!chip.isEmpty()) drawItem(c, chip, 439 + i * 42, 609, 1.2f);
+          else c.center("+", 449 + i * 42, 610, 17, MUTED);
         }
         c.panel(
             434,
@@ -386,10 +399,28 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
             loadout.isHoveredOrFocused() ? 0xff244454 : 0xff172632,
             loadout.isHoveredOrFocused() ? WHITE : CYAN);
         c.text("MANAGE QUICKHACKS  >", 452, 649, 23, CYAN);
-      } else if (stack.is(Cybernetics2077.MANTIS.get())) {
+      } else if (stack.getItem() instanceof MantisBladesItem) {
         c.glowText("PAIRED ARM BLADES", 434, 548, 23, CYAN);
-        c.body("Alternating slashes: 8 / 8 / 10 damage.", 434, 589, 19, WHITE);
-        c.body("Hold RMB, then release: 14-damage lunge.", 434, 617, 19, WHITE);
+        c.body(
+            String.format(
+                Locale.ROOT,
+                "Alternating slashes: %.1f / %.1f / %.1f damage.",
+                8 * item.tier().bladeMultiplier(),
+                8 * item.tier().bladeMultiplier(),
+                10 * item.tier().bladeMultiplier()),
+            434,
+            589,
+            19,
+            WHITE);
+        c.body(
+            String.format(
+                Locale.ROOT,
+                "Hold RMB, then release: %.1f-damage lunge.",
+                14 * item.tier().bladeMultiplier()),
+            434,
+            617,
+            19,
+            WHITE);
         c.body(
             "Empty hands. Press "
                 + dev.cybernetics2077.client.mantis.CyberwareClient.DRAW
@@ -408,7 +439,7 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
     }
     c.line(434, 704, 900, 704, 1, 0x80568293);
     c.tracked(
-        stack.is(Cybernetics2077.CYBERDECK.get())
+        stack.getItem() instanceof dev.cybernetics2077.deck.CyberdeckItem
             ? "CYBERDECK / PROGRAM MANAGEMENT"
             : "EQUIPMENT VIEW / INSTALLATION LOCKED",
         434,

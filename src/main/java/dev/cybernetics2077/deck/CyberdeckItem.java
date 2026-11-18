@@ -8,24 +8,40 @@ import net.minecraft.world.item.component.ItemContainerContents;
 
 /** Quickhacks belong to the physical deck, including when it is removed from the bench. */
 public final class CyberdeckItem extends CyberwareItem {
-  public static final int SLOTS = 2, RAM = 4;
-
   public CyberdeckItem() {
+    this(CyberwareTier.ONE);
+  }
+
+  public CyberdeckItem(CyberwareTier tier) {
     super(
         new Item.Properties().component(DataComponents.CONTAINER, ItemContainerContents.EMPTY),
         CyberwareCategory.OPERATING_SYSTEM,
-        8,
-        CyberwareTier.ONE);
+        tier.deckCapacity(),
+        tier);
+  }
+
+  public static int slots(ItemStack deck) {
+    return deck.getItem() instanceof CyberdeckItem item ? item.tier().programSlots() : 0;
   }
 
   public static ItemStack chip(ItemStack deck, int index) {
-    var items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
+    if (index < 0 || index >= slots(deck)) return ItemStack.EMPTY;
+    var items = NonNullList.withSize(slots(deck), ItemStack.EMPTY);
     deck.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(items);
     return items.get(index);
   }
 
   public static boolean has(ItemStack deck, Item item) {
     return deck.getItem() instanceof CyberdeckItem
-        && java.util.stream.IntStream.range(0, SLOTS).anyMatch(i -> chip(deck, i).is(item));
+        && java.util.stream.IntStream.range(0, slots(deck)).anyMatch(i -> chip(deck, i).is(item));
+  }
+
+  /** Ignore malformed/imported programs that exceed the installed deck's tier. */
+  public static QuickhackItem quickhack(ItemStack deck) {
+    if (!(deck.getItem() instanceof CyberdeckItem item)) return null;
+    for (int i = 0; i < slots(deck); i++)
+      if (chip(deck, i).getItem() instanceof QuickhackItem program
+          && program.tier().level <= item.tier().level) return program;
+    return null;
   }
 }

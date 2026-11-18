@@ -18,9 +18,18 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
   private final ContainerLevelAccess access;
   private final ItemStack deck;
   private final Player owner;
+  private final CyberwareTier tier;
+  private final int programSlots;
 
-  public CyberdeckMenu(int id, Inventory inv) {
-    this(id, inv, ContainerLevelAccess.NULL, ItemStack.EMPTY);
+  public CyberdeckMenu(int id, Inventory inv, net.minecraft.network.RegistryFriendlyByteBuf data) {
+    this(
+        id,
+        inv,
+        ContainerLevelAccess.NULL,
+        new ItemStack(
+            Cybernetics2077.CYBERDECK_TIERS
+                .get(CyberwareTier.of(data.readVarInt()).ordinal())
+                .get()));
   }
 
   public CyberdeckMenu(int id, Inventory inv, ContainerLevelAccess access, ItemStack deck) {
@@ -28,13 +37,17 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
     this.access = access;
     this.deck = deck;
     this.owner = inv.player;
+    this.tier = deck.getItem() instanceof CyberdeckItem item ? item.tier() : CyberwareTier.ONE;
+    this.programSlots = tier.programSlots();
     var store =
-        new ItemStackHandler(2) {
+        new ItemStackHandler(programSlots) {
           @Override
           public boolean isItemValid(int slot, ItemStack stack) {
-            return stack.getItem() instanceof QuickhackItem
-                && !java.util.stream.IntStream.range(0, 2)
-                    .anyMatch(i -> i != slot && ItemStack.isSameItem(getStackInSlot(i), stack));
+            return stack.getItem() instanceof QuickhackItem program
+                && program.tier().level <= tier.level
+                && !java.util.stream.IntStream.range(0, programSlots)
+                    .anyMatch(
+                        i -> i != slot && getStackInSlot(i).getItem() instanceof QuickhackItem);
           }
 
           @Override
@@ -45,18 +58,18 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
           @Override
           protected void onContentsChanged(int slot) {
             if (!owner.level().isClientSide && !deck.isEmpty()) {
-              var items = NonNullList.withSize(2, ItemStack.EMPTY);
-              for (int i = 0; i < 2; i++) items.set(i, getStackInSlot(i).copy());
+              var items = NonNullList.withSize(programSlots, ItemStack.EMPTY);
+              for (int i = 0; i < programSlots; i++) items.set(i, getStackInSlot(i).copy());
               deck.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
             }
           }
         };
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < programSlots; i++) {
       // Populate directly before exposing slots, without erasing another chip during
       // initialization.
       final int index = i;
       addSlot(
-          new SlotItemHandler(store, i, 112 + i * 54, 67) {
+          new SlotItemHandler(store, i, slotX(i), slotY(i)) {
             @Override
             public boolean mayPlace(ItemStack stack) {
               return store.isItemValid(index, stack);
@@ -68,18 +81,32 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
             }
           });
     }
-    var initial = NonNullList.withSize(2, ItemStack.EMPTY);
+    var initial = NonNullList.withSize(programSlots, ItemStack.EMPTY);
     deck.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY).copyInto(initial);
-    // Loading through deserializeNBT would couple this editor to registry serialization. Suppress
-    // writes
-    // by first snapshotting both items and finally restoring the component as an atomic pair.
-    for (int i = 0; i < 2; i++) store.setStackInSlot(i, initial.get(i).copy());
+    // Snapshot all slots before initializing the handlers, then restore the entire component.
+    for (int i = 0; i < programSlots; i++) store.setStackInSlot(i, initial.get(i).copy());
     if (!owner.level().isClientSide && !deck.isEmpty())
       deck.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(initial));
     for (int row = 0; row < 3; row++)
       for (int col = 0; col < 9; col++)
-        addSlot(new Slot(inv, col + row * 9 + 9, 58 + col * 18, 126 + row * 18));
-    for (int col = 0; col < 9; col++) addSlot(new Slot(inv, col, 58 + col * 18, 188));
+        addSlot(new Slot(inv, col + row * 9 + 9, 58 + col * 18, 134 + row * 18));
+    for (int col = 0; col < 9; col++) addSlot(new Slot(inv, col, 58 + col * 18, 196));
+  }
+
+  public CyberwareTier tier() {
+    return tier;
+  }
+
+  public int programSlots() {
+    return programSlots;
+  }
+
+  public static int slotX(int index) {
+    return 112 + index % 4 * 34;
+  }
+
+  public static int slotY(int index) {
+    return 62 + index / 4 * 34;
   }
 
   @Override
@@ -100,10 +127,10 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
     if (!slot.hasItem()) return ItemStack.EMPTY;
     var stack = slot.getItem();
     var original = stack.copy();
-    if (index < 2) {
-      if (!moveItemStackTo(stack, 2, 38, true)) return ItemStack.EMPTY;
-    } else if (!(stack.getItem() instanceof QuickhackItem) || !moveItemStackTo(stack, 0, 2, false))
-      return ItemStack.EMPTY;
+    if (index < programSlots) {
+      if (!moveItemStackTo(stack, programSlots, programSlots + 36, true)) return ItemStack.EMPTY;
+    } else if (!(stack.getItem() instanceof QuickhackItem)
+        || !moveItemStackTo(stack, 0, programSlots, false)) return ItemStack.EMPTY;
     if (stack.isEmpty()) slot.setByPlayer(ItemStack.EMPTY);
     else slot.setChanged();
     slot.onTake(p, stack);

@@ -12,26 +12,28 @@ Implant sockets in the inventory viewer are **read-only**. Select an installed *
 
 All implants have a strength tier from **1–5**, shown in their tooltip and socket badge: white, green, blue, purple and orange.
 
-| Equipment | Tier | System | Capacity | Effect |
-| --- | --- | --- | --- | --- |
-| Optical Scanner | 1 | Face | 4 | Hold **V** to scan a living target within 32 blocks. |
-| Cyberdeck | 1 | Operating System | 8 | 4 RAM and two quickhack slots; regenerates 1 RAM per 5 seconds. |
-| Mantis Claws | 1 | Arms | 12 | Press **G** with empty hands to deploy a pair of dorsal-mounted arm blades. |
-| Short Circuit chip | 1 | Cyberdeck | — | 2 RAM, 1-second upload, 8 electrical damage. |
+| Equipment | Tiers | System | Effect, tier 1 → 5 |
+| --- | --- | --- | --- |
+| Basic Kiroshi Optics | 1–5 | Face | Scan range: 32 → 64 blocks. |
+| Militech Paraline | 1–5 | Operating System | 4 → 12 RAM; 2 → 8 program sockets; faster recovery and uploads. |
+| Mantis Blades | 1–5 | Arms | Physical slashes: 8 → 16; charged lunge: 14 → 28. |
+| Short Circuit chip | 1–5 | Cyberdeck | 8 → 22 base electrical damage, plus the deck’s damage bonus. |
+
+Upgrade the previous tier at a smithing table with redstone and progressively rarer materials. Loaded chips and custom item data are preserved. [Tier stats and upgrade recipes](docs/CYBERWARE.md#tier-upgrades) · [Cyberpunk cyberware catalogue: 121 current entries](docs/research/CYBERWARE-CATALOGUE.md)
 
 The scanner shows health, armor, attack damage, absorption and visible effects. With a loaded cyberdeck, **left-click** to upload Short Circuit to the target; upload progress appears over its head. The overlay opens and closes with an animated transition from Minecraft’s HUD.
 
 ![Short Circuit scanner](docs/images/short-circuit-scanner.png)
 
-Mantis Claws deploy from the top/back-of-hand face of the forearm through multiple moving skin and sleeve sections. As the covers open, the folded support and blade rise together; the support/housing slides backward before the blade pivots forward and the cutting tip extends. The palm and hand remain closed. The Blender model uses separate rigid pivots and near/far meshes, with cached geometry and textures. The original Minecraft hand transitions continuously into the ready stance, with visible hands held low, blade profiles along the outer edges and a wider weapon view, following the supplied reference video. Alternating cross-body cuts and a rising third strike use dynamic blade extension. Charged lunges pull both arms back before driving forward. Subtle idle movement keeps the ready pose alive, and the third-person guard leaves the chest clear.
+Mantis Blades deploy from the top/back-of-hand face of the forearm through multiple moving skin and sleeve sections. As the covers open, the folded support and blade rise together; the support/housing slides backward before the blade pivots forward and the cutting tip extends. The palm and hand remain closed. The Blender model uses separate rigid pivots and near/far meshes, with cached geometry and textures. The original Minecraft hand transitions continuously into the ready stance, with visible hands held low, blade profiles along the outer edges and a wider weapon view, following the supplied reference video. Alternating cross-body cuts and a rising third strike use dynamic blade extension. Charged lunges pull both arms back before driving forward. Subtle idle movement keeps the ready pose alive, and the third-person guard leaves the chest clear.
 
-[Watch the claw animations](docs/media/mantis-claws.mp4) · [Attacks and lunge](docs/media/mantis-attacks.mp4) · [Idle motion](docs/media/mantis-idle.mp4) · [Blender model and build notes](art/mantis/README.md) · [Equipment, controls and recipes](docs/CYBERWARE.md)
+[Watch the blade animations](docs/media/mantis-claws.mp4) · [Attacks and lunge](docs/media/mantis-attacks.mp4) · [Idle motion](docs/media/mantis-idle.mp4) · [Blender model and build notes](art/mantis/README.md) · [Equipment, controls and recipes](docs/CYBERWARE.md)
 
 ![Dorsal-mounted arm blades](docs/images/mantis-first-person.png)
 
 ## Install cyberware
 
-Craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. While Mantis Claws are out, selected main-hand and off-hand items stay in their inventory slots and act as empty hands. Retract the claws to use them again. Drawing the claws still requires both hands to be empty. Install a deck, then select **Operating System → Manage Quickhacks** in the cyberware menu to load or remove chips. The bench’s **Cyberdeck** shortcut also remains available. Its programs stay with the physical deck when it is removed.
+Craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. While Mantis Blades are out, selected main-hand and off-hand items stay in their inventory slots and act as empty hands. Retract the claws to use them again. Drawing the claws still requires both hands to be empty. Install a deck, then select **Operating System → Manage Quickhacks** in the cyberware menu to load or remove chips. The bench’s **Cyberdeck** shortcut also remains available. Its programs stay with the physical deck when it is removed.
 
 ![Cybernetics Bench installation menu](docs/images/bench.png)
 
@@ -39,7 +41,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.6.1.jar](releases/Cybernetics2077-0.6.1.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.7.0.jar](releases/Cybernetics2077-0.7.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

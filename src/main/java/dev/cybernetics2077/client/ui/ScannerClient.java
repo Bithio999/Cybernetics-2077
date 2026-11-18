@@ -28,6 +28,7 @@ public final class ScannerClient {
           "key.categories.cybernetics2077");
   private static final int RED = 0xffff3742, CYAN = 0xff65e5f5, MUTED = 0xff7badae;
   private static boolean installed, down, prepared;
+  private static int scanRange = 32;
   private static Object level;
   private static ScannerMotion motion = new ScannerMotion();
   private static ScannerMotion.Frame frame = new ScannerMotion.Frame(0, 0, false);
@@ -57,7 +58,7 @@ public final class ScannerClient {
         && frame.data() > .95
         && focus >= 0
         && own.getBoolean("shortCircuit")
-        && own.getFloat("ram") >= 2
+        && own.getFloat("ram") >= own.getInt("hackCost")
         && now - lastHack > 180_000_000L) {
       lastHack = now;
       PacketDistributor.sendToServer(new dev.cybernetics2077.combat.CyberwareNetwork.Hack(focus));
@@ -82,6 +83,7 @@ public final class ScannerClient {
 
   public static void receive(CompoundTag data) {
     installed = data.getBoolean("installed");
+    scanRange = Math.clamp(data.getInt("range"), 0, 64);
     if (data.contains("id")) {
       target = data;
       received = System.nanoTime();
@@ -144,13 +146,13 @@ public final class ScannerClient {
     held();
     if (!active() || m.level == null) return;
     var eye = m.player.getEyePosition();
-    var end = eye.add(m.player.getLookAngle().scale(32));
+    var end = eye.add(m.player.getLookAngle().scale(scanRange));
     LivingEntity hit = null;
     double nearest = Double.MAX_VALUE;
     for (var entity :
         m.level.getEntitiesOfClass(
             LivingEntity.class,
-            m.player.getBoundingBox().inflate(32),
+            m.player.getBoundingBox().inflate(scanRange),
             t -> t != m.player && t.isAlive() && !t.isSpectator() && !t.isInvisibleTo(m.player))) {
       var clip = entity.getBoundingBox().inflate(.24).clip(eye, end);
       if (clip.isPresent()
@@ -283,10 +285,11 @@ public final class ScannerClient {
       return;
     }
     float ram = equipment.getFloat("ram");
-    c.glowText(String.format(Locale.ROOT, "CYBERDECK RAM: %.1f / 4", ram), 719, 108, 23, RED);
+    int max = Math.max(1, equipment.getInt("ramMax"));
+    c.glowText(String.format(Locale.ROOT, "CYBERDECK RAM: %.1f / %d", ram, max), 719, 108, 23, RED);
     c.glowLine(693, 151, 1257, 151, 1, 0xcfe72c38);
     c.tracked("NEURAL RESERVE", 696, 146, 7, 0x99a52a30, 1);
-    for (int k = 0; k < 4; k++) {
+    for (int k = 0; k < max; k++) {
       var cell = c.fade(f.layer(230 + k * 4, 140) / Math.max(.0001, f.resource()));
       float x = 720 + k * 17.55f, y = 163, w = 13.55f;
       var path = Geometry.pip(x, y, w, 44);
@@ -313,13 +316,13 @@ public final class ScannerClient {
     }
     var c = root.fade(f.row(0));
     float x = 210, y = 379, w = 410;
-    boolean poor = equipment.getFloat("ram") < 2,
+    boolean poor = equipment.getFloat("ram") < equipment.getInt("hackCost"),
         queued = !equipment.getList("uploads", 10).isEmpty();
     int tint = poor ? 0xffff565c : CYAN;
     var path = Geometry.chip(x, y, w, 57);
     c.halo(path, poor ? RED : CYAN);
     c.shape(path, poor ? 0xf0421117 : 0xf2123c4f, poor ? 0xffd7414c : 0xff70f2ff);
-    c.glowText("SHORT CIRCUIT", x + 23, y + 7, 25, tint);
+    c.glowText("SHORT CIRCUIT  /  T" + equipment.getInt("hackTier"), x + 23, y + 7, 22, tint);
     String status = queued ? "QUEUED" : poor ? "LOW RAM" : "READY";
     float badge = c.width(status, 12, true) + 8;
     c.stroke(Geometry.panel(x + 23, y + 35, badge, 16, 0), .7f, tint);
@@ -342,7 +345,7 @@ public final class ScannerClient {
         34,
         36,
         0xffffffff);
-    c.right("2", iconX - 35, y + 10, 31, tint);
+    c.right("" + equipment.getInt("hackCost"), iconX - 35, y + 10, 31, tint);
     c.line(iconX - 29, y + 16, iconX - 29, y + 38, .75f, tint);
     c.line(iconX - 9, y + 16, iconX - 9, y + 38, .75f, tint);
     c.text("RAM", iconX - 26, y + 23, 9, tint);
@@ -353,7 +356,16 @@ public final class ScannerClient {
     help.mouse(0, 0, 0);
     help.g.pose().popPose();
     help.tracked("CLICK TO UPLOAD", 252, 468, 13, 0xffd35a60, .6f);
-    help.body("8 ELECTRICAL DAMAGE / 1 s UPLOAD", 230, 503, 14, MUTED);
+    help.body(
+        String.format(
+            Locale.ROOT,
+            "%.1f ELECTRICAL DAMAGE / %.1f s UPLOAD",
+            equipment.getFloat("hackDamage"),
+            equipment.getInt("uploadTicks") / 20f),
+        230,
+        503,
+        14,
+        MUTED);
   }
 
   private static void overhead(net.minecraft.client.gui.GuiGraphics g, float w, float h) {

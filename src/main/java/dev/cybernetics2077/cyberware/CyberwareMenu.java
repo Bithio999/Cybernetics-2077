@@ -105,7 +105,10 @@ public final class CyberwareMenu extends AbstractContainerMenu {
             (id, inv, owner) ->
                 new dev.cybernetics2077.deck.CyberdeckMenu(
                     id, inv, ContainerLevelAccess.NULL, deck),
-            net.minecraft.network.chat.Component.translatable("cybernetics2077.deck.title")));
+            net.minecraft.network.chat.Component.translatable("cybernetics2077.deck.title")),
+        data ->
+            data.writeVarInt(
+                ((dev.cybernetics2077.deck.CyberdeckItem) deck.getItem()).tier().level));
     return true;
   }
 

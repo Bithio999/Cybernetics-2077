@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_previous": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "cybernetics2077:mantis_blades_tier_2"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_previous"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "cybernetics2077:mantis_blades_tier_3"
+    ]
+  }
+}

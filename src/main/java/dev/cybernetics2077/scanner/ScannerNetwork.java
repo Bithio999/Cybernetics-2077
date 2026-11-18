@@ -20,7 +20,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 @EventBusSubscriber(modid = Cybernetics2077.ID)
 public final class ScannerNetwork {
   public static Consumer<CompoundTag> receiver = t -> {};
-  private static final Map<ServerPlayer, Boolean> SENT = new WeakHashMap<>();
+  private static final Map<ServerPlayer, Integer> SENT = new WeakHashMap<>();
   private static final Map<ServerPlayer, Long> LAST = new WeakHashMap<>();
 
   public record Request(int target) implements CustomPacketPayload {
@@ -46,14 +46,27 @@ public final class ScannerNetwork {
   }
 
   public static boolean installed(net.minecraft.world.entity.player.Player player) {
-    return player
-        .getData(Cybernetics2077.CYBERWARE)
-        .getStackInSlot(CyberwareCategory.FACE.firstSlot())
-        .is(Cybernetics2077.OPTICS.get());
+    return tier(player) != null;
+  }
+
+  public static dev.cybernetics2077.cyberware.CyberwareTier tier(
+      net.minecraft.world.entity.player.Player player) {
+    var stack =
+        player
+            .getData(Cybernetics2077.CYBERWARE)
+            .getStackInSlot(CyberwareCategory.FACE.firstSlot());
+    return stack.getItem() instanceof dev.cybernetics2077.cyberware.OpticsItem item
+        ? item.tier()
+        : null;
+  }
+
+  public static int range(net.minecraft.world.entity.player.Player player) {
+    var tier = tier(player);
+    return tier == null ? 0 : tier.scanRange();
   }
 
   public static void register(RegisterPayloadHandlersEvent e) {
-    var r = e.registrar("2");
+    var r = e.registrar("3");
     r.playToServer(
         Request.TYPE,
         Request.CODEC,
@@ -73,14 +86,15 @@ public final class ScannerNetwork {
   }
 
   public static void syncIfChanged(ServerPlayer p) {
-    if (!Objects.equals(SENT.get(p), installed(p))) sync(p);
+    if (!Objects.equals(SENT.get(p), range(p))) sync(p);
   }
 
   public static void sync(ServerPlayer p) {
     boolean value = installed(p);
-    SENT.put(p, value);
+    SENT.put(p, range(p));
     var t = new CompoundTag();
     t.putBoolean("installed", value);
+    t.putInt("range", range(p));
     PacketDistributor.sendToPlayer(p, new State(t));
   }
 
@@ -102,6 +116,7 @@ public final class ScannerNetwork {
   public static CompoundTag inspect(ServerPlayer player, int id) {
     var t = new CompoundTag();
     t.putBoolean("installed", installed(player));
+    t.putInt("range", range(player));
     if (!installed(player) || !player.isAlive() || player.containerMenu != player.inventoryMenu)
       return t;
     var entity = player.serverLevel().getEntity(id);
@@ -115,7 +130,7 @@ public final class ScannerNetwork {
     if (target
         .getBoundingBox()
         .inflate(.35)
-        .clip(eye, eye.add(player.getLookAngle().scale(32)))
+        .clip(eye, eye.add(player.getLookAngle().scale(range(player))))
         .isEmpty()) return t;
     t.putInt("id", target.getId());
     t.putString("name", target.getName().getString());

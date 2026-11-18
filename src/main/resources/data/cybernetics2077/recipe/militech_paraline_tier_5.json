@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:smithing_transform",
+  "template": {
+    "item": "minecraft:redstone"
+  },
+  "base": {
+    "item": "cybernetics2077:militech_paraline_tier_4"
+  },
+  "addition": {
+    "item": "minecraft:nether_star"
+  },
+  "result": {
+    "id": "cybernetics2077:militech_paraline_tier_5",
+    "count": 1
+  }
+}

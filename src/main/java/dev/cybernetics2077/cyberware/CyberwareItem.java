@@ -31,6 +31,11 @@ public class CyberwareItem extends Item {
   }
 
   @Override
+  public net.minecraft.network.chat.Component getName(net.minecraft.world.item.ItemStack stack) {
+    return super.getName(stack).copy().withColor(tier.color & 0xffffff);
+  }
+
+  @Override
   public void appendHoverText(
       net.minecraft.world.item.ItemStack stack,
       TooltipContext context,
@@ -47,18 +52,36 @@ public class CyberwareItem extends Item {
         net.minecraft.network.chat.Component.translatable(
                 "cybernetics2077.implant.capacity", capacity)
             .withStyle(net.minecraft.ChatFormatting.GRAY));
-    if (this == dev.cybernetics2077.Cybernetics2077.OPTICS.get())
+    if (this instanceof OpticsItem)
       lines.add(
-          net.minecraft.network.chat.Component.translatable("cybernetics2077.optics.description")
+          net.minecraft.network.chat.Component.translatable(
+                  "cybernetics2077.optics.description", tier.scanRange())
               .withStyle(net.minecraft.ChatFormatting.AQUA));
-    if (this == dev.cybernetics2077.Cybernetics2077.CYBERDECK.get())
+    if (this instanceof dev.cybernetics2077.deck.CyberdeckItem) {
       lines.add(
-          net.minecraft.network.chat.Component.translatable("cybernetics2077.deck.description")
+          net.minecraft.network.chat.Component.translatable(
+                  "cybernetics2077.deck.description", tier.ram(), tier.programSlots())
               .withStyle(net.minecraft.ChatFormatting.AQUA));
-    if (this == dev.cybernetics2077.Cybernetics2077.MANTIS.get())
+      lines.add(
+          net.minecraft.network.chat.Component.translatable(
+                  "cybernetics2077.deck.stats",
+                  String.format(java.util.Locale.ROOT, "%.1f", tier.ramPerSecond()),
+                  tier.queueLimit(),
+                  Math.round(tier.quickhackBonus() * 100))
+              .withStyle(net.minecraft.ChatFormatting.GRAY));
+    }
+    if (this instanceof MantisBladesItem) {
       lines.add(
           net.minecraft.network.chat.Component.translatable("cybernetics2077.mantis.description")
               .withStyle(net.minecraft.ChatFormatting.AQUA));
+      lines.add(
+          net.minecraft.network.chat.Component.translatable(
+                  "cybernetics2077.mantis.stats",
+                  8 * tier.bladeMultiplier(),
+                  10 * tier.bladeMultiplier(),
+                  14 * tier.bladeMultiplier())
+              .withStyle(net.minecraft.ChatFormatting.GRAY));
+    }
   }
 
   public int capacityCost() {

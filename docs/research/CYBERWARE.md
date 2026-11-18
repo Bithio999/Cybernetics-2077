@@ -14,7 +14,7 @@ The mod's heavy attack acquires a visible target within **8 blocks**; without on
 
 ## Scanner
 
-Reviewed the user's **Blackwall Gateway Quickhack** MP4: the RAM cells, cyan chip-shaped quickhack rows, amber tags, right-side data panel, target label and red upload chips above the target. The earlier Additional Additions scanner source was also compared. The implementation retains its staged native-HUD transition, with no Tensura dependencies or displays. RAM shows the installed deck's real four cells, rather than inventing additional capacity to match the reference screenshot.
+Reviewed the user's **Blackwall Gateway Quickhack** MP4: the RAM cells, cyan chip-shaped quickhack rows, amber tags, right-side data panel, target label and red upload chips above the target. The earlier Additional Additions scanner source was also compared. The implementation retains its staged native-HUD transition, with no Tensura dependencies or displays. RAM shows the installed deck's real capacity (four cells at tier 1), rather than inventing additional capacity to match the reference screenshot.
 
 - [CD PROJEKT RED: Update 2.0](https://www.cyberpunk.net/en/news/49060/update-2-0): revised cyberware/ripperdoc experience, netrunning RAM, upload timing and queue mechanics.
 - [Gamestegy: Netrunner build](https://gamestegy.com/post/cyberpunk-2077/698/netrunner-build): deck/optics and quickhack references.
@@ -24,7 +24,7 @@ The eye enables scanning; a loaded cyberdeck enables hacking. Server checks cove
 
 ## Icons and attribution
 
-The production icons are now **original 32×32 pixel art**, with restrained colour clusters, dark outlines and no smoothing. The Kiroshi optic, Parallel deck, folded Mantis assembly and Short Circuit program keep recognizable silhouettes while fitting Minecraft. Earlier high-detail source artwork is no longer used. Research asset URLs remain in [the reference manifest](../../art/cyberpunk-icons/sources.json); downloaded icon PNGs have been removed from the current source tree.
+The production icons are now **original 32×32 pixel art**, with restrained colour clusters, dark outlines and no smoothing. The Kiroshi optic, Paraline deck, folded Mantis assembly and Short Circuit program keep recognizable silhouettes while fitting Minecraft. Earlier high-detail source artwork is no longer used. Research asset URLs remain in [the reference manifest](../../art/cyberpunk-icons/sources.json); downloaded icon PNGs have been removed from the current source tree.
 
 ## Mechanical presentation
 
@@ -79,3 +79,9 @@ Downloaded and reviewed the separate [Gamestegy combat MP4](https://cdn.gamesteg
 Light cuts now use separate anticipation, contact, follow-through and recovery keys with continuous cubic-Hermite velocity. The attacking arm moves across the body while the other guards. The sliding leaves compact for wind-up, extend at the existing damage frame, shorten during follow-through and return to ready. The assembly's structural hinges stay locked during cuts. A charged lunge pulls the rendered hands toward the body through camera-space translation and joint movement; release drives both arms forward. Existing movement-path progress controls the flight pose, and the server's contact timestamp controls recovery. The blade compacts during the pullback and extends for contact.
 
 Idle breathing uses small continuous offsets and joint motion, faded out during actions. The world-space guard opens the shoulders and turns the mounts away from the torso. Third-person rendering retains each native shoulder location while removing duplicated vanilla arm swing angles. No skin mesh, UV, implant size, network payload or damage values are changed. Tests check rendered wrist pullback/reach, continuous stroke velocity, telescoping at contact, left-handed mirroring, bounded idle movement, fixed shoulder/elbow attachments and the actual exported mechanism's torso clearance.
+
+## Names and tier progression (0.7.0)
+
+The [current cyberware catalogue](https://gamestegy.com/cyberpunk-2077/wiki/cyberware) was reviewed directly for current 2.x names, slot grouping and effect summaries. It supplies 121 current entries and 27 legacy names, retained in the [categorized reference list](CYBERWARE-CATALOGUE.md). The implemented families are **Basic Kiroshi Optics**, **Militech Paraline** and physical **Mantis Blades**. The catalogue describes Paraline’s quickhack damage benefit and Mantis Blades’ slashes/leap; those guide the families’ progression. Its optics zoom/camera-detection effects do not directly map to Minecraft, so higher scanning range is used here. Individual database pages returned 403 during this review; Fandom remained unavailable. The accessible catalogue and official Update 2.0 notes are the evidence for this pass.
+
+Tiers 1–5 use distinct registered items, shared original pixel-art silhouettes and colored names/socket badges. Tier-one registry IDs, capacity and effects remain compatible with existing saves. Higher tiers improve real effects and capacity costs; exact Minecraft values are listed in the equipment guide rather than represented as Cyberpunk statistics. Smithing transforms preserve base item components, including installed quickhack chips. There is no Relic, Overclock, attribute-attunement or perk system implied by this change.

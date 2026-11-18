@@ -111,3 +111,15 @@ Light attacks alternate cross-body cuts, then use a rising third strike. The oth
 ## Momentum and selected items (0.6.1)
 
 The lunge hands its remaining velocity back to normal Minecraft movement rather than forcing a stop. Selecting a hotbar item or browsing inventory leaves deployed claws out. Stored hand items are inactive until the claws retract; their attributes and enchantments do not affect the Mantis attacks. Deployment still requires empty hands. The current combat preview includes an enchanted sword selected while using the claws.
+
+## Cyberware tiers (0.7.0)
+
+Basic Kiroshi Optics, Militech Paraline and Mantis Blades now support tiers 1–5. These captures show a native tier-5 bench installation, an eight-socket chip editor with Short Circuit in its final socket, the equipment viewer and the scanner’s 12 RAM cells. The client review also uploaded the program and verified 26.4 electrical damage.
+
+![Tier-5 installation](images/tier-five-bench.png)
+
+![Tier-5 chip editor](images/tier-five-cyberdeck.png)
+
+![Tier-5 Paraline detail](images/tier-five-viewer.png)
+
+![Tier-5 scanner](images/tier-five-scanner.png)
