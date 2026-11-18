@@ -1,0 +1,81 @@
+{
+  "ambientocclusion": true,
+  "textures": {
+    "particle": "cybernetics2077:block/reinforced_panel",
+    "metal": "cybernetics2077:block/reinforced_panel",
+    "front": "cybernetics2077:block/afterlife_sign"
+  },
+  "elements": [
+    {
+      "from": [
+        -16,
+        0,
+        14
+      ],
+      "to": [
+        32,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

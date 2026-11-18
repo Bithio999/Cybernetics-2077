@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "MantisHandsMixin",
-    "OpticalCamoMixin"
+    "OpticalCamoMixin",
+    "VillagePoolAccess"
   ],
   "injectors": {
     "defaultRequire": 1

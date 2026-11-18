@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.8.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.9.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.8.0'
+    assert metadata['mods'][0]['version']=='0.9.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -110,4 +110,38 @@ with ZipFile(jar) as z:
         assert 'dev/cybernetics2077/mixin/client/'+mixin+'.class' in names
     for mixin in json.loads(z.read('cybernetics2077.common.mixins.json'))['mixins']:
         assert 'dev/cybernetics2077/mixin/'+mixin+'.class' in names
+    city_blocks=('reinforced_panel','clinic_tile','ribbed_floor','medical_cabinet','vent_grille',
+                 'diagnostic_monitor','surgical_chair','surgical_footrest','ceiling_truss',
+                 'surgical_light','service_pipe','cyan_strip','red_strip','green_strip',
+                 'bar_counter','bar_stool','ripperdoc_sign','afterlife_sign','bottle_shelf')
+    for block in city_blocks:
+        assert 'block.cybernetics2077.'+block in lang
+        model=json.loads(z.read(f'assets/cybernetics2077/models/block/{block}.json'))
+        states=json.loads(z.read(f'assets/cybernetics2077/blockstates/{block}.json'))
+        assert set(states['variants'])=={'facing='+d for d in ('north','east','south','west')}
+        assert f'assets/cybernetics2077/models/item/{block}.json' in names
+        assert f'data/cybernetics2077/loot_table/blocks/{block}.json' in names
+        for texture in model['textures'].values():
+            assert 'assets/'+texture.replace(':','/textures/')+'.png' in names, texture
+        for part in model['elements']:
+            assert all(-16<=v<=32 for v in part['from']+part['to']), 'Out-of-range geometry'
+            if part['from']==[0,0,0] and part['to']==[16,16,16]:
+                assert all(face.get('cullface')==name for name,face in part['faces'].items()), 'Unculled full cube'
+    for cls in ('CityContent','CityPoolElement','VillageServices','CityResident','RipperdocMenu','FixerMenu','StreetAccount','CyberwareCatalogue'):
+        assert f'dev/cybernetics2077/city/{cls}.class' in names
+    for cls in ('RipperdocScreen','FixerScreen','CityResidentRenderer'):
+        assert f'dev/cybernetics2077/client/ui/{cls}.class' in names
+    sys.path.insert(0,str(root/'art/city'))
+    from nbt import read as read_structure
+    for building,people in [('clinic_small',1),('clinic_large',1),('afterlife',2)]:
+        template=read_structure(z.read(f'data/cybernetics2077/structure/village/{building}.nbt'))
+        assert len(template['entities'])==people
+        assert sum(template['palette'][b['state']]['Name']=='minecraft:jigsaw' for b in template['blocks'])==3
+        assert sum(template['palette'][b['state']]['Name']=='minecraft:barrel' for b in template['blocks'])==1
+        for entry in template['palette']:
+            if entry['Name'].startswith('cybernetics2077:'):
+                assert entry['Name'].split(':')[1] in city_blocks
+        pool=json.loads(z.read(f'data/cybernetics2077/worldgen/template_pool/village/{building}.json'))
+        assert pool['elements'][0]['element']['element_type']=='cybernetics2077:supported_building'
+        assert f'data/cybernetics2077/loot_table/chests/{building}.json' in names
 print(f'PASS: standalone metadata, classes, resource parity, JSON, font license, no review fixtures: {jar.name}')

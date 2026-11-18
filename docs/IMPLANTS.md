@@ -1,6 +1,6 @@
 # Additional cyberware
 
-Install at the Cybernetics Bench and inspect effects in the inventory cyberware menu. Higher tiers improve the listed effects; each implant starts at its Cyberpunk 2077 starting tier and continues through **tier 5**. No `+` or `++` tiers are included. These additions have no crafting recipes yet; use Creative **Tools & Utilities** or `/give` for testing.
+Install through a ripperdoc or at the Cybernetics Bench and inspect effects in the inventory cyberware menu. Higher tiers improve the listed effects; each implant starts at its Cyberpunk 2077 starting tier and continues through **tier 5**. No `+` or `++` tiers are included. These additions have no crafting recipes yet. Buy them from a village ripperdoc, or use Creative **Tools & Utilities** / `/give` for testing.
 
 Only one version of each implant family can be installed. Different families can share a body system, within its socket count and your total capacity. Removing an implant removes its bonuses. Cooldowns and Blood Pump charges persist across logout and death; reinstalling an item does not reset them.
 

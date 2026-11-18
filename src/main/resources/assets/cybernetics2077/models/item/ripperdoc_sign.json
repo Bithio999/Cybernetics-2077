@@ -1,0 +1,17 @@
+{
+  "parent": "cybernetics2077:block/ripperdoc_sign",
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "scale": [
+        0.25,
+        0.25,
+        0.25
+      ]
+    }
+  }
+}

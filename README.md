@@ -23,7 +23,7 @@ The original implant/chip families retain their earlier smithing upgrades; the n
 
 **14 more implant families** cover the cortex, operating system, face, skeleton, nerves, circulation, skin and legs. They include Berserk, Blood Pump, Optical Camo, retained enemy highlights, defensive implants, a double jump and a charged jump. Each starts at its researched Cyberpunk tier and continues through tier 5. [Full implant list, starting tiers and effects](docs/IMPLANTS.md).
 
-Active controls: **I** for BioDyne Berserk, **H** for Blood Pump, **C** for Optical Camo. Leg abilities use **jump**. Bindings can be changed in Controls. New implants have no recipes yet and are available in Creative or through commands. Existing tier-1 Mantis Blades become tier 2 automatically.
+Active controls: **I** for BioDyne Berserk, **H** for Blood Pump, **C** for Optical Camo. Leg abilities use **jump**. Bindings can be changed in Controls. New implants have no recipes yet; they are sold by ripperdocs and also available in Creative or through commands. Existing tier-1 Mantis Blades become tier 2 automatically.
 
 The scanner shows health, armor, attack damage, absorption and visible effects. With a loaded cyberdeck, **left-click** to upload Short Circuit to the target; upload progress appears over its head. The overlay opens and closes with an animated transition from Minecraft’s HUD.
 
@@ -35,9 +35,17 @@ Mantis Blades deploy from the top/back-of-hand face of the forearm through multi
 
 ![Dorsal-mounted arm blades](docs/images/mantis-first-person.png)
 
+## Village clinics and the Afterlife
+
+Find **Ripperdoc clinics** in new villages, with a rarer two-storey clinic. Talk to the doctor to **purchase cyberware** or **install it** through separate tabs. Supply-barrel credit chips fund your saved eddies wallet. The occasional **Afterlife** has a descending entrance, industrial bar and two fixer NPCs. Contracts are coming later.
+
+[Buildings, purchasing and installation](docs/VILLAGE-SERVICES.md) · [Design references and block audits](docs/research/VILLAGE-SERVICES.md)
+
+![Village services](docs/images/village-services.png)
+
 ## Install cyberware
 
-Craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. While Mantis Blades are out, selected main-hand and off-hand items stay in their inventory slots and act as empty hands. Retract the claws to use them again. Drawing the claws still requires both hands to be empty. Install a deck, then select **Operating System → Manage Quickhacks** in the cyberware menu to load or remove chips. The bench’s **Cyberdeck** shortcut also remains available. Its programs stay with the physical deck when it is removed.
+Visit a ripperdoc and select **Install**, or craft and place a **Cybernetics Bench**, then right-click it. Move an implant from your inventory into a matching body-system socket, or **shift-click** to install it. Move it back to your inventory to remove it. Category and total capacity limits apply; merely carrying the scanner does not enable it. Equipment is saved with the player and retained on death. While Mantis Blades are out, selected main-hand and off-hand items stay in their inventory slots and act as empty hands. Retract the claws to use them again. Drawing the claws still requires both hands to be empty. Install a deck, then select **Operating System → Manage Quickhacks** in the cyberware menu to load or remove chips. The bench’s **Cyberdeck** shortcut also remains available. Its programs stay with the physical deck when it is removed.
 
 ![Cybernetics Bench installation menu](docs/images/bench.png)
 
@@ -45,7 +53,7 @@ Craft and place a **Cybernetics Bench**, then right-click it. Move an implant fr
 
 ## Install the mod
 
-Use [Cybernetics2077-0.8.0.jar](releases/Cybernetics2077-0.8.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.9.0.jar](releases/Cybernetics2077-0.9.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

@@ -5,6 +5,7 @@ gradle.projectsEvaluated {
  def reviewRoot=rootProject.findProperty('cyberReviewRoot') ?: '/tmp/cybernetics2077-review'
  rootProject.neoForge.runs.client.gameDirectory=rootProject.file(reviewRoot+'/client')
  rootProject.neoForge.runs.client.systemProperty('cybernetics2077.reviewRoot',reviewRoot.toString())
+ if(rootProject.hasProperty('cityReview')) rootProject.neoForge.runs.client.systemProperty('cybernetics2077.cityReview','true')
  if(rootProject.hasProperty('cyberContentOnly')) rootProject.neoForge.runs.client.systemProperty('cybernetics2077.contentOnly','true')
  if(rootProject.hasProperty('cyberRecording')) rootProject.neoForge.runs.client.systemProperty('cybernetics2077.recording','true')
  def recording=rootProject.hasProperty('cyberRecording')

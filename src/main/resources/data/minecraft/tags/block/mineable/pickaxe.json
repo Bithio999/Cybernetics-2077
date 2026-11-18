@@ -1,6 +1,25 @@
 {
   "replace": false,
   "values": [
-    "cybernetics2077:cybernetics_bench"
+    "cybernetics2077:cybernetics_bench",
+    "cybernetics2077:afterlife_sign",
+    "cybernetics2077:bar_counter",
+    "cybernetics2077:bar_stool",
+    "cybernetics2077:bottle_shelf",
+    "cybernetics2077:ceiling_truss",
+    "cybernetics2077:clinic_tile",
+    "cybernetics2077:cyan_strip",
+    "cybernetics2077:diagnostic_monitor",
+    "cybernetics2077:green_strip",
+    "cybernetics2077:medical_cabinet",
+    "cybernetics2077:red_strip",
+    "cybernetics2077:reinforced_panel",
+    "cybernetics2077:ribbed_floor",
+    "cybernetics2077:ripperdoc_sign",
+    "cybernetics2077:service_pipe",
+    "cybernetics2077:surgical_chair",
+    "cybernetics2077:surgical_footrest",
+    "cybernetics2077:surgical_light",
+    "cybernetics2077:vent_grille"
   ]
 }

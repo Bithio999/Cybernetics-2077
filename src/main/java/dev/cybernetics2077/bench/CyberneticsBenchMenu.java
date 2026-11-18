@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 /** Native server-owned slots provide pickup, swap, shift-click and cursor recovery. */
-public final class CyberneticsBenchMenu extends AbstractContainerMenu {
+public class CyberneticsBenchMenu extends AbstractContainerMenu {
   private final ContainerLevelAccess access;
   private final CyberwareInventory implants;
   private final Player owner;
@@ -20,7 +20,22 @@ public final class CyberneticsBenchMenu extends AbstractContainerMenu {
   }
 
   public CyberneticsBenchMenu(int id, Inventory inv, ContainerLevelAccess access) {
-    super(Cybernetics2077.BENCH_MENU.get(), id);
+    this(Cybernetics2077.BENCH_MENU.get(), id, inv, access, 0);
+  }
+
+  protected CyberneticsBenchMenu(
+      MenuType<?> type, int id, Inventory inv, ContainerLevelAccess access, int offset) {
+    this(type, id, inv, access, offset, false);
+  }
+
+  protected CyberneticsBenchMenu(
+      MenuType<?> type,
+      int id,
+      Inventory inv,
+      ContainerLevelAccess access,
+      int offset,
+      boolean compact) {
+    super(type, id);
     this.access = access;
     owner = inv.player;
     implants =
@@ -31,10 +46,24 @@ public final class CyberneticsBenchMenu extends AbstractContainerMenu {
       for (int n = 0; n < category.sockets; n++) {
         int index = category.firstSlot() + n;
         addSlot(
-            new SlotItemHandler(implants, index, x(category) + 76 + n * 18, y(category)) {
+            new SlotItemHandler(
+                implants,
+                index,
+                x(category) + 76 + n * 18,
+                (compact ? 31 + (category.ordinal() / 2) * 18 : y(category)) + offset) {
+              @Override
+              public boolean isActive() {
+                return installationActive();
+              }
+
+              @Override
+              public boolean mayPickup(Player player) {
+                return installationActive();
+              }
+
               @Override
               public boolean mayPlace(ItemStack stack) {
-                return fits(index, stack);
+                return installationActive() && fits(index, stack);
               }
 
               @Override
@@ -45,8 +74,34 @@ public final class CyberneticsBenchMenu extends AbstractContainerMenu {
       }
     for (int row = 0; row < 3; row++)
       for (int col = 0; col < 9; col++)
-        addSlot(new Slot(inv, col + row * 9 + 9, 84 + col * 18, 143 + row * 18));
-    for (int col = 0; col < 9; col++) addSlot(new Slot(inv, col, 84 + col * 18, 205));
+        addSlot(
+            inventorySlot(
+                inv, col + row * 9 + 9, 84 + col * 18, 143 + row * 18 + (compact ? 0 : offset)));
+    for (int col = 0; col < 9; col++)
+      addSlot(inventorySlot(inv, col, 84 + col * 18, 205 + (compact ? 0 : offset)));
+  }
+
+  protected boolean installationActive() {
+    return true;
+  }
+
+  private Slot inventorySlot(Inventory inv, int index, int x, int y) {
+    return new Slot(inv, index, x, y) {
+      @Override
+      public boolean isActive() {
+        return installationActive();
+      }
+
+      @Override
+      public boolean mayPickup(Player p) {
+        return installationActive();
+      }
+
+      @Override
+      public boolean mayPlace(ItemStack stack) {
+        return installationActive();
+      }
+    };
   }
 
   public static int x(CyberwareCategory c) {

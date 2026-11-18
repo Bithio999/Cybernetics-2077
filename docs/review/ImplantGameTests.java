@@ -110,47 +110,58 @@ public final class ImplantGameTests {
     var p = player(h);
     var pos = h.absolutePos(new BlockPos(2, 30, 2));
     p.setPos(Vec3.atBottomCenterOf(pos));
+    var targetChunk = h.absolutePos(new BlockPos(2, 30, 7));
+    h.getLevel().setChunkForced(targetChunk.getX() >> 4, targetChunk.getZ() >> 4, true);
+    h.getLevel().getChunkAt(targetChunk);
     var mob = h.spawn(EntityType.ZOMBIE, new BlockPos(2, 30, 7));
     mob.setNoAi(true);
     p.lookAt(
         net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, mob.getEyePosition());
-    h.assertTrue(
-        !ScannerNetwork.inspect(p, mob.getId()).contains("id"), "Scan worked without implant");
-    p.getData(Cybernetics2077.CYBERWARE)
-        .setStackInSlot(5, new ItemStack(Cybernetics2077.OPTICS.get()));
-    h.assertTrue(
-        ScannerNetwork.inspect(p, mob.getId()).contains("id"),
-        "Valid scan failed: owned="
-            + ScannerNetwork.installed(p)
-            + " player="
-            + p.isAlive()
-            + " menu="
-            + (p.containerMenu == p.inventoryMenu)
-            + " found="
-            + (p.serverLevel().getEntity(mob.getId()) != null)
-            + " mob="
-            + mob.isAlive()
-            + " LOS="
-            + p.hasLineOfSight(mob)
-            + " eye="
-            + p.getEyePosition()
-            + " look="
-            + p.getLookAngle()
-            + " target="
-            + mob.position());
-    p.setYRot(180);
-    h.assertTrue(!ScannerNetwork.inspect(p, mob.getId()).contains("id"), "Off-axis scan allowed");
-    p.lookAt(
-        net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, mob.getEyePosition());
-    for (int y = 30; y <= 33; y++) h.setBlock(new BlockPos(2, y, 4), Blocks.STONE);
-    h.assertTrue(
-        !ScannerNetwork.inspect(p, mob.getId()).contains("id"), "Scan passed through wall");
-    for (int y = 30; y <= 33; y++) h.setBlock(new BlockPos(2, y, 4), Blocks.AIR);
-    mob.setPos(mob.position().add(0, 0, 40));
-    p.lookAt(
-        net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES, mob.getEyePosition());
-    h.assertTrue(
-        !ScannerNetwork.inspect(p, mob.getId()).contains("id"), "Out-of-range scan allowed");
-    h.succeed();
+    h.runAfterDelay(
+        2,
+        () -> {
+          h.assertTrue(
+              !ScannerNetwork.inspect(p, mob.getId()).contains("id"),
+              "Scan worked without implant");
+          p.getData(Cybernetics2077.CYBERWARE)
+              .setStackInSlot(5, new ItemStack(Cybernetics2077.OPTICS.get()));
+          h.assertTrue(
+              ScannerNetwork.inspect(p, mob.getId()).contains("id"),
+              "Valid scan failed: owned="
+                  + ScannerNetwork.installed(p)
+                  + " player="
+                  + p.isAlive()
+                  + " menu="
+                  + (p.containerMenu == p.inventoryMenu)
+                  + " found="
+                  + (p.serverLevel().getEntity(mob.getId()) != null)
+                  + " mob="
+                  + mob.isAlive()
+                  + " LOS="
+                  + p.hasLineOfSight(mob)
+                  + " eye="
+                  + p.getEyePosition()
+                  + " look="
+                  + p.getLookAngle()
+                  + " target="
+                  + mob.position());
+          p.setYRot(180);
+          h.assertTrue(
+              !ScannerNetwork.inspect(p, mob.getId()).contains("id"), "Off-axis scan allowed");
+          p.lookAt(
+              net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
+              mob.getEyePosition());
+          for (int y = 30; y <= 33; y++) h.setBlock(new BlockPos(2, y, 4), Blocks.STONE);
+          h.assertTrue(
+              !ScannerNetwork.inspect(p, mob.getId()).contains("id"), "Scan passed through wall");
+          for (int y = 30; y <= 33; y++) h.setBlock(new BlockPos(2, y, 4), Blocks.AIR);
+          mob.setPos(mob.position().add(0, 0, 40));
+          p.lookAt(
+              net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
+              mob.getEyePosition());
+          h.assertTrue(
+              !ScannerNetwork.inspect(p, mob.getId()).contains("id"), "Out-of-range scan allowed");
+          h.succeed();
+        });
   }
 }

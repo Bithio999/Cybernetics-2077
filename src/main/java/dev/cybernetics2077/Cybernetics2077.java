@@ -133,6 +133,7 @@ public final class Cybernetics2077 {
   private static final ModConfigSpec SPEC = CONFIG.build();
 
   public Cybernetics2077(IEventBus bus, ModContainer container) {
+    dev.cybernetics2077.city.CityContent.register(bus);
     BLOCKS.register(bus);
     ITEMS.register(bus);
     MENUS.register(bus);

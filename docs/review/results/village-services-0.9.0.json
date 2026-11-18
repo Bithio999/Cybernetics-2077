@@ -1,0 +1,43 @@
+{
+  "release": "0.9.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvmTestsPassed": 53,
+  "serverGameTestsPassed": 53,
+  "authoredTemplatePositionsAudited": 5681,
+  "templateRotationsChecked": 12,
+  "layoutSeedsPerVillageType": 192,
+  "layoutCounts": {
+    "plains": {
+      "afterlife": 25,
+      "clinic_large": 19,
+      "clinic_small": 104
+    },
+    "desert": {
+      "afterlife": 19,
+      "clinic_large": 13,
+      "clinic_small": 95
+    },
+    "savanna": {
+      "afterlife": 49,
+      "clinic_large": 28,
+      "clinic_small": 188
+    },
+    "snowy": {
+      "afterlife": 31,
+      "clinic_large": 16,
+      "clinic_small": 94
+    },
+    "taiga": {
+      "afterlife": 30,
+      "clinic_large": 21,
+      "clinic_small": 130
+    }
+  },
+  "minimumGuiChecked": [
+    320,
+    240
+  ],
+  "nativeClientReview": "PASS: native interiors/exteriors, NPC interactions, wallet synchronization, purchase, installation, fixer dossier and actual vanilla village chunk placement with doctors/fixers.",
+  "cleanReleaseVerifier": "passed"
+}

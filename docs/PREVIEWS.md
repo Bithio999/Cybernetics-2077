@@ -48,7 +48,7 @@ These are native Minecraft captures. The hatch and mount sit on the **dorsal sid
 
 [Watch quickhack editing from the cyberware menu](media/quickhack-management.mp4)
 
-Select your installed Operating System, then **Manage Quickhacks**. Implant installation stays at the bench.
+Select your installed Operating System, then **Manage Quickhacks**. Implant installation is available at ripperdoc clinics and the bench.
 
 ![Quickhack action on the OS page](images/cyberware-quickhack-entry.png)
 
@@ -147,3 +147,27 @@ Fourteen new families use their researched starting tiers and continue through t
 ![Optical Camo active](images/expansion-optical-camo.png)
 
 ![Charged ankle jump](images/expansion-charged-jump.png)
+
+## Village services (0.9.0)
+
+Native Minecraft captures, including vanilla village jigsaw/chunk placement on flat review terrain. The references are documented in [building notes](research/VILLAGE-SERVICES.md).
+
+![Services in a village](images/village-services.png)
+
+| Small clinic | Rare two-storey clinic |
+| --- | --- |
+| ![Small clinic](images/clinic-small-exterior.png) | ![Large clinic](images/clinic-large-exterior.png) |
+
+[Small clinic interior](images/clinic-small-interior.png) · [Upper treatment floor](images/clinic-large-surgery.png) · [Rear service wall](images/clinic-large-rear.png)
+
+| Afterlife exterior | Bar |
+| --- | --- |
+| ![Afterlife](images/afterlife-exterior.png) | ![Bar](images/afterlife-bar.png) |
+
+[Fixer booth](images/afterlife-booth.png) · [Fixer dossier](images/afterlife-fixer.png)
+
+| Purchase | Install |
+| --- | --- |
+| ![Purchase](images/ripperdoc-purchase.png) | ![Install](images/ripperdoc-install.png) |
+
+[Installation at the minimum 320 × 240 GUI size](images/ripperdoc-install-compact.png) · [Guide](VILLAGE-SERVICES.md)

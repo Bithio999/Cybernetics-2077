@@ -2,7 +2,18 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.8.0 uses the local player’s skin in the hologram. All 53 JVM tests, 41 server GameTests and the expanded native content review pass. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+Release 0.9.0 passes all **53 JVM tests**, **53 server GameTests**, the native village-services review and clean-release verification. The local player’s skin remains in the hologram. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+
+## Village services (0.9.0)
+
+- The authoring generator reviews all **5,681** template positions, including connected occupied blocks, complete envelopes, furniture/wall/ceiling supports, chair/footrest pairing, monitor stands, NPC body space and reachable service areas. Regeneration produces identical resource bytes.
+- Minecraft tests resolve every authored palette entry and compare **every placed state** to its authored/rotated state, then check survival, in all twelve template/rotation combinations. These comparisons include both door halves. Foundation gaps, the street-aligned Afterlife basement, correct persistent NPC counts and supply-barrel currency loot are also checked.
+- **960 deterministic vanilla village layouts** (192 for each vanilla village type) exercise actual jigsaw selection, lot fitting and road attachments. These are layout tests on the server review terrain, not estimates of per-village spawn percentages.
+- The native client opens NPC menus through interaction, purchases and installs an implant, checks synchronized currency, visits both kinds of building and places a vanilla village through `StructureStart.placeInChunk`. Building, service-wall and menu screenshots are in [Previews](PREVIEWS.md). Native placement uses the same known-shape flags as vanilla jigsaw generation. The isolated structure scenes use flat review terrain.
+- The purchase/install menu is checked at **320 × 240 GUI size**. Server tests reject unfunded/full-inventory purchases, distant/dead-NPC access and forged installation clicks in the purchase tab. Fixers expose no unfinished contract/reward actions.
+- The old scanner fixture now waits for its target's entity section to become accessible; FakePlayers do not load chunks like real players. No scanner gameplay rules were changed.
+
+[Machine-readable results](review/results/village-services-0.9.0.json) · [Block-context reports](../art/city/audits) · [Reference notes](research/VILLAGE-SERVICES.md)
 
 ## Automated checks
 
@@ -85,7 +96,7 @@ python3 docs/review/trim-native-recording.py recording.mp4 /path/to/capture RECO
 
 For desktop recording, match the capture rectangle to the actual game window; a 1280×720 review window can otherwise be centered inside a larger virtual display. The current Mantis clips were recorded with both the desktop and game window at 960×540 and visually checked after trimming.
 
-Release 0.8.0 uses combat protocol 9 and scanner protocol 3. Update clients and server together. The release JAR is built after a clean, without the review profiles.
+Release 0.9.0 uses combat protocol 9 and scanner protocol 3. Update clients and server together. The release JAR is built after a clean, without the review profiles.
 
 The 0.5.8 revision also checks ordered cover/hinge/carriage channels and reverse retraction, verifies the inventory tab overlaps its inventory edge, and captures the exposed mechanical cavity. All four item icons are 32×32 nearest-neighbour pixel art.
 

@@ -72,6 +72,16 @@ public final class ClientHooks {
       e.<dev.cybernetics2077.bench.CyberneticsBenchMenu, CyberneticsBenchScreen>register(
           Cybernetics2077.BENCH_MENU.get(), CyberneticsBenchScreen::new);
       e.register(Cybernetics2077.DECK_MENU.get(), CyberdeckScreen::new);
+      e.register(dev.cybernetics2077.city.CityContent.RIPPER_MENU.get(), RipperdocScreen::new);
+      e.register(dev.cybernetics2077.city.CityContent.FIXER_MENU.get(), FixerScreen::new);
+    }
+
+    @SubscribeEvent
+    public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
+      e.registerEntityRenderer(
+          dev.cybernetics2077.city.CityContent.RIPPERDOC.get(), CityResidentRenderer::new);
+      e.registerEntityRenderer(
+          dev.cybernetics2077.city.CityContent.FIXER.get(), CityResidentRenderer::new);
     }
 
     @SubscribeEvent

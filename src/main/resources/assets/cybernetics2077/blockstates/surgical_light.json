@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "cybernetics2077:block/surgical_light",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "cybernetics2077:block/surgical_light",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "cybernetics2077:block/surgical_light",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cybernetics2077:block/surgical_light",
+      "y": 270
+    }
+  }
+}
