@@ -1,0 +1,20 @@
+{
+  "release": "0.9.1",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvmTestsPassed": 53,
+  "serverGameTestsPassed": 55,
+  "templatePositionsAudited": 6019,
+  "geometryShellSurfacesChecked": 1271,
+  "templateRotationsChecked": 12,
+  "layoutSeedsPerVillageType": 192,
+  "furnitureItemsCheckedInSevenNativeDisplayContexts": 25,
+  "distinctNativeResidentSkins": 4,
+  "creditChipValue": 100,
+  "nativeClientReview": "PASS: native interiors/exteriors, NPC interactions, wallet synchronization, purchase, installation, fixer dossier and actual vanilla village chunk placement with doctors/fixers.",
+  "geometryRegressionChecks": [
+    "partial wall truss rejected",
+    "distant surgical light rejected"
+  ],
+  "cleanReleaseVerifier": "passed"
+}

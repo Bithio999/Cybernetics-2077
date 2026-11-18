@@ -39,6 +39,10 @@ public final class CityResident extends PathfinderMob {
     return getType() == CityContent.FIXER.get();
   }
 
+  public boolean slim() {
+    return fixer() ? style() == 0 : style() == 1;
+  }
+
   public int style() {
     return entityData.get(STYLE);
   }
@@ -67,7 +71,9 @@ public final class CityResident extends PathfinderMob {
         ? getCustomName()
         : Component.translatable(
             "cybernetics2077.city."
-                + (fixer() ? (style() == 0 ? "fixer_mara" : "fixer_ren") : "doctor"));
+                + (fixer()
+                    ? (style() == 0 ? "fixer_mara" : "fixer_ren")
+                    : (style() == 1 ? "doctor_iris" : "doctor")));
   }
 
   @Override

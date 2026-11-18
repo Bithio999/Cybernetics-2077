@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.9.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.9.1.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.9.0'
+    assert metadata['mods'][0]['version']=='0.9.1'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -113,10 +113,15 @@ with ZipFile(jar) as z:
     city_blocks=('reinforced_panel','clinic_tile','ribbed_floor','medical_cabinet','vent_grille',
                  'diagnostic_monitor','surgical_chair','surgical_footrest','ceiling_truss',
                  'surgical_light','service_pipe','cyan_strip','red_strip','green_strip',
-                 'bar_counter','bar_stool','ripperdoc_sign','afterlife_sign','bottle_shelf')
+                 'bar_counter','bar_stool','ripperdoc_sign','afterlife_sign','bottle_shelf',
+                 'bar_corner','canopy_panel','ceiling_diffuser','recessed_panel','facade_duct','booth_seat')
     for block in city_blocks:
         assert 'block.cybernetics2077.'+block in lang
         model=json.loads(z.read(f'assets/cybernetics2077/models/block/{block}.json'))
+        assert model['parent']=='minecraft:block/block', 'Furniture lacks standard block display inheritance'
+        item_model=json.loads(z.read(f'assets/cybernetics2077/models/item/{block}.json'))
+        for view,budget in [('gui',.625),('firstperson_righthand',.4),('firstperson_lefthand',.4),('thirdperson_righthand',.375),('thirdperson_lefthand',.375),('ground',.25),('fixed',.5)]:
+            assert view in item_model['display'] and max(item_model['display'][view]['scale'])<=budget
         states=json.loads(z.read(f'assets/cybernetics2077/blockstates/{block}.json'))
         assert set(states['variants'])=={'facing='+d for d in ('north','east','south','west')}
         assert f'assets/cybernetics2077/models/item/{block}.json' in names
@@ -127,6 +132,8 @@ with ZipFile(jar) as z:
             assert all(-16<=v<=32 for v in part['from']+part['to']), 'Out-of-range geometry'
             if part['from']==[0,0,0] and part['to']==[16,16,16]:
                 assert all(face.get('cullface')==name for name,face in part['faces'].items()), 'Unculled full cube'
+    for skin in ('ripperdoc','ripperdoc_iris','fixer_mara','fixer_ren'):
+        png=z.read('assets/cybernetics2077/textures/entity/'+skin+'.png');assert struct.unpack('>II',png[16:24])==(64,64)
     for cls in ('CityContent','CityPoolElement','VillageServices','CityResident','RipperdocMenu','FixerMenu','StreetAccount','CyberwareCatalogue'):
         assert f'dev/cybernetics2077/city/{cls}.class' in names
     for cls in ('RipperdocScreen','FixerScreen','CityResidentRenderer'):

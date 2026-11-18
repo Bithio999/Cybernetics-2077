@@ -7,6 +7,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 
 public final class EurodollarChip extends Item {
+  public static final int VALUE = 100;
+
   public EurodollarChip() {
     super(new Properties());
   }
@@ -16,8 +18,8 @@ public final class EurodollarChip extends Item {
     var stack = player.getItemInHand(hand);
     if (!level.isClientSide) {
       var account = player.getData(CityContent.ACCOUNT);
-      if (account.eddies() >= 1_000_000_000L) return InteractionResultHolder.fail(stack);
-      account.credit(1000);
+      if (account.eddies() > 1_000_000_000L - VALUE) return InteractionResultHolder.fail(stack);
+      account.credit(VALUE);
       stack.shrink(1);
       player.displayClientMessage(
           Component.translatable("cybernetics2077.city.deposit", account.eddies()), true);
@@ -29,7 +31,7 @@ public final class EurodollarChip extends Item {
   public void appendHoverText(
       ItemStack s, TooltipContext c, java.util.List<Component> lines, TooltipFlag f) {
     lines.add(
-        Component.translatable("cybernetics2077.city.chip.description")
+        Component.translatable("cybernetics2077.city.chip.description", VALUE)
             .withStyle(net.minecraft.ChatFormatting.GRAY));
   }
 }

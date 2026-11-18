@@ -37,7 +37,7 @@ Mantis Blades deploy from the top/back-of-hand face of the forearm through multi
 
 ## Village clinics and the Afterlife
 
-Find **Ripperdoc clinics** in new villages, with a rarer two-storey clinic. Talk to the doctor to **purchase cyberware** or **install it** through separate tabs. Supply-barrel credit chips fund your saved eddies wallet. The occasional **Afterlife** has a descending entrance, industrial bar and two fixer NPCs. Contracts are coming later.
+Find **Ripperdoc clinics** in new villages, with a rarer two-storey clinic. Talk to the doctor to **purchase cyberware** or **install it** through separate tabs. Supply-barrel credit chips each deposit **100 eddies** into your saved wallet. The occasional **Afterlife** has a recessed industrial entrance, an illuminated island bar and two distinct fixer NPCs. Contracts are coming later.
 
 [Buildings, purchasing and installation](docs/VILLAGE-SERVICES.md) · [Design references and block audits](docs/research/VILLAGE-SERVICES.md)
 
@@ -53,7 +53,7 @@ Visit a ripperdoc and select **Install**, or craft and place a **Cybernetics Ben
 
 ## Install the mod
 
-Use [Cybernetics2077-0.9.0.jar](releases/Cybernetics2077-0.9.0.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
+Use [Cybernetics2077-0.9.1.jar](releases/Cybernetics2077-0.9.1.jar) with **Minecraft 1.21.1** and **NeoForge 21.1.248 or newer for 1.21.1**. Replace the old Cybernetics 2077 JAR rather than keeping both. Install on both the server and client for multiplayer.
 
 No Tensura mod or other addon is required. Base cyberware capacity defaults to 100 and can be configured in the world's server configuration. Existing saves remain compatible.
 

@@ -75,7 +75,7 @@ public final class CityGameTests {
     h.assertTrue(
         restored
             .getSize(h.getLevel().getStructureManager(), Rotation.NONE)
-            .equals(new Vec3i(13, 10, 13)),
+            .equals(new Vec3i(13, 12, 13)),
         "Template size lost");
     h.succeed();
   }
@@ -449,6 +449,42 @@ public final class CityGameTests {
             .getBlockState(origin.offset(6, -2, 6))
             .is(CityContent.BLOCK_SET.get("ribbed_floor").get()),
         "Bar floor not two blocks below street");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void creditChipsHaveLowerValueAndNeverPartiallyConsumeAtCap(GameTestHelper h) {
+    var p = player(h);
+    var stack = new ItemStack(CityContent.EDDIES.get(), 2);
+    p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, stack);
+    CityContent.EDDIES.get().use(p.level(), p, net.minecraft.world.InteractionHand.MAIN_HAND);
+    h.assertTrue(
+        p.getData(CityContent.ACCOUNT).eddies() == 100 && stack.getCount() == 1,
+        "Credit chip is not 100 eddies");
+    p.getData(CityContent.ACCOUNT).credit(1_000_000_000L);
+    CityContent.EDDIES.get().use(p.level(), p, net.minecraft.world.InteractionHand.MAIN_HAND);
+    h.assertTrue(
+        stack.getCount() == 1 && p.getData(CityContent.ACCOUNT).eddies() == 1_000_000_000L,
+        "Full wallet consumed a chip");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void residentIdentityAndBodyStylePersist(GameTestHelper h) {
+    for (boolean fixer : List.of(false, true))
+      for (int style = 0; style < 2; style++) {
+        var n = (fixer ? CityContent.FIXER : CityContent.RIPPERDOC).get().create(h.getLevel());
+        var tag = new net.minecraft.nbt.CompoundTag();
+        tag.putInt("CityStyle", style);
+        n.readAdditionalSaveData(tag);
+        var saved = new net.minecraft.nbt.CompoundTag();
+        n.addAdditionalSaveData(saved);
+        var copy = (fixer ? CityContent.FIXER : CityContent.RIPPERDOC).get().create(h.getLevel());
+        copy.readAdditionalSaveData(saved);
+        h.assertTrue(
+            copy.style() == style && copy.slim() == (fixer ? style == 0 : style == 1),
+            "Resident lost body/identity style");
+      }
     h.succeed();
   }
 }

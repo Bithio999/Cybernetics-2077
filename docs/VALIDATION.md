@@ -2,7 +2,18 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.9.0 passes all **53 JVM tests**, **53 server GameTests**, the native village-services review and clean-release verification. The local player’s skin remains in the hologram. The client review covers live skins, category close-ups, the rotated inventory tab, implant and chip installation, scanner uploads, and first/third-person claw animations.
+Release 0.9.1 passes **53 JVM tests**, **55 server GameTests**, the expanded native village-services review and clean-release verification. The client verifies all 25 furniture items in GUI, both first-person hands, both third-person hands, ground and frame contexts. The local player’s skin remains in the hologram.
+
+## Visual and balance corrections (0.9.1)
+
+- Research uses the original location owner’s 29-image environment portfolio and original bar/VIP/capsule concepts. References are linked in [design notes](research/VILLAGE-SERVICES.md).
+- All **6,019** authored template positions pass the support, envelope, patient-light alignment and walking-route audit. Model geometry is checked for a closing plane on every exterior wall and roof surface; deliberately reintroducing the partial-wall truss is rejected. Distant ceiling-only task-light placement is also rejected.
+- Native captures inspect the revised industrial entrance, rear elevation, island counter, canopy, clinic task light, four resident skins, inventory icons and held items. Day/night captures check the emissive signs, lenses and continuous lime channels.
+- Actual baked vertices are measured after all seven item display transforms. All 25 models are present and fit the display budgets; none uses a missing-model fallback.
+- Server checks confirm the credit-chip value of **100 eddies**, no consumption at a full wallet, persistent resident body/identity styles, exact block-state placement in all rotations and village generation in all five pools.
+- No decoration ticker, block entity renderer, dynamic light loop or particle emitter was introduced. Emissive faces use NeoForge’s baked face-light data.
+
+[Machine-readable 0.9.1 results](review/results/village-services-0.9.1.json) · [Updated screenshots](PREVIEWS.md)
 
 ## Village services (0.9.0)
 

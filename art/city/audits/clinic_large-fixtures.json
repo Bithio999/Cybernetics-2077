@@ -50,8 +50,8 @@
     ],
     [
       6,
-      12,
-      8,
+      9,
+      7,
       "surgical_light"
     ],
     [
@@ -80,8 +80,8 @@
     ],
     [
       10,
-      12,
-      8,
+      9,
+      7,
       "surgical_light"
     ],
     [
@@ -110,9 +110,33 @@
     ],
     [
       9,
+      3,
+      8,
+      "surgical_light"
+    ],
+    [
       5,
+      12,
+      5,
+      "ceiling_diffuser"
+    ],
+    [
       9,
-      "surgical_light"
+      12,
+      5,
+      "ceiling_diffuser"
+    ],
+    [
+      6,
+      5,
+      4,
+      "ceiling_diffuser"
+    ],
+    [
+      6,
+      5,
+      10,
+      "ceiling_diffuser"
     ],
     [
       2,
@@ -133,7 +157,7 @@
       1,
       6.5,
       "ripperdoc",
-      0
+      1
     ]
   ],
   "entrance": [

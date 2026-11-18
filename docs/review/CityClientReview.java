@@ -20,6 +20,7 @@ import net.minecraft.world.phys.*;
 
 final class CityClientReview {
   static volatile int doc, fixer;
+  static volatile int expectedVillageDocs, expectedVillageFixers;
   static volatile net.minecraft.world.level.levelgen.structure.BoundingBox villageBox;
 
   static void camera(double x, double y, double z, double tx, double ty, double tz) {
@@ -148,8 +149,10 @@ final class CityClientReview {
     if (t == 205) shot("clinic-large-surgery");
     if (t == 220) camera(146, 70, -6, 156.5, 65, 6);
     if (t == 260) shot("afterlife-exterior");
-    if (t == 275) camera(157.2, 62.1, 5.5, 152.5, 64, 10.5);
+    if (t == 275) camera(157.2, 62.1, 5.5, 154, 64.5, 8.5);
     if (t == 310) shot("afterlife-bar");
+    if (t == 312) camera(151.3, 63.5, 4.3, 154.5, 63, 8.5);
+    if (t == 321) shot("afterlife-island-bar");
     if (t == 325) camera(157.6, 62, 6.8, 160.7, 63, 7);
     if (t == 355) shot("afterlife-booth");
     if (t == 370) {
@@ -292,6 +295,16 @@ final class CityClientReview {
                 l.setChunkForced(cx, cz, true);
                 l.getChunk(cx, cz);
               }
+            for (var old :
+                l.getEntitiesOfClass(
+                    net.minecraft.world.entity.Mob.class,
+                    new AABB(
+                        box.minX(),
+                        l.getMinBuildHeight(),
+                        box.minZ(),
+                        box.maxX() + 1,
+                        l.getMaxBuildHeight(),
+                        box.maxZ() + 1))) old.discard();
             // A flat review terrain patch. Actual village pieces are placed by StructureStart,
             // using the same chunk clipping and pool elements as normal generation.
             for (int x = box.minX() - 32; x <= box.maxX() + 32; x++)
@@ -315,23 +328,55 @@ final class CityClientReview {
                         cz * 16 + 15),
                     new net.minecraft.world.level.ChunkPos(cx, cz));
               }
-            var residents =
-                l.getEntitiesOfClass(
-                    CityResident.class,
-                    new AABB(
-                        box.minX(),
-                        l.getMinBuildHeight(),
-                        box.minZ(),
-                        box.maxX() + 1,
-                        l.getMaxBuildHeight(),
-                        box.maxZ() + 1));
-            check(
-                residents.stream().filter(CityResident::fixer).count() >= 2,
-                "Generated village missing fixers");
-            check(
-                residents.stream().anyMatch(n -> !n.fixer()), "Generated village missing doctors");
+            expectedVillageFixers =
+                (int)
+                        start.getPieces().stream()
+                            .filter(
+                                v ->
+                                    v
+                                            instanceof
+                                            net.minecraft.world.level.levelgen.structure
+                                                        .PoolElementStructurePiece
+                                                    e
+                                        && e.getElement() instanceof CityPoolElement
+                                        && e.getElement().toString().contains("afterlife"))
+                            .count()
+                    * 2;
+            expectedVillageDocs =
+                (int)
+                    start.getPieces().stream()
+                        .filter(
+                            v ->
+                                v
+                                        instanceof
+                                        net.minecraft.world.level.levelgen.structure
+                                                    .PoolElementStructurePiece
+                                                e
+                                    && e.getElement() instanceof CityPoolElement
+                                    && e.getElement().toString().contains("clinic_"))
+                        .count();
           });
     }
+    if (t == 580)
+      server(
+          p -> {
+            var b = villageBox;
+            var ns =
+                p.serverLevel()
+                    .getEntitiesOfClass(
+                        CityResident.class,
+                        new AABB(
+                            b.minX(),
+                            p.serverLevel().getMinBuildHeight(),
+                            b.minZ(),
+                            b.maxX() + 1,
+                            p.serverLevel().getMaxBuildHeight(),
+                            b.maxZ() + 1));
+            check(
+                ns.stream().filter(CityResident::fixer).count() == expectedVillageFixers
+                    && ns.stream().filter(n -> !n.fixer()).count() == expectedVillageDocs,
+                "Missing or duplicate village residents");
+          });
     if (t == 600) {
       check(villageBox != null, "Village setup incomplete");
       var b = villageBox;
@@ -339,7 +384,47 @@ final class CityClientReview {
       camera(x - 43, 99, z - 43, x, 65, z);
     }
     if (t == 650) shot("village-services");
-    if (t == 680) {
+    if (t == 675) mc.setScreen(new CityAssetReviewScreen(true));
+    if (t == 705) shot("city-residents");
+    if (t == 715) mc.setScreen(new CityAssetReviewScreen(false));
+    if (t == 745) shot("city-block-icons");
+    if (t == 755) {
+      mc.setScreen(null);
+      mc.options.hideGui = false;
+      mc.player.getInventory().selected = 0;
+      camera(156.5, 64, -3, 156.5, 65, 3);
+      server(
+          p -> {
+            p.getInventory()
+                .setItem(0, new ItemStack(CityContent.BLOCK_ITEMS.get("surgical_chair").get()));
+            p.getInventory().selected = 0;
+          });
+    }
+    if (t == 785) shot("held-surgical-chair");
+    if (t == 795)
+      server(
+          p ->
+              p.getInventory()
+                  .setItem(
+                      0, new ItemStack(CityContent.BLOCK_ITEMS.get("reinforced_panel").get())));
+    if (t == 825) shot("held-reinforced-panel");
+    if (t == 835)
+      server(
+          p ->
+              p.getInventory()
+                  .setItem(0, new ItemStack(CityContent.BLOCK_ITEMS.get("afterlife_sign").get())));
+    if (t == 865) shot("held-afterlife-sign");
+    if (t == 875) {
+      mc.options.hideGui = true;
+      camera(166, 69, 18, 156.5, 65, 9);
+    }
+    if (t == 900) shot("afterlife-rear");
+    if (t == 905) {
+      server(p -> p.serverLevel().setDayTime(18000));
+      camera(146, 68, -5, 156.5, 65, 5);
+    }
+    if (t == 935) shot("afterlife-exterior-night");
+    if (t == 950) {
       Files.writeString(
           OUT.resolve("city-passed.txt"),
           "PASS: native interiors/exteriors, NPC interactions, wallet synchronization, purchase,"

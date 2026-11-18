@@ -32,15 +32,26 @@ public final class CityBlock extends HorizontalDirectionalBlock {
           case "ceiling_truss" -> new double[] {0, 12, 0, 16, 16, 16};
           case "bar_stool" -> new double[] {3, 0, 3, 13, 12, 13};
           case "diagnostic_monitor" -> new double[] {1, 0, 3, 15, 13, 13};
+          case "canopy_panel" -> new double[] {0, 11, 0, 16, 16, 16};
+          case "ceiling_diffuser" -> new double[] {0, 12, 0, 16, 16, 16};
           case "surgical_light" -> new double[] {1, 10, 1, 15, 16, 15};
           case "service_pipe" -> new double[] {5, 0, 5, 11, 16, 11};
           case "ripperdoc_sign", "afterlife_sign" -> new double[] {-16, 0, 14, 32, 16, 16};
           default -> new double[] {0, 0, 0, 16, 16, 16};
         };
     shapes = new VoxelShape[4];
+    double[][] parts =
+        kind.equals("bar_corner")
+            ? new double[][] {{0, 0, 8, 4, 16, 16}, {4, 0, 4, 8, 16, 16}, {8, 0, 0, 16, 16, 16}}
+            : new double[][] {b};
     for (int i = 0; i < 4; i++) {
-      shapes[i] = Block.box(b[0], b[1], b[2], b[3], b[4], b[5]);
-      b = new double[] {16 - b[5], b[1], b[0], 16 - b[2], b[4], b[3]};
+      var shape = Shapes.empty();
+      for (int n = 0; n < parts.length; n++) {
+        var p0 = parts[n];
+        shape = Shapes.or(shape, Block.box(p0[0], p0[1], p0[2], p0[3], p0[4], p0[5]));
+        parts[n] = new double[] {16 - p0[5], p0[1], p0[0], 16 - p0[2], p0[4], p0[3]};
+      }
+      shapes[i] = shape.optimize();
     }
   }
 

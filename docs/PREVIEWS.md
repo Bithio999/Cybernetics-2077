@@ -171,3 +171,25 @@ Native Minecraft captures, including vanilla village jigsaw/chunk placement on f
 | ![Purchase](images/ripperdoc-purchase.png) | ![Install](images/ripperdoc-install.png) |
 
 [Installation at the minimum 320 × 240 GUI size](images/ripperdoc-install-compact.png) · [Guide](VILLAGE-SERVICES.md)
+
+## Afterlife and clinic corrections (0.9.1)
+
+The [primary location artist and original concept designs](research/VILLAGE-SERVICES.md) guide the industrial entrance, pipe bands, inset service bays, chamfered island counter and luminous canopy. These are native Minecraft captures on the review terrain.
+
+| Entrance by day | Entrance by night |
+| --- | --- |
+| ![Afterlife entrance](images/afterlife-exterior.png) | ![Afterlife at night](images/afterlife-exterior-night.png) |
+
+[Rear elevation](images/afterlife-rear.png) · [Island bar and continuous light channels](images/afterlife-island-bar.png) · [Illuminated canopy](images/afterlife-bar.png)
+
+![Suspended clinical task light and neutral room lighting](images/clinic-small-interior.png)
+
+![Four distinct resident skins and native body models](images/city-residents.png)
+
+The character sheet uses Minecraft's inventory entity renderer as a test fixture. It is not a new player-facing menu.
+
+![Furniture inventory icons](images/city-block-icons.png)
+
+[Held surgical chair](images/held-surgical-chair.png) · [Held wall block](images/held-reinforced-panel.png) · [Held sign](images/held-afterlife-sign.png). Native checks measure every furniture item's baked bounds in all seven display contexts.
+
+Credit chips now deposit **100 eddies**. Existing placed buildings retain their layout; generate or place a new copy to inspect the architectural changes.

@@ -51,7 +51,13 @@ public final class CityContent {
             "bar_stool",
             "ripperdoc_sign",
             "afterlife_sign",
-            "bottle_shelf")) {
+            "bottle_shelf",
+            "bar_corner",
+            "booth_seat",
+            "canopy_panel",
+            "ceiling_diffuser",
+            "recessed_panel",
+            "facade_duct")) {
       boolean prop =
           List.of(
                   "diagnostic_monitor",
@@ -59,6 +65,12 @@ public final class CityContent {
                   "surgical_footrest",
                   "ceiling_truss",
                   "surgical_light",
+                  "canopy_panel",
+                  "ceiling_diffuser",
+                  "bar_corner",
+                  "booth_seat",
+                  "recessed_panel",
+                  "facade_duct",
                   "service_pipe",
                   "bar_stool",
                   "ripperdoc_sign",
@@ -66,7 +78,14 @@ public final class CityContent {
               .contains(name);
       int light =
           switch (name) {
-            case "cyan_strip", "red_strip", "green_strip", "surgical_light" -> 14;
+            case "cyan_strip",
+                    "red_strip",
+                    "green_strip",
+                    "surgical_light",
+                    "canopy_panel",
+                    "ceiling_diffuser" ->
+                14;
+            case "bar_counter", "bar_corner" -> 6;
             case "diagnostic_monitor", "ripperdoc_sign", "afterlife_sign" -> 9;
             default -> 0;
           };

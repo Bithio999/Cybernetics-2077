@@ -69,10 +69,39 @@ def cube(a,b,tex,faces=None):
   edge=a[axis] if value==0 else b[axis]
   if f in out['faces'] and edge==value:out['faces'][f]['cullface']=f
  return out
+def write_item_model(name,elements):
+ bounds=[(min(e['from'][i] for e in elements),max(e['to'][i] for e in elements)) for i in range(3)]
+ fit=min(1.,16/max(b-a for a,b in bounds));center=[(a+b)/2 for a,b in bounds]
+ def transform(scale,rotation,translation):
+  k=scale*fit
+  # Rotate the centring offset before applying the display translation.
+  import math
+  x,y,z=[(8-c)*k for c in center];rx,ry,rz=map(math.radians,rotation)
+  x,y=x*math.cos(rz)-y*math.sin(rz),x*math.sin(rz)+y*math.cos(rz)
+  x,z=x*math.cos(ry)+z*math.sin(ry),-x*math.sin(ry)+z*math.cos(ry)
+  y,z=y*math.cos(rx)-z*math.sin(rx),y*math.sin(rx)+z*math.cos(rx)
+  return {'rotation':rotation,'translation':[round(v+t,4) for v,t in zip((x,y,z),translation)],'scale':[round(k,5)]*3}
+ display={
+  'gui':transform(.625,[30,225,0],[0,0,0]),
+  'ground':transform(.25,[0,0,0],[0,3,0]),
+  'fixed':transform(.5,[0,0,0],[0,0,0]),
+  'thirdperson_righthand':transform(.375,[75,45,0],[0,2.5,0]),
+  'thirdperson_lefthand':transform(.375,[75,225,0],[0,2.5,0]),
+  'firstperson_righthand':transform(.4,[0,45,0],[0,0,0]),
+  'firstperson_lefthand':transform(.4,[0,225,0],[0,0,0])}
+ js(A/'models/item'/f'{name}.json',{'parent':'cybernetics2077:block/'+name,'display':display})
 def model(name,elements,textures):
- js(A/'models/block'/f'{name}.json',{'ambientocclusion':True,'textures':{'particle':'cybernetics2077:block/reinforced_panel',**{k:'cybernetics2077:block/'+v for k,v in textures.items()}},'elements':elements})
+ for element in elements:
+  lit_only=True
+  for face in element['faces'].values():
+   key=face['texture'].removeprefix('#')
+   lit=key in ('light','lens') or (name.endswith('_sign') and key=='front') or (name.endswith('_strip') and key in ('side','run'))
+   if lit or key=='screen':face['neoforge_data']={'block_light':15 if lit else 12,'sky_light':15 if lit else 12,'ambient_occlusion':False}
+   lit_only=lit_only and lit
+  if lit_only:element['shade']=False
+ js(A/'models/block'/f'{name}.json',{'parent':'minecraft:block/block','ambientocclusion':True,'textures':{'particle':'cybernetics2077:block/reinforced_panel',**{k:'cybernetics2077:block/'+v for k,v in textures.items()}},'elements':elements})
  js(A/'blockstates'/f'{name}.json',{'variants':{'facing='+f:{'model':'cybernetics2077:block/'+name,'y':y} for f,y in [('north',0),('east',90),('south',180),('west',270)]}})
- js(A/'models/item'/f'{name}.json',{'parent':'cybernetics2077:block/'+name})
+ write_item_model(name,elements)
  js(DATA/'loot_table/blocks'/f'{name}.json',{'type':'minecraft:block','pools':[{'rolls':1,'entries':[{'type':'minecraft:item','name':'cybernetics2077:'+name}],'conditions':[{'condition':'minecraft:survives_explosion'}]}]})
 for name in ['reinforced_panel','clinic_tile','ribbed_floor','red_strip','cyan_strip','green_strip']:
  model(name,[cube([0,0,0],[16,16,16],'all')],{'all':name})
@@ -99,38 +128,19 @@ model('service_pipe',[cube([5,0,5],[11,16,11],'metal'),cube([4,0,4],[12,2,12],'m
 for name in ('ripperdoc_sign','afterlife_sign'):
  e=cube([-16,0,14],[32,16,16],'metal');e['faces']['north']['texture']='#front'
  model(name,[e],{'metal':'reinforced_panel','front':name})
- js(A/'models/item'/f'{name}.json',{'parent':'cybernetics2077:block/'+name,'display':{'gui':{'rotation':[30,225,0],'scale':[.25,.25,.25]}}})
+
+from furnishings import build_furnishings
+build_furnishings(A,model,cube)
 for name in ('fixer_spawn_egg','ripperdoc_spawn_egg'):js(A/'models/item'/f'{name}.json',{'parent':'minecraft:item/template_spawn_egg'})
 # Credit chip is pixel art at the same scale as existing implants.
 im=Image.new('RGBA',(32,32));d=ImageDraw.Draw(im);d.polygon([(5,5),(25,5),(28,8),(28,25),(5,25)],fill='#24453f',outline='#7bdaa7');d.rectangle((11,9,22,21),fill='#c4a462');d.line((16,10,16,20),fill='#213c35',width=2)
 for y in (13,17):d.line((13,y,20,y),fill='#213c35',width=2)
 im.save(A/'textures/item/eurodollar_chip.png');js(A/'models/item/eurodollar_chip.json',{'parent':'minecraft:item/generated','textures':{'layer0':'cybernetics2077:item/eurodollar_chip'}})
-# Original low-resolution skins, classic Minecraft UV layout, no downloaded skin or realism.
-def skin(name,coat,accent,hair,skin):
- im=Image.new('RGBA',(64,64));d=ImageDraw.Draw(im)
- # Each box uses normal vanilla 64x64 UVs. Adjacent side/top faces stay coherent.
- def box(x,y,w,h,dep,col):
-  d.rectangle((x,y+dep,x+2*(w+dep)-1,y+dep+h-1),fill=col)
-  d.rectangle((x+dep,y,x+dep+w*2-1,y+dep-1),fill=col)
- box(0,0,8,8,8,skin);box(16,16,8,12,4,coat)
- for x,y in [(40,16),(32,48),(0,16),(16,48)]:box(x,y,4,12,4,coat)
- d.rectangle((8,8,15,9),fill=hair);d.rectangle((8,8,9,11),fill=hair);d.rectangle((0,8,7,15),fill=hair);d.rectangle((16,8,31,15),fill=hair);d.rectangle((8,0,23,7),fill=hair)
- for x in (10,14):d.point((x,12),fill='#e2d6bb');d.point((x,13),fill='#182e34')
- d.line((11,15,13,15),fill='#765449');d.rectangle((9,10,10,11),fill=hair)
- d.rectangle((20,20,27,22),fill=accent);d.line((23,23,23,31),fill=accent);d.rectangle((25,25,27,27),fill='#afc3b7')
- # Hands at the end of each arm, trousers and boots on legs.
- for x,y in [(44,20),(36,52)]:d.rectangle((x,y+8,x+3,y+11),fill=skin)
- for x,y in [(4,20),(20,52)]:d.rectangle((x,y,x+3,y+8),fill='#29343c');d.rectangle((x,y+9,x+3,y+11),fill='#17252b')
- # Subtle coat seam and pocket pixels.
- for x in (20,27):d.line((x,24,x,30),fill=tuple(max(0,c-20) for c in ImageColor(coat)))
- p=A/'textures/entity'/f'{name}.png';p.parent.mkdir(parents=True,exist_ok=True);im.save(p)
-def ImageColor(hex):return tuple(int(hex[i:i+2],16) for i in (1,3,5))
-skin('ripperdoc','#78958b','#25494a','#36302b','#ba8d70')
-skin('fixer_mara','#283a40','#ae905d','#322522','#b8846c')
-skin('fixer_ren','#3a4540','#77b4a2','#77746b','#c79b79')
+from skins import build_skins
+build_skins(A)
 
 PANEL='reinforced_panel';FLOOR='ribbed_floor';TILE='clinic_tile'
-CUSTOM=set(['reinforced_panel','clinic_tile','ribbed_floor','medical_cabinet','vent_grille','diagnostic_monitor','surgical_chair','surgical_footrest','ceiling_truss','surgical_light','service_pipe','red_strip','cyan_strip','green_strip','bar_counter','bar_stool','ripperdoc_sign','afterlife_sign','bottle_shelf'])
+CUSTOM=set(['reinforced_panel','clinic_tile','ribbed_floor','medical_cabinet','vent_grille','diagnostic_monitor','surgical_chair','surgical_footrest','ceiling_truss','surgical_light','service_pipe','red_strip','cyan_strip','green_strip','bar_counter','bar_stool','ripperdoc_sign','afterlife_sign','bottle_shelf','canopy_panel','ceiling_diffuser','recessed_panel','facade_duct','bar_corner','booth_seat'])
 class Plan:
  def __init__(self,name,w,h,d):
   self.name,self.w,self.h,self.d=name,w,h,d;self.b={};self.npcs=[];self.goals=[];self.fixtures=[]
@@ -159,6 +169,7 @@ class Plan:
   self.put(x,y,z,'jigsaw',role='village road connection',orientation='north_up')
   name,p,role,_=self.b[x,y,z];self.b[x,y,z]=(name,p,role,{'name':S('minecraft:building_entrance'),'target':S('minecraft:building_entrance'),'pool':S('minecraft:empty'),'final_state':S('minecraft:polished_deepslate'),'joint':S('aligned'),'id':S('minecraft:jigsaw')});self.entry=(x,y+1,z)
  def shell(self,front=2,walltop=5):
+  self.front,self.walltop=front,walltop
   self.wall(0,1,front,0,walltop,self.d-1);self.wall(self.w-1,1,front,self.w-1,walltop,self.d-1)
   self.wall(0,1,self.d-1,self.w-1,walltop,self.d-1);self.wall(0,1,front,self.w-1,walltop,front)
   self.fill(0,walltop+1,front,self.w-1,walltop+1,self.d-1,PANEL,role='sealed structural roof')
@@ -172,7 +183,7 @@ class Plan:
      inner=1 if x==0 else self.w-2
      self.fill(inner,1,z,inner,walltop,z,TILE,role='sealed recessed clinical side wall')
      self.fill(x,1,z,x,walltop,z,'air',role='intentional exterior recess between structural pilasters')
-  for x in range(1,self.w-1):self.put(x,walltop+1,front,'cyan_strip' if self.name!='afterlife' else 'green_strip',role='supported facade light cornice')
+  for x in range(1,self.w-1):self.put(x,walltop+1,front,'cyan_strip' if self.name!='afterlife' else 'green_strip',role='supported facade light cornice',facing='east')
  def window(self,x,z,width=3):
   self.fill(x,2,z,x+width-1,3,z,'light_blue_stained_glass',role='glazed window in sealed wall')
   self.fill(x,1,z,x+width-1,1,z,'polished_deepslate',role='solid window sill')
@@ -182,11 +193,14 @@ class Plan:
   for (x,y,z),(n,p,r,t) in self.b.items():
    assert r and (y!=0 or n!='minecraft:air')
   for x,y,z,n in self.fixtures:
-   support=(x,y+1,z) if n=='surgical_light' else ((x,y,z+1) if n.endswith('_sign') else (x,y-1,z))
+   support=(x,y+1,z) if n in ('surgical_light','ceiling_diffuser') else ((x,y,z+1) if n.endswith('_sign') else (x,y-1,z))
    assert support in self.b and self.b[support][0] not in ('minecraft:air','minecraft:light_blue_stained_glass'),(self.name,'unsupported',n,(x,y,z),support)
   for x,y,z,n in self.fixtures:
    if n.endswith('_sign'):
     for dx in (-1,0,1):assert self.b[x+dx,y,z+1][0]!='minecraft:air',(self.name,'marquee wing lacks wall backing')
+   if n=='surgical_light':
+    patients=[yy for yy in range(1,y) if self.b[x,yy,z][0] in ('cybernetics2077:surgical_chair','cybernetics2077:surgical_footrest')]
+    assert patients and 1<(y+10/16)-(max(patients)+.5)<=2.5,(self.name,'task light is not positioned over a patient at working height')
    if n=='surgical_footrest':assert self.b[x,y,z+1][0]=='cybernetics2077:surgical_chair'
    if n=='surgical_chair':
     assert self.b[x,y,z-1][0]=='cybernetics2077:surgical_footrest'
@@ -232,7 +246,36 @@ class Plan:
     entrance=self.name=='afterlife' and n[2]==2 and 5<=n[0]<=7 and 3<=n[1]<=4
     if n in self.b and n not in occupied and n not in exterior and not entrance:exterior.add(n);q.append(n)
   assert all(g not in exterior for g in self.goals),(self.name,'unintended wall/roof air leak')
-  return {'template':self.name,'size':[self.w,self.h,self.d],'blocksReviewed':len(self.b),'fixtureSupportChecks':len(self.fixtures),'reachableDestinations':len(self.goals),'walkablePositions':len(seen),'connectedOccupiedBlocks':len(connected),'sealedEnvelope':True,'roles':dict(collections.Counter(v[2] for v in self.b.values()))}
+  def seals(k,axis):
+   name,props,_,_=self.b[k]
+   if name=='minecraft:air':return False
+   if name=='minecraft:jigsaw':return True
+   if name.startswith('minecraft:'):
+    if name.endswith('_door'):return axis==(2 if props.get('facing') in ('north','south') else 0) and props.get('open')=='false'
+    if name.endswith('_slab'):return axis==1 or props.get('type')=='double'
+    if name.endswith(('_stairs','_bars','_fence')):return False
+    return True
+   local_axis=axis
+   if props.get('facing') in ('east','west') and axis in (0,2):local_axis=2-axis
+   model_data=json.loads((A/'models/block'/(name.split(':')[1]+'.json')).read_text())
+   across=[n for n in range(3) if n!=local_axis]
+   return any(all(e['from'][n]<=0 and e['to'][n]>=16 for n in across) and e['to'][local_axis]>e['from'][local_axis] for e in model_data['elements'])
+  shell_checks=0
+  for y in range(1,self.walltop+1):
+   for z in range(self.front,self.d):
+    for edge,inner in [(0,1),(self.w-1,self.w-2)]:
+     assert seals((edge,y,z),0) or (self.name!='afterlife' and seals((inner,y,z),0)),(self.name,'geometric side-wall gap',(edge,y,z))
+     shell_checks+=1
+   for x in range(1,self.w-1):
+    assert seals((x,y,self.d-1),2),(self.name,'geometric rear-wall gap',(x,y,self.d-1))
+    entry=self.name=='afterlife' and 5<=x<=7 and 3<=y<=4
+    if not entry:assert seals((x,y,self.front),2),(self.name,'geometric front-wall gap',(x,y,self.front))
+    shell_checks+=2
+  for x in range(1,self.w-1):
+   for z in range(self.front+1,self.d-1):
+    assert seals((x,self.walltop+1,z),1),(self.name,'geometric roof gap',(x,z))
+    shell_checks+=1
+  return {'template':self.name,'size':[self.w,self.h,self.d],'blocksReviewed':len(self.b),'fixtureSupportChecks':len(self.fixtures),'reachableDestinations':len(self.goals),'walkablePositions':len(seen),'connectedOccupiedBlocks':len(connected),'sealedEnvelope':True,'geometryShellSurfacesChecked':shell_checks,'roles':dict(collections.Counter(v[2] for v in self.b.values()))}
  def save(self):
   audit=self.audit();palette=[];index={};blocks=[]
   for (x,y,z),(name,props,role,tag) in sorted(self.b.items(),key=lambda kv:(kv[0][1],kv[0][2],kv[0][0])):
@@ -263,7 +306,7 @@ def clinic(large):
  p.supplies(5 if large else 2,1,10,'clinic_large' if large else 'clinic_small')
  desk=9 if large else 3
  for x in range(desk-1,desk+2):p.furniture(x,1,5,'medical_cabinet')
- p.furniture(desk,2,5,'diagnostic_monitor',facing='south');p.npc(desk,1,6,'ripperdoc')
+ p.furniture(desk,2,5,'diagnostic_monitor',facing='south');p.npc(desk,1,6,'ripperdoc',1 if large else 0)
  p.goals += [(mid,1,4),(mid,1,10)]
  if large:
   # A genuine larger clinic inside village-sized lots: two floors, three treatment bays.
@@ -275,20 +318,19 @@ def clinic(large):
    p.fill(2,y,z,3,y,z,'polished_deepslate_stairs',role='continuous two-wide clinical staircase',facing='south',half='bottom',shape='straight',waterlogged='false')
   p.fill(4,7,3,4,7,9,'iron_bars',role='stairwell guardrail on solid upper-floor edge',east='false',west='false',north='true',south='true',waterlogged='false')
   for x in (6,10):
-   p.furniture(x,7,8,'surgical_chair');p.furniture(x,7,7,'surgical_footrest');p.furniture(x,12,8,'surgical_light')
+   p.furniture(x,7,8,'surgical_chair');p.furniture(x,7,7,'surgical_footrest');p.furniture(x,9,7,'surgical_light');p.fill(x,10,7,x,12,7,'service_pipe',role='continuous surgical-light suspension to roof')
    p.furniture(x,7,10,'medical_cabinet');p.furniture(x,8,10,'diagnostic_monitor')
    p.goals.append((x-1,7,9))
-  p.furniture(9,1,9,'surgical_chair');p.furniture(9,1,8,'surgical_footrest');p.furniture(9,5,9,'surgical_light')
+  p.furniture(9,1,9,'surgical_chair');p.furniture(9,1,8,'surgical_footrest');p.furniture(9,3,8,'surgical_light');p.fill(9,4,8,9,5,8,'service_pipe',role='task-light suspension to upper floor')
   for x in (2,8):p.fill(x,8,2,x+2,10,2,'light_blue_stained_glass',role='sealed upper-storey facade window')
-  for x in (3,9):p.put(x,11,12,'red_strip',role='upper treatment-room wall lighting')
+  for x in (5,9):p.furniture(x,12,5,'ceiling_diffuser')
   p.goals.append((3,7,10))
  else:
   for z in (4,6):p.furniture(p.w-3,1,z,'bar_stool')
-  p.furniture(8,1,9,'surgical_chair');p.furniture(8,1,8,'surgical_footrest');p.furniture(8,5,9,'surgical_light');p.goals.append((7,1,9))
+  p.furniture(8,1,9,'surgical_chair');p.furniture(8,1,8,'surgical_footrest');p.furniture(8,3,8,'surgical_light');p.fill(8,4,8,8,5,8,'service_pipe',role='task-light suspension centred over patient to roof');p.goals.append((7,1,9))
   for x in range(2,6):p.furniture(x,1,11,'medical_cabinet')
-  p.furniture(3,2,11,'diagnostic_monitor');p.put(6,4,12,'red_strip',role='workshop light recessed into sealed wall')
- for z in (5,9):
-  for x in (1,p.w-2):p.put(x,4,z,'cyan_strip',role='clinical light mounted to recessed wall behind it')
+  p.furniture(3,2,11,'diagnostic_monitor')
+ for x,z in ([(6,4),(6,10)] if large else [(3,7),(5,10)]):p.furniture(x,5,z,'ceiling_diffuser')
  for x in (2,p.w-3):p.put(x,4,12,'vent_grille',facing='south',role='rear service exhaust connected to roof plant above')
  if large:
   for x in (2,10):p.put(x,10,12,'vent_grille',facing='south',role='upper service exhaust in sealed rear wall')
@@ -298,35 +340,69 @@ def clinic(large):
  return p
 
 def afterlife():
- p=Plan('afterlife',13,10,13);p.shell(front=2,walltop=6);mid=6
+ p=Plan('afterlife',13,12,13);p.shell(front=2,walltop=6);mid=6
+ # Street apron and a real recessed industrial threshold, not a glass-fronted shop.
  p.fill(0,0,0,12,2,1,'polished_deepslate',role='continuous street-height entrance terrace')
  p.fill(4,0,2,8,2,3,'polished_deepslate',role='supported entrance vestibule podium')
  p.fill(5,3,2,7,4,2,'air',role='wide bar entrance')
  p.fill(5,2,3,7,2,3,'deepslate_brick_stairs',role='first supported descending entry tread',facing='north',half='bottom',shape='straight',waterlogged='false')
  p.fill(5,1,4,7,1,4,'deepslate_brick_stairs',role='second supported descending entry tread',facing='north',half='bottom',shape='straight',waterlogged='false')
  p.fill(5,3,3,7,5,4,'air',role='stairwell headroom')
- for x in (4,8):p.fill(x,3,2,x,5,3,PANEL,role='sealed entrance vestibule side wall')
- p.furniture(mid,5,1,'afterlife_sign');p.connector(mid,2,0);p.connector(2,2,0);p.connector(10,2,0)
- # The former-morgue bar vocabulary in a compact village lot, rather than an empty hall.
- for z in range(5,12):p.furniture(3,1,z,'bar_counter',facing='east')
- for z in (6,9,11):p.furniture(5,1,z,'bar_stool',facing='west')
- for z in range(5,12):p.put(0,3,z,'bottle_shelf',facing='east',role='bottle storage recessed into sealed backbar wall')
- for z in (5,11):p.fill(3,2,z,3,6,z,'polished_deepslate',role='bar canopy support post joined to roof')
- p.fill(3,5,6,3,5,10,'green_strip',role='bar canopy spanning between two solid support posts')
+ for x in (4,8):p.fill(x,3,1,x,5,3,'polished_andesite',role='deep structural portal cheek supported by entrance podium')
+ p.fill(4,5,1,8,5,1,'polished_deepslate',role='doorway lintel spanning between portal cheeks')
+ p.furniture(mid,5,0,'afterlife_sign')
+ p.connector(mid,2,0);p.connector(2,2,0);p.connector(10,2,0)
+ # Ribbed service shell: real recessed panels, clamped duct bands and distinct rear bays.
+ for x in (0,12):
+  facing='west' if x==0 else 'east'
+  for z in range(3,12):
+   if z in (3,6,9,11):p.fill(x,1,z,x,6,z,'polished_andesite',role='continuous facade structural rib')
+   else:
+    for y in (3,4):p.put(x,y,z,'recessed_panel',facing=facing,role='inset steel wall bay between structural ribs')
+   p.put(x,5,z,'facade_duct',facing=facing,role='continuous clamped exterior service duct with sealed wall backing')
+ for x in range(1,12):
+  if x in (1,4,8,11):p.fill(x,1,12,x,6,12,'polished_andesite',role='rear elevation structural pier')
+  else:
+   for y in (3,4):p.put(x,y,12,'recessed_panel',facing='south',role='deep rear service-wall recess')
+  p.put(x,5,12,'facade_duct',facing='south',role='rear duct band joining facade service run')
+ # A secondary exposed duct run frames the entrance, following the location artist's reference.
+ for x in range(1,12):p.put(x,6,1,'facade_duct',role='header service pipe mounted to solid entrance wall')
+ for x in (1,2,10,11):
+  for y in (3,4):p.put(x,y,2,'recessed_panel',role='sealed inset equipment panel beside entrance')
+ for x in range(13):p.put(x,7,2,'polished_andesite',role='continuous solid lintel cornice below parapet')
+ # An elongated coffin-shaped island bar. Centre cells are a clear bartender aisle.
+ for z in range(6,11):
+  for x in (3,5):p.furniture(x,1,z,'bar_counter')
+ for z in (6,10):p.furniture(4,1,z,'bar_counter')
+ for x,z,f in [(3,6,'north'),(5,6,'east'),(5,10,'south'),(3,10,'west')]:
+  p.put(x,1,z,'bar_corner',facing=f,role='chamfered island-bar end with continuous light channel')
+ for x,z,f in [(2,7,'east'),(2,9,'east'),(6,7,'west'),(6,9,'west')]:p.furniture(x,1,z,'bar_stool',facing=f)
+ # The luminous canopy uses neutral opal diffusers and a single aligned lime edge, not cube UVs.
+ for z in (6,10):p.fill(4,2,z,4,6,z,'polished_deepslate',role='bar service column connecting counter canopy and roof')
+ for x in range(3,6):
+  for z in range(6,11):
+   if not(x==4 and z in (6,10)):p.put(x,5,z,'canopy_panel',role='linked opal canopy suspended between structural bar columns')
+ # Glass-fronted side niches and discreet cove lighting reference the former morgue interior.
+ for z in (5,7,9,11):p.put(0,3,z,'bottle_shelf',facing='east',role='recessed backbar display in sealed side wall')
  for z in (5,10):
-  p.fill(0,6,z,12,6,z,'ceiling_truss',role='roof-mounted open truss spanning side walls')
-  for x in (1,7,10):p.furniture(x,6,z,'surgical_light')
- # Two private alcoves open onto the centre aisle, with backs and seats against solid walls.
+  p.fill(1,6,z,11,6,z,'ceiling_truss',role='roof-mounted open truss spanning side walls')
+  for x in (1,7,10):p.furniture(x,6,z,'ceiling_diffuser')
+ # Enclosed fixer alcoves remain accessible from a two-block-wide concourse.
  for z in (5,8):p.wall(8,1,z,11,3,z)
- for z in (6,7,9,10,11):p.put(11,1,z,'dark_oak_stairs',role='booth seat backed by continuous right wall',facing='east',half='bottom',shape='straight',waterlogged='false')
+ for z in (6,7,9,10,11):p.furniture(11,1,z,'booth_seat',facing='west')
  for z,style in ((7,0),(11,1)):
   p.furniture(9,1,z-1,'bar_counter');p.npc(10,1,z,'fixer',style);p.goals.append((8,1,z))
-  p.put(12,4,z,'green_strip',role='recessed booth wall lighting')
- for x in (1,9):p.fill(x,3,2,x+2,4,2,'green_stained_glass',role='sealed industrial facade glazing')
- for z in (4,9):p.put(0,4,z,'green_strip',role='flush backbar wall lighting')
- for x in (2,10):p.put(x,8,10,PANEL,role='roof air handler supported by roof');p.furniture(x,9,10,'service_pipe')
- for x in (2,10):p.put(x,4,12,'vent_grille',facing='south',role='rear extraction grille below roof air handler')
+  p.put(12,4,z,'green_strip',role='recessed meeting-booth cove lighting')
  p.supplies(1,1,10,'afterlife')
+ # Stepped parapets and substantial rooftop mechanical cases finish every elevation.
+ for x in range(13):
+  for z in (2,12):p.put(x,8,z,'polished_andesite_slab',type='bottom',waterlogged='false',role='roof-edge cap supported continuously by roof cornice')
+ for z in range(3,12):
+  for x in (0,12):p.put(x,8,z,'polished_andesite_slab',type='bottom',waterlogged='false',role='side parapet on continuous roof slab')
+ for x in (2,10):
+  p.fill(x-1,8,8,x+1,10,11,PANEL,role='solid mechanical roof housing on sealed roof deck')
+  p.put(x,9,8,'vent_grille',role='air-handler intake inside mechanical housing')
+  p.furniture(x,11,10,'service_pipe')
  p.goals += [(7,1,6),(7,1,11),(1,1,8)]
  return p
 
@@ -340,6 +416,6 @@ blocks=list(CUSTOM)
 js(RES/'data/minecraft/tags/block/mineable/pickaxe.json',{'replace':False,'values':['cybernetics2077:cybernetics_bench']+['cybernetics2077:'+n for n in sorted(blocks)]})
 langpath=A/'lang/en_us.json';lang=json.loads(langpath.read_text())
 for name in blocks:lang['block.cybernetics2077.'+name]=name.replace('_',' ').title()
-lang.update({'entity.cybernetics2077.ripperdoc':'Ripperdoc','entity.cybernetics2077.fixer':'Afterlife Fixer','item.cybernetics2077.ripperdoc_spawn_egg':'Ripperdoc Spawn Egg','item.cybernetics2077.fixer_spawn_egg':'Fixer Spawn Egg','item.cybernetics2077.eurodollar_chip':'Eurodollar Credit Chip','cybernetics2077.city.chip.description':'Use to deposit 1,000 eddies.','cybernetics2077.city.deposit':'Deposit received. Balance: €$ %s','cybernetics2077.city.balance':'%s: €$ %s','cybernetics2077.city.doctor':'Dr. Vale · Ripperdoc','cybernetics2077.city.fixer_mara':'Mara Voss · Fixer','cybernetics2077.city.fixer_ren':'Ren Calder · Fixer'})
+lang.update({'entity.cybernetics2077.ripperdoc':'Ripperdoc','entity.cybernetics2077.fixer':'Afterlife Fixer','item.cybernetics2077.ripperdoc_spawn_egg':'Ripperdoc Spawn Egg','item.cybernetics2077.fixer_spawn_egg':'Fixer Spawn Egg','item.cybernetics2077.eurodollar_chip':'Eurodollar Credit Chip','cybernetics2077.city.chip.description':'Use to deposit %s eddies.','cybernetics2077.city.deposit':'Deposit received. Balance: €$ %s','cybernetics2077.city.balance':'%s: €$ %s','cybernetics2077.city.doctor':'Dr. Vale · Ripperdoc','cybernetics2077.city.doctor_iris':'Dr. Iris · Ripperdoc','cybernetics2077.city.fixer_mara':'Mara Voss · Fixer','cybernetics2077.city.fixer_ren':'Ren Calder · Fixer'})
 js(langpath,lang)
 print(json.dumps(reports,indent=2))

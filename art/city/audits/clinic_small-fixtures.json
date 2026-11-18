@@ -62,8 +62,8 @@
     ],
     [
       8,
-      5,
-      9,
+      3,
+      8,
       "surgical_light"
     ],
     [
@@ -95,6 +95,18 @@
       2,
       11,
       "diagnostic_monitor"
+    ],
+    [
+      3,
+      5,
+      7,
+      "ceiling_diffuser"
+    ],
+    [
+      5,
+      5,
+      10,
+      "ceiling_diffuser"
     ],
     [
       2,

@@ -171,7 +171,7 @@
   "item.cybernetics2077.ripperdoc_spawn_egg": "Ripperdoc Spawn Egg",
   "item.cybernetics2077.fixer_spawn_egg": "Fixer Spawn Egg",
   "item.cybernetics2077.eurodollar_chip": "Eurodollar Credit Chip",
-  "cybernetics2077.city.chip.description": "Use to deposit 1,000 eddies.",
+  "cybernetics2077.city.chip.description": "Use to deposit %s eddies.",
   "cybernetics2077.city.deposit": "Deposit received. Balance: \u20ac$ %s",
   "cybernetics2077.city.balance": "%s: \u20ac$ %s",
   "cybernetics2077.city.doctor": "Dr. Vale \u00b7 Ripperdoc",
@@ -180,5 +180,12 @@
   "block.cybernetics2077.surgical_footrest": "Surgical Footrest",
   "block.cybernetics2077.ceiling_truss": "Ceiling Truss",
   "block.cybernetics2077.red_strip": "Red Strip",
-  "block.cybernetics2077.vent_grille": "Vent Grille"
+  "block.cybernetics2077.vent_grille": "Vent Grille",
+  "block.cybernetics2077.bar_corner": "Bar Corner",
+  "block.cybernetics2077.ceiling_diffuser": "Ceiling Diffuser",
+  "block.cybernetics2077.canopy_panel": "Canopy Panel",
+  "block.cybernetics2077.recessed_panel": "Recessed Panel",
+  "block.cybernetics2077.facade_duct": "Facade Duct",
+  "cybernetics2077.city.doctor_iris": "Dr. Iris \u00b7 Ripperdoc",
+  "block.cybernetics2077.booth_seat": "Booth Seat"
 }

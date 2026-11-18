@@ -3,14 +3,8 @@
     [
       6,
       5,
-      1,
+      0,
       "afterlife_sign"
-    ],
-    [
-      3,
-      1,
-      5,
-      "bar_counter"
     ],
     [
       3,
@@ -19,7 +13,19 @@
       "bar_counter"
     ],
     [
+      5,
+      1,
+      6,
+      "bar_counter"
+    ],
+    [
       3,
+      1,
+      7,
+      "bar_counter"
+    ],
+    [
+      5,
       1,
       7,
       "bar_counter"
@@ -31,106 +37,166 @@
       "bar_counter"
     ],
     [
-      3,
+      5,
       1,
-      9,
+      8,
       "bar_counter"
     ],
     [
       3,
       1,
-      10,
+      9,
+      "bar_counter"
+    ],
+    [
+      5,
+      1,
+      9,
       "bar_counter"
     ],
     [
       3,
       1,
-      11,
+      10,
       "bar_counter"
     ],
     [
       5,
       1,
-      6,
-      "bar_stool"
-    ],
-    [
-      5,
-      1,
-      9,
-      "bar_stool"
-    ],
-    [
-      5,
-      1,
-      11,
-      "bar_stool"
-    ],
-    [
-      1,
-      6,
-      5,
-      "surgical_light"
-    ],
-    [
-      7,
-      6,
-      5,
-      "surgical_light"
-    ],
-    [
       10,
-      6,
-      5,
-      "surgical_light"
+      "bar_counter"
     ],
     [
-      1,
-      6,
-      10,
-      "surgical_light"
-    ],
-    [
-      7,
-      6,
-      10,
-      "surgical_light"
-    ],
-    [
-      10,
-      6,
-      10,
-      "surgical_light"
-    ],
-    [
-      9,
+      4,
       1,
       6,
       "bar_counter"
     ],
     [
-      9,
+      4,
       1,
       10,
       "bar_counter"
     ],
     [
       2,
+      1,
+      7,
+      "bar_stool"
+    ],
+    [
+      2,
+      1,
       9,
-      10,
-      "service_pipe"
+      "bar_stool"
+    ],
+    [
+      6,
+      1,
+      7,
+      "bar_stool"
+    ],
+    [
+      6,
+      1,
+      9,
+      "bar_stool"
+    ],
+    [
+      1,
+      6,
+      5,
+      "ceiling_diffuser"
+    ],
+    [
+      7,
+      6,
+      5,
+      "ceiling_diffuser"
     ],
     [
       10,
-      9,
+      6,
+      5,
+      "ceiling_diffuser"
+    ],
+    [
+      1,
+      6,
       10,
-      "service_pipe"
+      "ceiling_diffuser"
+    ],
+    [
+      7,
+      6,
+      10,
+      "ceiling_diffuser"
+    ],
+    [
+      10,
+      6,
+      10,
+      "ceiling_diffuser"
+    ],
+    [
+      11,
+      1,
+      6,
+      "booth_seat"
+    ],
+    [
+      11,
+      1,
+      7,
+      "booth_seat"
+    ],
+    [
+      11,
+      1,
+      9,
+      "booth_seat"
+    ],
+    [
+      11,
+      1,
+      10,
+      "booth_seat"
+    ],
+    [
+      11,
+      1,
+      11,
+      "booth_seat"
+    ],
+    [
+      9,
+      1,
+      6,
+      "bar_counter"
+    ],
+    [
+      9,
+      1,
+      10,
+      "bar_counter"
     ],
     [
       1,
       1,
       10,
       "barrel"
+    ],
+    [
+      2,
+      11,
+      10,
+      "service_pipe"
+    ],
+    [
+      10,
+      11,
+      10,
+      "service_pipe"
     ]
   ],
   "NPCs": [
