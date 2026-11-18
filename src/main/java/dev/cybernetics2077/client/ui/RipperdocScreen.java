@@ -133,7 +133,14 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
       b.active =
           b.visible
               && menu.getCarried().isEmpty()
+              && menu.streetCred()
+                  >= CyberwareCatalogue.offers().get(offers.get(i)).requiredStreetCred()
               && menu.eddies() >= CyberwareCatalogue.offers().get(offers.get(i)).price();
+      if (b.visible) {
+        int required = CyberwareCatalogue.offers().get(offers.get(i)).requiredStreetCred();
+        b.setMessage(Component.literal(menu.streetCred() < required ? "SC " + required : "BUY"));
+        b.setTooltip(Tooltip.create(Component.literal("Requires Street Cred " + required)));
+      }
     }
     super.render(g, mx, my, partial);
     renderTooltip(g, mx, my);
@@ -159,6 +166,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
       var c = new CyberCanvas(g, 1);
       c.panel(0, 0, imageWidth, imageHeight, 7, 0xfc0a131b, 0xff4a878b);
       c.glowText("RIPPERDOC // CLINICAL SERVICES", 10, 7, 12, 0xff80e7e0);
+      c.right("SC " + menu.streetCred(), 306, 8, 10, 0xff9ae8ae);
       c.right("€$ " + String.format(Locale.ROOT, "%,d", menu.eddies()), 306, 31, 10, 0xffe6bd6c);
       c.rect(menu.tab() == 0 ? 10 : 108, 45, 92, 1, 0xff79ece0);
       if (menu.tab() == 0) {
@@ -171,7 +179,12 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
           c.rect(12, y + 1, 2, 21, CyberwareTier.of(o.tier()).color);
           c.text(o.item().getDescription().getString(), 38, y + 4, 10, 0xffd6e2df);
           c.text(
-              "TIER " + o.tier() + "   /   €$ " + String.format(Locale.ROOT, "%,d", o.price()),
+              "T"
+                  + o.tier()
+                  + "  /  SC "
+                  + o.requiredStreetCred()
+                  + "  /  €$ "
+                  + String.format(Locale.ROOT, "%,d", o.price()),
               38,
               y + 14,
               8,
@@ -190,6 +203,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
               case 1 -> "INSUFFICIENT EDDIES";
               case 2 -> "FREE AN INVENTORY SLOT";
               case 3 -> "PURCHASE ADDED TO INVENTORY";
+              case 4 -> "HIGHER STREET CRED REQUIRED";
               default -> "Hover an implant for its effects. Installation is free.";
             };
         c.center(result, 159, 225, 8, menu.result() == 3 ? 0xff80e8bd : 0xffb6b2a7);

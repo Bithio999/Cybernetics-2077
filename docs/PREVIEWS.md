@@ -14,6 +14,17 @@ These captures come from Minecraft 1.21.1 with NeoForge and Cybernetics 2077. Ma
 
 [Cortex category](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory entry](images/creative.png)
 
+## Fixer contract and Street Cred (0.10.0)
+
+Actual native menu, item tooltip and scanner captures from the one-time **First Impressions** delivery. Cargo is digital; the shard authorizes delivery. The scanner route works before optics are installed, without revealing target data. [How to play](VILLAGE-SERVICES.md#first-impressions).
+
+![Fixer offer](images/contract-offer.png)
+![Hoverable contract details](images/contract-shard-tooltip.png)
+![Scanner navigation](images/contract-scanner-route.png)
+![Stock gated by Street Cred](images/ripperdoc-street-cred.png)
+
+[Active contract](images/contract-active.png) · [Completion dialogue](images/contract-complete-dialogue.png) · [Completed dossier at minimum resolution](images/contract-completed-small.png)
+
 ## Classic and slim skins
 
 The review switches the local player's loaded skin to Minecraft's built-in Steve and Alex skins to verify live texture and model changes. These textures are supplied by Minecraft and are not bundled in the mod.

@@ -98,6 +98,7 @@ public final class ScannerNetwork {
     var t = new CompoundTag();
     t.putBoolean("installed", value);
     t.putInt("range", range(p));
+    t.put("contract", dev.cybernetics2077.city.DeliveryContracts.navigation(p));
     PacketDistributor.sendToPlayer(p, new State(t));
   }
 
@@ -120,6 +121,7 @@ public final class ScannerNetwork {
     var t = new CompoundTag();
     t.putBoolean("installed", installed(player));
     t.putInt("range", range(player));
+    t.put("contract", dev.cybernetics2077.city.DeliveryContracts.navigation(player));
     if (!installed(player) || !player.isAlive() || player.containerMenu != player.inventoryMenu)
       return t;
     var entity = player.serverLevel().getEntity(id);

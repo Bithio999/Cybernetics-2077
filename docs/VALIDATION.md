@@ -2,7 +2,24 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
-Release 0.9.1 passes **53 JVM tests**, **55 server GameTests**, the expanded native village-services review and clean-release verification. The client verifies all 25 furniture items in GUI, both first-person hands, both third-person hands, ground and frame contexts. The local player’s skin remains in the hologram.
+The previous 0.9.1 village-services release passed **53 JVM tests**, **55 server GameTests**, the expanded native village-services review and clean-release verification. The client verifies all 25 furniture items in GUI, both first-person hands, both third-person hands, ground and frame contexts. The local player’s skin remains in the hologram.
+
+## Street Cred and delivery contracts (0.10.0)
+
+Release 0.10.0 passes **53 JVM tests**, **61 dedicated-server GameTests**, the native contract review and clean-release verification.
+
+The six new server scenarios cover every tier's reputation gate before payment; real use-on-doctor completion; duplicate/foreign/forged shards; reissue authorization; full inventory handling; saved active/completed records; reward persistence; and navigation without granting optics. The existing 55 scenarios remain green.
+
+The native review accepts the job through the actual fixer screen, checks that the item arrives while that screen is open, hovers the shard, opens the navigation-only scanner, completes through the NPC interaction, verifies €$1,000/+5 Street Cred, buys/installs Basic Kiroshi Optics, and checks the completed dossier at 320×240. It verifies client/server menu and inventory synchronization. A separate two-computer session was not run.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PcontractReview
+```
+
+Use the disposable review save described below. Success writes `capture/contract-passed.txt`; a failure writes `capture/failed.txt`. Clean before packaging, as with the other review profiles.
+
+[Results](review/results/contracts-0.10.0.json) · [Contract guide and screenshots](VILLAGE-SERVICES.md#first-impressions)
 
 ## Visual and balance corrections (0.9.1)
 
@@ -77,7 +94,7 @@ python3 scripts/verify-release.py
 
 [Selected cortex socket](images/cortex.png) · [4:3 layout](images/four-three.png) · [Ultrawide layout](images/ultrawide.png) · [Creative inventory](images/creative.png)
 
-The inventory cyberware screen remains read-only; the bench is the only installation interface. Release 0.5.8 includes the tier 1 deck and Short Circuit; other quickhacks and operating systems are not implemented. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
+The inventory cyberware screen remains read-only; install through a ripperdoc's Install tab or the Cybernetics Bench. Release 0.5.8 includes the tier 1 deck and Short Circuit; other quickhacks and operating systems are not implemented. Multiplayer uses native server-backed menus and validates scans on the server. An integrated client and headless dedicated server were tested; a separate two-computer session was not.
 
 The category zoom was guided by the user's supplied Cyberpunk video at 0:21–1:05. The scanner's original authored animation and UI drawing code were adapted from the earlier project, with its skill systems, resource displays and dependencies removed.
 

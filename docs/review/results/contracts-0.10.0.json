@@ -1,0 +1,24 @@
+{
+  "release": "0.10.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvmTestsPassed": 53,
+  "serverGameTestsPassed": 61,
+  "nativeContractReview": "PASS: native acceptance, virtual cargo shard and hover details, navigation without optics, use-on-ripperdoc turn-in, dialogue, one-time 1000 eddies/+5 Street Cred, locked stock, purchase and installation of first scanner, completed dossier at 320x240.",
+  "streetCredByTier": [
+    0,
+    10,
+    20,
+    30,
+    40
+  ],
+  "deliveryReward": {
+    "eddies": 1000,
+    "streetCred": 5
+  },
+  "oneTimePerPlayer": true,
+  "cargo": "virtual diagnostic packet; authorization shard only",
+  "navigation": "nearest recorded ripperdoc; coordinates, bearing, distance, relative turn, elevation and dimension",
+  "cleanReleaseVerifier": "passed",
+  "sha256": "fdc82dfda41602aa75c59a7cc578e5837847ae0e6bcff98d49335035701c9a37"
+}

@@ -33,6 +33,7 @@ public final class ScannerClient {
   private static ScannerMotion motion = new ScannerMotion();
   private static ScannerMotion.Frame frame = new ScannerMotion.Frame(0, 0, false);
   private static CompoundTag target = new CompoundTag();
+  private static CompoundTag contract = new CompoundTag();
   private static long received;
   private static int focus = -1, focusTicks;
   private static long lastHack;
@@ -83,6 +84,7 @@ public final class ScannerClient {
 
   public static void receive(CompoundTag data) {
     installed = data.getBoolean("installed");
+    contract = data.getCompound("contract").copy();
     scanRange = Math.clamp(data.getInt("range"), 0, 64);
     if (data.contains("id")) {
       target = data;
@@ -91,12 +93,12 @@ public final class ScannerClient {
   }
 
   public static boolean available() {
-    return installed;
+    return installed || contract.getInt("stage") == 1;
   }
 
   public static boolean active() {
     var m = Minecraft.getInstance();
-    return down && installed && m.player != null && m.screen == null && !m.options.hideGui;
+    return down && available() && m.player != null && m.screen == null && !m.options.hideGui;
   }
 
   public static ScannerMotion.Frame hudMotion() {
@@ -114,7 +116,7 @@ public final class ScannerClient {
   private static void held() {
     var m = Minecraft.getInstance();
     boolean value =
-        installed
+        available()
             && KEY.isDown()
             && m.player != null
             && m.player.isAlive()
@@ -136,7 +138,10 @@ public final class ScannerClient {
     var m = Minecraft.getInstance();
     if (level != m.level) {
       // A login payload can arrive just before the first level tick; do not discard that payload.
-      if (m.level == null) installed = false;
+      if (m.level == null) {
+        installed = false;
+        contract = new CompoundTag();
+      }
       target = new CompoundTag();
       level = m.level;
       focus = -1;
@@ -148,6 +153,11 @@ public final class ScannerClient {
     held();
     if (!active() || m.level == null) return;
     if (m.player.tickCount % 8 == 0) dev.cybernetics2077.client.ui.AugmentClient.action(10);
+    if (!installed) {
+      focus = -1;
+      target = new CompoundTag();
+      return;
+    }
     var eye = m.player.getEyePosition();
     var end = eye.add(m.player.getLookAngle().scale(scanRange));
     LivingEntity hit = null;
@@ -196,7 +206,7 @@ public final class ScannerClient {
     var g = e.getGuiGraphics();
     CyberBatch.begin();
     try {
-      if (installed && !prepared) {
+      if (available() && !prepared) {
         prepared = true;
         m.levelRenderer.requestOutlineEffect();
         g.pose().pushPose();
@@ -266,9 +276,14 @@ public final class ScannerClient {
     edge(chrome, f);
     var equipment = dev.cybernetics2077.client.mantis.CyberwareClient.own();
     boolean deck = equipment.getBoolean("deck"), chip = equipment.getBoolean("shortCircuit");
+    // A delivery shard provides navigation, never the optical/deck functions.
+    deck &= installed;
+    chip &= installed;
     resource(root.fade(f.resource()), f, equipment, deck);
     hacks(root, f, equipment, deck, chip);
-    data(root.fade(f.data()), f, entity);
+    if (installed) data(root.fade(f.data()), f, entity);
+    else navigationOnly(root.fade(f.data()));
+    navigation(root.fade(f.data()));
     var controls = root.fade(f.layer(550, 180));
     controls.right(
         "RELEASE "
@@ -284,7 +299,7 @@ public final class ScannerClient {
       CyberCanvas c, ScannerMotion.Frame f, CompoundTag equipment, boolean deck) {
     c.dots(693, 97, 3, 5, 0x99ff323e);
     if (!deck) {
-      c.glowText("OPTICAL LINK", 719, 108, 23, RED);
+      c.glowText(installed ? "OPTICAL LINK" : "CONTRACT LINK", 719, 108, 23, RED);
       return;
     }
     float ram = equipment.getFloat("ram");
@@ -311,10 +326,20 @@ public final class ScannerClient {
     var title = root.fade(f.hacks());
     title.dots(181, 297, 3, 5, 0xb3cd3538);
     title.tracked("NEURAL INTERFACE v.01", 195, 293, 12, 0xb3ac3335, .7f);
-    title.glowText(deck ? "AVAILABLE QUICKHACKS:" : "OPTICAL SCANNER", 200, 315, 26, CYAN);
+    title.glowText(
+        deck ? "AVAILABLE QUICKHACKS:" : installed ? "OPTICAL SCANNER" : "CONTRACT SHARD",
+        200,
+        315,
+        26,
+        CYAN);
     title.glowLine(200, 361, 598, 361, 1, 0xffd62f39);
     if (!chip) {
-      title.body(deck ? "NO QUICKHACKS INSTALLED" : "OPTICAL DATA ONLY", 230, 389, 17, MUTED);
+      title.body(
+          deck ? "NO QUICKHACKS INSTALLED" : installed ? "OPTICAL DATA ONLY" : "NAVIGATION ONLY",
+          230,
+          389,
+          17,
+          MUTED);
       return;
     }
     var c = root.fade(f.row(0));
@@ -527,6 +552,55 @@ public final class ScannerClient {
     if (effects.size() > 2) c.body("+" + (effects.size() - 2) + " more", 1410, 780, 13, MUTED);
     c.tracked("CYBERNETICS 2077 // OPTICAL DATA", 1412, 838, 12, 0xff3c7d93, 1.2f);
     c.g.pose().popPose();
+  }
+
+  private static void navigationOnly(CyberCanvas c) {
+    c.text("CONTRACT SHARD // NAVIGATION", 1410, 369, 20, CYAN);
+    c.body("Install optics to unlock target scanning.", 1410, 414, 17, MUTED);
+  }
+
+  private static void navigation(CyberCanvas c) {
+    if (contract.getInt("stage") != 1) return;
+    var mc = Minecraft.getInstance();
+    double dx = contract.getInt("x") + .5 - mc.player.getX();
+    double dz = contract.getInt("z") + .5 - mc.player.getZ();
+    double dy = contract.getInt("y") - mc.player.getY();
+    boolean same =
+        contract.getString("dimension").equals(mc.level.dimension().location().toString());
+    double angle = Math.toDegrees(Math.atan2(dx, -dz));
+    String[] bearings = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+    String bearing = bearings[Math.floorMod((int) Math.round(angle / 45), 8)];
+    double relative = net.minecraft.util.Mth.wrapDegrees(angle - (mc.player.getYRot() + 180));
+    String turn = Math.abs(relative) < 20 ? "AHEAD" : relative > 0 ? "RIGHT" : "LEFT";
+    c.panel(1390, 868, 418, 116, 8, 0xee0b171e, 0xff467f88);
+    c.tracked("GIG // FIRST IMPRESSIONS", 1410, 881, 14, CYAN, .5f);
+    c.text(
+        same
+            ? String.format(Locale.ROOT, "%s  /  %.0f m  /  %s", bearing, Math.hypot(dx, dz), turn)
+            : "TRAVEL TO DESTINATION DIMENSION",
+        1410,
+        909,
+        18,
+        0xffe9cc84);
+    c.body(
+        "X "
+            + contract.getInt("x")
+            + "   Y "
+            + contract.getInt("y")
+            + "   Z "
+            + contract.getInt("z"),
+        1410,
+        937,
+        16,
+        0xffc8eff5);
+    c.body(
+        same
+            ? "RIPPERDOC  /  " + (dy > 2 ? "ABOVE" : dy < -2 ? "BELOW" : "SAME LEVEL")
+            : c.fit(contract.getString("dimension"), 378, 13, false),
+        1410,
+        963,
+        13,
+        MUTED);
   }
 
   private static String number(double n) {

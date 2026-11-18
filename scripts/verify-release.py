@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.9.1.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.10.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.9.1'
+    assert metadata['mods'][0]['version']=='0.10.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -24,6 +24,11 @@ with ZipFile(jar) as z:
             if path.suffix == '.json':
                 json.loads(z.read(entry))
     for required in ('dev/cybernetics2077/Cybernetics2077.class',
+                     'dev/cybernetics2077/city/DeliveryContracts.class',
+                     'dev/cybernetics2077/city/DeliveryContract.class',
+                     'dev/cybernetics2077/city/ClinicDirectory.class',
+                     'assets/cybernetics2077/models/item/delivery_contract.json',
+                     'assets/cybernetics2077/textures/item/delivery_contract.png',
                      'dev/cybernetics2077/client/ui/CyberwareScreen.class',
                      'dev/cybernetics2077/client/ui/HologramRenderer.class',
                      'dev/cybernetics2077/bench/CyberneticsBenchMenu.class',

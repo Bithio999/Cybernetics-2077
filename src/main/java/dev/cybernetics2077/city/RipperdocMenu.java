@@ -33,6 +33,10 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     return data.balance();
   }
 
+  public int streetCred() {
+    return data.get(4);
+  }
+
   @Override
   protected boolean installationActive() {
     return tab() == 1;
@@ -70,6 +74,11 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
       return false;
     var offer = CyberwareCatalogue.offers().get(button - 1000);
     var wallet = p.getData(CityContent.ACCOUNT);
+    if (wallet.streetCred() < offer.requiredStreetCred()) {
+      data.set(6, 4);
+      broadcastChanges();
+      return false;
+    }
     if (wallet.eddies() < offer.price()) {
       data.set(6, 1);
       broadcastChanges();

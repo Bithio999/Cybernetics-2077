@@ -80,6 +80,11 @@ public final class CityResident extends PathfinderMob {
   protected InteractionResult mobInteract(Player p, InteractionHand hand) {
     if (hand != InteractionHand.MAIN_HAND || p.isSpectator() || !isAlive())
       return InteractionResult.PASS;
+    if (!fixer() && p.getItemInHand(hand).is(CityContent.CONTRACT.get())) {
+      if (p instanceof ServerPlayer server)
+        DeliveryContracts.turnIn(server, this, p.getItemInHand(hand));
+      return InteractionResult.sidedSuccess(level().isClientSide);
+    }
     if (p instanceof ServerPlayer server && p.containerMenu.getCarried().isEmpty()) {
       server.openMenu(
           new SimpleMenuProvider(

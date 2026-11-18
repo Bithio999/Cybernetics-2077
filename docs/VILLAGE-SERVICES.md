@@ -6,8 +6,20 @@ These buildings can appear in newly generated **plains, desert, savanna, snowy a
 
 Talk to **Dr. Vale** (small clinic) or **Dr. Iris** (large clinic) to open the clinic's two tabs:
 
-- **Purchase:** search cyberware, filter by body system and tier, inspect an implant's tooltip, then buy it with eddies. Purchases go into your inventory. Both clinic sizes sell the full catalogue at the same prices, including cyberdecks, Short Circuit chips and Mantis Blades starting at tier 2.
+- **Purchase:** search cyberware, filter by body system and tier, inspect an implant's tooltip, then buy it with eddies. Purchases go into your inventory. Both clinic sizes share the same catalogue and prices, including cyberdecks, Short Circuit chips and Mantis Blades starting at tier 2. Locked stock shows the Street Cred needed to buy it.
 - **Install:** move implants into their matching sockets, or shift-click to install/remove them. Existing capacity and duplicate-implant restrictions apply. Installation and removal are free.
+
+Purchase access follows your saved **Street Cred**:
+
+| Tier | Required Street Cred |
+| --- | ---: |
+| 1 | 0 |
+| 2 | 10 |
+| 3 | 20 |
+| 4 | 30 |
+| 5 | 40 |
+
+The requirement applies to implants and quickhack chips. It gates purchases; you can still install equipment you already own. Existing installations are preserved.
 
 The small clinic has one treatment chair. The larger clinic has three treatment bays across two floors, with a supported staircase and upper-floor guardrail. Doctors stay at reception.
 
@@ -32,7 +44,24 @@ Operators can fund a player for testing:
 
 The village adaptation has a deeply framed industrial entrance descending to a chamfered island bar with continuous lime underlighting and an illuminated opal canopy. Exterior service pipes, inset wall bays, padded booths and rooftop machinery follow the original location artist’s references. **Mara Voss** and **Ren Calder** are the fixers. Talk to either to view your eddies and Street Cred.
 
-**Contracts are not implemented yet.** The fixer menu reports that no contracts are available; it does not award unfinished contract rewards. Street Cred currently starts at zero and is saved for the future contract system.
+### First Impressions
+
+A **one-time delivery contract per player**, shared by both fixers.
+
+1. Talk to a fixer and accept **First Impressions**. The fixer explains the job and gives you a **Delivery Contract Shard**.
+2. Hover the shard for the destination coordinates, instructions and reward. The diagnostic packet is carried digitally; there is no separate cargo item.
+3. Hold your scan key (default **V**) to see the clinic's coordinates, compass direction, distance, left/right guidance and elevation. Before you own optics, the shard provides navigation only. Target analysis and quickhacks still require their usual implants.
+4. **Use the shard on a ripperdoc** to deliver it. Any ripperdoc accepts the packet, even if the original destination becomes unavailable.
+5. Receive **€$1,000 and 5 Street Cred**. The doctor suggests buying **Basic Kiroshi Optics**. The reward covers the tier 1 eye implant; install it through the clinic's Install tab.
+
+The fixer assigns the nearest recorded ripperdoc in your current dimension. Clinic addresses are recorded when their doctors load and persist through chunk unloading. If none is known, visit a clinic and return to the fixer; no guessed coordinates or expensive world-generation search is used.
+
+Lost the shard? Return to a fixer and choose **Reissue Contract**. This invalidates earlier copies. The job, wallet and Street Cred persist across logout and death. Completed contracts cannot be repeated, including through another fixer or copied shard. The scanner route clears after completion.
+
+![Delivery offer](images/contract-offer.png)
+![Contract details](images/contract-shard-tooltip.png)
+![Scanner route before installing optics](images/contract-scanner-route.png)
+![Street Cred stock locks](images/ripperdoc-street-cred.png)
 
 ![Afterlife bar](images/afterlife-bar.png)
 ![Fixer](images/afterlife-fixer.png)

@@ -8,7 +8,11 @@ import net.minecraft.world.item.Item;
 
 /** One canonical, server-priced catalogue shared by both clinic sizes. */
 public final class CyberwareCatalogue {
-  public record Offer(Item item, int tier, int price, CyberwareCategory category) {}
+  public record Offer(Item item, int tier, int price, CyberwareCategory category) {
+    public int requiredStreetCred() {
+      return (tier - 1) * 10;
+    }
+  }
 
   private static List<Offer> offers;
 

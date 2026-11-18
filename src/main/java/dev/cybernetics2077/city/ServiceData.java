@@ -6,7 +6,7 @@ import net.minecraft.world.inventory.*;
 /** Wallet values use 16-bit lanes because vanilla container data packets carry signed shorts. */
 final class ServiceData implements ContainerData {
   private final Player owner;
-  private final int[] values = new int[7];
+  private final int[] values = new int[8];
 
   ServiceData(Player p) {
     owner = p;
@@ -17,6 +17,7 @@ final class ServiceData implements ContainerData {
     var account = owner.getData(CityContent.ACCOUNT);
     if (i < 4) return (int) (account.eddies() >>> (i * 16)) & 65535;
     if (i == 4) return account.streetCred();
+    if (i == 7) return account.deliveryStage();
     return values[i];
   }
 

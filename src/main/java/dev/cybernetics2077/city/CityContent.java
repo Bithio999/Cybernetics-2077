@@ -107,6 +107,8 @@ public final class CityContent {
     }
   }
 
+  public static final Supplier<Item> CONTRACT =
+      ITEMS.register("delivery_contract", DeliveryContract::new);
   public static final Supplier<Item> EDDIES =
       ITEMS.register("eurodollar_chip", EurodollarChip::new);
   public static final Supplier<EntityType<CityResident>> RIPPERDOC = resident("ripperdoc");

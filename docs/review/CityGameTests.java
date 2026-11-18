@@ -128,7 +128,7 @@ public final class CityGameTests {
   }
 
   @GameTest(template = "empty", timeoutTicks = 60)
-  public static void walletRoundTripAndFixerHaveNoFakeContracts(GameTestHelper h) {
+  public static void walletRoundTripAndFixerRejectsUnknownActions(GameTestHelper h) {
     var p = player(h);
     var a = p.getData(CityContent.ACCOUNT);
     a.credit(123456789);
@@ -485,6 +485,182 @@ public final class CityGameTests {
             copy.style() == style && copy.slim() == (fixer ? style == 0 : style == 1),
             "Resident lost body/identity style");
       }
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void streetCredEnforcedForEveryTierBeforePayment(GameTestHelper h) {
+    var p = player(h);
+    var npc = resident(h, p, false);
+    var m = new RipperdocMenu(1, p.getInventory(), npc.getId());
+    p.containerMenu = m;
+    var wallet = p.getData(CityContent.ACCOUNT);
+    wallet.credit(1_000_000);
+    var offers = CyberwareCatalogue.offers();
+    for (int tier = 2; tier <= 5; tier++) {
+      final int wanted = tier;
+      int index =
+          java.util.stream.IntStream.range(0, offers.size())
+              .filter(i -> offers.get(i).tier() == wanted)
+              .findFirst()
+              .orElseThrow();
+      int required = offers.get(index).requiredStreetCred();
+      h.assertTrue(required == (tier - 1) * 10, "Unexpected reputation curve");
+      wallet.reputation(required - wallet.streetCred() - 1);
+      long before = wallet.eddies();
+      h.assertTrue(
+          !m.clickMenuButton(p, 1000 + index)
+              && wallet.eddies() == before
+              && m.result() == 4
+              && p.getInventory().isEmpty(),
+          "Unqualified buy packet accepted");
+      wallet.reputation(1);
+      h.assertTrue(
+          m.clickMenuButton(p, 1000 + index)
+              && wallet.eddies() == before - offers.get(index).price(),
+          "Unlocked tier rejected");
+      p.getInventory().clearContent();
+    }
+    wallet.reputation(Integer.MAX_VALUE);
+    h.assertTrue(wallet.streetCred() == 50, "Street Cred overflowed");
+    h.succeed();
+  }
+
+  private static ItemStack acceptDelivery(GameTestHelper h, ServerPlayer p) {
+    var doctor = resident(h, p, false);
+    ClinicDirectory.get(p.server).record(doctor);
+    var fixer = resident(h, p, true);
+    var menu = new FixerMenu(2, p.getInventory(), fixer.getId());
+    p.containerMenu = menu;
+    h.assertTrue(menu.hasRoute() && menu.clickMenuButton(p, 1), "Contract not accepted");
+    h.assertTrue(p.getData(CityContent.ACCOUNT).deliveryStage() == 1, "Acceptance not persisted");
+    h.assertTrue(
+        p.getInventory().getItem(0).is(CityContent.CONTRACT.get()), "Missing contract shard");
+    h.assertTrue(
+        p.getInventory().items.stream().filter(i -> !i.isEmpty()).count() == 1,
+        "Virtual cargo became another item");
+    return p.getInventory().getItem(0);
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void deliveryUsesRealNpcInteractionAndPaysOnlyOnce(GameTestHelper h) {
+    var p = player(h);
+    var shard = acceptDelivery(h, p);
+    var copied = shard.copy();
+    var doctor = resident(h, p, false);
+    p.closeContainer();
+    p.getInventory().selected = 0;
+    p.interactOn(doctor, net.minecraft.world.InteractionHand.MAIN_HAND);
+    var account = p.getData(CityContent.ACCOUNT);
+    h.assertTrue(
+        account.deliveryStage() == 2 && account.eddies() == 1000 && account.streetCred() == 5,
+        "Actual use-on-doctor did not complete/pay delivery");
+    h.assertTrue(p.getInventory().isEmpty(), "Completed shard remained");
+    h.assertTrue(
+        !DeliveryContracts.turnIn(p, doctor, copied) && account.eddies() == 1000,
+        "Copied shard paid again");
+    var anotherFixer = resident(h, p, true);
+    h.assertTrue(
+        DeliveryContracts.issue(p, anotherFixer) == 3, "Second fixer restarted one-time job");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void reissueInvalidatesLostCopiesAndPreservesRoute(GameTestHelper h) {
+    var p = player(h);
+    var original = acceptDelivery(h, p).copy();
+    var old = p.getData(CityContent.ACCOUNT).delivery();
+    p.getInventory().clearContent();
+    var fixer = resident(h, p, true);
+    h.assertTrue(DeliveryContracts.issue(p, fixer) == 0, "Lost shard not recoverable");
+    var replacement = p.getInventory().getItem(0);
+    var record = p.getData(CityContent.ACCOUNT).delivery();
+    h.assertTrue(
+        !old.getUUID("token").equals(record.getUUID("token"))
+            && old.getInt("x") == record.getInt("x")
+            && old.getInt("z") == record.getInt("z"),
+        "Reissue failed to replace authorization or changed route");
+    var doctor = resident(h, p, false);
+    h.assertTrue(!DeliveryContracts.turnIn(p, doctor, original), "Lost shard remained authorized");
+    h.assertTrue(DeliveryContracts.turnIn(p, doctor, replacement), "Replacement did not work");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void contractRejectsOtherOwnersForgedTokensAndRemoteUse(GameTestHelper h) {
+    var p = player(h);
+    var shard = acceptDelivery(h, p);
+    var other = player(h);
+    var doctor = resident(h, other, false);
+    h.assertTrue(
+        !DeliveryContracts.turnIn(other, doctor, shard.copy()), "Another owner redeemed shard");
+    p.setPos(doctor.position().add(20, 0, 0));
+    h.assertTrue(!DeliveryContracts.turnIn(p, doctor, shard.copy()), "Remote delivery accepted");
+    p.setPos(doctor.position().add(1, 0, 0));
+    var forgery = shard.copy();
+    var t = forgery.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA).copyTag();
+    t.putUUID("token", UUID.randomUUID());
+    forgery.set(
+        net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+        net.minecraft.world.item.component.CustomData.of(t));
+    h.assertTrue(
+        !DeliveryContracts.turnIn(p, doctor, forgery)
+            && p.getData(CityContent.ACCOUNT).deliveryStage() == 1,
+        "Forged token completed contract");
+    h.assertTrue(
+        DeliveryContracts.turnIn(p, doctor, shard), "Valid token rejected after failed attempts");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void contractInventoryFailureIsAtomicAndReissueWorksWhenFull(GameTestHelper h) {
+    var p = player(h);
+    var doctor = resident(h, p, false);
+    ClinicDirectory.get(p.server).record(doctor);
+    var fixer = resident(h, p, true);
+    for (int i = 0; i < 36; i++) p.getInventory().setItem(i, new ItemStack(Items.STONE, 64));
+    h.assertTrue(
+        DeliveryContracts.issue(p, fixer) == 2
+            && p.getData(CityContent.ACCOUNT).deliveryStage() == 0,
+        "Full inventory consumed offer");
+    p.getInventory().setItem(0, ItemStack.EMPTY);
+    h.assertTrue(DeliveryContracts.issue(p, fixer) == 0, "Free slot not usable");
+    var token = p.getData(CityContent.ACCOUNT).delivery().getUUID("token");
+    h.assertTrue(
+        DeliveryContracts.issue(p, fixer) == 0
+            && !p.getData(CityContent.ACCOUNT).delivery().getUUID("token").equals(token),
+        "Full inventory prevented replacement in existing shard slot");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void contractAndWalletReloadKeepNavigationWithoutFreeOptics(GameTestHelper h) {
+    var p = player(h);
+    var shard = acceptDelivery(h, p);
+    var saved = p.getData(CityContent.ACCOUNT).serializeNBT(h.getLevel().registryAccess());
+    var reloaded = new StreetAccount();
+    reloaded.deserializeNBT(h.getLevel().registryAccess(), saved);
+    p.setData(CityContent.ACCOUNT, reloaded);
+    p.containerMenu = p.inventoryMenu;
+    var scan = dev.cybernetics2077.scanner.ScannerNetwork.inspect(p, -1);
+    h.assertTrue(
+        !scan.getBoolean("installed")
+            && !scan.contains("id")
+            && scan.getCompound("contract").getInt("stage") == 1,
+        "Contract route lost or shard granted free optics");
+    var snapshot = reloaded.delivery();
+    snapshot.putInt("stage", 2);
+    h.assertTrue(reloaded.deliveryStage() == 1, "Snapshot edited authoritative ledger");
+    var doctor = resident(h, p, false);
+    h.assertTrue(DeliveryContracts.turnIn(p, doctor, shard), "Reload lost item authorization");
+    var after = dev.cybernetics2077.scanner.ScannerNetwork.inspect(p, -1);
+    h.assertTrue(after.getCompound("contract").isEmpty(), "Completed route remained in scanner");
+    var completed = new StreetAccount();
+    completed.deserializeNBT(
+        h.getLevel().registryAccess(), reloaded.serializeNBT(h.getLevel().registryAccess()));
+    h.assertTrue(
+        completed.deliveryStage() == 2 && completed.eddies() == 1000 && completed.streetCred() == 5,
+        "Completion/reward did not persist");
     h.succeed();
   }
 }
