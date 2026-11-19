@@ -125,7 +125,8 @@ public final class SandevistanClient {
 
   @SubscribeEvent
   public static void stage(RenderLevelStageEvent e) {
-    if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) SandevistanTrails.render(e);
+    if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS)
+      SandevistanTrails.render(e);
   }
 
   @SubscribeEvent

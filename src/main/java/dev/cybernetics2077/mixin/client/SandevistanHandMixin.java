@@ -26,16 +26,17 @@ public abstract class SandevistanHandMixin {
       MultiBufferSource buffers,
       int light,
       Operation<Void> original) {
+    if (!(stack.getItem() instanceof MapItem)) {
+      boolean left =
+          (hand == InteractionHand.MAIN_HAND ? p.getMainArm() : p.getMainArm().getOpposite())
+              == HumanoidArm.LEFT;
+      SandevistanTrails.vanillaHand(
+          p,
+          left,
+          buffers,
+          recorder ->
+              original.call(p, partial, pitch, hand, swing, stack, equip, pose, recorder, light));
+    }
     original.call(p, partial, pitch, hand, swing, stack, equip, pose, buffers, light);
-    if (stack.getItem() instanceof MapItem) return;
-    boolean left =
-        (hand == InteractionHand.MAIN_HAND ? p.getMainArm() : p.getMainArm().getOpposite())
-            == HumanoidArm.LEFT;
-    SandevistanTrails.vanillaHand(
-        p,
-        left,
-        buffers,
-        recorder ->
-            original.call(p, partial, pitch, hand, swing, stack, equip, pose, recorder, light));
   }
 }

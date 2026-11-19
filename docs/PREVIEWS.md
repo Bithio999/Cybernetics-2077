@@ -2,6 +2,16 @@
 
 Older captures and implementation history are kept here for contributors. **[Current player wiki](wiki/index.md)** pages include the relevant screenshots and videos beside the item they describe.
 
+## Sandevistan trails (0.15.1)
+
+Longer eleven-stop spectrum, movement reversal through the previous poses, and a return to first person. Direct silent X11 capture; no generated or interpolated frames.
+
+[Watch the updated trail](media/sandevistan-trails-0.15.1.mp4) · [Player guide](wiki/dynalar-sandevistan.md)
+
+![Long spectrum trail](images/sandevistan-long-trails.png)
+
+[Stationary third person](images/sandevistan-stationary.png) · [Camera inside a saved pose](images/sandevistan-camera-clear.png)
+
 ## Dynalar Sandevistan (0.15.0)
 
 Native footage of activation, first-person Mantis echoes and colored textured pose trails. Includes the real integrated-server player and a tracked scripted second runner. The silent recording is captured at 960×540; it is not an offline render or a two-computer latency test.

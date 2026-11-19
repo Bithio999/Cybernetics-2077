@@ -193,15 +193,19 @@ public final class ExpansionGameTests {
     h.runAtTickTime(
         10,
         () -> {
-          // Align absolute clock to the next check without advancing the global world clock.
-          for (int i = 0; i < 10; i++) h.runAfterDelay(i, () -> AugmentRuntime.tick(p));
+          // Cover all ten clock phases on future ticks. A zero-delay callback scheduled while
+          // executing this callback can miss the current tick's task iteration entirely.
+          for (int i = 1; i <= 10; i++) h.runAfterDelay(i, () -> AugmentRuntime.tick(p));
         });
     h.runAtTickTime(
         22,
         () -> {
           h.assertTrue(
               s.pumpCharges == 1 && p.getHealth() >= 52,
-              "Biomonitor did not spend one amplified pump charge");
+              "Biomonitor did not spend one amplified pump charge: charges="
+                  + s.pumpCharges
+                  + ", hp="
+                  + p.getHealth());
           p.getData(Cybernetics2077.CYBERWARE)
               .setStackInSlot(BLOOD_PUMP.category.firstSlot() + 1, ItemStack.EMPTY);
           p.setHealth(10);

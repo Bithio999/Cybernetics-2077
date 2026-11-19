@@ -63,6 +63,34 @@
         1,
         1
       ]
+    },
+    {
+      "name": "ExclusionEnabled",
+      "type": "float",
+      "count": 1,
+      "values": [
+        0
+      ]
+    },
+    {
+      "name": "ExclusionMin",
+      "type": "float",
+      "count": 3,
+      "values": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "ExclusionMax",
+      "type": "float",
+      "count": 3,
+      "values": [
+        0,
+        0,
+        0
+      ]
     }
   ]
 }

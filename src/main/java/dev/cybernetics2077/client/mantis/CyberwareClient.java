@@ -249,10 +249,11 @@ public final class CyberwareClient {
                 e.getEquipProgress(),
                 e.getSwingProgress(),
                 pose));
-        MantisMesh.render(
-            p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose, true);
+        // Render ghosts first; opaque current hands always cover their old poses.
         dev.cybernetics2077.client.temporal.SandevistanTrails.hand(
             p, e.getMultiBufferSource(), m.player, left, pose, e.getPackedLight());
+        MantisMesh.render(
+            p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose, true);
         p.popPose();
       }
     } finally {

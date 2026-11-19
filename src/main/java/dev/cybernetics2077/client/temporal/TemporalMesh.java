@@ -32,13 +32,23 @@ final class TemporalMesh implements AutoCloseable {
     VertexBuffer.unbind();
   }
 
-  void draw(PoseStack pose, int color) {
+  void draw(PoseStack pose, int color, net.minecraft.world.phys.AABB exclude) {
     type.setupRenderState();
     RenderSystem.setShaderColor(
         ((color >> 16) & 255) / 255f,
         ((color >> 8) & 255) / 255f,
         (color & 255) / 255f,
         ((color >>> 24) & 255) / 255f);
+    var shader = RenderSystem.getShader();
+    shader.safeGetUniform("ExclusionEnabled").set(exclude == null ? 0f : 1f);
+    if (exclude != null) {
+      shader
+          .safeGetUniform("ExclusionMin")
+          .set((float) exclude.minX, (float) exclude.minY, (float) exclude.minZ);
+      shader
+          .safeGetUniform("ExclusionMax")
+          .set((float) exclude.maxX, (float) exclude.maxY, (float) exclude.maxZ);
+    }
     gpu.bind();
     gpu.drawWithShader(
         new Matrix4f(RenderSystem.getModelViewMatrix()).mul(pose.last().pose()),

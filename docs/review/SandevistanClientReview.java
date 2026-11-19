@@ -229,6 +229,10 @@ final class SandevistanClientReview {
       maxVertices = Math.max(maxVertices, SandevistanTrails.lastVertices);
       maxActors = Math.max(maxActors, SandevistanTrails.lastActors);
     }
+    if (t >= 325 && Boolean.getBoolean("cybernetics2077.trailReview")) {
+      TrailClientReview.tick(t);
+      return;
+    }
     if (t == 325) {
       server(
           p -> {

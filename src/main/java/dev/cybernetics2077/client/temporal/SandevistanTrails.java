@@ -7,6 +7,7 @@ import java.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.*;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
@@ -21,20 +22,7 @@ public final class SandevistanTrails {
   private static final Map<UUID, Float> LAST_YAW = new HashMap<>();
   private static final ArrayDeque<Echo> LEFT = new ArrayDeque<>(), RIGHT = new ArrayDeque<>();
   private static Object level;
-  public static int lastActors, lastEchoes, lastVertices;
-
-  private static int color(double fraction, boolean hands) {
-    int[] colors = {0xf5f258, 0x7dff70, 0x29edb4, 0x26cfee, 0x5a83ff, 0xb26aff};
-    double step = Math.clamp(fraction, 0, .9999) * (colors.length - 1);
-    int i = (int) step;
-    float t = (float) (step - i);
-    int a = colors[i], b = colors[Math.min(i + 1, colors.length - 1)];
-    int rgb = 0;
-    for (int shift : new int[] {0, 8, 16})
-      rgb |= Math.round(((a >> shift) & 255) * (1 - t) + ((b >> shift) & 255) * t) << shift;
-    int alpha = (int) ((hands ? 85 : 150) * Math.pow(1 - fraction, 1.15));
-    return (alpha << 24) | rgb;
-  }
+  public static int lastActors, lastEchoes, lastVertices, lastBodyExclusions, lastSelfSuppressed;
 
   private static List<TemporalMesh> upload(List<PoseMesh.Batch> source) {
     return source.stream().map(TemporalMesh::new).toList();
@@ -48,10 +36,9 @@ public final class SandevistanTrails {
     while (history.size() > count) discard(history.removeFirst());
   }
 
-  private static void emit(
-      PoseStack pose, MultiBufferSource source, List<TemporalMesh> mesh, int color) {
+  private static void emit(PoseStack pose, List<TemporalMesh> mesh, int color, AABB exclude) {
     for (var batch : mesh) {
-      batch.draw(pose, color);
+      batch.draw(pose, color, exclude);
       lastVertices += batch.count;
     }
   }
@@ -87,7 +74,9 @@ public final class SandevistanTrails {
                       net.minecraft.util.Mth.wrapDegrees(
                           yaw - LAST_YAW.getOrDefault(p.getUUID(), yaw)))
                   > 8;
-      if (motion && (last == null || now - last.time >= 2) && captured < 3) {
+      if (motion
+          && (last == null || now - last.time >= TrailStyle.WORLD_INTERVAL)
+          && captured < 3) {
         var mesh = new PoseMesh();
         capturing = true;
         try {
@@ -113,19 +102,19 @@ public final class SandevistanTrails {
         }
         LAST_SWING.put(p.getUUID(), swing);
         LAST_YAW.put(p.getUUID(), yaw);
-        trim(history, 8);
+        trim(history, TrailStyle.WORLD_HISTORY);
       }
     }
     var pose = e.getPoseStack();
     var source = m.renderBuffers().bufferSource();
     source.endBatch();
     var camera = e.getCamera().getPosition();
-    lastActors = lastEchoes = lastVertices = 0;
+    lastActors = lastEchoes = lastVertices = lastBodyExclusions = lastSelfSuppressed = 0;
     var iterator = HISTORY.entrySet().iterator();
     while (iterator.hasNext()) {
       var entry = iterator.next();
       var history = entry.getValue();
-      while (!history.isEmpty() && now - history.peekFirst().time >= 16)
+      while (!history.isEmpty() && now - history.peekFirst().time >= TrailStyle.WORLD_LIFETIME)
         discard(history.removeFirst());
       if (history.isEmpty()) {
         iterator.remove();
@@ -134,37 +123,42 @@ public final class SandevistanTrails {
         continue;
       }
       var owner = m.level.getPlayerByUUID(entry.getKey());
-      if (owner != null
-          && Sandevistan.active(owner)
-          && (!entry.getKey().equals(m.player.getUUID())
-              || !m.options.getCameraType().isFirstPerson())) {
-        double activationAge = now - CyberwareClient.state(owner.getId()).getLong("sandyClock");
-        if (activationAge >= 0 && activationAge < 8) {
-          var current = history.peekLast();
-          pose.pushPose();
-          var d =
-              owner
-                  .getPosition(e.getPartialTick().getGameTimeDeltaPartialTick(false))
-                  .subtract(camera);
-          pose.translate(d.x, d.y, d.z);
-          int tint = ((int) (180 * (1 - activationAge / 8)) << 24) | 0xaaff70;
-          emit(pose, source, current.mesh, tint);
-          pose.popPose();
-        }
+      // The body renderer is for observers/third person. First person has its own arm echoes.
+      if (!TrailStyle.bodyVisible(
+          entry.getKey().equals(m.player.getUUID()), m.options.getCameraType().isFirstPerson())) {
+        lastSelfSuppressed++;
+        continue;
       }
+      if (lastActors >= 6 || lastEchoes >= TrailStyle.WORLD_DRAW_LIMIT) continue;
       lastActors++;
-      int ordinal = 0;
+      int budget =
+          Math.min(
+              TrailStyle.WORLD_HISTORY,
+              TrailStyle.WORLD_DRAW_LIMIT / Math.max(1, Math.min(6, HISTORY.size())));
+      if (history.peekLast().position.distanceToSqr(camera) > 32 * 32) budget = Math.min(budget, 6);
+      int index = 0;
       for (var echo : history) {
+        int ordinal = index++;
         double age = now - echo.time;
-        if (age < 1.5) continue;
-        if (echo.position.distanceToSqr(camera) > 32 * 32 && (++ordinal % 2 == 0)) continue;
-        if (entry.getKey().equals(m.player.getUUID())
-            && m.options.getCameraType().isFirstPerson()
-            && echo.position.distanceToSqr(camera) < .9) continue;
+        if (age < 1.5 || !TrailStyle.selected(ordinal, history.size(), budget)) continue;
+        if (lastEchoes >= TrailStyle.WORLD_DRAW_LIMIT) break;
         pose.pushPose();
         var delta = echo.position.subtract(camera);
         pose.translate(delta.x, delta.y, delta.z);
-        emit(pose, source, echo.mesh, color(age / 16, false));
+        // The live body's volume is expressed in the saved mesh's world-aligned local space.
+        var exclude =
+            owner == null
+                ? null
+                : owner
+                    .getBoundingBox()
+                    .move(
+                        owner
+                            .getPosition(e.getPartialTick().getGameTimeDeltaPartialTick(false))
+                            .subtract(owner.position()))
+                    .inflate(.09)
+                    .move(echo.position.scale(-1));
+        emit(pose, echo.mesh, TrailStyle.color(age, false), exclude);
+        if (exclude != null) lastBodyExclusions++;
         pose.popPose();
         lastEchoes++;
       }
@@ -190,7 +184,7 @@ public final class SandevistanTrails {
     boolean active = Sandevistan.active(player);
     var last = history.peekLast();
     boolean moving = player.getDeltaMovement().lengthSqr() > .0005 || motion.trail() > 0;
-    if (active && moving && (last == null || now - last.time >= 2)) {
+    if (active && moving && (last == null || now - last.time >= TrailStyle.HAND_INTERVAL)) {
       var recorder = new PoseMesh();
       capturing = true;
       try {
@@ -199,14 +193,15 @@ public final class SandevistanTrails {
         capturing = false;
       }
       history.addLast(new Echo(Vec3.ZERO, now, upload(recorder.finish())));
-      trim(history, 3);
+      trim(history, TrailStyle.HAND_HISTORY);
     }
-    while (!history.isEmpty() && now - history.peekFirst().time > 7) discard(history.removeFirst());
+    while (!history.isEmpty() && now - history.peekFirst().time > TrailStyle.HAND_LIFETIME)
+      discard(history.removeFirst());
     var identity = new PoseStack();
     var types = new HashSet<RenderType>();
     for (var echo : history)
       if (now - echo.time >= 1.5) {
-        emit(identity, source, echo.mesh, color((now - echo.time) / 7, true));
+        emit(identity, echo.mesh, TrailStyle.color(now - echo.time, true), null);
         for (var b : echo.mesh) types.add(b.type);
       }
     if (source instanceof MultiBufferSource.BufferSource buffers) types.forEach(buffers::endBatch);
@@ -225,7 +220,7 @@ public final class SandevistanTrails {
     boolean active = Sandevistan.active(player);
     var last = history.peekLast();
     boolean moving = player.getDeltaMovement().lengthSqr() > .0005 || player.getAttackAnim(0) > .01;
-    if (active && moving && (last == null || now - last.time >= 2)) {
+    if (active && moving && (last == null || now - last.time >= TrailStyle.HAND_INTERVAL)) {
       var recorder = new PoseMesh();
       capturing = true;
       try {
@@ -234,13 +229,14 @@ public final class SandevistanTrails {
         capturing = false;
       }
       history.addLast(new Echo(Vec3.ZERO, now, upload(recorder.finish())));
-      trim(history, 3);
+      trim(history, TrailStyle.HAND_HISTORY);
     }
-    while (!history.isEmpty() && now - history.peekFirst().time > 7) discard(history.removeFirst());
+    while (!history.isEmpty() && now - history.peekFirst().time > TrailStyle.HAND_LIFETIME)
+      discard(history.removeFirst());
     var types = new HashSet<RenderType>();
     for (var echo : history)
       if (now - echo.time >= 1.5) {
-        emit(new PoseStack(), source, echo.mesh, color((now - echo.time) / 7, true));
+        emit(new PoseStack(), echo.mesh, TrailStyle.color(now - echo.time, true), null);
         for (var b : echo.mesh) types.add(b.type);
       }
     if (source instanceof MultiBufferSource.BufferSource buffers) types.forEach(buffers::endBatch);

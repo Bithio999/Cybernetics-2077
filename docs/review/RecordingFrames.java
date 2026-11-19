@@ -23,6 +23,10 @@ public final class RecordingFrames {
 
   @SubscribeEvent
   public static void frame(RenderFrameEvent.Post event) {
+    if (Boolean.getBoolean("cybernetics2077.trailReview")) {
+      TrailClientReview.frame();
+      return;
+    }
     if (Boolean.getBoolean("cybernetics2077.sandevistanReview")) {
       SandevistanClientReview.frame();
       return;

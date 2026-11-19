@@ -2,6 +2,25 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Sandevistan trail corrections (0.15.1)
+
+**74 JVM tests, 99 dedicated-server GameTests, the native trail review and clean package audit pass.** [Results](review/results/trails-0.15.1.json) · [Rendering changes and root causes](research/SANDEVISTAN-TRAILS-0.15.1.md) · [Player guide](wiki/dynalar-sandevistan.md).
+
+Six new JVM cases cover visible late-spectrum colors, continuous interpolation, independent opacity, bounded history sampling and first-person suppression. The extended native review exercises stationary views, attacks, a camera inside a saved head, reversal through the player's trail and returning to first person. It reached 12 simultaneous world echoes / 70,944 replayed vertices in the extended scenes and remained within the global 48-pose draw limit. Live-body exclusions and first-person body suppression are asserted. The first full server run exposed an existing Biomonitor fixture scheduling a zero-delay callback from inside another callback. Its ten checks now all run on future ticks so every absolute clock phase is covered; production medical code is unchanged.
+
+Comparing the native camera-inside-ghost capture with the same scene after clearing the history gives a mean channel difference of **0.276 / 255** in the central 400×240 region; no upper-view pixel changes by more than 64 in any channel. This is evidence for that regression scene, not an exhaustive guarantee for every camera/shader combination.
+
+The [silent preview](media/sandevistan-trails-0.15.1.mp4) is direct 960×540 X11 footage encoded at 30 fps without generated/interpolated frames. While recording the longer-trail segment, software OpenGL measured **28.0 ms median / 36.2 ms p95**, across 185 intervals. This differs from the older two-moving-runner scene and is not a controlled comparison or a hardware benchmark. Testing uses an integrated server plus a scripted tracked player, not two computers.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PtrailReview
+./gradlew clean test build
+python3 scripts/verify-release.py
+```
+
+Native success writes `capture/trails-passed.txt`. Review fixtures are excluded from the clean release. Tier slowing strength and all combat/battery rules remain unchanged.
+
 ## Dynalar Sandevistan (0.15.0)
 
 **68 JVM tests, 99 dedicated-server GameTests, the native client review and clean package audit pass.** [Results](review/results/sandevistan-0.15.0.json) · [Research and clock/rendering design](research/SANDEVISTAN-0.15.0.md) · [Player guide](wiki/dynalar-sandevistan.md).

@@ -327,6 +327,7 @@ public final class CyberwareClientReview {
           Files.deleteIfExists(OUT.resolve("enhanced-passed.txt"));
           Files.deleteIfExists(OUT.resolve("expansion-passed.txt"));
           Files.deleteIfExists(OUT.resolve("sandevistan-passed.txt"));
+          Files.deleteIfExists(OUT.resolve("trails-passed.txt"));
           mc.options.pauseOnLostFocus = false;
           mc.options.guiScale().set(2);
           mc.options.enableVsync().set(false);

@@ -1,0 +1,53 @@
+{
+  "version": "0.15.1",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvmTests": 74,
+  "serverGameTests": 99,
+  "status": "passed",
+  "releaseVerifier": "passed",
+  "wikiPages": 56,
+  "jarSha256": "7fe6c715b4535be437097e899b2136edc8a97c9f05874df8bebbbd258f758b17",
+  "nativeStatus": "PASS: longer spectrum and bounded GPU histories; stationary first-person exclusion; stationary third-person body clipping; camera inside saved head; reversal across own history; return to first person; opaque hands/player render after echoes. Maximum echoes=12, vertices=70944, clipped=12.",
+  "nativeFrameTiming": {
+    "p95Ms": 36.191563,
+    "medianMs": 27.955612,
+    "frames": 185,
+    "renderer": "Mesa software OpenGL; LP_NUM_THREADS=3; 960x540 with simultaneous X11 recording",
+    "hardwareBenchmark": false
+  },
+  "cameraRegression": {
+    "scene": "Camera inside another runner\u2019s saved head, compared with cleared history",
+    "centerRegionPixels": [
+      400,
+      240
+    ],
+    "centerMeanChannelDifference": 0.27570833333333333,
+    "channelRange": [
+      0,
+      255
+    ],
+    "upperPixelsWithChannelDifferenceOver64": 0,
+    "upperPixelsCompared": 448000
+  },
+  "checks": [
+    "Eleven smoothly interpolated color stops remain visible before trail expiry",
+    "42-tick world history and independent opacity envelope; 12-tick subtler hand histories",
+    "Six actors, 48 world-pose draws, three new captures per frame; LOD retains both ends",
+    "Own full-body history excluded in first person; hands and blades still leave echoes",
+    "World afterimages precede live opaque entities; current interpolated owner volume softly excluded",
+    "Camera-proximity fragment fade for any player\u2019s ghost geometry",
+    "Current first-person opaque hands drawn after historical poses",
+    "Native stationary first/third person, attacks, camera inside saved head, movement reversal and view switching",
+    "Existing 99 server regression scenarios retain fixed 50% Dynalar strength for every tier",
+    "Clean release excludes review fixtures and includes current shader resources",
+    "Biomonitor regression fixture uses future callbacks covering every absolute check phase; initial failed server run retained in local validation logs"
+  ],
+  "limits": [
+    "Integrated server with a tracked scripted second runner; not two-computer network testing.",
+    "The camera comparison checks a specific regression scene, not all camera/shader combinations.",
+    "Frame timing is software-rendered while recording; not a hardware benchmark or a controlled comparison with the older review.",
+    "Native preview is silent direct X11 footage encoded at 30 fps without interpolated/generated frames."
+  ],
+  "preview": "docs/media/sandevistan-trails-0.15.1.mp4"
+}
