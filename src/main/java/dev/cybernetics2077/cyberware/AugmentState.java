@@ -17,6 +17,10 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
       pumpEnd,
       adrenalineEnd,
       adrenalineReady;
+  public long sandyEnd, sandyClock, sandyRearm;
+  public double sandyCharge = 1, lastSandyPace = 1;
+  public int sandyProfile = 2;
+  public boolean wasSandy;
   public long pumpPulse;
   public long iceReady, heartReady, biomonitorReady, shockReady, jenkinsClock;
   public int jenkinsFatigue;
@@ -32,6 +36,11 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
   @Override
   public CompoundTag serializeNBT(HolderLookup.Provider registries) {
     var t = new CompoundTag();
+    t.putLong("sandyEnd", sandyEnd);
+    t.putLong("sandyClock", sandyClock);
+    t.putLong("sandyRearm", sandyRearm);
+    t.putDouble("sandyCharge", sandyCharge);
+    t.putInt("sandyProfile", sandyProfile);
     t.putLong("berserkEnd", berserkEnd);
     t.putLong("berserkReady", berserkReady);
     t.putLong("camoEnd", camoEnd);
@@ -56,6 +65,11 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
 
   @Override
   public void deserializeNBT(HolderLookup.Provider registries, CompoundTag t) {
+    sandyEnd = t.getLong("sandyEnd");
+    sandyClock = t.getLong("sandyClock");
+    sandyRearm = t.getLong("sandyRearm");
+    sandyCharge = t.contains("sandyCharge") ? Math.clamp(t.getDouble("sandyCharge"), 0, 1) : 1;
+    sandyProfile = t.contains("sandyProfile") ? Math.clamp(t.getInt("sandyProfile"), 2, 5) : 2;
     iceReady = t.getLong("iceReady");
     heartReady = t.getLong("heartReady");
     biomonitorReady = t.getLong("biomonitorReady");

@@ -1,0 +1,29 @@
+{
+  "sandy_on": {
+    "subtitle": "subtitles.cybernetics2077.sandy_on",
+    "sounds": [
+      {
+        "name": "cybernetics2077:sandy_on",
+        "stream": false
+      }
+    ]
+  },
+  "sandy_off": {
+    "subtitle": "subtitles.cybernetics2077.sandy_off",
+    "sounds": [
+      {
+        "name": "cybernetics2077:sandy_off",
+        "stream": false
+      }
+    ]
+  },
+  "sandy_hum": {
+    "subtitle": "subtitles.cybernetics2077.sandy_hum",
+    "sounds": [
+      {
+        "name": "cybernetics2077:sandy_hum",
+        "stream": false
+      }
+    ]
+  }
+}

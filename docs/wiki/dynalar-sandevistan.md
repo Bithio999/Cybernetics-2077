@@ -1,0 +1,50 @@
+# Dynalar Sandevistan
+
+[Wiki home](index.md) · [Cyberware](cyberware.md) · [Village services](ripperdocs.md)
+
+<img src="assets/icons/dynalar_sandevistan.png" alt="Dynalar Sandevistan" width="48" height="48" class="item-icon">
+
+| System | Tiers | Capacity |
+| --- | --- | --- |
+| Operating System | 2–5 | 18 |
+
+Press **O** to activate or deactivate. Dynalar replaces your cyberdeck or Berserk in the Operating System socket. Buy it through normal daily ripperdoc stock; it has no crafting recipe.
+
+**Every tier has the same 50% relative slowing.** Higher tiers improve duration, recharge and critical bonuses.
+
+| Tier | Maximum duration | Full recharge | Extra weapon crit chance | Crit damage bonus | Purchase Street Cred |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 2 | 7 s | 45 s | 6% | 6% | 10 |
+| 3 | 8 s | 40 s | 9% | 9% | 20 |
+| 4 | 9 s | 35 s | 12% | 12% | 30 |
+| 5 | 10 s | 30 s | 15% | 15% | 40 |
+
+Critical bonuses apply to weapons and Mantis Blades while active, not quickhacks or retaliation damage. Critical chance combines with other implants under the existing 50% cyberware chance limit.
+
+## Charge
+
+Deactivating early preserves unused charge. Charge refills while inactive, including elapsed server time while logged out. You need **20% charge** and a **1-second rearm** before activating again. A partially charged implant provides a shorter activation.
+
+The HUD shows remaining active time or charge percentage. Death, dimension changes, logout or removing the implant end the activation; reinstallation does not reset its battery.
+
+## Combat and other players
+
+The encounter radius is **32 blocks**. Nearby non-allied mobs and projectiles slow in movement, attacks and reaction time. Your walking and weapon recovery accelerate by 25%; the shared encounter clock keeps ordinary opponents at half your pace. Mantis attack animations and lunges follow that same clock. Camera input, the world tick rate, redstone, weather and battery timing remain normal.
+
+Two active Dynalar users have equal temporal pace, regardless of tier. Overlapping fields apply their strongest strength once; they do not multiply. The relative-speed system supports other slowing strengths for future models, but **tier upgrades never increase Dynalar’s slowing**.
+
+Server PvP settings and team protections prevent slowing protected players or their projectiles. Creative players and spectators are protected. Mounted entities retain normal vehicle physics. Normal defensive effects still work; Sandevistan does not grant invulnerability or ignore armor.
+
+[Watch the native preview (silent)](../media/sandevistan-native-preview.mp4)
+
+## Effects
+
+Movement and attacks leave textured **yellow-green → cyan → blue → violet** pose afterimages, including your skin, armor and deployed Mantis Blades. First-person hands and blades also leave brief echoes. Trails fade when you stop and are visible to other players.
+
+Activation adds a brief lens pulse, restrained color separation, a small FOV transition and original electronic audio. Environmental sounds become lower and quieter; player sounds remain clear. Your camera stays responsive.
+
+![Dynalar implant details](../images/sandevistan-details.png)
+
+![Colored pose trails](../images/sandevistan-afterimages.png)
+
+[Controls](controls.md) · [Installing cyberware](installation.md) · [Ripperdoc stock](ripperdocs.md)

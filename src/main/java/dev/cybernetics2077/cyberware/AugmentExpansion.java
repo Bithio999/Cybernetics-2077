@@ -133,11 +133,21 @@ public final class AugmentExpansion {
     float visual = AugmentRuntime.tier(p, VISUAL_CORTEX_SUPPORT) * .06f * distance;
     float berserk =
         AugmentRuntime.berserk(p) ? (AugmentRuntime.tier(p, BIODYNE_BERSERK) - 1) * .05f : 0;
-    return Math.min(.5f, 1 - (1 - stab) * (1 - visual) * (1 - berserk));
+    float sandy =
+        dev.cybernetics2077.temporal.Sandevistan.active(p)
+            ? dev.cybernetics2077.temporal.TemporalRules.critChance(
+                dev.cybernetics2077.temporal.Sandevistan.tier(p))
+            : 0;
+    return Math.min(.5f, 1 - (1 - stab) * (1 - visual) * (1 - berserk) * (1 - sandy));
   }
 
   public static float critMultiplier(ServerPlayer p) {
     return 1.5f
+        * (dev.cybernetics2077.temporal.Sandevistan.active(p)
+            ? 1
+                + dev.cybernetics2077.temporal.TemporalRules.critDamage(
+                    dev.cybernetics2077.temporal.Sandevistan.tier(p))
+            : 1)
         * (AugmentRuntime.berserk(p)
             ? 1 + (AugmentRuntime.tier(p, BIODYNE_BERSERK) - 1) * .25f
             : 1);

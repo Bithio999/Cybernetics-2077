@@ -6,7 +6,9 @@
     "MantisHandsMixin",
     "OpticalCamoMixin",
     "VillagePoolAccess",
-    "LynxStepsMixin"
+    "LynxStepsMixin",
+    "TemporalServerMixin",
+    "TemporalSwingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

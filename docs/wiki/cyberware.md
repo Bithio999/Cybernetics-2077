@@ -7,7 +7,7 @@ Choose a body system below. Each link opens an implant's effects, tiers and stat
 | System | Implants |
 | --- | --- |
 | Frontal Cortex | [Ex-Disk](ex-disk.md), [Memory Boost](memory-boost.md), [RAM Upgrade](ram-upgrade.md), [Self-ICE](self-ice.md) |
-| Operating System | [Militech Paraline](militech-paraline.md), [Raven Microcyber](raven-microcyber.md), [BioDyne Berserk](biodyne-berserk.md) |
+| Operating System | [Militech Paraline](militech-paraline.md), [Raven Microcyber](raven-microcyber.md), [BioDyne Berserk](biodyne-berserk.md), [Dynalar Sandevistan](dynalar-sandevistan.md) |
 | Arms | [Mantis Blades](mantis-blades.md) |
 | Face | [Basic Kiroshi Optics](kiroshi-optics.md), [Clairvoyant Optics](clairvoyant-optics.md), [Kiroshi “Doomsayer” Optics](doomsayer-optics.md), [Kiroshi “Stalker” Optics](stalker-optics.md) |
 | Skeleton | [Bionic Joints](bionic-joints.md), [Epimorphic Skeleton](epimorphic-skeleton.md), [Dense Marrow](dense-marrow.md), [Para Bellum](para-bellum.md) |

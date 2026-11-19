@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.14.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.15.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.14.0'
+    assert metadata['mods'][0]['version']=='0.15.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -62,6 +62,9 @@ with ZipFile(jar) as z:
                      'dev/cybernetics2077/cyberware/CyberwareTier.class',
                      'dev/cybernetics2077/cyberware/Augment.class',
                      'dev/cybernetics2077/cyberware/AugmentExpansion.class',
+                     'dev/cybernetics2077/temporal/Sandevistan.class',
+                     'dev/cybernetics2077/client/temporal/TemporalMesh.class',
+                     'dev/cybernetics2077/client/temporal/SandevistanLens.class',
                      'data/cybernetics2077/damage_type/cybernetic_discharge.json',
                      'dev/cybernetics2077/cyberware/AugmentItem.class',
                      'dev/cybernetics2077/cyberware/AugmentState.class',
@@ -126,7 +129,7 @@ with ZipFile(jar) as z:
         'ex_disk': 3, 'memory_boost': 2, 'biodyne_berserk': 2, 'kiroshi_clairvoyant_optics': 3,
         'bionic_joints': 1, 'epimorphic_skeleton': 4, 'neofiber': 3, 'adrenaline_converter': 1,
         'blood_pump': 2, 'heal_on_kill': 1, 'subdermal_armor': 1, 'optical_camo': 2,
-        'reinforced_tendons': 2, 'fortified_ankles': 2,
+        'reinforced_tendons': 2, 'fortified_ankles': 2, 'dynalar_sandevistan': 2,
         'ram_upgrade': 1,
         'self_ice': 3,
         'kiroshi_doomsayer_optics': 1,
@@ -155,6 +158,12 @@ with ZipFile(jar) as z:
             assert f'data/cybernetics2077/recipe/{item}.json' not in names, 'Unrequested expansion recipe'
         if first > 1:
             assert f'assets/cybernetics2077/models/item/{implant}_tier_{first - 1}.json' not in names
+    for sound in ('sandy_on', 'sandy_off', 'sandy_hum'):
+        assert z.read(f'assets/cybernetics2077/sounds/{sound}.ogg').startswith(b'OggS')
+        assert sound in json.loads(z.read('assets/cybernetics2077/sounds.json'))
+    for shader in ('temporal_ghost', 'temporal_lens'):
+        for extension in ('json', 'vsh', 'fsh'):
+            assert f'assets/cybernetics2077/shaders/core/{shader}.{extension}' in names
     for mixin in json.loads(z.read('cybernetics2077.mixins.json'))['client']:
         assert 'dev/cybernetics2077/mixin/client/'+mixin+'.class' in names
     for mixin in json.loads(z.read('cybernetics2077.common.mixins.json'))['mixins']:

@@ -32,7 +32,8 @@ public enum Augment {
   SHOCK_N_AWE("shock_n_awe", CyberwareCategory.INTEGUMENTARY_SYSTEM, 1, 25),
   PAIN_EDITOR("pain_editor", CyberwareCategory.INTEGUMENTARY_SYSTEM, 4, 35),
   LYNX_PAWS("lynx_paws", CyberwareCategory.LEGS, 2, 5),
-  JENKINS_TENDONS("jenkins_tendons", CyberwareCategory.LEGS, 2, 6);
+  JENKINS_TENDONS("jenkins_tendons", CyberwareCategory.LEGS, 2, 6),
+  DYNALAR_SANDEVISTAN("dynalar_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 2, 18);
 
   public final String id;
   public final CyberwareCategory category;
@@ -50,7 +51,10 @@ public enum Augment {
   }
 
   public boolean active() {
-    return this == BIODYNE_BERSERK || this == BLOOD_PUMP || this == OPTICAL_CAMO;
+    return this == BIODYNE_BERSERK
+        || this == BLOOD_PUMP
+        || this == OPTICAL_CAMO
+        || this == DYNALAR_SANDEVISTAN;
   }
 
   public boolean optics() {
@@ -150,6 +154,18 @@ public enum Augment {
               "Hold jump on ground, then release to launch.",
               "Full charge: 1 second. Maximum impulse: " + number(.6 + t * .08) + ".",
               "Normal jumps work with a quick tap.");
+      case DYNALAR_SANDEVISTAN ->
+          List.of(
+              "O: toggle Sandevistan. 50% relative slowing at every tier.",
+              "32-block encounter radius; overlapping fields never stack.",
+              "Maximum duration: "
+                  + dev.cybernetics2077.temporal.TemporalRules.duration(t)
+                  + " seconds.",
+              "Full recharge: "
+                  + dev.cybernetics2077.temporal.TemporalRules.recharge(t)
+                  + " seconds; charge is saved.",
+              "+" + (t * 3) + "% weapon critical chance and critical damage while active.",
+              "Early deactivation preserves charge; rearm: 1 second, minimum 20% charge.");
       case RAM_UPGRADE ->
           List.of(
               "+" + (1 + t / 3) + " maximum RAM with a cyberdeck.",

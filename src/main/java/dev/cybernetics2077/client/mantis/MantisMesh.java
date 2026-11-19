@@ -52,7 +52,8 @@ public final class MantisMesh {
       boolean firstPerson) {
     boolean slim = player.getSkin().model() == PlayerSkin.Model.SLIM;
     float depth = slim ? 3 / 16f : 4 / 16f;
-    var local = source(player.getSkin().texture());
+    boolean capture = dev.cybernetics2077.client.temporal.SandevistanTrails.capturing;
+    MultiBufferSource local = capture ? buffers : source(player.getSkin().texture());
     var skin = local.getBuffer(RenderType.entityCutoutNoCull(player.getSkin().texture()));
     var metal = local.getBuffer(RenderType.entityCutoutNoCull(METAL));
     var modelBuffer = local.getBuffer(MantisMaterial.TYPE);
@@ -67,17 +68,18 @@ public final class MantisMesh {
     section(p, skin, metal, light, player, left, slim, depth, motion, sleeves, false);
     if (motion.panels() > .001f) {
       boolean distant =
-          !firstPerson
-              && net.minecraft.client.Minecraft.getInstance()
-                      .gameRenderer
-                      .getMainCamera()
-                      .getPosition()
-                      .distanceToSqr(player.position())
-                  > 256;
+          capture
+              || !firstPerson
+                  && net.minecraft.client.Minecraft.getInstance()
+                          .gameRenderer
+                          .getMainCamera()
+                          .getPosition()
+                          .distanceToSqr(player.position())
+                      > 256;
       MantisBlenderMesh.render(p, modelBuffer, light, motion, distant, depth);
     }
     p.popPose();
-    local.endBatch();
+    if (!capture) ((MultiBufferSource.BufferSource) local).endBatch();
   }
 
   private static void section(

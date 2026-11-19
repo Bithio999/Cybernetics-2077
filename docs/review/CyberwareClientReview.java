@@ -326,6 +326,7 @@ public final class CyberwareClientReview {
           Files.deleteIfExists(OUT.resolve("hacks-passed.txt"));
           Files.deleteIfExists(OUT.resolve("enhanced-passed.txt"));
           Files.deleteIfExists(OUT.resolve("expansion-passed.txt"));
+          Files.deleteIfExists(OUT.resolve("sandevistan-passed.txt"));
           mc.options.pauseOnLostFocus = false;
           mc.options.guiScale().set(2);
           mc.options.enableVsync().set(false);
@@ -335,7 +336,8 @@ public final class CyberwareClientReview {
           server(
               p -> {
                 p.setGameMode(GameType.SURVIVAL);
-                if (Boolean.getBoolean("cybernetics2077.expansionReview")) {
+                if (Boolean.getBoolean("cybernetics2077.expansionReview")
+                    || Boolean.getBoolean("cybernetics2077.sandevistanReview")) {
                   p.setHealth(p.getMaxHealth());
                   p.deathTime = 0;
                   p.setPose(net.minecraft.world.entity.Pose.STANDING);
@@ -367,6 +369,10 @@ public final class CyberwareClientReview {
         return;
       }
       ticks++;
+      if (Boolean.getBoolean("cybernetics2077.sandevistanReview")) {
+        SandevistanClientReview.tick(contentTicks++);
+        return;
+      }
       if (Boolean.getBoolean("cybernetics2077.expansionReview")) {
         ExpansionClientReview.tick(contentTicks++);
         return;

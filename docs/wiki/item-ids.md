@@ -28,6 +28,7 @@ Replace `<tier>` only with a tier listed in the table.
 | Mantis Blades | `cybernetics2077:mantis_blades_tier_<tier>` | 2–5 |
 | Ex-Disk | `cybernetics2077:ex_disk_tier_<tier>` | 3–5 |
 | Memory Boost | `cybernetics2077:memory_boost_tier_<tier>` | 2–5 |
+| Dynalar Sandevistan | `cybernetics2077:dynalar_sandevistan_tier_<tier>` | 2–5 |
 | BioDyne Berserk | `cybernetics2077:biodyne_berserk_tier_<tier>` | 2–5 |
 | Clairvoyant Optics | `cybernetics2077:kiroshi_clairvoyant_optics_tier_<tier>` | 3–5 |
 | Bionic Joints | `cybernetics2077:bionic_joints_tier_<tier>` | 1–5 |

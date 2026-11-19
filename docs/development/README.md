@@ -17,7 +17,7 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 ## Edit the wiki
 
-The 55 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
+The 56 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
 
 ```sh
 python3 -m venv .venv-docs

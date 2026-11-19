@@ -82,7 +82,8 @@ public final class AugmentRuntime {
   }
 
   public static float meleeRate(Player p) {
-    return berserk(p) ? 1 + (5 + tier(p, BIODYNE_BERSERK) * 5) * .01f : 1;
+    return (berserk(p) ? 1 + (5 + tier(p, BIODYNE_BERSERK) * 5) * .01f : 1)
+        * (float) dev.cybernetics2077.temporal.Sandevistan.playerPace(p);
   }
 
   public static int interval(Player p, int ticks) {
@@ -135,6 +136,7 @@ public final class AugmentRuntime {
         p.heal(p.getMaxHealth() * pump * .005f);
       }
     }
+    dev.cybernetics2077.temporal.Sandevistan.tick(p);
     AugmentExpansion.tick(p);
     int epi = tier(p, EPIMORPHIC_SKELETON);
     double armor = 0, toughness = 0;
@@ -225,6 +227,9 @@ public final class AugmentRuntime {
     }
     if (!CyberwareRuntime.usable(p) || p.isPassenger()) return false;
     switch (action) {
+      case 13 -> {
+        return dev.cybernetics2077.temporal.Sandevistan.toggle(p);
+      }
       case 5 -> {
         int t = tier(p, BIODYNE_BERSERK);
         if (t == 0 || time < s.berserkReady || berserk(p)) return false;
@@ -396,6 +401,7 @@ public final class AugmentRuntime {
   public static void snapshot(ServerPlayer p, CompoundTag t) {
     var s = state(p);
     long time = now(p);
+    dev.cybernetics2077.temporal.Sandevistan.snapshot(p, t);
     t.putLong("augmentTime", time);
     t.putBoolean("berserk", berserk(p));
     t.putLong("berserkEnd", s.berserkEnd);
@@ -474,6 +480,11 @@ public final class AugmentRuntime {
         || p.getRandom().nextFloat() < AugmentExpansion.weaponCritChance(p, e.getTarget(), blade)) {
       e.setCriticalHit(true);
       float multiplier = Math.max(1.5f, e.getDamageMultiplier());
+      if (dev.cybernetics2077.temporal.Sandevistan.active(p))
+        multiplier *=
+            1
+                + dev.cybernetics2077.temporal.TemporalRules.critDamage(
+                    dev.cybernetics2077.temporal.Sandevistan.tier(p));
       if (berserk(p)) multiplier *= 1 + (tier(p, BIODYNE_BERSERK) - 1) * .25f;
       e.setDamageMultiplier(multiplier);
     }

@@ -17,6 +17,7 @@ Default bindings can be changed under **Options → Controls → Cybernetics 207
 | Mantis light attacks | Left-click |
 | Mantis lunge | Hold right-click ≥0.4 s, then release |
 | Activate Berserk | I |
+| Toggle Sandevistan | O |
 | Use Blood Pump | H |
 | Activate Optical Camo | C |
 | Reinforced Tendons double jump | Jump again in midair |

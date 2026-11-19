@@ -1,0 +1,44 @@
+{
+  "version": "0.15.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "jvmTests": 68,
+  "serverGameTests": 99,
+  "status": "passed",
+  "releaseVerifier": "passed",
+  "wikiPages": 56,
+  "jarSha256": "325bf847e7582cf0166d670f168771457beaf6d7e7d786366d9887e80caefb1d",
+  "nativeStatus": "PASS: native bench install and OS detail page; key activation and early off; actual GPU lens; tracked second player with independent Sandevistan and Mantis Blades; textured pose trails and armor; first-person blade echoes; real battery recharge HUD. Maximum actors=2, echoes=14, vertices=97176.",
+  "nativeFrameTiming": {
+    "renderer": "Mesa software rendering, LP_NUM_THREADS=3; 960x540 native window with simultaneous X11 recording",
+    "beforeGpuReplayMedianMs": 40.081022,
+    "medianMs": 35.65309,
+    "p95Ms": 55.331203,
+    "sampleFrames": 142,
+    "hardwareBenchmark": false
+  },
+  "checks": [
+    "Dynalar tiers 2\u20135 all use 50% relative slowing; no tier-dependent strengthening",
+    "Exact proportional rules for hypothetical 80% versus 60% models; equal Dynalar temporal strength",
+    "Shared encounter normalization; overlapping fields use maximum strength once",
+    "Native mob AI/projectile ticks and collision slowed with world clock unchanged; client partial-tick interpolation",
+    "Native player movement, melee recovery, Mantis attack animation and lunge timing",
+    "Battery early off, minimum charge, rearm, expiry, offline recharge and serialization",
+    "Uninstall/expiry remove attribute modifiers; activation ends on death/logout/dimension transfer",
+    "PvP and team protection; player-owned projectile treatment and normal outside-field behavior",
+    "Hurt timers advance in real time; weapon critical benefits",
+    "Native bench and inventory OS page; real key activation and early off; synchronized recharge HUD",
+    "Tracked scripted second player, skin/armor/Mantis afterimages, first-person blade echoes and original audio assets",
+    "Real player slows when their active opponent remains after early deactivation",
+    "CPU capture with low-LOD Mantis geometry; retained GPU buffers closed on expiry/world change; bounded pose history",
+    "One framebuffer copy and lens pass; shader resources validated in native client; no menu/HUD replacement",
+    "Clean JAR excludes review code and cyberware recipes"
+  ],
+  "limits": [
+    "Integrated server plus a tracked scripted second runner; not a two-computer latency test.",
+    "Mounted entities retain normal vehicle physics; player vertical gravity and noncombat timers remain normal.",
+    "Frame timing comes from software rendering while recording; not a prediction of hardware GPU performance.",
+    "Native preview is silent, un-interpolated in-game footage encoded at 30 fps."
+  ],
+  "preview": "docs/media/sandevistan-native-preview.mp4"
+}

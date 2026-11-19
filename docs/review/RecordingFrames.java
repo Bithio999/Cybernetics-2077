@@ -23,6 +23,10 @@ public final class RecordingFrames {
 
   @SubscribeEvent
   public static void frame(RenderFrameEvent.Post event) {
+    if (Boolean.getBoolean("cybernetics2077.sandevistanReview")) {
+      SandevistanClientReview.frame();
+      return;
+    }
     if (!Boolean.getBoolean("cybernetics2077.recording")) return;
     int tick = CyberwareClientReview.contentTicks;
     if (tick < 220 || tick > 502) {

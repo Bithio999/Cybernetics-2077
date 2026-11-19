@@ -27,14 +27,18 @@ public final class ExpansionGameTests {
   @GameTest(template = "empty", timeoutTicks = 60)
   public static void fourteenFamiliesAppendWithoutChangingSavedStockIds(GameTestHelper h) {
     var offers = CyberwareCatalogue.offers();
-    h.assertTrue(offers.size() == 154, "Missing new tier variants");
+    h.assertTrue(offers.size() == 158, "Missing new tier variants");
     h.assertTrue(
         offers.get(74).item() == Cybernetics2077.RAVEN_TIERS.getFirst().get(),
         "Saved Raven offer index changed");
     for (var category : CyberwareCategory.values()) {
       long count =
           java.util.Arrays.stream(Augment.values())
-              .filter(a -> a.ordinal() > FORTIFIED_ANKLES.ordinal() && a.category == category)
+              .filter(
+                  a ->
+                      a.ordinal() > FORTIFIED_ANKLES.ordinal()
+                          && a != DYNALAR_SANDEVISTAN
+                          && a.category == category)
               .count();
       boolean excluded =
           category == CyberwareCategory.ARMS

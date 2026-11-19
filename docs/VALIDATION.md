@@ -2,6 +2,23 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Dynalar Sandevistan (0.15.0)
+
+**68 JVM tests, 99 dedicated-server GameTests, the native client review and clean package audit pass.** [Results](review/results/sandevistan-0.15.0.json) · [Research and clock/rendering design](research/SANDEVISTAN-0.15.0.md) · [Player guide](wiki/dynalar-sandevistan.md).
+
+Seven new pure rules tests cover fixed Dynalar slowing, proportional different-model interaction, equal-user parity, non-stacking fields, fractional clock accumulation, virtual interpolation and tier progression. Six new server scenarios cover saved battery/rearm/recharge, reversible attributes, equal-strength different-tier users, PvP-off protection, projectile ownership/range, actual paced mob/projectile ticks with unchanged world time, real-time hurt protection and weapon critical/recovery benefits. The native-tick fixture explicitly forces its test chunks so asynchronous chunk loading cannot produce an unticked entity. Existing installation coverage now includes all 115 augment variants.
+
+The client review installs Dynalar and Mantis Blades through actual bench transactions, opens the native OS page, activates/deactivates through the real keybind and checks the charge HUD. A tracked scripted second player receives independent Sandy/Mantis state. When the local player switches off first, their real server-authoritative movement pace drops to 0.625 while the opponent remains active. Visual inspection checks textured skin/armor/cyberarm pose echoes, first-person trails and the framebuffer lens. The final run reached two trailed actors, 14 visible echoes and 97,176 replayed vertices; no duplicate ghost entities are spawned.
+
+The silent [native preview](media/sandevistan-native-preview.mp4) uses direct X11 capture without generated/interpolated frames. During the recorded active segment at 960×540, this software-rendered environment measured median **35.7 ms**, p95 **55.3 ms** (142 intervals). Retained GPU replay improved the median from **40.1 ms** in the preceding capture. These are capture-environment timings, not hardware GPU promises or a two-computer latency test. The recorded frame rate is 30 fps; the renderer can deliver fewer unique frames.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PsandevistanReview
+```
+
+Use the disposable **Cybernetics Review** save. Success writes `capture/sandevistan-passed.txt`; failure writes `capture/failed.txt`. Clean before packaging to exclude review code. Source assets can be regenerated with `python3 art/sandevistan/build_assets.py` (Pillow and FFmpeg).
+
 ## Fourteen-family expansion (0.14.0)
 
 **61 JVM tests, 93 dedicated-server GameTests, the native client review, clean build, package audit and 55-page wiki validation pass.** [Results](review/results/expansion-0.14.0.json) · [Sources and adaptation notes](research/CYBERWARE-EXPANSION-0.14.0.md).

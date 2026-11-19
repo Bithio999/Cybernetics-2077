@@ -2,6 +2,16 @@
 
 Older captures and implementation history are kept here for contributors. **[Current player wiki](wiki/index.md)** pages include the relevant screenshots and videos beside the item they describe.
 
+## Dynalar Sandevistan (0.15.0)
+
+Native footage of activation, first-person Mantis echoes and colored textured pose trails. Includes the real integrated-server player and a tracked scripted second runner. The silent recording is captured at 960×540; it is not an offline render or a two-computer latency test.
+
+[Watch the native preview](media/sandevistan-native-preview.mp4) · [Implant guide](wiki/dynalar-sandevistan.md)
+
+![Sandevistan pose afterimages](images/sandevistan-afterimages.png)
+
+[Implant details](images/sandevistan-details.png) · [First-person effects](images/sandevistan-first-person.png) · [Recharge](images/sandevistan-recharge.png)
+
 ## Cyberware expansion (0.14.0)
 
 Fourteen new implant families, captured with Minecraft’s native item renderer. The review installs both loadouts using real bench transactions, opens Self-ICE’s detail page, and confirms a fatal hit restores the actual integrated-server player’s HP and synchronizes Second Heart’s cooldown.

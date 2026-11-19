@@ -12,7 +12,7 @@ Install optics in **Face** at a ripperdoc or bench. Carrying the item is not eno
 
 ## Why are there no quickhacks in the scanner?
 
-Install a cyberdeck in **Operating System** and load chips through **Manage Quickhacks**. A chip cannot exceed the deck's tier. Berserk occupies that same socket and replaces a cyberdeck.
+Install a cyberdeck in **Operating System** and load chips through **Manage Quickhacks**. A chip cannot exceed the deck's tier. Berserk and Sandevistan occupy that same socket and replace a cyberdeck.
 
 ## Why can I not install an implant?
 

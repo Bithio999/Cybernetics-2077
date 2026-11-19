@@ -321,5 +321,15 @@
   "cybernetics2077.self_ice.rejected": "Quickhack neutralized by Self-ICE.",
   "cybernetics2077.second_heart.revived": "Second Heart restored your vital signs.",
   "death.attack.cybernetic_discharge": "%1$s was shocked by %2$s’s cyberware",
-  "death.attack.cybernetic_discharge.player": "%1$s was shocked by %2$s’s cyberware"
+  "death.attack.cybernetic_discharge.player": "%1$s was shocked by %2$s’s cyberware",
+  "cybernetics2077.augment.dynalar_sandevistan": "Dynalar Sandevistan",
+  "item.cybernetics2077.dynalar_sandevistan_tier_2": "Dynalar Sandevistan",
+  "item.cybernetics2077.dynalar_sandevistan_tier_3": "Dynalar Sandevistan",
+  "item.cybernetics2077.dynalar_sandevistan_tier_4": "Dynalar Sandevistan",
+  "item.cybernetics2077.dynalar_sandevistan_tier_5": "Dynalar Sandevistan",
+  "key.cybernetics2077.sandevistan": "Toggle Sandevistan",
+  "cybernetics2077.sandy.recharging": "Sandevistan recharging — requires 20% charge.",
+  "subtitles.cybernetics2077.sandy_on": "Sandevistan engages",
+  "subtitles.cybernetics2077.sandy_off": "Sandevistan disengages",
+  "subtitles.cybernetics2077.sandy_hum": "Temporal processor humming"
 }

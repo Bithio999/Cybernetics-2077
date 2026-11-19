@@ -9,7 +9,15 @@
     "ScannerOutlineMixin",
     "MantisPlayerMixin",
     "MantisArmorMixin",
-    "MantisTravelMixin"
+    "MantisTravelMixin",
+    "TemporalClientMixin",
+    "TemporalRenderMixin",
+    "TemporalRenderTypeAccess",
+    "TemporalTextureAccess",
+    "TemporalTextureInvoker",
+    "SandevistanLensMixin",
+    "SandevistanSoundMixin",
+    "SandevistanHandMixin"
   ],
   "injectors": {
     "defaultRequire": 1

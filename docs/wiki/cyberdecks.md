@@ -2,7 +2,7 @@
 
 [Wiki home](index.md) · [Cyberware](cyberware.md) · [Quickhacks](quickhacks.md) · [Village services](ripperdocs.md)
 
-A cyberdeck occupies the single **Operating System** socket. Install [optics](kiroshi-optics.md) as well to upload quickhacks.
+A cyberdeck occupies the single **Operating System** socket, shared with [Berserk](biodyne-berserk.md) and [Sandevistan](dynalar-sandevistan.md). Install [optics](kiroshi-optics.md) as well to upload quickhacks.
 
 | Deck | Tiers | Best suited to |
 | --- | --- | --- |

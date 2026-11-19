@@ -101,7 +101,8 @@ public final class AugmentClient {
         && s.getInt("berserkTier") == 0
         && s.getInt("camoTier") == 0
         && s.getInt("iceTier") == 0
-        && s.getInt("heartTier") == 0) return;
+        && s.getInt("heartTier") == 0
+        && s.getInt("sandyTier") == 0) return;
     var g = e.getGuiGraphics();
     CyberBatch.begin();
     try {
@@ -148,8 +149,34 @@ public final class AugmentClient {
         badge(c, 5, y, "ICE", "SELF-ICE " + ready(s.getLong("iceReady"), time), false);
         y -= 21;
       }
-      if (s.getInt("heartTier") > 0)
+      if (s.getInt("heartTier") > 0) {
         badge(c, 5, y, "HP", "HEART " + ready(s.getLong("heartReady"), time), false);
+        y -= 21;
+      }
+      if (s.getInt("sandyTier") > 0) {
+        int profile = Math.clamp(s.getInt("sandyProfile"), 2, 5);
+        boolean active = s.getLong("sandyEnd") > time;
+        double charge =
+            active
+                ? (s.getLong("sandyEnd") - time)
+                    / (20. * dev.cybernetics2077.temporal.TemporalRules.duration(profile))
+                : s.getDouble("sandyCharge")
+                    + Math.max(0, time - s.getLong("sandyClock"))
+                        / (20. * dev.cybernetics2077.temporal.TemporalRules.recharge(profile));
+        badge(
+            c,
+            5,
+            y,
+            dev.cybernetics2077.client.temporal.SandevistanClient.KEY
+                .getTranslatedKeyMessage()
+                .getString(),
+            "SANDY "
+                + (active
+                    ? seconds(s.getLong("sandyEnd"), time)
+                    : Math.round(Math.clamp(charge, 0, 1) * 100) + "%"),
+            active);
+        c.rect(9, y + 15, (float) (108 * Math.clamp(charge, 0, 1)), 1, 0xffa2f08a);
+      }
     } finally {
       CyberBatch.flush(g);
     }

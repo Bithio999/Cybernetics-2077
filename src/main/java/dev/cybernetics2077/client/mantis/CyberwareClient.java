@@ -83,7 +83,7 @@ public final class CyberwareClient {
     return MantisMotion.sample(
         true,
         progress * CombatRules.DEPLOY,
-        (now - t.getLong("attack") + partial) * Math.max(1, t.getFloat("meleeRate")),
+        (now - t.getLong("attack") + partial) * Math.max(.1f, t.getFloat("meleeRate")),
         t.getInt("combo"),
         t.getLong("charge") >= 0,
         now - t.getLong("charge") + partial,
@@ -251,6 +251,8 @@ public final class CyberwareClient {
                 pose));
         MantisMesh.render(
             p, e.getMultiBufferSource(), e.getPackedLight(), m.player, left, pose, true);
+        dev.cybernetics2077.client.temporal.SandevistanTrails.hand(
+            p, e.getMultiBufferSource(), m.player, left, pose, e.getPackedLight());
         p.popPose();
       }
     } finally {

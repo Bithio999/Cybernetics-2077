@@ -412,7 +412,13 @@ public final class CyberwareRuntime {
       if (toward.length() <= separation + .15) return;
       destination = target.position().subtract(toward.normalize().scale(separation));
     }
-    int duration = LungePath.duration(start.distanceTo(destination));
+    int duration =
+        Math.max(
+            2,
+            (int)
+                Math.ceil(
+                    LungePath.duration(start.distanceTo(destination))
+                        / dev.cybernetics2077.temporal.Sandevistan.playerPace(p)));
     var path =
         new LungePath(
             start.x, start.y, start.z, destination.x, destination.y, destination.z, .65, duration);

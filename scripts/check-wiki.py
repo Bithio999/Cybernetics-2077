@@ -54,6 +54,7 @@ for path in [ROOT / 'README.md', ROOT / 'docs/README.md', ROOT / 'docs/developme
 families = {
     'optical_scanner':'kiroshi-optics', 'cyberdeck_tier_1':'militech-paraline',
     'raven_microcyber':'raven-microcyber', 'mantis_claws_tier_1':'mantis-blades',
+    'dynalar_sandevistan':'dynalar-sandevistan',
     'ex_disk':'ex-disk', 'memory_boost':'memory-boost', 'biodyne_berserk':'biodyne-berserk',
     'kiroshi_clairvoyant_optics':'clairvoyant-optics', 'bionic_joints':'bionic-joints',
     'epimorphic_skeleton':'epimorphic-skeleton', 'neofiber':'neofiber',

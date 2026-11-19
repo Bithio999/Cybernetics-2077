@@ -87,7 +87,7 @@ public final class AugmentGameTests {
                 == Items.AIR,
             "Unavailable lower tier registered");
     }
-    h.assertTrue(Augment.values().length == 28 && count == 111, "Wrong expansion size");
+    h.assertTrue(Augment.values().length == 29 && count == 115, "Wrong expansion size");
     h.assertTrue(
         Cybernetics2077.LEGACY_MANTIS.get().tier() == CyberwareTier.TWO
             && Cybernetics2077.MANTIS_TIERS.size() == 4,
