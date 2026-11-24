@@ -24,6 +24,10 @@ Requires Minecraft **1.21.1**, NeoForge **21.1.248+ for 1.21.1**, and Java **21*
 
 Existing worlds are supported; new village buildings require new chunks.
 
+## Media downloader & trimmer
+
+**[Media Workshop](tools/media-workshop/README.md)** converts YouTube/Twitch links to MP4 or MP3 and includes a preview, trimmer and batch queue. Runs independently of Minecraft. **[Download the program ZIP](releases/tools/Media-Workshop-1.0.0.zip)**.
+
 <details>
 <summary>Source code, building and documentation maintenance</summary>
 

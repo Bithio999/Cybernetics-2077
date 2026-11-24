@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Media Workshop</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a href="/" class="brand"><span class="brand-icon">M<span>W</span></span><span>MEDIA <b>WORKSHOP</b><small>DOWNLOAD / CONVERT / CUT</small></span></a><span class="local"><i></i> RUNNING LOCALLY</span></header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">YOUR NEXT REFERENCE, READY TO USE</p><h1>From link to <em>final cut.</em></h1><p>YouTube &amp; Twitch downloads. Precise trims. One tidy workspace.</p></div><a href="#editor" class="text-link">Already have a file? Open the editor →</a></div>
+    <div id="dependencies" class="notice" hidden></div>
+    <div id="message" role="status" aria-live="polite" hidden></div>
+    <section class="workspace">
+      <section class="panel download-panel" aria-labelledby="download-heading">
+        <div class="section-heading"><span class="number">01</span><div><h2 id="download-heading">Bring it in</h2><p>One link or a whole batch.</p></div><span class="badge">BATCH READY</span></div>
+        <form id="download-form">
+          <label for="urls">Video links <span id="link-count" class="muted">0 links</span></label>
+          <textarea id="urls" rows="6" placeholder="https://www.youtube.com/watch?v=…&#10;https://www.twitch.tv/videos/…&#10;https://clips.twitch.tv/…" spellcheck="false" required></textarea>
+          <p class="hint">One link per line · Up to 100 jobs · Duplicate links are combined</p>
+          <div class="two-columns"><div><label for="download-format">Save as</label><select id="download-format"><option value="mp4">MP4 · video + audio</option><option value="mp3">MP3 · audio only</option></select></div><div><label for="height">Maximum quality</label><select id="height"><option value="480">480p</option><option value="720">720p</option><option value="1080" selected>1080p · recommended</option><option value="1440">1440p</option><option value="2160">2160p · 4K</option></select></div></div>
+          <button class="primary full" id="add-batch" type="submit">↓ Add to download queue</button>
+        </form>
+        <div class="divider"><span>OR WORK WITH YOUR OWN FILES</span></div>
+        <label class="import-zone" for="files"><span class="import-icon">＋</span><strong>Choose audio or video</strong><span>MP4, MP3, MOV, MKV, WebM and more</span><span class="hint">Select several files to import a batch</span></label>
+        <input class="visually-hidden" id="files" type="file" multiple accept=".mp4,.mp3,.m4a,.mov,.mkv,.webm,.wav,.ogg,.flac,.aac">
+        <div id="import-progress" class="hint" aria-live="polite"></div>
+      </section>
+      <section class="panel editor-panel" id="editor" aria-labelledby="editor-heading">
+        <div class="section-heading"><span class="number">02</span><div><h2 id="editor-heading">Make the cut</h2><p>Preview. Mark your range. Export.</p></div><span class="badge secondary" id="source-type">TRIM &amp; CONVERT</span></div>
+        <label for="source">Source media</label><select id="source"><option value="">Download or import a file to begin</option></select>
+        <div class="preview"><video id="player" controls preload="metadata" playsinline hidden></video><div id="empty-preview"><span class="play-symbol">▷</span><strong>Your preview goes here</strong><p>Finished downloads and imported files appear in the media library.</p></div></div>
+        <div class="preview-caption"><span id="source-info">NO MEDIA SELECTED</span><span id="play-time">00:00.000</span></div>
+        <form id="trim-form"><fieldset id="trim-controls" disabled>
+          <div class="range-track"><div id="range-selection"></div></div>
+          <div class="range-controls"><label for="in-range">IN <input id="in-range" aria-label="Trim start position" type="range" min="0" max="1" step="0.001" value="0"></label><label for="out-range">OUT <input id="out-range" aria-label="Trim end position" type="range" min="0" max="1" step="0.001" value="1"></label></div>
+          <div class="two-columns time-fields"><div><label for="start">Start</label><div class="input-button"><input id="start" value="00:00.000" inputmode="decimal" aria-label="Trim start time"><button type="button" id="mark-in" title="Set start to the current playback position">Mark in</button></div></div><div><label for="end">End</label><div class="input-button"><input id="end" value="00:00.000" inputmode="decimal" aria-label="Trim end time"><button type="button" id="mark-out" title="Set end to the current playback position">Mark out</button></div></div></div>
+          <div class="cut-summary"><span>SELECTED DURATION</span><strong id="cut-duration">00:00.000</strong><button id="preview-cut" type="button" class="text-link">Preview selection</button></div>
+          <div class="export-row"><div><label for="export-format">Export as</label><select id="export-format"><option value="mp4">MP4 · H.264 / AAC</option><option value="mp3">MP3 · 192 kbps</option></select></div><button type="submit" class="primary" id="export">Export cut →</button></div>
+          <label class="checkbox"><input type="checkbox" id="batch-trim"> Apply this range to all checked library files <span id="selected-count">(0 selected)</span></label>
+          <p class="hint">Times accept seconds or HH:MM:SS.mmm. Exports create new files; originals stay intact.</p>
+        </fieldset></form>
+      </section>
+    </section>
+    <section class="panel queue-panel" aria-labelledby="queue-heading"><div class="section-heading"><span class="number">03</span><div><h2 id="queue-heading">The queue <span id="queue-count" class="count">0</span></h2><p id="queue-summary">Ready when you are.</p></div><div class="actions"><button class="quiet" id="cancel-all">Cancel unfinished</button><button class="quiet" id="clear">Clear finished</button></div></div><div id="queue"><div class="empty-list">No jobs yet. Add links or export a cut to get started.</div></div></section>
+    <section class="panel library-panel" aria-labelledby="library-heading"><div class="section-heading"><span class="number">04</span><div><h2 id="library-heading">Media library <span id="library-count" class="count">0</span></h2><p>Ready to preview, cut or save to your computer.</p></div><label class="checkbox"><input type="checkbox" id="select-all"> Select all</label></div><div id="library"><div class="empty-list">Your files will appear here.</div></div></section>
+    <footer><span>MEDIA WORKSHOP <b>1.0</b> · LOCAL TO YOUR COMPUTER</span><span id="footer-status">Connecting…</span><p id="storage"></p></footer>
+  </main>
+</body></html>
