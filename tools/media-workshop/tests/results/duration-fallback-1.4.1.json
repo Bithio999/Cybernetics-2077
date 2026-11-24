@@ -1,0 +1,48 @@
+{
+  "scope": "Synthetic low-resolution reproduction using the reported source frame count, nominal frame rate and exact cut times. The user video was not downloaded. Audio ends after video, reproducing the track-duration mismatch; pixels are test black and audio is looped test silence.",
+  "source": {
+    "duration": 3096.981,
+    "video": true,
+    "audio": true,
+    "width": 80,
+    "height": 48,
+    "video_codec": "h264",
+    "pixel_format": "yuv420p",
+    "audio_codec": "aac",
+    "video_frames": 185628,
+    "container": "mov,mp4,m4a,3gp,3g2,mj2",
+    "start_time": 0.0,
+    "fps": 59.94005994005994
+  },
+  "start": 1314.974,
+  "end": 3096.961,
+  "nominalFrameRate": "60000/1001",
+  "results": {
+    "1.4.0": {
+      "workerExit": 1,
+      "error": "Boundary renderer returned an unexpected duration"
+    },
+    "1.4.1": {
+      "workerExit": 0,
+      "error": "",
+      "output": {
+        "duration": 1782.007,
+        "video": true,
+        "audio": true,
+        "width": 80,
+        "height": 48,
+        "video_codec": "h264",
+        "pixel_format": "yuv420p",
+        "audio_codec": "aac",
+        "video_frames": 106808,
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "start_time": 0.0,
+        "fps": 59.94005994005994
+      },
+      "copiedVideoSeconds": 1777.7759999999998,
+      "expectedVideoDuration": 1781.9198,
+      "audioProcessing": "copy",
+      "cleanDecode": true
+    }
+  }
+}

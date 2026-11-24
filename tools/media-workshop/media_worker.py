@@ -77,7 +77,7 @@ def smart_trim(source, destination, start, end, threads):
         VideoCutter,
         VideoSettings,
     )
-    from video_index import index_video_window
+    from video_index import index_video_window, presentation_bounds
 
     engine = importlib.import_module("smartcut.cut_video")
 
@@ -217,10 +217,58 @@ def smart_trim(source, destination, start, end, threads):
         video_meta = app.probe(video)
         if video_meta["video_frames"] != expected_frames:
             raise app.MediaError("Boundary renderer returned an unexpected frame count")
-        if abs(video_meta["duration"] - (end - start)) > max(
-            0.025, 1.25 / max(1, meta.get("fps", 25))
-        ):
-            raise app.MediaError("Boundary renderer returned an unexpected duration")
+        duration_tolerance = max(0.025, 1.25 / max(1, meta.get("fps", 25)))
+        # A source's audio can outlast its video. Validate video against its own
+        # packet timeline, rather than requiring extra nonexistent video frames
+        # up to the combined container/audio end.
+        clip_start = segments[0][0] + container.start_time
+        clip_end = segments[0][1] + container.start_time
+        expected_video_duration = float(
+            min(clip_end, container.video_presentation_end) - clip_start
+        )
+        expected_mux_duration = expected_video_duration
+        if meta["audio"]:
+            audio_stream = container.av_container.streams.audio[0]
+            if audio_stream.duration is not None and audio_stream.time_base is not None:
+                audio_end = (
+                    (audio_stream.start_time or 0) + audio_stream.duration
+                ) * audio_stream.time_base
+                expected_mux_duration = max(
+                    expected_mux_duration, float(min(clip_end, audio_end) - clip_start)
+                )
+            else:
+                expected_mux_duration = end - start
+        first_index = bisect_left(container.video_frame_times, clip_start)
+        last_index = bisect_left(container.video_frame_times, clip_end) - 1
+        expected_first = container.video_frame_times[first_index] - clip_start
+        expected_last = container.video_frame_times[last_index] - clip_start
+        timing_tolerance = max(0.002, 2 * float(container.video_stream.time_base))
+        repair_duration = (
+            abs(video_meta["duration"] - expected_video_duration) > duration_tolerance
+            or abs(video_meta["start_time"] - expected_first) > timing_tolerance
+        )
+        emit(expected_video_duration=expected_video_duration)
+        if repair_duration:
+            # Check the actual presentation timeline before abandoning copied
+            # video. A wrong container duration summary does not imply bad frames.
+            first, last, presented_end = presentation_bounds(video, expected_last)
+            if (
+                abs(first - expected_first) > timing_tolerance
+                or abs(last - expected_last) > timing_tolerance
+                or abs(float(presented_end) - expected_video_duration)
+                > duration_tolerance
+            ):
+                raise app.MediaError(
+                    f"Boundary renderer returned an unexpected duration: wanted video {expected_video_duration:.6f}s "
+                    f"within a {end - start:.6f}s selection, "
+                    f"container reported {video_meta['duration']:.6f}s; "
+                    f"first frame {float(first):.6f}s (wanted {float(expected_first):.6f}s), "
+                    f"last frame {float(last):.6f}s (wanted {float(expected_last):.6f}s), "
+                    f"presentation ends {float(presented_end):.6f}s; {expected_frames} frames."
+                )
+            emit(
+                stage="Repairing video duration metadata", duration_metadata_repair=True
+            )
         emit(
             stage="Finishing audio"
             if audio_future and not audio_future.done()
@@ -257,6 +305,14 @@ def smart_trim(source, destination, start, end, threads):
             ],
             lambda t: emit(progress=min(99, 95 + 4 * t / (end - start))),
         )
+        if (
+            repair_duration
+            and abs(app.probe(destination)["duration"] - expected_mux_duration)
+            > duration_tolerance
+        ):
+            raise app.MediaError(
+                "Stream-copy duration repair could not preserve the selected timing"
+            )
         emit(progress=100)
     finally:
         stop_audio.set()

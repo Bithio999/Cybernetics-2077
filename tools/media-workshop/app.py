@@ -878,6 +878,8 @@ class Workshop:
             "encoder_started_before_download_finished",
             "indexed_video_frames",
             "audio_processing",
+            "duration_metadata_repair",
+            "expected_video_duration",
         }
         values = {k: v for k, v in values.items() if k in allowed}
         if "progress" in values:
@@ -1032,11 +1034,31 @@ class Workshop:
                 except MediaError as error:
                     self.check_cancel(job_id)
                     shutil.rmtree(result_folder / "processing", ignore_errors=True)
+                    versions = {}
+                    for package in ("smartcut", "av"):
+                        try:
+                            versions[package] = importlib.metadata.version(package)
+                        except importlib.metadata.PackageNotFoundError:
+                            versions[package] = None
                     self.update(
                         job_id,
                         progress=0,
                         processing_backend="encoder",
                         fallback_reason=str(error),
+                        fallback_info={
+                            **versions,
+                            "python": sys.version.split()[0],
+                            **{
+                                key: meta.get(key)
+                                for key in (
+                                    "video_codec",
+                                    "pixel_format",
+                                    "width",
+                                    "height",
+                                    "fps",
+                                )
+                            },
+                        },
                         stage="Encoding MP4 (compatibility fallback)",
                     )
                     self.run(

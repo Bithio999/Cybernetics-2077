@@ -64,7 +64,7 @@ Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. P
 3. Use **Preview selection** to play only the chosen range.
 4. Select MP4 or MP3 and click **Export cut**.
 
-There is **one accurate cut workflow**, optimized automatically. Your selected start/end times stay in place, within the source's frame/audio-sample precision.
+There is **one accurate cut workflow**, optimized automatically. Version 1.4.1 fixes false full-encoding fallbacks when audio extends past the end of the video track. Your selected start/end times stay in place, within the source's frame/audio-sample precision.
 
 - Compatible H.264 cuts copy complete video sections and re-encode only the boundaries. Compatible AAC audio is copied with precise start timing; other audio is converted alongside the video work.
 - Very short cuts and other codecs use a fast accurate encoder automatically. If boundary processing cannot preserve the requested timing, the app uses that encoder instead.
@@ -80,6 +80,8 @@ AAC exports can retain up to one compressed audio frame at the end (normally abo
 Original files are never overwritten. Imports are copied into the library, and each export has a separate folder. Imports stream to disk rather than loading an entire large file into memory.
 
 ## Your files and queue
+
+If a cut shows **Encoding MP4 (compatibility fallback)**, expand **Why this cut is encoding** in that queue entry and use **Copy details**. This shows the actual boundary-processing error; new failures also include codec, resolution and dependency versions. The explanation remains available after completion. Existing saved failures can be inspected without repeating the cut. On older versions, the same error is saved as `fallback_reason` in `data/library.json`. A fallback means the selected clip is being fully encoded to preserve timing; the status alone does not identify its cause.
 
 The library lives in **`data/` beside app.py**; its location is also shown at the bottom of the app. Queue records and finished media survive closing and reopening. Jobs interrupted by a process crash become **Interrupted**, with a Retry button. An orderly Ctrl+C cancels unfinished jobs. Closing the browser tab leaves the app running; press **Ctrl+C in its terminal** to quit.
 

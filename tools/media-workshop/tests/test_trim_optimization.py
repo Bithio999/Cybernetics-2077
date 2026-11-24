@@ -486,7 +486,188 @@ media_worker.smart_trim(Path(sys.argv[2]), Path(sys.argv[3]), 3.25, 17.25, 2)
         self.assertEqual(job["processing_backend"], "encoder")
         self.assertEqual(job["trim_start"], 3.25)
         self.assertIn("renderer failed", job["fallback_reason"])
+        self.assertEqual(job["fallback_info"]["video_codec"], "h264")
+        self.assertEqual(job["fallback_info"]["pixel_format"], "yuv420p")
+        self.assertEqual(job["fallback_info"]["width"], 320)
+        self.assertTrue(job["fallback_info"]["python"])
+        self.assertNotIn("path", job["fallback_info"])
         self.assertAlmostEqual(app.probe(output)["duration"], 2, delta=0.11)
+
+    @unittest.skipUnless(
+        importlib.util.find_spec("smartcut"), "Smart backend unavailable"
+    )
+    def test_duration_summary_error_repairs_without_reencoding_copied_video(self):
+        import media_worker
+        import smartcut.cut_video as engine
+        from fractions import Fraction
+        from video_index import presentation_bounds
+
+        render = engine.smart_cut
+        events = []
+
+        def missing_durations(*args, **kwargs):
+            cutter = engine.VideoCutter
+            fix = cutter._fix_packet_timestamps
+
+            def clear_duration(self, packet):
+                fix(self, packet)
+                packet.duration = 0
+
+            with patch.object(cutter, "_fix_packet_timestamps", clear_duration):
+                return render(*args, **kwargs)
+
+        output = self.workshop.directory / "duration-repaired.mp4"
+        with (
+            patch.object(engine, "smart_cut", side_effect=missing_durations),
+            patch.object(
+                media_worker, "emit", side_effect=lambda **e: events.append(e)
+            ),
+        ):
+            media_worker.smart_trim(self.indexed, output, 0.25, 13.5, 2)
+        self.assertTrue(any(e.get("duration_metadata_repair") for e in events))
+        meta = app.probe(output)
+        self.assertEqual(meta["video_frames"], 132)
+        self.assertAlmostEqual(meta["duration"], 13.25, delta=0.11)
+        first, last, _ = presentation_bounds(output, Fraction(1315, 100))
+        self.assertAlmostEqual(float(first), 0.05, delta=0.002)
+        self.assertAlmostEqual(float(last), 13.15, delta=0.002)
+        copied = set(packet_hashes(self.indexed, "v:0")) & set(
+            packet_hashes(output, "v:0")
+        )
+        self.assertGreater(len(copied), 80)
+        decoded = subprocess.run(
+            [
+                app.executable("ffmpeg"),
+                "-v",
+                "error",
+                "-i",
+                str(output),
+                "-f",
+                "null",
+                "-",
+            ],
+            capture_output=True,
+        )
+        self.assertEqual(decoded.returncode, 0, decoded.stderr)
+        self.assertEqual(decoded.stderr, b"")
+
+    @unittest.skipUnless(
+        importlib.util.find_spec("smartcut"), "Smart backend unavailable"
+    )
+    def test_duration_repair_rejects_genuinely_shifted_frame_timestamps(self):
+        import media_worker
+        import smartcut.cut_video as engine
+
+        render = engine.smart_cut
+
+        def shifted_render(*args, **kwargs):
+            result = render(*args, **kwargs)
+            path = Path(args[2])
+            shifted = path.with_name("shifted.mp4")
+            subprocess.run(
+                [
+                    app.executable("ffmpeg"),
+                    "-v",
+                    "error",
+                    "-y",
+                    "-itsoffset",
+                    "2",
+                    "-i",
+                    str(path),
+                    "-c",
+                    "copy",
+                    "-copyts",
+                    str(shifted),
+                ],
+                check=True,
+            )
+            shifted.replace(path)
+            return result
+
+        output = self.workshop.directory / "incorrect-time.mp4"
+        with (
+            patch.object(engine, "smart_cut", side_effect=shifted_render),
+            patch.object(media_worker, "emit"),
+        ):
+            with self.assertRaisesRegex(app.MediaError, "first frame.*wanted") as error:
+                media_worker.smart_trim(self.indexed, output, 0.25, 13.5, 2)
+        self.assertIn("wanted video 13.250000s", str(error.exception))
+        self.assertFalse(output.exists())
+
+    @unittest.skipUnless(
+        importlib.util.find_spec("smartcut"), "Smart backend unavailable"
+    )
+    def test_cut_to_a_longer_audio_tail_does_not_require_nonexistent_video(self):
+        import av
+
+        video = Path(self.temp.name) / "5994-video.mp4"
+        source = Path(self.temp.name) / "5994-longer-audio.mp4"
+        subprocess.run(
+            [
+                app.executable("ffmpeg"),
+                "-v",
+                "error",
+                "-f",
+                "lavfi",
+                "-i",
+                "testsrc2=size=80x48:rate=60000/1001",
+                "-frames:v",
+                "1200",
+                "-an",
+                "-c:v",
+                "libx264",
+                "-preset",
+                "veryfast",
+                "-g",
+                "120",
+                "-sc_threshold",
+                "0",
+                "-threads",
+                "2",
+                str(video),
+            ],
+            check=True,
+        )
+        subprocess.run(
+            [
+                app.executable("ffmpeg"),
+                "-v",
+                "error",
+                "-i",
+                str(video),
+                "-f",
+                "lavfi",
+                "-i",
+                "sine=sample_rate=48000",
+                "-t",
+                "20.087424",
+                "-map",
+                "0:v:0",
+                "-map",
+                "1:a:0",
+                "-c:v",
+                "copy",
+                "-c:a",
+                "aac",
+                str(source),
+            ],
+            check=True,
+        )
+        start = 8.974
+        end = round(app.probe(source)["duration"], 3)
+        job, output, _ = self.export(source, start=start, end=end)
+        self.assertEqual(job["processing_backend"], "smart", job.get("fallback_reason"))
+        self.assertNotIn("fallback_reason", job)
+        self.assertEqual(job["audio_processing"], "copy")
+        self.assertAlmostEqual(job["expected_video_duration"], 20.02 - start, places=5)
+        self.assertGreater((end - start) - job["expected_video_duration"], 0.06)
+        self.assertEqual(app.probe(output)["video_frames"], 662)
+        self.assertAlmostEqual(app.probe(output)["duration"], end - start, delta=0.025)
+        with av.open(str(output)) as result:
+            v, a = result.streams.video[0], result.streams.audio[0]
+            self.assertGreater(
+                float(a.duration * a.time_base - v.duration * v.time_base), 0.05
+            )
 
     def test_batch_uses_same_accurate_workflow_for_all_sources(self):
         first = self.import_source(self.indexed)

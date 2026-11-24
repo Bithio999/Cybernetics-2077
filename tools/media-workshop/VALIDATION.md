@@ -1,15 +1,15 @@
-# Media Workshop 1.4 — validation
+# Media Workshop 1.4.1 — validation
 
 Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, PyAV 16.0.1, FFmpeg/ffprobe 7.1.5, Node.js 24.19.0 and Chromium 154 on Linux.
 
 ## Automated checks
 
-**50 tests pass**, using actual FFmpeg processes and temporary media:
+**53 tests pass**, using actual FFmpeg processes and temporary media:
 
 - Accurate MP4/MP3 cuts, fractional timing, decoded audio sample counts, batches and unchanged original files.
 - Direct bounded H.264 indexing and boundary-only processing: matching source packet hashes through the copied middle, expected frame counts, first-frame comparison, full decoding without errors, nonzero timestamps and cutting an already-edited result again.
 - AAC packet preservation and decoded-sample agreement at fractional starts for 44.1/48 kHz noise, preservation of a delayed audio track, Opus-to-AAC conversion, silent late-source cuts, six-second smart cuts, end-of-source frame preservation, and cancellation of parallel audio work.
-- Automatic accurate fallback after boundary processing fails; whole-source exports preserve their originals; old cut-mode settings cannot change timing.
+- Correct video/audio track ends, lossless repair of duration-summary errors, rejection of actually shifted timestamps, and automatic accurate fallback after boundary processing fails; whole-source exports preserve their originals; old cut-mode settings cannot change timing.
 - Actual yt-dlp subprocess downloads over local HTTP. MP3 conversion starts before download completion, retains every decoded sample, and produces 192 kbps audio. Native MP3 downloads remain byte-identical.
 - A real nonstreamable M4A requests a seekable-file fallback; a separate queue test verifies that fallback completes. Failed downloads cannot publish apparently playable partial output.
 - Cancellation kills the streaming worker/process group and removes partial files. Queue retry, interrupted-job recovery, persistent libraries and exclusive library locking remain covered.
@@ -19,6 +19,14 @@ Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, 
 Reproduce with `python -m unittest discover -s tests -v` after installing `requirements.txt`. Ruff undefined/unused-name checks and JavaScript syntax checks also pass.
 
 ## One accurate cut workflow
+
+Version **1.4.1 fixes track-duration validation**. Video is checked against the selected video packets' own end, separately from the audio/container end. A source's audio can finish tens of milliseconds after its last video frame; this previously rejected a correctly copied video when cutting to the file's end. The audio tail is retained instead of requiring nonexistent additional video frames.
+
+A synthetic 80×48 source reproduces the reported **185,628 frames at 60000/1001 fps** and the exact **1314.974–3096.961-second** selection, with audio extending past the video. The old 1.4 worker fails with the reported duration error; 1.4.1 succeeds, retains 106,808 video frames, copies 1,777.776 seconds of interior video and copies AAC audio. Full output decoding reports no errors. The synthetic output's 1,782.007-second duration includes about 20 ms of compressed AAC tail. The user's actual footage was not downloaded; this test reproduces the timing/track-end condition, not its pixels or HD processing speed. [Reproduction record](tests/results/duration-fallback-1.4.1.json).
+
+Two additional regressions verify that misleading duration metadata can be repaired through stream-copy muxing when the actual first/last presentation timestamps are correct, and that a genuine two-second timestamp shift is rejected. Frame-count checks remain strict. Failed duration checks now report measured/expected timeline values.
+
+The queue also exposes the saved boundary error, selected range, source/dependency context and a copy button. Old saved fallback reasons remain inspectable. A real failed subprocess followed by successful accurate encoding is covered by the browser review: the explanation survives polling/completion, copied text matches the displayed error, progress chatter is hidden, and the expanded panel remains readable at a 390px viewport.
 
 The interface has one **Export cut** workflow. Compatible 8-bit H.264 clips of at least six seconds use smartcut to render cut boundaries and copy complete middle sections when enough can be copied. Other codecs, very short clips and genuine processing failures use the accurate encoder automatically. No path deliberately moves the start to a preceding keyframe.
 

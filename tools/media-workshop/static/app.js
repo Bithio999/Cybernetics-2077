@@ -43,6 +43,28 @@ function saveLink(a) {
   return link;
 }
 const jobRows = new Map();
+function renderJobDetails(row, job) {
+  const reason = job.error || job.fallback_reason;
+  if (!reason) return;
+  let details = row.querySelector("details");
+  if (!details) {
+    details = element("details");
+    details.append(element("summary"), element("p", "hint"), element("pre"));
+    details.append(button("Copy details", async () => {
+      await navigator.clipboard.writeText(details.querySelector("pre").textContent);
+      notify("Processing details copied.");
+    }));
+    row.querySelector(".job-main").append(details);
+  }
+  details.querySelector("summary").textContent = job.error ? "Show error details" : "Why this cut is encoding";
+  details.querySelector("p").textContent = job.error ? "The job could not finish." : "Boundary processing failed. Full encoding preserves your selected timing but takes longer.";
+  const info = job.fallback_info;
+  const range = job.spec.kind === "trim" ? `\n\nSelected range: ${job.spec.start}–${job.spec.end} s` : "";
+  const context = range + (info ? `\nSource: ${info.video_codec || "unknown"} / ${info.pixel_format || "unknown"}, ${info.width} × ${info.height}, ${info.fps} fps\nPython: ${info.python}\nsmartcut: ${info.smartcut || "unavailable"}; PyAV: ${info.av || "unavailable"}` : "");
+  const failure = reason.split("\n").filter(line => !line.startsWith("WORKSHOP:")).join("\n").trim() || reason;
+  const text = failure + context;
+  if (details.querySelector("pre").textContent !== text) details.querySelector("pre").textContent = text;
+}
 function renderJobs() {
   const jobs = [...state.jobs].reverse();
   const active = jobs.filter(j => ["queued", "running"].includes(j.state));
@@ -71,7 +93,7 @@ function renderJobs() {
     const status = row.querySelector(".state"); status.className = "state " + job.state; status.textContent = job.state;
     row.querySelector(".stage").textContent = job.stage + (job.method ? " · " + job.method : ""); row.querySelector(".pct").textContent = job.progress.toFixed(0) + "%";
     const progress = row.querySelector("progress"); progress.value = job.progress; progress.setAttribute("aria-label", job.title + " progress");
-    if (job.error && !row.querySelector("details")) { const details = element("details"); details.append(element("summary", "", "Show error details"), element("pre", "", job.error)); row.querySelector(".job-main").append(details); }
+    renderJobDetails(row, job);
     const file = asset(job.asset_id), actionKey = job.state + ":" + (file?.id || "");
     if (row.dataset.actionKey !== actionKey) {
       row.dataset.actionKey = actionKey;

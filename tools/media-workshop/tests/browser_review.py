@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -178,6 +179,54 @@ def main():
                 assert page.evaluate(
                     "document.documentElement.scrollWidth <= window.innerWidth"
                 )
+
+                # A real worker failure should remain inspectable/copyable after
+                # accurate fallback succeeds, without collapsing during polling.
+                def broken_boundary(*args):
+                    return [
+                        sys.executable,
+                        "-c",
+                        "print('WORKSHOP:{\"progress\":1}',flush=True);raise SystemExit('Fixture: boundary encoder unavailable')",
+                    ], "smart"
+
+                with patch.object(app, "trim_plan", side_effect=broken_boundary):
+                    page.locator("#source").select_option(s["assets"][0]["id"])
+                    page.locator("#start").fill("1.25")
+                    page.locator("#end").fill("3.75")
+                    page.locator("#export").click()
+                    s = finish(5)
+                failed_boundary = s["jobs"][-1]
+                assert failed_boundary["processing_backend"] == "encoder"
+                assert failed_boundary["fallback_info"]["video_codec"] == "h264"
+                details = page.locator(
+                    f'.job[data-id="{failed_boundary["id"]}"] details'
+                )
+                details.locator("summary").click()
+                assert (
+                    details.locator("pre")
+                    .inner_text()
+                    .startswith("Fixture: boundary encoder unavailable")
+                )
+                assert "Source: h264" in details.locator("pre").inner_text()
+                assert "WORKSHOP:" not in details.locator("pre").inner_text()
+                assert "Selected range: 1.25–3.75 s" in details.locator("pre").inner_text()
+                assert details.bounding_box()["width"] > 200
+                details.evaluate("n => window.testDetails=n")
+                page.wait_for_timeout(1200)
+                assert details.evaluate("n => n===window.testDetails && n.open")
+                page.context.grant_permissions(
+                    ["clipboard-read", "clipboard-write"], origin=base
+                )
+                details.get_by_role("button", name="Copy details").click()
+                page.get_by_text("Processing details copied.", exact=True).wait_for()
+                assert (
+                    page.evaluate("navigator.clipboard.readText()")
+                    == details.locator("pre").inner_text()
+                )
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= window.innerWidth"
+                )
+                page.screenshot(path=str(root / "fallback-details.png"), full_page=True)
                 assert not errors, errors
                 (root / "browser-results.json").write_text(
                     json.dumps(
@@ -196,6 +245,7 @@ def main():
                                 "mobile layout without horizontal overflow",
                                 "one accurate workflow without a cut-mode selector",
                                 "accurate boundary-only video cut and native playback",
+                                "copyable fallback reason/source diagnostics with stable expanded details",
                             ],
                             "jobs": len(s["jobs"]),
                             "assets": len(s["assets"]),
