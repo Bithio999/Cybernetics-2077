@@ -75,6 +75,7 @@ def main():
                 page.goto(base, wait_until="networkidle")
                 page.screenshot(path=str(root / "initial.png"), full_page=True)
                 assert page.locator("#export").is_disabled()
+                assert page.locator("#trim-mode").input_value() == "exact"
                 page.locator("#urls").fill(
                     "https://youtu.be/first\nhttps://clips.twitch.tv/Second\nhttps://youtu.be/first"
                 )
@@ -97,6 +98,7 @@ def main():
                     1.2 <= page.locator("#player").evaluate("(v)=>v.currentTime") <= 3.8
                 )
                 page.locator("#player").evaluate("(v)=>v.pause()")
+                page.locator("#trim-mode").select_option("exact")
                 page.locator("#export").click()
 
                 def state():
@@ -119,6 +121,7 @@ def main():
                 for a in s["assets"][:2]:
                     page.locator('[data-asset="' + a["id"] + '"]').check()
                 page.locator("#batch-trim").check()
+                page.locator("#trim-mode").select_option("fast")
                 page.locator("#export-format").select_option("mp3")
                 page.locator("#export").click()
                 s = finish(3)
@@ -139,7 +142,25 @@ def main():
                 assert page.locator(".job-actions button").first.evaluate(
                     "(n)=>n===window.testButton"
                 )
-                page.wait_for_timeout(3500)
+                page.locator("#batch-trim").uncheck()
+                page.locator("#export-format").select_option("mp4")
+                page.locator("#export").click()
+                s = finish(4)
+                fast_job = s["jobs"][-1]
+                assert fast_job["spec"]["mode"] == "fast"
+                assert "stream copy" in fast_job["method"]
+                assert fast_job["trim_start"] <= fast_job["spec"]["start"]
+                page.locator(f'.job[data-id="{fast_job["id"]}"] button').first.click()
+                page.wait_for_function(
+                    '() => document.querySelector("#player").readyState >= 2'
+                )
+                page.locator("#player").evaluate("v => v.play()")
+                page.wait_for_timeout(250)
+                assert page.locator("#player").evaluate(
+                    "v => v.currentTime > 0 && !v.error"
+                )
+                page.locator("#player").evaluate("v => v.pause()")
+                page.wait_for_timeout(5000)
                 page.screenshot(path=str(root / "desktop.png"), full_page=True)
                 page.set_viewport_size({"width": 390, "height": 844})
                 page.screenshot(path=str(root / "mobile.png"), full_page=True)
@@ -162,6 +183,8 @@ def main():
                                 "browser Save file download",
                                 "stable queue action DOM during polling",
                                 "mobile layout without horizontal overflow",
+                                "Exact default and Fast selection",
+                                "fast stream-copy video trim and native playback",
                             ],
                             "jobs": len(s["jobs"]),
                             "assets": len(s["assets"]),

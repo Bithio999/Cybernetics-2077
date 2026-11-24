@@ -177,7 +177,7 @@ def probe(path):
             "-protocol_whitelist",
             "file,pipe",
             "-show_entries",
-            "format=duration,format_name:stream=codec_type,codec_name,pix_fmt,width,height:stream_disposition=attached_pic",
+            "format=duration,start_time,format_name:stream=codec_type,codec_name,pix_fmt,width,height:stream_disposition=attached_pic",
             "-of",
             "json",
             str(path),
@@ -192,6 +192,7 @@ def probe(path):
     try:
         data = json.loads(result.stdout)
         duration = float(data["format"]["duration"])
+        start_time = float(data["format"].get("start_time", 0) or 0)
         video = next(
             (
                 s
@@ -221,6 +222,7 @@ def probe(path):
             "pixel_format": video.get("pix_fmt") if video else None,
             "audio_codec": audio.get("codec_name") if audio else None,
             "container": data["format"].get("format_name", ""),
+            "start_time": start_time if math.isfinite(start_time) else 0,
         }
     except (ValueError, KeyError, TypeError):
         raise MediaError(
@@ -286,7 +288,9 @@ def download_command(url, directory, fmt, height):
     return [*command, "--", supported_url(url)]
 
 
-def convert_command(source, destination, fmt, start, duration, height=None):
+def convert_command(
+    source, destination, fmt, start, duration, height=None, *, threads=2, preset="fast"
+):
     command = [
         executable("ffmpeg"),
         "-hide_banner",
@@ -331,7 +335,7 @@ def convert_command(source, destination, fmt, start, duration, height=None):
             "-c:v",
             "libx264",
             "-preset",
-            "fast",
+            preset,
             "-crf",
             "20",
             "-pix_fmt",
@@ -348,7 +352,7 @@ def convert_command(source, destination, fmt, start, duration, height=None):
     return [
         *command,
         "-threads",
-        "2",
+        str(threads),
         "-map_metadata",
         "-1",
         "-progress",
@@ -389,10 +393,13 @@ def fast_start_mp4(path):
     return False
 
 
-def download_finish_plan(source, destination, fmt, meta, height, threads=2):
+def download_finish_plan(
+    source, destination, fmt, meta, height, threads=2, *, allow_direct=True
+):
     """A None command means a same-filesystem rename, with no media processing."""
     if (
-        fmt == "mp3"
+        allow_direct
+        and fmt == "mp3"
         and meta.get("container") == "mp3"
         and meta.get("audio_codec") == "mp3"
     ):
@@ -407,7 +414,13 @@ def download_finish_plan(source, destination, fmt, meta, height, threads=2):
         and meta["height"] <= height
     )
     audio_copy = not meta["audio"] or meta.get("audio_codec") == "aac"
-    if fmt == "mp4" and video_copy and audio_copy and fast_start_mp4(source):
+    if (
+        allow_direct
+        and fmt == "mp4"
+        and video_copy
+        and audio_copy
+        and fast_start_mp4(source)
+    ):
         return "Direct save", None
     command = [
         executable("ffmpeg"),
@@ -480,6 +493,101 @@ def download_finish_plan(source, destination, fmt, meta, height, threads=2):
         "-nostats",
         str(destination),
     ]
+
+
+def keyframe_before(source, meta, start):
+    """Seek the local index and inspect half a second of packets, without decoding frames."""
+    if start == 0:
+        return 0.0
+    offset = meta.get("start_time", 0)
+    try:
+        result = subprocess.run(
+            [
+                executable("ffprobe"),
+                "-v",
+                "error",
+                "-protocol_whitelist",
+                "file,pipe",
+                "-select_streams",
+                "v:0",
+                "-read_intervals",
+                f"{start + offset:.9f}%+0.5",
+                "-show_packets",
+                "-show_entries",
+                "packet=pts_time,flags",
+                "-of",
+                "json",
+                str(source),
+            ],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=10,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+        )
+        if result.returncode:
+            return None
+        candidates = [
+            float(packet["pts_time"]) - offset
+            for packet in json.loads(result.stdout).get("packets", [])
+            if "K" in packet.get("flags", "") and "pts_time" in packet
+        ]
+        candidates = [
+            v for v in candidates if math.isfinite(v) and v <= start + 0.000001
+        ]
+        return max(0.0, max(candidates)) if candidates else None
+    except (ValueError, KeyError, subprocess.TimeoutExpired):
+        return None
+
+
+def trim_plan(source, destination, fmt, meta, start, end, mode, threads):
+    if mode == "exact":
+        return (
+            "Exact trim",
+            convert_command(
+                source,
+                destination,
+                fmt,
+                start,
+                end - start,
+                threads=threads,
+                preset="veryfast",
+            ),
+            start,
+        )
+    method, command = download_finish_plan(
+        source,
+        destination,
+        fmt,
+        meta,
+        max(2, meta["height"]),
+        threads,
+        allow_direct=False,
+    )
+    actual_start = start
+    if fmt == "mp4" and method in {"Stream copy", "Audio conversion only"}:
+        actual_start = keyframe_before(source, meta, start)
+        if actual_start is None:
+            return (
+                "Exact fallback (keyframe unavailable)",
+                convert_command(
+                    source,
+                    destination,
+                    fmt,
+                    start,
+                    end - start,
+                    threads=threads,
+                    preset="veryfast",
+                ),
+                start,
+            )
+    # Seek before opening the input, then limit the copied/converted output duration.
+    index = command.index("-i")
+    command[index:index] = ["-ss", str(actual_start)]
+    index = command.index("-i") + 2
+    command[index:index] = ["-t", str(end - actual_start)]
+    return "Fast trim · " + method.lower(), command, actual_start
 
 
 class Workshop:
@@ -649,8 +757,10 @@ class Workshop:
             ]
         )
 
-    def trim(self, asset_ids, fmt, start, end):
+    def trim(self, asset_ids, fmt, start, end, mode="exact"):
         fmt, _ = options(fmt)
+        if mode not in {"fast", "exact"}:
+            raise MediaError("Choose Fast or Exact trimming.")
         if not isinstance(asset_ids, list) or not 1 <= len(asset_ids) <= MAX_BATCH:
             raise MediaError("Select between 1 and 100 media files.")
         start = timestamp(start)
@@ -680,6 +790,7 @@ class Workshop:
                     "format": fmt,
                     "start": start,
                     "end": min(finish, asset["duration"]),
+                    "mode": mode,
                     "title": asset["title"] + " — trimmed",
                 }
             )
@@ -806,7 +917,7 @@ class Workshop:
             else:
                 asset = self.asset(spec["source"])
                 source = self.asset_path(asset)
-                meta = asset
+                meta = probe(source) if spec.get("mode", "exact") == "fast" else asset
                 start, duration, base = spec["start"], spec["end"] - spec["start"], 0
             if spec["format"] == "mp3" and not meta["audio"]:
                 raise MediaError("This source has no audio track.")
@@ -816,8 +927,8 @@ class Workshop:
             result_folder = folder / "result"
             result_folder.mkdir()
             destination = result_folder / (safe_name(title) + "." + spec["format"])
+            threads = max(1, min(8, (os.cpu_count() or 2) // self.workers))
             if spec["kind"] == "download":
-                threads = max(1, min(8, (os.cpu_count() or 2) // self.workers))
                 method, command = download_finish_plan(
                     source, destination, spec["format"], meta, spec["height"], threads
                 )
@@ -827,11 +938,19 @@ class Workshop:
                     + spec["format"].upper()
                 )
             else:
-                method = "Accurate trim"
-                stage = "Encoding " + spec["format"].upper()
-                command = convert_command(
-                    source, destination, spec["format"], start, duration
+                method, command, actual_start = trim_plan(
+                    source,
+                    destination,
+                    spec["format"],
+                    meta,
+                    start,
+                    spec["end"],
+                    spec.get("mode", "exact"),
+                    threads,
                 )
+                duration = spec["end"] - actual_start
+                self.update(job_id, trim_start=actual_start)
+                stage = "Trimming " + spec["format"].upper()
             self.update(job_id, stage=stage, method=method, progress=base)
 
             def encoded(line):
@@ -1088,6 +1207,7 @@ class Handler(BaseHTTPRequestHandler):
                             data.get("format"),
                             data.get("start", 0),
                             data.get("end"),
+                            data.get("mode", "exact"),
                         )
                     },
                 )
@@ -1161,7 +1281,13 @@ def wait_for_jobs(app, ids):
                 if job["error"]:
                     print(job["error"], file=sys.stderr)
                 if job["asset_id"]:
-                    print(app.asset_path(app.asset(job["asset_id"])))
+                    asset = app.asset(job["asset_id"])
+                    if job.get("trim_start") is not None:
+                        print(
+                            f"{job['method']}: source start {job['trim_start']:.3f}s "
+                            f"(requested {job['spec']['start']:.3f}s), output duration {asset['duration']:.3f}s"
+                        )
+                    print(app.asset_path(asset))
             return 0 if all(j["state"] == "complete" for j in selected) else 1
         time.sleep(0.3)
 
@@ -1188,6 +1314,12 @@ def main():
     trim.add_argument("--start", default="0")
     trim.add_argument("--end", default="", help="Blank means the end of each source.")
     trim.add_argument("--format", choices=sorted(FORMATS), default="mp4")
+    trim.add_argument(
+        "--mode",
+        choices=("fast", "exact"),
+        default="exact",
+        help="Fast copies compatible tracks and starts at a preceding keyframe; Exact preserves the chosen times.",
+    )
     for command in (gui, download, trim):
         command.add_argument("--data-dir", type=Path, default=ROOT / "data")
         command.add_argument("--workers", type=int, choices=(1, 2, 3, 4), default=2)
@@ -1209,7 +1341,7 @@ def main():
                 shutil.copy2(source, path)
                 assets.append(app.register(path, source.stem, details)["id"])
             return wait_for_jobs(
-                app, app.trim(assets, args.format, args.start, args.end)
+                app, app.trim(assets, args.format, args.start, args.end, args.mode)
             )
         server = Server(app, args.port)
         url = f"http://127.0.0.1:{server.server_address[1]}"

@@ -1,0 +1,38 @@
+{
+  "source": "15-second generated 1280x720 / 30 fps H.264 + AAC MP4, 2-second GOP",
+  "requestedStart": 4.25,
+  "requestedEnd": 11.25,
+  "processingSeconds": {
+    "old_exact": [
+      2.3999963290043524,
+      2.4668283610008075,
+      2.2295386850018986
+    ],
+    "new_exact": [
+      1.3556263159989612,
+      1.3128285840066383,
+      1.3600029770022957
+    ],
+    "fast": [
+      0.34635405500011984,
+      0.25982910099992296,
+      0.2804318870039424
+    ]
+  },
+  "medianSeconds": {
+    "old_exact": 2.3999963290043524,
+    "new_exact": 1.3556263159989612,
+    "fast": 0.2804318870039424
+  },
+  "actualSourceStart": {
+    "old_exact": 4.25,
+    "new_exact": 4.25,
+    "fast": 4.0
+  },
+  "outputDuration": {
+    "old_exact": 7.0,
+    "new_exact": 7.0,
+    "fast": 7.333333
+  },
+  "scope": "Three sequential local runs per mode, includes input/output probing. Excludes fixture generation and imports. Fast starts at a preceding keyframe and is not equivalent to Exact timing. Not a hardware or universal speed guarantee."
+}
