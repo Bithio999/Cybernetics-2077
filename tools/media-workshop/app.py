@@ -177,7 +177,7 @@ def probe(path):
             "-protocol_whitelist",
             "file,pipe",
             "-show_entries",
-            "format=duration:stream=codec_type,width,height:stream_disposition=attached_pic",
+            "format=duration,format_name:stream=codec_type,codec_name,pix_fmt,width,height:stream_disposition=attached_pic",
             "-of",
             "json",
             str(path),
@@ -201,7 +201,9 @@ def probe(path):
             ),
             None,
         )
-        audio = any(s["codec_type"] == "audio" for s in data.get("streams", []))
+        audio = next(
+            (s for s in data.get("streams", []) if s["codec_type"] == "audio"), None
+        )
         if (
             result.returncode
             or not math.isfinite(duration)
@@ -212,9 +214,13 @@ def probe(path):
         return {
             "duration": duration,
             "video": bool(video),
-            "audio": audio,
+            "audio": bool(audio),
             "width": video.get("width", 0) if video else 0,
             "height": video.get("height", 0) if video else 0,
+            "video_codec": video.get("codec_name") if video else None,
+            "pixel_format": video.get("pix_fmt") if video else None,
+            "audio_codec": audio.get("codec_name") if audio else None,
+            "container": data["format"].get("format_name", ""),
         }
     except (ValueError, KeyError, TypeError):
         raise MediaError(
@@ -272,6 +278,8 @@ def download_command(url, directory, fmt, height):
         command += [
             "--format",
             f"bv*[height<=?{height}]+ba/b[height<=?{height}]",
+            "--format-sort",
+            "lang,quality,res,fps,vcodec:h264,acodec:aac",
             "--merge-output-format",
             "mkv",
         ]
@@ -341,6 +349,130 @@ def convert_command(source, destination, fmt, start, duration, height=None):
         *command,
         "-threads",
         "2",
+        "-map_metadata",
+        "-1",
+        "-progress",
+        "pipe:1",
+        "-nostats",
+        str(destination),
+    ]
+
+
+def fast_start_mp4(path):
+    """Read only top-level MP4 box headers; never scan the video payload."""
+    size = path.stat().st_size
+    with path.open("rb") as stream:
+        offset, ftyp = 0, False
+        for _ in range(256):
+            if offset + 8 > size:
+                return False
+            stream.seek(offset)
+            header = stream.read(8)
+            length, kind = int.from_bytes(header[:4], "big"), header[4:]
+            minimum = 8
+            if length == 1:
+                extension = stream.read(8)
+                if len(extension) != 8:
+                    return False
+                length, minimum = int.from_bytes(extension, "big"), 16
+            elif length == 0:
+                length = size - offset
+            if length < minimum or offset + length > size:
+                return False
+            if kind == b"ftyp":
+                ftyp = True
+            elif kind == b"mdat":
+                return False
+            elif kind == b"moov":
+                return ftyp
+            offset += length
+    return False
+
+
+def download_finish_plan(source, destination, fmt, meta, height, threads=2):
+    """A None command means a same-filesystem rename, with no media processing."""
+    if (
+        fmt == "mp3"
+        and meta.get("container") == "mp3"
+        and meta.get("audio_codec") == "mp3"
+    ):
+        return "Direct save", None
+    video_copy = (
+        meta.get("video_codec") == "h264"
+        and meta.get("pixel_format") in {"yuv420p", "yuvj420p"}
+        and meta["width"] > 0
+        and meta["height"] > 0
+        and meta["width"] % 2 == 0
+        and meta["height"] % 2 == 0
+        and meta["height"] <= height
+    )
+    audio_copy = not meta["audio"] or meta.get("audio_codec") == "aac"
+    if fmt == "mp4" and video_copy and audio_copy and fast_start_mp4(source):
+        return "Direct save", None
+    command = [
+        executable("ffmpeg"),
+        "-hide_banner",
+        "-loglevel",
+        "warning",
+        "-nostdin",
+        "-y",
+        "-filter_threads",
+        "1",
+        "-protocol_whitelist",
+        "file,pipe",
+        "-i",
+        str(source),
+    ]
+    if fmt == "mp3":
+        copy_mp3 = meta.get("audio_codec") == "mp3"
+        method = "Stream copy" if copy_mp3 else "Audio conversion"
+        command += [
+            "-map",
+            "0:a:0",
+            "-vn",
+            "-c:a",
+            "copy" if copy_mp3 else "libmp3lame",
+        ]
+        if not copy_mp3:
+            command += ["-b:a", "192k"]
+        command += ["-id3v2_version", "3"]
+    else:
+        method = (
+            "Stream copy"
+            if video_copy and audio_copy
+            else "Audio conversion only"
+            if video_copy
+            else "Video conversion only"
+            if audio_copy
+            else "Full conversion"
+        )
+        command += [
+            "-map",
+            "0:v:0",
+            "-map",
+            "0:a:0?",
+            "-c:v",
+            "copy" if video_copy else "libx264",
+        ]
+        if not video_copy:
+            command += [
+                "-preset",
+                "veryfast",
+                "-crf",
+                "20",
+                "-pix_fmt",
+                "yuv420p",
+                "-vf",
+                f"scale=-2:trunc(min(ih\\,{height})/2)*2",
+            ]
+        command += ["-c:a", "copy" if audio_copy else "aac"]
+        if not audio_copy:
+            command += ["-b:a", "192k"]
+        command += ["-movflags", "+faststart"]
+    return method, [
+        *command,
+        "-threads",
+        str(threads),
         "-map_metadata",
         "-1",
         "-progress",
@@ -684,9 +816,23 @@ class Workshop:
             result_folder = folder / "result"
             result_folder.mkdir()
             destination = result_folder / (safe_name(title) + "." + spec["format"])
-            self.update(
-                job_id, stage="Encoding " + spec["format"].upper(), progress=base
-            )
+            if spec["kind"] == "download":
+                threads = max(1, min(8, (os.cpu_count() or 2) // self.workers))
+                method, command = download_finish_plan(
+                    source, destination, spec["format"], meta, spec["height"], threads
+                )
+                stage = (
+                    ("Saving" if command is None else "Finalizing")
+                    + " "
+                    + spec["format"].upper()
+                )
+            else:
+                method = "Accurate trim"
+                stage = "Encoding " + spec["format"].upper()
+                command = convert_command(
+                    source, destination, spec["format"], start, duration
+                )
+            self.update(job_id, stage=stage, method=method, progress=base)
 
             def encoded(line):
                 if line.startswith("out_time_us="):
@@ -699,18 +845,11 @@ class Workshop:
                     except ValueError:
                         pass
 
-            self.run(
-                job_id,
-                convert_command(
-                    source,
-                    destination,
-                    spec["format"],
-                    start,
-                    duration,
-                    spec.get("height"),
-                ),
-                encoded,
-            )
+            self.check_cancel(job_id)
+            if command is None:
+                source.replace(destination)
+            else:
+                self.run(job_id, command, encoded)
             self.check_cancel(job_id)
             result = self.register(destination, title)
             self.update(

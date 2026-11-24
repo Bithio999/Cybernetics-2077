@@ -13,7 +13,7 @@ SOURCE = ROOT / "tools/media-workshop"
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--output", type=Path, default=ROOT / "releases/tools/Media-Workshop-1.0.0.zip"
+        "--output", type=Path, default=ROOT / "releases/tools/Media-Workshop-1.1.0.zip"
     )
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -33,6 +33,7 @@ def main():
     ]
     paths += sorted((SOURCE / "static").glob("*"))
     paths += sorted((SOURCE / "tests").glob("*.py"))
+    paths += sorted((SOURCE / "tests/results").glob("*.json"))
     with ZipFile(
         args.output, "w", compression=ZIP_DEFLATED, compresslevel=9
     ) as archive:
@@ -52,8 +53,12 @@ def main():
                     data = data.replace(b"\n", b"\r\n")
             archive.writestr(entry, data)
     digest = hashlib.sha256(args.output.read_bytes()).hexdigest()
+    archives = set(args.output.parent.glob("Media-Workshop-*.zip")) | {args.output}
     (args.output.parent / "SHA256SUMS").write_text(
-        digest + "  " + args.output.name + "\n"
+        "".join(
+            hashlib.sha256(path.read_bytes()).hexdigest() + "  " + path.name + "\n"
+            for path in sorted(archives)
+        )
     )
     print(
         f"Created {args.output.name}: {args.output.stat().st_size:,} bytes; SHA256 {digest}"

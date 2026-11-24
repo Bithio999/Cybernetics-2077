@@ -1,0 +1,18 @@
+{
+  "source": "15-second generated 1280x720 / 30 fps H.264 + AAC in MKV",
+  "sourceBytes": 5126000,
+  "oldSeconds": [
+    4.942382853001618,
+    4.18738857399876,
+    4.071047564000764
+  ],
+  "newSeconds": [
+    0.20617039899661904,
+    0.21245646699753706,
+    0.21309144599945284
+  ],
+  "oldMedianSeconds": 4.18738857399876,
+  "newMedianSeconds": 0.21245646699753706,
+  "medianSpeedup": 19.709395685504376,
+  "scope": "Post-download processing including input/output probe; excludes network time and fixture generation. Local Linux CPU/filesystem, not a universal speed guarantee."
+}

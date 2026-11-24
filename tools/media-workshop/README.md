@@ -38,6 +38,8 @@ The examples below use `python`; use `python3` on systems that name it that way.
 
 Official installers: [Python](https://www.python.org/downloads/) · [FFmpeg](https://ffmpeg.org/download.html) · [Deno](https://docs.deno.com/runtime/getting_started/installation/) · [Node.js](https://nodejs.org/en/download).
 
+When updating from 1.0, replace the program files and retain your **data/** folder (and **.venv/**). Existing media and queue history remain available.
+
 ## Download a batch
 
 1. Paste one YouTube or Twitch link per line. Duplicate links in the batch are combined.
@@ -47,7 +49,11 @@ Official installers: [Python](https://www.python.org/downloads/) · [FFmpeg](htt
 
 Each job has its own progress, cancellation and retry controls. One failed link does not stop the rest. **Cancel unfinished** stops active and waiting jobs; **Clear finished** clears history while retaining library files.
 
-MP4 exports use H.264/AAC with fast-start playback. MP3 exports use 192 kbps. MP4 conversion re-encodes the source for consistent player compatibility, so large or 4K videos take longer. Maximum quality is a ceiling; lower-resolution sources are not upscaled.
+MP4 downloads prefer H.264 video and AAC audio while retaining the selected resolution/frame rate. Ready-to-use, fast-start MP4s are saved directly. Other compatible files are remuxed using **stream copy**, preserving their compressed audio and video without re-encoding. If one track is incompatible, only that track is converted. Necessary video conversions use a faster preset and a bounded CPU-thread budget shared between the configured workers.
+
+The queue shows **Direct save**, **Stream copy**, or which tracks require conversion. Resolution still respects your quality ceiling, and sources are not upscaled. A 4K source is not replaced with a lower-resolution H.264 source just to avoid conversion.
+
+Existing MP3 downloads are preserved at their source bitrate. Other audio downloads and trimmed MP3 exports use 192 kbps. Exact trims continue to re-encode, so cuts are not restricted to keyframes.
 
 Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. Playlist/channel URLs are not expanded into batches, and ongoing live streams are not recorded. Site availability, authentication requirements and network restrictions can still prevent a download. This app has no login or DRM-unlocking feature.
 

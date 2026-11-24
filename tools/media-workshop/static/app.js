@@ -69,7 +69,7 @@ function renderJobs() {
     }
     row.querySelector(".item-title").textContent = job.title;
     const status = row.querySelector(".state"); status.className = "state " + job.state; status.textContent = job.state;
-    row.querySelector(".stage").textContent = job.stage; row.querySelector(".pct").textContent = job.progress.toFixed(0) + "%";
+    row.querySelector(".stage").textContent = job.stage + (job.method ? " · " + job.method : ""); row.querySelector(".pct").textContent = job.progress.toFixed(0) + "%";
     const progress = row.querySelector("progress"); progress.value = job.progress; progress.setAttribute("aria-label", job.title + " progress");
     if (job.error && !row.querySelector("details")) { const details = element("details"); details.append(element("summary", "", "Show error details"), element("pre", "", job.error)); row.querySelector(".job-main").append(details); }
     const file = asset(job.asset_id), actionKey = job.state + ":" + (file?.id || "");
