@@ -6,7 +6,9 @@ from __future__ import annotations
 import argparse
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
+from fractions import Fraction
 import importlib.metadata
+import importlib.util
 import json
 import math
 import mimetypes
@@ -177,7 +179,7 @@ def probe(path):
             "-protocol_whitelist",
             "file,pipe",
             "-show_entries",
-            "format=duration,start_time,format_name:stream=codec_type,codec_name,pix_fmt,width,height:stream_disposition=attached_pic",
+            "format=duration,start_time,format_name:stream=codec_type,codec_name,pix_fmt,width,height,avg_frame_rate,nb_frames:stream_disposition=attached_pic",
             "-of",
             "json",
             str(path),
@@ -221,8 +223,14 @@ def probe(path):
             "video_codec": video.get("codec_name") if video else None,
             "pixel_format": video.get("pix_fmt") if video else None,
             "audio_codec": audio.get("codec_name") if audio else None,
+            "video_frames": int(video.get("nb_frames", 0))
+            if video and str(video.get("nb_frames", "")).isdigit()
+            else 0,
             "container": data["format"].get("format_name", ""),
             "start_time": start_time if math.isfinite(start_time) else 0,
+            "fps": float(Fraction(video.get("avg_frame_rate", "0/1")))
+            if video and video.get("avg_frame_rate") not in {None, "0/0"}
+            else 0,
         }
     except (ValueError, KeyError, TypeError):
         raise MediaError(
@@ -541,53 +549,45 @@ def keyframe_before(source, meta, start):
         return None
 
 
-def trim_plan(source, destination, fmt, meta, start, end, mode, threads):
-    if mode == "exact":
-        return (
-            "Exact trim",
-            convert_command(
-                source,
-                destination,
-                fmt,
-                start,
-                end - start,
-                threads=threads,
-                preset="veryfast",
-            ),
-            start,
+def streaming_mp3_command(url, destination, folder):
+    return [
+        sys.executable,
+        str(ROOT / "media_worker.py"),
+        "mp3",
+        url,
+        str(destination),
+        str(folder),
+    ]
+
+
+def trim_plan(source, destination, fmt, meta, start, end, threads):
+    """Choose an accurate implementation automatically; cut points never move."""
+    if start == 0 and end >= meta["duration"] - 0.000001:
+        _, command = download_finish_plan(
+            source, destination, fmt, meta, max(2, meta["height"]), threads
         )
-    method, command = download_finish_plan(
-        source,
-        destination,
-        fmt,
-        meta,
-        max(2, meta["height"]),
-        threads,
-        allow_direct=False,
+        return command, "whole-source"
+    smart = (
+        fmt == "mp4"
+        and meta.get("video_codec") == "h264"
+        and meta.get("pixel_format") in {"yuv420p", "yuvj420p"}
+        and end - start >= 12
+        and importlib.util.find_spec("smartcut") is not None
     )
-    actual_start = start
-    if fmt == "mp4" and method in {"Stream copy", "Audio conversion only"}:
-        actual_start = keyframe_before(source, meta, start)
-        if actual_start is None:
-            return (
-                "Exact fallback (keyframe unavailable)",
-                convert_command(
-                    source,
-                    destination,
-                    fmt,
-                    start,
-                    end - start,
-                    threads=threads,
-                    preset="veryfast",
-                ),
-                start,
-            )
-    # Seek before opening the input, then limit the copied/converted output duration.
-    index = command.index("-i")
-    command[index:index] = ["-ss", str(actual_start)]
-    index = command.index("-i") + 2
-    command[index:index] = ["-t", str(end - actual_start)]
-    return "Fast trim · " + method.lower(), command, actual_start
+    if smart:
+        return [
+            sys.executable,
+            str(ROOT / "media_worker.py"),
+            "cut",
+            str(source),
+            str(destination),
+            str(start),
+            str(end),
+            str(threads),
+        ], "smart"
+    return convert_command(
+        source, destination, fmt, start, end - start, threads=threads, preset="veryfast"
+    ), "encoder"
 
 
 class Workshop:
@@ -757,10 +757,8 @@ class Workshop:
             ]
         )
 
-    def trim(self, asset_ids, fmt, start, end, mode="exact"):
+    def trim(self, asset_ids, fmt, start, end, mode=None):
         fmt, _ = options(fmt)
-        if mode not in {"fast", "exact"}:
-            raise MediaError("Choose Fast or Exact trimming.")
         if not isinstance(asset_ids, list) or not 1 <= len(asset_ids) <= MAX_BATCH:
             raise MediaError("Select between 1 and 100 media files.")
         start = timestamp(start)
@@ -790,7 +788,6 @@ class Workshop:
                     "format": fmt,
                     "start": start,
                     "end": min(finish, asset["duration"]),
-                    "mode": mode,
                     "title": asset["title"] + " — trimmed",
                 }
             )
@@ -867,6 +864,43 @@ class Workshop:
                     os.killpg(process.pid, signal.SIGKILL)
                 process.wait()
 
+    def worker_progress(self, job_id, line):
+        if not line.startswith("WORKSHOP:"):
+            return
+        values = json.loads(line[9:])
+        allowed = {
+            "stage",
+            "method",
+            "title",
+            "progress",
+            "smart_copied_seconds",
+            "smart_boundary_segments",
+            "encoder_started_before_download_finished",
+        }
+        values = {k: v for k, v in values.items() if k in allowed}
+        if "progress" in values:
+            values["progress"] = max(0, min(99, values["progress"]))
+        self.update(job_id, **values)
+
+    def stream_mp3(self, job_id, folder, spec):
+        output = folder / "result"
+        output.mkdir(exist_ok=True)
+        destination = output / "audio.mp3"
+        self.run(
+            job_id,
+            streaming_mp3_command(spec["url"], destination, folder),
+            lambda line: self.worker_progress(job_id, line),
+        )
+        self.check_cancel(job_id)
+        title = self.jobs[job_id]["title"]
+        final = output / (safe_name(title) + ".mp3")
+        if final != destination:
+            destination.replace(final)
+        asset = self.register(final, title)
+        self.update(
+            job_id, state="complete", stage="Ready", progress=100, asset_id=asset["id"]
+        )
+
     def work(self, job_id):
         folder = self.directory / "jobs" / job_id
         try:
@@ -876,6 +910,21 @@ class Workshop:
             self.update(job_id, state="running", stage="Preparing", error="")
             executable("ffmpeg")
             executable("ffprobe")
+            if spec["kind"] == "download" and spec["format"] == "mp3":
+                try:
+                    self.stream_mp3(job_id, folder, spec)
+                    return
+                except MediaError as error:
+                    self.check_cancel(job_id)
+                    if "STREAM_FALLBACK:" not in str(error):
+                        raise
+                    self.update(
+                        job_id,
+                        progress=0,
+                        stage="Preparing audio",
+                        audio_stream_fallback=True,
+                    )
+                    (folder / "result/audio.mp3").unlink(missing_ok=True)
             if spec["kind"] == "download":
                 paths = []
 
@@ -917,7 +966,7 @@ class Workshop:
             else:
                 asset = self.asset(spec["source"])
                 source = self.asset_path(asset)
-                meta = probe(source) if spec.get("mode", "exact") == "fast" else asset
+                meta = probe(source)
                 start, duration, base = spec["start"], spec["end"] - spec["start"], 0
             if spec["format"] == "mp3" and not meta["audio"]:
                 raise MediaError("This source has no audio track.")
@@ -925,7 +974,7 @@ class Workshop:
                 raise MediaError("This source has no video track. Choose MP3.")
             title = self.jobs[job_id]["title"]
             result_folder = folder / "result"
-            result_folder.mkdir()
+            result_folder.mkdir(exist_ok=True)
             destination = result_folder / (safe_name(title) + "." + spec["format"])
             threads = max(1, min(8, (os.cpu_count() or 2) // self.workers))
             if spec["kind"] == "download":
@@ -938,18 +987,17 @@ class Workshop:
                     + spec["format"].upper()
                 )
             else:
-                method, command, actual_start = trim_plan(
+                command, backend = trim_plan(
                     source,
                     destination,
                     spec["format"],
                     meta,
                     start,
                     spec["end"],
-                    spec.get("mode", "exact"),
                     threads,
                 )
-                duration = spec["end"] - actual_start
-                self.update(job_id, trim_start=actual_start)
+                method = "Accurate cut"
+                self.update(job_id, trim_start=start, processing_backend=backend)
                 stage = "Trimming " + spec["format"].upper()
             self.update(job_id, stage=stage, method=method, progress=base)
 
@@ -966,7 +1014,38 @@ class Workshop:
 
             self.check_cancel(job_id)
             if command is None:
-                source.replace(destination)
+                if spec["kind"] == "trim":
+                    shutil.copyfile(source, destination)
+                else:
+                    source.replace(destination)
+            elif spec["kind"] == "trim" and backend == "smart":
+                try:
+                    self.run(
+                        job_id, command, lambda line: self.worker_progress(job_id, line)
+                    )
+                except MediaError as error:
+                    self.check_cancel(job_id)
+                    shutil.rmtree(result_folder / "processing", ignore_errors=True)
+                    self.update(
+                        job_id,
+                        progress=0,
+                        processing_backend="encoder",
+                        fallback_reason=str(error),
+                        stage="Trimming MP4",
+                    )
+                    self.run(
+                        job_id,
+                        convert_command(
+                            source,
+                            destination,
+                            spec["format"],
+                            start,
+                            duration,
+                            threads=threads,
+                            preset="veryfast",
+                        ),
+                        encoded,
+                    )
             else:
                 self.run(job_id, command, encoded)
             self.check_cancel(job_id)
@@ -1207,7 +1286,6 @@ class Handler(BaseHTTPRequestHandler):
                             data.get("format"),
                             data.get("start", 0),
                             data.get("end"),
-                            data.get("mode", "exact"),
                         )
                     },
                 )
@@ -1314,12 +1392,7 @@ def main():
     trim.add_argument("--start", default="0")
     trim.add_argument("--end", default="", help="Blank means the end of each source.")
     trim.add_argument("--format", choices=sorted(FORMATS), default="mp4")
-    trim.add_argument(
-        "--mode",
-        choices=("fast", "exact"),
-        default="exact",
-        help="Fast copies compatible tracks and starts at a preceding keyframe; Exact preserves the chosen times.",
-    )
+    trim.add_argument("--mode", help=argparse.SUPPRESS)  # Legacy spelling; ignored.
     for command in (gui, download, trim):
         command.add_argument("--data-dir", type=Path, default=ROOT / "data")
         command.add_argument("--workers", type=int, choices=(1, 2, 3, 4), default=2)
@@ -1341,7 +1414,7 @@ def main():
                 shutil.copy2(source, path)
                 assets.append(app.register(path, source.stem, details)["id"])
             return wait_for_jobs(
-                app, app.trim(assets, args.format, args.start, args.end, args.mode)
+                app, app.trim(assets, args.format, args.start, args.end)
             )
         server = Server(app, args.port)
         url = f"http://127.0.0.1:{server.server_address[1]}"

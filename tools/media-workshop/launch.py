@@ -2,6 +2,7 @@
 """Create the private Python environment on first launch, then open Media Workshop."""
 
 import os
+import hashlib
 from pathlib import Path
 import subprocess
 import sys
@@ -27,10 +28,18 @@ def main():
         == 0
     )
     args = sys.argv[1:]
+    requirements = ROOT / "requirements.txt"
+    fingerprint = hashlib.sha256(requirements.read_bytes()).hexdigest()
+    stamp = directory / "requirements.sha256"
     update = "--update" in args
     if update:
         args.remove("--update")
-    if not installed or update:
+    if (
+        not installed
+        or update
+        or not stamp.exists()
+        or stamp.read_text().strip() != fingerprint
+    ):
         subprocess.run(
             [
                 str(python),
@@ -43,6 +52,7 @@ def main():
             ],
             check=True,
         )
+        stamp.write_text(fingerprint)
     return subprocess.call([str(python), str(ROOT / "app.py"), *args], cwd=ROOT)
 
 

@@ -69,8 +69,7 @@ function renderJobs() {
     }
     row.querySelector(".item-title").textContent = job.title;
     const status = row.querySelector(".state"); status.className = "state " + job.state; status.textContent = job.state;
-    const aligned = job.trim_start !== undefined && job.trim_start < job.spec.start - .001 ? ` · starts at ${clock(job.trim_start)} (keyframe)` : "";
-    row.querySelector(".stage").textContent = job.stage + (job.method ? " · " + job.method : "") + aligned; row.querySelector(".pct").textContent = job.progress.toFixed(0) + "%";
+    row.querySelector(".stage").textContent = job.stage + (job.method ? " · " + job.method : ""); row.querySelector(".pct").textContent = job.progress.toFixed(0) + "%";
     const progress = row.querySelector("progress"); progress.value = job.progress; progress.setAttribute("aria-label", job.title + " progress");
     if (job.error && !row.querySelector("details")) { const details = element("details"); details.append(element("summary", "", "Show error details"), element("pre", "", job.error)); row.querySelector(".job-main").append(details); }
     const file = asset(job.asset_id), actionKey = job.state + ":" + (file?.id || "");
@@ -126,7 +125,7 @@ function openAsset(id, scroll = true) {
   $("export-format").value = file.video ? "mp4" : "mp3";
   $("export-format").querySelector('[value="mp4"]').disabled = !file.video;
   $("start").value = clock(0); $("end").value = clock(file.duration);
-  syncRange(); trimNote();
+  syncRange();
   if (scroll) $("editor").scrollIntoView({behavior: "smooth", block: "start"});
 }
 function syncRange() {
@@ -138,15 +137,6 @@ function syncRange() {
   $("range-selection").style.width = `${100 * Math.max(0, Math.min(end, file.duration) - start) / file.duration}%`;
   $("cut-duration").textContent = end > start ? clock(end - start) : "Invalid range";
 }
-function trimNote() {
-  $("trim-note").textContent = $("trim-mode").value === "exact"
-    ? "Exact keeps your selected cut points using a faster encoder preset. It is slower than copying tracks."
-    : $("export-format").value === "mp3"
-      ? "Fast keeps native MP3 frames and bitrate. Other audio is converted to MP3 at 192 kbps; audio boundaries can vary by one frame."
-      : "Fast copies compatible tracks. Video may include footage from the preceding keyframe; the end can vary by a few frames. Incompatible tracks still require conversion. Choose Exact for precise timing.";
-}
-$("trim-mode").addEventListener("change", trimNote);
-$("export-format").addEventListener("change", trimNote);
 async function refresh() {
   const response = await fetch("/api/state"); if (!response.ok) throw new Error("The local app is unavailable.");
   state = await response.json(); token = state.token;
@@ -177,7 +167,7 @@ $("player").addEventListener("error", () => { if (currentId) notify("This browse
 $("trim-form").addEventListener("submit", (event) => { event.preventDefault(); action(async () => {
   const ids = $("batch-trim").checked ? [...selected] : [currentId];
   if (!ids.length || !ids[0]) throw new Error("Choose media files first.");
-  const result = await request("/api/trim", {assets: ids, format: $("export-format").value, start: $("start").value, end: $("end").value, mode: $("trim-mode").value});
+  const result = await request("/api/trim", {assets: ids, format: $("export-format").value, start: $("start").value, end: $("end").value});
   notify(`${result.ids.length} export${result.ids.length === 1 ? "" : "s"} queued. Originals are kept.`);
 }); });
 $("batch-trim").addEventListener("change", updateSelected);

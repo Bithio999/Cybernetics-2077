@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "browser": "system Chromium / Playwright",
+  "checks": [
+    "empty state",
+    "batch link count and deduplication",
+    "multi-file import",
+    "native video preview and selected-range playback",
+    "real MP4 export and duration",
+    "two-file MP3 batch export",
+    "browser Save file download",
+    "stable queue action DOM during polling",
+    "mobile layout without horizontal overflow",
+    "one accurate workflow without a cut-mode selector",
+    "accurate boundary-only video cut and native playback"
+  ],
+  "jobs": 4,
+  "assets": 6,
+  "consoleErrors": []
+}

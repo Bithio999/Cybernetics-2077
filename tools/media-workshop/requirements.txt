@@ -1,1 +1,2 @@
 yt-dlp[default]>=2026.11.23
+smartcut==1.7; python_version < "3.15"

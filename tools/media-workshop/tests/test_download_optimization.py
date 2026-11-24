@@ -8,9 +8,12 @@ import shutil
 import subprocess
 import sys
 import unittest
+import threading
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import patch
 
 from test_workshop import Fixture, app
+from media_fixtures import local_stream_command
 
 
 def packet_hashes(path, stream):
@@ -74,6 +77,39 @@ class DownloadOptimization(Fixture, unittest.TestCase):
             script = "import shutil,json,sys;shutil.copy2(sys.argv[1],sys.argv[2]);print('TITLE:'+json.dumps('Fixture'));print('FILE:'+json.dumps(sys.argv[2]))"
             return [sys.executable, "-c", script, str(source), str(output)]
 
+        if fmt == "mp3":
+
+            class Handler(SimpleHTTPRequestHandler):
+                def __init__(self, *args, **kwargs):
+                    super().__init__(*args, directory=str(source.parent), **kwargs)
+
+                def log_message(self, *args):
+                    pass
+
+                def handle(self):
+                    try:
+                        super().handle()
+                    except (ConnectionResetError, BrokenPipeError):
+                        pass
+
+            server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            url = f"http://127.0.0.1:{server.server_address[1]}/{source.name}"
+            try:
+                with patch.object(
+                    app,
+                    "streaming_mp3_command",
+                    side_effect=lambda ignored, dest, folder: local_stream_command(
+                        url, dest, folder
+                    ),
+                ):
+                    ids = self.workshop.download(["https://youtu.be/fixture"], fmt)
+                    return ids[0], self.assert_success(ids)[0]
+            finally:
+                server.shutdown()
+                server.server_close()
+                thread.join()
         with patch.object(app, "download_command", side_effect=command):
             ids = self.workshop.download(["https://youtu.be/fixture"], fmt)
             return ids[0], self.assert_success(ids)[0]

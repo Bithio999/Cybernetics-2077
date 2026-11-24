@@ -18,6 +18,7 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import app
+from media_fixtures import local_stream_command
 
 
 def until(predicate, timeout=30):
@@ -300,7 +301,12 @@ class Media(Fixture, unittest.TestCase):
         url = f"http://127.0.0.1:{fixture_server.server_address[1]}/fixture.mp4"
         try:
             # Local test-only generic extractor. Production still restricts links to YouTube/Twitch.
-            with patch.object(app, "supported_url", side_effect=lambda value: value):
+            with (
+                patch.object(app, "supported_url", side_effect=lambda value: value),
+                patch.object(
+                    app, "streaming_mp3_command", side_effect=local_stream_command
+                ),
+            ):
                 ids = self.workshop.download([url], "mp4")
                 ids += self.workshop.download([url], "mp3")
                 video, audio = self.assert_success(ids)

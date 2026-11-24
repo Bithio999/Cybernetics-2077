@@ -42,9 +42,15 @@ def main():
                 "-i",
                 "sine=frequency=660:sample_rate=44100",
                 "-t",
-                "8",
+                "20",
                 "-c:v",
                 "libx264",
+                "-g",
+                "48",
+                "-keyint_min",
+                "48",
+                "-sc_threshold",
+                "0",
                 "-threads",
                 "2",
                 "-c:a",
@@ -75,7 +81,7 @@ def main():
                 page.goto(base, wait_until="networkidle")
                 page.screenshot(path=str(root / "initial.png"), full_page=True)
                 assert page.locator("#export").is_disabled()
-                assert page.locator("#trim-mode").input_value() == "exact"
+                assert page.locator("#trim-mode").count() == 0
                 page.locator("#urls").fill(
                     "https://youtu.be/first\nhttps://clips.twitch.tv/Second\nhttps://youtu.be/first"
                 )
@@ -98,7 +104,6 @@ def main():
                     1.2 <= page.locator("#player").evaluate("(v)=>v.currentTime") <= 3.8
                 )
                 page.locator("#player").evaluate("(v)=>v.pause()")
-                page.locator("#trim-mode").select_option("exact")
                 page.locator("#export").click()
 
                 def state():
@@ -121,7 +126,6 @@ def main():
                 for a in s["assets"][:2]:
                     page.locator('[data-asset="' + a["id"] + '"]').check()
                 page.locator("#batch-trim").check()
-                page.locator("#trim-mode").select_option("fast")
                 page.locator("#export-format").select_option("mp3")
                 page.locator("#export").click()
                 s = finish(3)
@@ -144,12 +148,19 @@ def main():
                 )
                 page.locator("#batch-trim").uncheck()
                 page.locator("#export-format").select_option("mp4")
+                page.locator("#end").fill("00:18.250")
                 page.locator("#export").click()
                 s = finish(4)
                 fast_job = s["jobs"][-1]
-                assert fast_job["spec"]["mode"] == "fast"
-                assert "stream copy" in fast_job["method"]
-                assert fast_job["trim_start"] <= fast_job["spec"]["start"]
+                assert "mode" not in fast_job["spec"]
+                assert fast_job["method"] == "Accurate cut"
+                assert fast_job["trim_start"] == fast_job["spec"]["start"]
+                if app.importlib.util.find_spec("smartcut"):
+                    assert fast_job["processing_backend"] == "smart", fast_job.get(
+                        "fallback_reason"
+                    )
+                    assert fast_job["smart_copied_seconds"] >= 14
+                assert abs(s["assets"][-1]["duration"] - 17) < 0.08
                 page.locator(f'.job[data-id="{fast_job["id"]}"] button').first.click()
                 page.wait_for_function(
                     '() => document.querySelector("#player").readyState >= 2'
@@ -183,8 +194,8 @@ def main():
                                 "browser Save file download",
                                 "stable queue action DOM during polling",
                                 "mobile layout without horizontal overflow",
-                                "Exact default and Fast selection",
-                                "fast stream-copy video trim and native playback",
+                                "one accurate workflow without a cut-mode selector",
+                                "accurate boundary-only video cut and native playback",
                             ],
                             "jobs": len(s["jobs"]),
                             "assets": len(s["assets"]),

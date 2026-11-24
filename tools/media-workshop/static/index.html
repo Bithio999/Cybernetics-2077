@@ -35,8 +35,7 @@
           <div class="range-controls"><label for="in-range">IN <input id="in-range" aria-label="Trim start position" type="range" min="0" max="1" step="0.001" value="0"></label><label for="out-range">OUT <input id="out-range" aria-label="Trim end position" type="range" min="0" max="1" step="0.001" value="1"></label></div>
           <div class="two-columns time-fields"><div><label for="start">Start</label><div class="input-button"><input id="start" value="00:00.000" inputmode="decimal" aria-label="Trim start time"><button type="button" id="mark-in" title="Set start to the current playback position">Mark in</button></div></div><div><label for="end">End</label><div class="input-button"><input id="end" value="00:00.000" inputmode="decimal" aria-label="Trim end time"><button type="button" id="mark-out" title="Set end to the current playback position">Mark out</button></div></div></div>
           <div class="cut-summary"><span>SELECTED DURATION</span><strong id="cut-duration">00:00.000</strong><button id="preview-cut" type="button" class="text-link">Preview selection</button></div>
-          <label for="trim-mode">Cut mode</label><select id="trim-mode"><option value="exact">Exact · precise cut points</option><option value="fast">Fast · copy compatible tracks</option></select>
-          <p class="hint" id="trim-note" role="status">Exact keeps your selected cut points using a faster encoder preset. It is slower than copying tracks.</p>
+          <p class="hint" id="cut-note">Cuts keep your selected timing and are optimized automatically.</p>
           <div class="export-row"><div><label for="export-format">Export as</label><select id="export-format"><option value="mp4">MP4 · H.264 / AAC</option><option value="mp3">MP3 · audio</option></select></div><button type="submit" class="primary" id="export">Export cut →</button></div>
           <label class="checkbox"><input type="checkbox" id="batch-trim"> Apply this range to all checked library files <span id="selected-count">(0 selected)</span></label>
           <p class="hint">Times accept seconds or HH:MM:SS.mmm. Exports create new files; originals stay intact.</p>
@@ -45,6 +44,6 @@
     </section>
     <section class="panel queue-panel" aria-labelledby="queue-heading"><div class="section-heading"><span class="number">03</span><div><h2 id="queue-heading">The queue <span id="queue-count" class="count">0</span></h2><p id="queue-summary">Ready when you are.</p></div><div class="actions"><button class="quiet" id="cancel-all">Cancel unfinished</button><button class="quiet" id="clear">Clear finished</button></div></div><div id="queue"><div class="empty-list">No jobs yet. Add links or export a cut to get started.</div></div></section>
     <section class="panel library-panel" aria-labelledby="library-heading"><div class="section-heading"><span class="number">04</span><div><h2 id="library-heading">Media library <span id="library-count" class="count">0</span></h2><p>Ready to preview, cut or save to your computer.</p></div><label class="checkbox"><input type="checkbox" id="select-all"> Select all</label></div><div id="library"><div class="empty-list">Your files will appear here.</div></div></section>
-    <footer><span>MEDIA WORKSHOP <b>1.2</b> · LOCAL TO YOUR COMPUTER</span><span id="footer-status">Connecting…</span><p id="storage"></p></footer>
+    <footer><span>MEDIA WORKSHOP <b>1.3</b> · LOCAL TO YOUR COMPUTER</span><span id="footer-status">Connecting…</span><p id="storage"></p></footer>
   </main>
 </body></html>

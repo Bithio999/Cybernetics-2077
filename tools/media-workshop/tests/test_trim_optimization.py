@@ -1,7 +1,7 @@
-"""Exercise actual fast/exact cuts, keyframes, timestamps and playable copied packets."""
+"""One accurate workflow, automatic copying of interior GOPs, and safe fallbacks."""
 
 import hashlib
-import json
+import importlib.util
 from pathlib import Path
 import shutil
 import subprocess
@@ -12,26 +12,46 @@ from test_workshop import Fixture, app
 from test_download_optimization import packet_hashes
 
 
-def video_packets(path):
-    return json.loads(
-        subprocess.check_output(
-            [
-                app.executable("ffprobe"),
-                "-v",
-                "error",
-                "-select_streams",
-                "v:0",
-                "-show_packets",
-                "-show_data_hash",
-                "sha256",
-                "-show_entries",
-                "packet=pts_time,flags,data_hash",
-                "-of",
-                "json",
-                str(path),
-            ]
-        )
-    )["packets"]
+def pcm(path):
+    return subprocess.check_output(
+        [
+            app.executable("ffmpeg"),
+            "-v",
+            "error",
+            "-i",
+            str(path),
+            "-map",
+            "0:a:0",
+            "-ac",
+            "1",
+            "-ar",
+            "48000",
+            "-f",
+            "s16le",
+            "-",
+        ]
+    )
+
+
+def first_frame(path, start=0):
+    return subprocess.check_output(
+        [
+            app.executable("ffmpeg"),
+            "-v",
+            "error",
+            "-ss",
+            str(start),
+            "-i",
+            str(path),
+            "-frames:v",
+            "1",
+            "-pix_fmt",
+            "rgb24",
+            "-f",
+            "rawvideo",
+            "-",
+        ]
+    )
 
 
 class TrimOptimization(Fixture, unittest.TestCase):
@@ -53,7 +73,7 @@ class TrimOptimization(Fixture, unittest.TestCase):
                 "-i",
                 "sine=sample_rate=48000",
                 "-t",
-                "8",
+                "20",
                 "-c:v",
                 "libx264",
                 "-g",
@@ -76,29 +96,39 @@ class TrimOptimization(Fixture, unittest.TestCase):
         shutil.copy2(source, path)
         return self.workshop.register(path, source.stem)
 
-    def export(self, source, fmt="mp4", start=3.25, end=5.25, mode="fast"):
+    def export(self, source, fmt="mp4", start=3.25, end=5.25, legacy=None):
         asset = self.import_source(source)
-        ids = self.workshop.trim([asset["id"]], fmt, start, end, mode)
+        ids = self.workshop.trim([asset["id"]], fmt, start, end, legacy)
         result = self.assert_success(ids)[0]
         return self.workshop.jobs[ids[0]], self.workshop.asset_path(result), asset
 
-    def test_fast_cut_starts_at_real_keyframe_and_preserves_compressed_video(self):
-        original = hashlib.sha256(self.indexed.read_bytes()).hexdigest()
-        job, output, asset = self.export(self.indexed)
-        self.assertEqual(job["trim_start"], 2)
-        self.assertIn("stream copy", job["method"])
-        source_packets = video_packets(self.indexed)
-        output_packets = video_packets(output)
-        first_key = next(
-            p for p in source_packets if "K" in p["flags"] and float(p["pts_time"]) == 2
+    def test_legacy_fast_setting_does_not_move_cut_to_previous_keyframe(self):
+        job, output, asset = self.export(self.indexed, legacy="fast")
+        self.assertEqual(job["trim_start"], 3.25)
+        self.assertNotIn("mode", job["spec"])
+        self.assertEqual(job["method"], "Accurate cut")
+        self.assertAlmostEqual(app.probe(output)["duration"], 2, delta=0.11)
+        self.assertTrue(self.workshop.asset_path(asset).exists())
+
+    @unittest.skipUnless(
+        importlib.util.find_spec("smartcut"), "Optional smart renderer unavailable"
+    )
+    def test_long_cut_copies_middle_frames_and_preserves_requested_timing(self):
+        before = hashlib.sha256(self.indexed.read_bytes()).hexdigest()
+        job, output, asset = self.export(self.indexed, start=3.25, end=17.25)
+        self.assertEqual(job["processing_backend"], "smart", job.get("fallback_reason"))
+        self.assertEqual(job["trim_start"], 3.25)
+        self.assertGreaterEqual(job["smart_copied_seconds"], 10)
+        self.assertAlmostEqual(app.probe(output)["duration"], 14, delta=0.11)
+        self.assertEqual(app.probe(output)["video_frames"], 140)
+        copied = set(packet_hashes(self.indexed, "v:0")) & set(
+            packet_hashes(output, "v:0")
         )
-        self.assertEqual(output_packets[0]["data_hash"], first_key["data_hash"])
-        self.assertAlmostEqual(float(output_packets[0]["pts_time"]), 0, delta=0.001)
-        self.assertTrue(
-            all(
-                p["data_hash"] in {s["data_hash"] for s in source_packets}
-                for p in output_packets
-            )
+        self.assertGreater(len(copied), 80)
+        expected, actual = first_frame(self.indexed, 3.25), first_frame(output)
+        self.assertEqual(len(expected), len(actual))
+        self.assertLess(
+            sum(abs(a - b) for a, b in zip(expected, actual)) / len(actual), 3
         )
         decoded = subprocess.run(
             [
@@ -117,16 +147,10 @@ class TrimOptimization(Fixture, unittest.TestCase):
         self.assertEqual(decoded.stderr, b"")
         self.assertEqual(
             hashlib.sha256(self.workshop.asset_path(asset).read_bytes()).hexdigest(),
-            original,
+            before,
         )
 
-    def test_exact_cut_retains_requested_start_and_duration(self):
-        job, output, _ = self.export(self.indexed, mode="exact")
-        self.assertEqual(job["trim_start"], 3.25)
-        self.assertEqual(job["method"], "Exact trim")
-        self.assertAlmostEqual(app.probe(output)["duration"], 2, delta=0.11)
-
-    def test_fast_mp3_preserves_original_audio_packets(self):
+    def test_mp3_cut_keeps_exact_audio_sample_count(self):
         source = Path(self.temp.name) / "native.mp3"
         subprocess.run(
             [
@@ -145,21 +169,18 @@ class TrimOptimization(Fixture, unittest.TestCase):
             check=True,
         )
         job, output, _ = self.export(source, fmt="mp3", start=1.2, end=2.7)
-        self.assertIn("stream copy", job["method"])
-        before, after = packet_hashes(source, "a:0"), packet_hashes(output, "a:0")
-        self.assertTrue(after)
-        self.assertTrue(
-            any(before[i : i + len(after)] == after for i in range(len(before)))
-        )
-        self.assertAlmostEqual(app.probe(output)["duration"], 1.5, delta=0.12)
+        self.assertEqual(job["trim_start"], 1.2)
+        self.assertEqual(len(pcm(output)) // 2, 72000)
 
-    def test_fast_aac_to_mp3_still_converts_audio(self):
+    def test_aac_to_mp3_cut_is_accurate(self):
         job, output, _ = self.export(self.indexed, fmt="mp3", start=1.2, end=2.7)
-        self.assertIn("audio conversion", job["method"])
         self.assertEqual(app.probe(output)["audio_codec"], "mp3")
-        self.assertAlmostEqual(app.probe(output)["duration"], 1.5, delta=0.12)
+        self.assertEqual(len(pcm(output)) // 2, 72000)
 
-    def test_nonzero_source_timestamps_are_normalized_for_keyframe_seek(self):
+    @unittest.skipUnless(
+        importlib.util.find_spec("smartcut"), "Optional smart renderer unavailable"
+    )
+    def test_nonzero_source_timestamps_do_not_shift_smart_cut(self):
         source = Path(self.temp.name) / "offset.mp4"
         subprocess.run(
             [
@@ -176,41 +197,76 @@ class TrimOptimization(Fixture, unittest.TestCase):
             ],
             check=True,
         )
-        job, output, _ = self.export(source)
-        self.assertAlmostEqual(
-            job["trim_start"], 102 - app.probe(source)["start_time"], delta=0.001
-        )
-        packet = next(
-            p
-            for p in video_packets(source)
-            if "K" in p["flags"] and float(p["pts_time"]) == 102
-        )
-        self.assertEqual(video_packets(output)[0]["data_hash"], packet["data_hash"])
-        self.assertAlmostEqual(
-            float(video_packets(output)[0]["pts_time"]), 0, delta=0.001
+        job, output, _ = self.export(source, start=3.25, end=17.25)
+        self.assertEqual(job["trim_start"], 3.25)
+        self.assertEqual(job["processing_backend"], "smart", job.get("fallback_reason"))
+        self.assertAlmostEqual(app.probe(output)["duration"], 14, delta=0.11)
+        expected, actual = first_frame(source, 3.25), first_frame(output)
+        self.assertLess(
+            sum(abs(a - b) for a, b in zip(expected, actual)) / len(actual), 3
         )
 
-    def test_no_usable_keyframe_falls_back_to_exact_instead_of_wrong_cut(self):
-        with patch.object(app, "keyframe_before", return_value=None):
+    def test_smart_failure_automatically_preserves_accuracy(self):
+        original = app.trim_plan
+
+        def broken(*args):
+            command, backend = original(*args)
+            return [
+                __import__("sys").executable,
+                "-c",
+                "raise SystemExit('renderer failed')",
+            ], "smart"
+
+        with patch.object(app, "trim_plan", side_effect=broken):
             job, output, _ = self.export(self.indexed)
-        self.assertIn("Exact fallback", job["method"])
+        self.assertEqual(job["processing_backend"], "encoder")
         self.assertEqual(job["trim_start"], 3.25)
+        self.assertIn("renderer failed", job["fallback_reason"])
         self.assertAlmostEqual(app.probe(output)["duration"], 2, delta=0.11)
 
-    def test_fast_batch_keeps_each_source_and_records_mode(self):
+    def test_batch_uses_same_accurate_workflow_for_all_sources(self):
         first = self.import_source(self.indexed)
         second = self.workshop.register(
             self.workshop.asset_path(first), "Second source"
         )
-        ids = self.workshop.trim([first["id"], second["id"]], "mp4", 3.25, 5.25, "fast")
+        ids = self.workshop.trim([first["id"], second["id"]], "mp4", 3.25, 5.25)
         outputs = self.assert_success(ids)
         self.assertEqual(len({a["path"] for a in outputs}), 2)
-        self.assertTrue(
-            all(self.workshop.jobs[i]["spec"]["mode"] == "fast" for i in ids)
-        )
+        self.assertTrue(all(self.workshop.jobs[i]["trim_start"] == 3.25 for i in ids))
         self.assertTrue(self.workshop.asset_path(first).exists())
 
-    def test_invalid_mode_is_rejected_before_creating_jobs(self):
-        with self.assertRaises(app.MediaError):
-            self.workshop.trim([self.media["id"]], "mp4", 0, 1, "turbo")
-        self.assertFalse(self.workshop.jobs)
+    def test_whole_source_copy_never_moves_the_original(self):
+        asset = self.import_source(self.indexed)
+        ids = self.workshop.trim([asset["id"]], "mp4", 0, "")
+        self.assert_success(ids)
+        self.assertTrue(self.workshop.asset_path(asset).exists())
+
+    @unittest.skipUnless(
+        importlib.util.find_spec("smartcut"), "Optional smart renderer unavailable"
+    )
+    def test_cutting_a_previous_smart_result_keeps_timing_and_decodes_cleanly(self):
+        _, first, _ = self.export(self.indexed, start=3.25, end=17.25)
+        source = self.workshop.register(first, "Previous cut")
+        ids = self.workshop.trim([source["id"]], "mp4", 0.25, 13)
+        result = self.assert_success(ids)[0]
+        output = self.workshop.asset_path(result)
+        self.assertAlmostEqual(result["duration"], 12.75, delta=0.11)
+        expected, actual = first_frame(first, 0.25), first_frame(output)
+        self.assertLess(
+            sum(abs(a - b) for a, b in zip(expected, actual)) / len(actual), 3
+        )
+        decoded = subprocess.run(
+            [
+                app.executable("ffmpeg"),
+                "-v",
+                "error",
+                "-i",
+                str(output),
+                "-f",
+                "null",
+                "-",
+            ],
+            capture_output=True,
+        )
+        self.assertEqual(decoded.returncode, 0, decoded.stderr)
+        self.assertEqual(decoded.stderr, b"")

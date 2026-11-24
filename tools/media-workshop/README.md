@@ -6,7 +6,7 @@ A local browser app for downloading **YouTube videos and Twitch VODs/clips** to 
 
 ## Install and open
 
-Requires **Python 3.11+**, **FFmpeg with ffprobe**, and **Deno or Node.js 22+** for current YouTube support. The launcher installs yt-dlp and its YouTube JavaScript components into a private `.venv` folder on first use.
+Requires **Python 3.11+**, **FFmpeg with ffprobe**, and **Deno or Node.js 22+** for current YouTube support. Python **3.13 is recommended**. The launcher installs the download and cut-processing dependencies into a private `.venv` folder on first use.
 
 **Windows**
 
@@ -38,7 +38,7 @@ The examples below use `python`; use `python3` on systems that name it that way.
 
 Official installers: [Python](https://www.python.org/downloads/) · [FFmpeg](https://ffmpeg.org/download.html) · [Deno](https://docs.deno.com/runtime/getting_started/installation/) · [Node.js](https://nodejs.org/en/download).
 
-When updating from an older version, replace the program files and retain your **data/** folder (and **.venv/**). Existing media and queue history remain available.
+When updating from an older version, replace the program files and retain your **data/** folder (and **.venv/**). Existing media and queue history remain available. The launcher automatically installs changed requirements on the next start.
 
 ## Download a batch
 
@@ -53,7 +53,7 @@ MP4 downloads prefer H.264 video and AAC audio while retaining the selected reso
 
 The queue shows **Direct save**, **Stream copy**, or which tracks require conversion. Resolution still respects your quality ceiling, and sources are not upscaled. A 4K source is not replaced with a lower-resolution H.264 source just to avoid conversion.
 
-Existing MP3 downloads are preserved at their source bitrate. Other audio downloads and converted/Exact MP3 exports use 192 kbps. Fast cuts of existing MP3s preserve their native frames and bitrate.
+**MP3 conversion starts during the download**, rather than waiting for the entire source to finish. Existing MP3 downloads are preserved at their source bitrate without encoding; other audio downloads are converted to **192 kbps**. If a source requires a seekable file, the app automatically downloads it first and then converts it.
 
 Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. Playlist/channel URLs are not expanded into batches, and ongoing live streams are not recorded. Site availability, authentication requirements and network restrictions can still prevent a download. This app has no login or DRM-unlocking feature.
 
@@ -62,17 +62,20 @@ Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. P
 1. Download media or choose **Choose audio or video** to import files from your computer. Multiple selection is supported.
 2. Select a source, play the preview, and choose start/end times with the sliders or **Mark in / Mark out**.
 3. Use **Preview selection** to play only the chosen range.
-4. Choose **Exact** (default) or **Fast**, select MP4 or MP3, and click **Export cut**.
+4. Select MP4 or MP3 and click **Export cut**.
 
-**Fast** copies compatible video/audio tracks instead of re-encoding. A video cut can begin at the **preceding keyframe**, including earlier footage, and its end can vary by a few frames. The queue shows the actual source start when it shifts. Fast MP3 cuts preserve native MP3 frames; incompatible tracks still need conversion.
+There is **one accurate cut workflow**, optimized automatically. Your selected start/end times stay in place, within the source's frame/audio-sample precision.
 
-**Exact** keeps the selected cut points by re-encoding. It now uses a faster encoder preset and a CPU-thread budget shared between the configured workers. It takes longer than copying, and can produce larger files than older releases. Choose it when the precise start/end matters.
+- Longer compatible H.264 cuts copy complete video sections and re-encode only the boundaries. Audio is encoded for accurate timing.
+- Shorter cuts and other codecs use a fast accurate encoder automatically. If boundary processing cannot preserve the requested timing, the app uses that encoder instead.
+- Exporting the whole source copies compatible tracks when possible. Originals remain intact.
+- MP3 cuts are encoded at 192 kbps to retain precise timing without compressed-frame cut shifts.
 
-If a suitable keyframe cannot be located quickly, Fast visibly falls back to Exact rather than producing a cut from the wrong position.
+Boundary processing uses smartcut on Python 3.11–3.14; other supported Python versions retain the accurate FFmpeg path. Performance depends on the codec, resolution, keyframe spacing and selected range. Faster encoding can produce larger files than slower presets.
 
 For **batch trimming**, check files in the media library, then enable **Apply this range to all checked library files**. All selected files use the same time range and output format. An invalid range or incompatible file prevents the entire batch from being queued, with an explanation. Leave End blank to use each file's own end.
 
-Times accept seconds (`83.5`), minutes/seconds (`01:23.500`) or hours/minutes/seconds (`00:01:23.500`). Exact cuts respect the source's frame/audio-sample precision. Fast cuts use the boundaries described above. Audio-only media exports as MP3; video with no audio cannot export as MP3. Some imported codecs cannot preview in a particular browser but can still be converted.
+Times accept seconds (`83.5`), minutes/seconds (`01:23.500`) or hours/minutes/seconds (`00:01:23.500`). Audio-only media exports as MP3; video with no audio cannot export as MP3. Some imported codecs cannot preview in a particular browser but can still be converted.
 
 Original files are never overwritten. Imports are copied into the library, and each export has a separate folder. Imports stream to disk rather than loading an entire large file into memory.
 
@@ -105,12 +108,12 @@ The same queue/encoder is available without the browser:
 ```sh
 python launch.py download "https://youtu.be/VIDEO_ID" "https://www.twitch.tv/videos/VOD_ID" --format mp4 --height 1080
 python launch.py download "https://clips.twitch.tv/CLIP_ID" --format mp3
-python launch.py trim "first.mp4" "second.mp4" --start 00:00:10 --end 00:00:25.500 --format mp4 --mode fast
-python launch.py trim "recording.mp4" --start 10.250 --end 25.500 --format mp4 --mode exact
+python launch.py trim "first.mp4" "second.mp4" --start 00:00:10 --end 00:00:25.500 --format mp4
+python launch.py trim "recording.mp4" --start 10.250 --end 25.500 --format mp4
 python launch.py trim "recording.mp4" --format mp3
 ```
 
-Use `python app.py --help` for commands. Each command accepts `--data-dir` and `--workers`. The CLI defaults to Exact trimming, prints the actual cut start and output duration, and exits nonzero if any job fails. Existing saved jobs without a mode retain Exact behavior.
+Use `python app.py --help` for commands. Each command accepts `--data-dir` and `--workers`. The CLI uses the same automatic accurate workflow, prints the cut start and output duration, and exits nonzero if any job fails. Old saved cut-mode settings are ignored.
 
 ## Testing
 
@@ -131,4 +134,4 @@ python tests/browser_review.py
 
 Use `--browser /path/to/chromium` for an existing Chromium installation, or `--output /path/to/review` to change the capture directory.
 
-Download backend: [yt-dlp](https://github.com/yt-dlp/yt-dlp) · YouTube runtime requirements: [yt-dlp EJS](https://github.com/yt-dlp/yt-dlp/wiki/EJS) · Encoding: [FFmpeg](https://ffmpeg.org/ffmpeg.html).
+Download backend: [yt-dlp](https://github.com/yt-dlp/yt-dlp) · YouTube runtime requirements: [yt-dlp EJS](https://github.com/yt-dlp/yt-dlp/wiki/EJS) · Encoding: [FFmpeg](https://ffmpeg.org/ffmpeg.html) · Boundary processing: [smartcut](https://github.com/skeskinen/smartcut) by Santtu Keskinen ([MIT license](https://github.com/skeskinen/smartcut/blob/main/LICENSE)) using [PyAV](https://pyav.org/). Dependencies are installed separately; their source and binaries are not bundled in the ZIP.

@@ -1,0 +1,61 @@
+{
+  "environment": "Python 3.12.14 / FFmpeg 7.1.5 / Linux; sequential local runs",
+  "video": {
+    "source": "60-second generated 1280x720 / 30fps H.264 + AAC MP4, two-second GOP",
+    "requestedStart": 3.25,
+    "requestedEnd": 55.25,
+    "threads": 4,
+    "scope": "Includes probes, processing and worker launch; excludes import and fixture generation. Same requested timing for both implementations.",
+    "processingSeconds": {
+      "accurate_full_encode": [
+        6.8934112369970535,
+        6.658532073997776,
+        7.533789903995057
+      ],
+      "automatic_accurate_cut": [
+        3.246375930000795,
+        3.3340724219960975,
+        3.115449206001358
+      ]
+    },
+    "outputDuration": {
+      "accurate_full_encode": 52.0,
+      "automatic_accurate_cut": 52.016016
+    },
+    "outputFrames": {
+      "accurate_full_encode": 1559,
+      "automatic_accurate_cut": 1560
+    },
+    "copiedSeconds": 50.0,
+    "medianSeconds": {
+      "accurate_full_encode": 6.8934112369970535,
+      "automatic_accurate_cut": 3.246375930000795
+    }
+  },
+  "mp3": {
+    "source": "90-second generated stereo AAC 160kbps/48kHz M4A",
+    "output": "MP3 192kbps CBR; identical LAME settings",
+    "scope": "Real yt-dlp generic extractor over local HTTP, throttled at 4096 bytes per 8ms; includes extraction, transfer, encoding and probe. Excludes fixture creation. Not a YouTube/Twitch throughput benchmark.",
+    "processingSeconds": {
+      "download_then_encode": [
+        5.6235579879939905,
+        5.499029448998044,
+        5.546503948004101
+      ],
+      "download_while_encoding": [
+        4.541418685003009,
+        4.468504301999928,
+        4.536780223999813
+      ]
+    },
+    "outputDuration": {
+      "download_then_encode": 90.024,
+      "download_while_encoding": 90.048
+    },
+    "encodingOverlappedDownload": true,
+    "medianSeconds": {
+      "download_then_encode": 5.546503948004101,
+      "download_while_encoding": 4.536780223999813
+    }
+  }
+}

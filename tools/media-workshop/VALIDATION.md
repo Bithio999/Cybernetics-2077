@@ -1,52 +1,48 @@
-# Media Workshop 1.2 — validation
+# Media Workshop 1.3 — validation
 
-Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, FFmpeg/ffprobe 7.1.5, Node.js 24.19.0 and Chromium 154 on Linux.
+Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, PyAV 16.0.1, FFmpeg/ffprobe 7.1.5, Node.js 24.19.0 and Chromium 154 on Linux.
 
 ## Automated checks
 
-**35 tests pass**, using actual FFmpeg processes and real temporary files:
+**43 tests pass**, using actual FFmpeg processes and temporary media:
 
-- MP4 and MP3 encoding, fractional start/end cuts and measured output durations.
-- Two-file batch exports, unique destinations and unchanged source-file hashes.
-- Rejection of invalid ranges, incompatible audio-only exports and malformed batches before queuing.
-- Actual yt-dlp subprocess downloads from a local HTTP media fixture, followed by both output formats. The fixture deliberately uses the generic extractor; production URLs remain limited to individual YouTube/Twitch videos.
-- Cancellation of a running child process and a waiting job; failed-job retry.
-- Saved-library reopening, interrupted-job recovery and exclusive library locking.
-- Real HTTP imports, playable-file downloads, deletion, byte-range seeking and invalid ranges.
-- Local host/token checks, URL validation, filename handling and prevention of playlist/channel expansion.
+- Accurate MP4/MP3 cuts, fractional timing, decoded audio sample counts, batches and unchanged original files.
+- Boundary-only H.264 processing: matching source packet hashes through the copied middle, expected frame counts, first-frame comparison, full decoding without errors, nonzero timestamps and cutting an already-edited result again.
+- Automatic accurate fallback after boundary processing fails; whole-source exports preserve their originals; old cut-mode settings cannot change timing.
+- Actual yt-dlp subprocess downloads over local HTTP. MP3 conversion starts before download completion, retains every decoded sample, and produces 192 kbps audio. Native MP3 downloads remain byte-identical.
+- A real nonstreamable M4A requests a seekable-file fallback; a separate queue test verifies that fallback completes. Failed downloads cannot publish apparently playable partial output.
+- Cancellation kills the streaming worker/process group and removes partial files. Queue retry, interrupted-job recovery, persistent libraries and exclusive library locking remain covered.
+- HTTP imports/downloads, seeking, deletion, URL/host/token checks, invalid ranges, filenames and prevention of playlist expansion.
+- Existing MP4 direct-save, stream-copy and selective-conversion tests, including compatible-track packet preservation and the requested resolution ceiling.
 
-Reproduce with `python -m unittest discover -s tests -v` after installing `requirements.txt`.
+Reproduce with `python -m unittest discover -s tests -v` after installing `requirements.txt`. Ruff undefined/unused-name checks and JavaScript syntax checks also pass.
 
-## Download optimization
+## One accurate cut workflow
 
-Eight additional real-media tests verify byte-identical direct saves for ready MP4 and MP3 files, video/audio packet hashes through remuxing, preservation of the compatible track during selective conversion, full fallback conversion, and enforcing the requested resolution ceiling. An offline test uses yt-dlp's actual format selector to verify that H.264/AAC is preferred at the same resolution while a requested 4K source remains 4K.
+The interface has one **Export cut** workflow. Longer 8-bit H.264 clips use smartcut to encode cut boundaries while copying complete middle sections. A video-only temporary window avoids indexing the entire source or retaining its compressed audio in memory. The adapter checks frame count and duration before accepting the video. Audio is cut accurately with FFmpeg. Short clips, other codecs and processing failures use the accurate encoder automatically. No path deliberately shifts the start to a preceding keyframe.
 
-A generated **15-second, 1280×720 / 30 fps H.264 + AAC MKV** was processed three times with each path. The former full encode took **4.19 seconds median**; the new stream-copy path took **0.212 seconds median**, approximately **19.7× faster**. These timings include input/output probes and exclude fixture generation and network transfer. They describe this local Linux CPU/filesystem fixture, not a universal speedup or network-throughput improvement. Raw measurements are in [the benchmark record](tests/results/speed-1.1.0.json).
+The optional smart backend is pinned to the tested smartcut 1.7 API and installed on Python 3.11–3.14. Its isolated worker adapts encoder thread/preset settings without editing installed dependency source. Newer Python versions retain accurate FFmpeg encoding. Updated requirements are installed automatically when the launcher sees their fingerprint change.
 
-Ready fast-start MP4s use a same-filesystem rename instead of either processing path. Necessary video conversions use `veryfast` at CRF 20 and a CPU-thread budget of at most eight per job, divided against the configured worker count. That preset can produce larger files than the previous `fast` preset. Exact trims retain precise timing with the faster encoding preset. Existing libraries need no migration; older records without codec/method fields remain usable.
+On a generated 60-second **1280×720 / 30 fps H.264 + AAC MP4** with two-second keyframes, the same requested **3.25–55.25-second** cut took **6.89 seconds median** with full accurate encoding and **3.25 seconds median** with automatic boundary processing, approximately **2.1× faster**. The latter copied 50 seconds of video. Durations were 52.000 and 52.016 seconds, within one source frame of the requested range. Three sequential runs include probes and worker launch, and exclude fixture generation/import. This is a local fixture measurement, not a universal speed guarantee. [Raw results](tests/results/unified-1.3.0.json).
 
-## Trimming optimization
+Earlier download/remux measurements remain in [speed-1.1.0.json](tests/results/speed-1.1.0.json). The older [trim-1.2.0.json](tests/results/trim-1.2.0.json) describes the former two-mode workflow; its preceding-keyframe Fast cut was not timing-equivalent. Those modes are no longer presented or used.
 
-Eight additional real-media tests cover fast video packet copying, an actual keyframe-aligned start, decoding the complete result, source preservation, precise Exact durations, native MP3 packet copying, AAC-to-MP3 conversion, nonzero source timestamps, safe fallback when no suitable keyframe is found, batch cuts and invalid-mode rejection.
+## MP3 download conversion
 
-Exact remains the default in the interface and CLI. Fast is an explicit option; copied video can include preceding-keyframe footage and end a few frames later. The queue and CLI report the actual source start. Fast does not move or overwrite source files. Legacy API requests and saved jobs without a mode retain Exact behavior.
+yt-dlp's audio stream now feeds FFmpeg directly through a bounded pipe. Download and conversion overlap instead of running as two complete sequential stages, and no full intermediate source is needed on the streaming path. Both processes must succeed before the file enters the library. Nonstreamable source containers automatically use the existing seekable-file path. Cancellation covers the downloader, encoder and worker together.
 
-A generated 15-second **1280×720 / 30 fps H.264 + AAC MP4**, with a two-second keyframe interval, was cut three times per path. For a requested 4.25–11.25-second cut, median processing times were **2.40 s** with the old encoder, **1.36 s** with improved Exact mode, and **0.280 s** in Fast mode. Exact outputs were 7.0 seconds and retained the selected start. Fast began at the 4.0-second keyframe and produced 7.333 seconds, so it is not an identical cut. Timings include input/output probing but exclude imports and fixture generation; they describe this local environment. [Raw trimming measurements](tests/results/trim-1.2.0.json).
+MP3 remains **192 kbps CBR** using the existing LAME quality settings; native MP3 is copied without encoding. FFmpeg reports that libmp3lame has no threading capability: assigning it extra threads does not make one conversion faster. The optimization overlaps work and removes intermediate file I/O, rather than lowering audio quality or joining separately encoded chunks.
 
-Fast keyframe lookup seeks the index and inspects only half a second of packet metadata rather than scanning or decoding the whole source. Missing/unusable keyframe metadata visibly falls back to Exact. Exact uses `veryfast` at CRF 20 and up to eight CPU threads per job, budgeted against worker count; faster compression can create larger files than the old preset.
+For a generated 90-second stereo AAC source over throttled local HTTP, three sequential runs took **5.55 seconds median** for download-then-encode and **4.54 seconds** with overlapping conversion, about **18% less elapsed time**. Both used the same 192 kbps output settings. The fixture sends 4,096 bytes every 8 ms; timings include real yt-dlp extraction, transfer, encoding and probing. They do not establish a public-site throughput improvement. [Raw results and assumptions](tests/results/unified-1.3.0.json).
 
-## Browser review
+## Browser and package review
 
-The included `tests/browser_review.py` passes in real headless Chromium through Playwright. It imports two generated videos, plays the selected range, exports a 2.5-second MP4, batch-exports two MP3 files and saves a playable MP3 through the browser's download flow. It checks link counting/deduplication, stable queue action elements across progress polling and a 390px layout without horizontal overflow. It also switches between Exact and Fast, performs a fast stream-copy video cut and plays that saved clip in the native browser player. No page JavaScript errors were observed.
+`tests/browser_review.py` passes in real headless Chromium through Playwright. It imports two generated videos, previews a range, exports a 2.5-second MP4, batch-exports two MP3s, saves a playable MP3 and plays a longer accurately cut video. It verifies there is no cut-mode selector, stable queue action elements during progress polling, link deduplication and a 390px layout without horizontal overflow. No page JavaScript errors occurred. The README image is from that running app; Playwright is only a test dependency.
 
-The screenshot in the README is from that running app, with generated FFmpeg test media. Playwright is only a development/test dependency.
+The release ZIP contains source, launchers, tests, documentation and UI assets. It excludes Python, FFmpeg, browsers, virtual environments, downloaded media and credentials. Its contents were checked against source and extracted into a separate directory. The extracted launcher installed its dependencies into a fresh environment and completed a real CLI cut. The Minecraft mod/release is unchanged.
 
-## External-site checks and limits
+## External-site and platform limits
 
-Earlier public-site download attempts were made separately. The cloud network denied YouTube with **proxy CONNECT 403**. Twitch failed **TLS certificate verification** through this environment. Consequently, successful current YouTube/Twitch downloads could not be verified here. The successful local-fixture tests establish the real download/conversion pipeline; they do not establish external access or simulate successful YouTube/Twitch extraction.
+Earlier public-site attempts were blocked separately: YouTube returned **proxy CONNECT 403**, and Twitch failed TLS certificate verification through the cloud network. Current successful public YouTube/Twitch extraction is therefore **not established** by these tests. The local fixtures exercise real yt-dlp/FFmpeg processes using the generic extractor; they do not simulate successful public-site access.
 
-The program delegates site extraction to the current yt-dlp release. Its updater is provided because those sites change. Windows and macOS launch paths and setup instructions are included; native execution was tested on Linux, not on those operating systems.
-
-The ZIP contains source, launchers, tests, documentation and UI assets. It does not bundle Python, FFmpeg, browser binaries, downloaded videos, credentials or a virtual environment. The Minecraft mod and its current release are unchanged.
-
-The ZIP was extracted into a separate directory. Its launcher successfully created a fresh virtual environment and installed its requirements. A real two-file CLI batch through that extracted launcher produced both MP3 cuts successfully. Archive contents were checked against the source and screened for virtual environments, caches and downloaded media.
+The updater installs current yt-dlp components because sites change. Windows and macOS launch paths are included, but native execution was tested on Linux. Boundary processing depends on source codec/keyframe layout; audio encoding still takes CPU time even when it overlaps the download.
