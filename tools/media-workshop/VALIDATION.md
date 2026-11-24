@@ -1,13 +1,14 @@
-# Media Workshop 1.3 — validation
+# Media Workshop 1.4 — validation
 
 Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, PyAV 16.0.1, FFmpeg/ffprobe 7.1.5, Node.js 24.19.0 and Chromium 154 on Linux.
 
 ## Automated checks
 
-**43 tests pass**, using actual FFmpeg processes and temporary media:
+**50 tests pass**, using actual FFmpeg processes and temporary media:
 
 - Accurate MP4/MP3 cuts, fractional timing, decoded audio sample counts, batches and unchanged original files.
-- Boundary-only H.264 processing: matching source packet hashes through the copied middle, expected frame counts, first-frame comparison, full decoding without errors, nonzero timestamps and cutting an already-edited result again.
+- Direct bounded H.264 indexing and boundary-only processing: matching source packet hashes through the copied middle, expected frame counts, first-frame comparison, full decoding without errors, nonzero timestamps and cutting an already-edited result again.
+- AAC packet preservation and decoded-sample agreement at fractional starts for 44.1/48 kHz noise, preservation of a delayed audio track, Opus-to-AAC conversion, silent late-source cuts, six-second smart cuts, end-of-source frame preservation, and cancellation of parallel audio work.
 - Automatic accurate fallback after boundary processing fails; whole-source exports preserve their originals; old cut-mode settings cannot change timing.
 - Actual yt-dlp subprocess downloads over local HTTP. MP3 conversion starts before download completion, retains every decoded sample, and produces 192 kbps audio. Native MP3 downloads remain byte-identical.
 - A real nonstreamable M4A requests a seekable-file fallback; a separate queue test verifies that fallback completes. Failed downloads cannot publish apparently playable partial output.
@@ -19,13 +20,17 @@ Reproduce with `python -m unittest discover -s tests -v` after installing `requi
 
 ## One accurate cut workflow
 
-The interface has one **Export cut** workflow. Longer 8-bit H.264 clips use smartcut to encode cut boundaries while copying complete middle sections. A video-only temporary window avoids indexing the entire source or retaining its compressed audio in memory. The adapter checks frame count and duration before accepting the video. Audio is cut accurately with FFmpeg. Short clips, other codecs and processing failures use the accurate encoder automatically. No path deliberately shifts the start to a preceding keyframe.
+The interface has one **Export cut** workflow. Compatible 8-bit H.264 clips of at least six seconds use smartcut to render cut boundaries and copy complete middle sections when enough can be copied. Other codecs, very short clips and genuine processing failures use the accurate encoder automatically. No path deliberately moves the start to a preceding keyframe.
 
-The optional smart backend is pinned to the tested smartcut 1.7 API and installed on Python 3.11–3.14. Its isolated worker adapts encoder thread/preset settings without editing installed dependency source. Newer Python versions retain accurate FFmpeg encoding. Updated requirements are installed automatically when the launcher sees their fingerprint change.
+Version 1.4 removes a temporary video remux. A bounded index reads only video packet timestamps around the selected range directly from the source, without decoding, buffering audio, or scanning the file prefix. The renderer also seeks directly to that indexed window. Compatible AAC audio uses MP4 edit lists/preroll for accurate leading samples and is copied without quality loss. Non-AAC audio is encoded concurrently with video processing. The final pass only muxes the finished tracks. An AAC export can retain less than one compressed frame of trailing audio; the start is checked against decoded reference samples.
 
-On a generated 60-second **1280×720 / 30 fps H.264 + AAC MP4** with two-second keyframes, the same requested **3.25–55.25-second** cut took **6.89 seconds median** with full accurate encoding and **3.25 seconds median** with automatic boundary processing, approximately **2.1× faster**. The latter copied 50 seconds of video. Durations were 52.000 and 52.016 seconds, within one source frame of the requested range. Three sequential runs include probes and worker launch, and exclude fixture generation/import. This is a local fixture measurement, not a universal speed guarantee. [Raw results](tests/results/unified-1.3.0.json).
+Zero-duration packets from the boundary encoder previously caused some correct-frame-count cuts to fail duration validation and trigger a full encode. The adapter now supplies missing packet durations. A reproduced 10 fps regression fails the 1.3 worker and succeeds in 1.4 with copied interior video/audio; the delayed-audio test also checks its original offset. Frame-count and duration checks remain in place, with accurate fallback for genuine failures. The queue now says when it is copying/rendering boundaries, finishing audio, or using full encoding.
 
-Earlier download/remux measurements remain in [speed-1.1.0.json](tests/results/speed-1.1.0.json). The older [trim-1.2.0.json](tests/results/trim-1.2.0.json) describes the former two-mode workflow; its preceding-keyframe Fast cut was not timing-equivalent. Those modes are no longer presented or used.
+The backend remains pinned to smartcut 1.7 on Python 3.11–3.14. Its isolated worker adapts the tested backend API without editing installed dependency source. Newer Python versions retain accurate FFmpeg encoding. Existing libraries and queues need no migration.
+
+On the same generated 60-second **1280×720 / 30 fps H.264 + AAC MP4**, a **3.25–55.25-second** cut took **3.13 seconds median in 1.3** and **1.10 seconds in 1.4**, approximately **2.8× faster**. Three sequential runs per version each launch a fresh worker and include parent input/output probes. The current cut copies 50 seconds of video and the AAC audio. Every benchmark output decodes without errors. This is a local fixture measurement, not a universal speed guarantee or a measurement of the user's hardware/file. [Raw results and the duration regression](tests/results/trim-1.4.0.json).
+
+The prior [1.3 measurements](tests/results/unified-1.3.0.json), [1.2 trimming measurements](tests/results/trim-1.2.0.json), and [1.1 download/remux measurements](tests/results/speed-1.1.0.json) remain historical records. The older separate cut modes are no longer presented or used.
 
 ## MP3 download conversion
 

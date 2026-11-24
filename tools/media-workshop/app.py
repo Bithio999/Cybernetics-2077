@@ -571,7 +571,7 @@ def trim_plan(source, destination, fmt, meta, start, end, threads):
         fmt == "mp4"
         and meta.get("video_codec") == "h264"
         and meta.get("pixel_format") in {"yuv420p", "yuvj420p"}
-        and end - start >= 12
+        and end - start >= 6
         and importlib.util.find_spec("smartcut") is not None
     )
     if smart:
@@ -876,6 +876,8 @@ class Workshop:
             "smart_copied_seconds",
             "smart_boundary_segments",
             "encoder_started_before_download_finished",
+            "indexed_video_frames",
+            "audio_processing",
         }
         values = {k: v for k, v in values.items() if k in allowed}
         if "progress" in values:
@@ -998,7 +1000,11 @@ class Workshop:
                 )
                 method = "Accurate cut"
                 self.update(job_id, trim_start=start, processing_backend=backend)
-                stage = "Trimming " + spec["format"].upper()
+                stage = (
+                    "Preparing accurate cut"
+                    if backend == "smart"
+                    else "Encoding " + spec["format"].upper()
+                )
             self.update(job_id, stage=stage, method=method, progress=base)
 
             def encoded(line):
@@ -1031,7 +1037,7 @@ class Workshop:
                         progress=0,
                         processing_backend="encoder",
                         fallback_reason=str(error),
-                        stage="Trimming MP4",
+                        stage="Encoding MP4 (compatibility fallback)",
                     )
                     self.run(
                         job_id,

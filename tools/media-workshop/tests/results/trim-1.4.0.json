@@ -1,0 +1,85 @@
+{
+  "environment": "Linux / Python 3.12.14 / FFmpeg 7.1.5 / smartcut 1.7 / PyAV 16.0.1",
+  "source": "60-second generated 1280x720, 30fps H.264 + AAC MP4; two-second GOP",
+  "requestedStart": 3.25,
+  "requestedEnd": 55.25,
+  "threads": 4,
+  "scope": "Three sequential runs per version, each in a fresh worker process. Includes parent input/output probes and worker launch. Excludes fixture generation/import. Local fixture measurements, not a universal speed guarantee.",
+  "processingSeconds": {
+    "1.3.0": [
+      3.3268139219999284,
+      3.128485481998723,
+      3.083968287000971
+    ],
+    "1.4.0": [
+      1.0987755170008313,
+      1.0525138799985143,
+      1.098371385000064
+    ]
+  },
+  "outputDuration": {
+    "1.3.0": 52.016016,
+    "1.4.0": 52.016016
+  },
+  "outputFrames": {
+    "1.3.0": 1560,
+    "1.4.0": 1560
+  },
+  "copiedVideoSeconds": 50.0,
+  "audioProcessing": "copy",
+  "medianSeconds": {
+    "1.3.0": 3.128485481998723,
+    "1.4.0": 1.098371385000064
+  },
+  "speedup": 2.8482947796373455,
+  "previousProfile": [
+    {
+      "seconds": 3.0428194950000034,
+      "phases": [
+        {
+          "output": "window.mp4",
+          "seconds": 0.09228128699942317
+        },
+        {
+          "output": "old-0.mp4",
+          "seconds": 1.998281792999478
+        }
+      ]
+    },
+    {
+      "seconds": 2.7282002749998355,
+      "phases": [
+        {
+          "output": "window.mp4",
+          "seconds": 0.08378367899967998
+        },
+        {
+          "output": "old-1.mp4",
+          "seconds": 1.9612894940000842
+        }
+      ]
+    },
+    {
+      "seconds": 2.839233257998785,
+      "phases": [
+        {
+          "output": "window.mp4",
+          "seconds": 0.08599491200038756
+        },
+        {
+          "output": "old-2.mp4",
+          "seconds": 2.0637270660008653
+        }
+      ]
+    }
+  ],
+  "previousProfileScope": "In-process warm/initial runs; identifies serial AAC encoding as the dominant final-pass cost. These are separate from the fresh-worker timing comparison.",
+  "zeroDurationRegression": {
+    "source": "20-second H.264 10fps + AAC with delayed audio; cut 0.25 to 13.5 seconds",
+    "previousWorkerExit": 1,
+    "previousError": "Boundary renderer returned an unexpected duration",
+    "currentWorkerExit": 0,
+    "currentOutputDuration": 13.206667,
+    "note": "The previous queue would fall back to full encoding. Current cut succeeds with interior video/AAC copied."
+  }
+}

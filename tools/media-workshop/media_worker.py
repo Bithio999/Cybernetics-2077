@@ -28,7 +28,9 @@ def emit(**data):
         print("WORKSHOP:" + json.dumps(data, ensure_ascii=True), flush=True)
 
 
-def ffmpeg(command, callback=lambda seconds: None):
+def ffmpeg(command, callback=lambda seconds: None, *, cancel_event=None):
+    if cancel_event is not None and cancel_event.is_set():
+        raise app.MediaError("Processing interrupted")
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
@@ -41,6 +43,8 @@ def ffmpeg(command, callback=lambda seconds: None):
     errors = deque(maxlen=12)
     try:
         for line in process.stdout:
+            if cancel_event is not None and cancel_event.is_set():
+                raise app.MediaError("Processing interrupted")
             errors.append(line.strip())
             if line.startswith("out_time_us="):
                 try:
@@ -61,43 +65,49 @@ def ffmpeg(command, callback=lambda seconds: None):
 
 
 def smart_trim(source, destination, start, end, threads):
-    """Work on a video-only window, not the full source or its compressed audio."""
-    from smartcut.media_container import MediaContainer
-    from smartcut.media_utils import VideoExportMode, VideoExportQuality
+    """Index the source directly and encode audio alongside boundary rendering."""
+    from concurrent.futures import ThreadPoolExecutor
     import importlib
-
-    engine = importlib.import_module("smartcut.cut_video")
+    import av
+    from smartcut.media_utils import VideoExportMode, VideoExportQuality
     from smartcut.cut_video import (
         make_adjusted_segment_times,
         make_cut_segments,
         smart_cut,
+        VideoCutter,
+        VideoSettings,
     )
-    from smartcut.cut_video import VideoCutter, VideoSettings
+    from video_index import index_video_window
+
+    engine = importlib.import_module("smartcut.cut_video")
 
     class BudgetedCutter(VideoCutter):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # The backend normally opens its packet reader at the file's start.
+            # Always seek directly to our first indexed GOP, including late cuts.
+            self.input_av_container.seek(
+                args[0].gop_start_times_dts[0], stream=self.in_stream
+            )
+            self.demux_iter = self.input_av_container.demux(self.in_stream)
+
         def init_encoder(self):
             super().init_encoder()
             self.encoding_options.update(preset="veryfast", threads=str(threads))
 
-    # Isolated process, pinned backend: adapt its factory without altering installed source.
+        def _fix_packet_timestamps(self, packet):
+            super()._fix_packet_timestamps(packet)
+            # PyAV's boundary encoder can leave duration at zero. MP4 otherwise
+            # understates the tail duration and triggers an unnecessary full encode.
+            if not packet.duration and self.in_stream.guessed_rate:
+                packet.duration = max(
+                    1, round(1 / self.in_stream.guessed_rate / self.out_time_base)
+                )
 
     meta = app.probe(source)
-    nearest = app.keyframe_before(source, meta, start)
-    if nearest is None:
-        raise app.MediaError("No indexed keyframe available for boundary processing")
-    # Include a preceding GOP for decoder priming, plus tail reference frames.
-    window_start = (
-        app.keyframe_before(source, meta, max(0, nearest - 0.001))
-        if nearest > 0.001
-        else 0
-    )
-    if window_start is None:
-        window_start = 0
-    window_end = min(meta["duration"], end + 2)
     temporary = destination.parent / "processing"
     temporary.mkdir(exist_ok=True)
-    window = temporary / "window.mp4"
-    video = temporary / "video.mp4"
+    video, audio = temporary / "video.mp4", temporary / "audio.m4a"
     emit(stage="Preparing cut", progress=1)
     base = [
         app.executable("ffmpeg"),
@@ -109,39 +119,51 @@ def smart_trim(source, destination, start, end, threads):
         "-protocol_whitelist",
         "file,pipe",
     ]
-    try:
+    stop_audio = threading.Event()
+    executor = ThreadPoolExecutor(max_workers=1)
+    container = None
+
+    def encode_audio():
+        # MP4 edit lists retain the selected sample start and AAC preroll. Copy
+        # compatible AAC instead of needlessly encoding the entire audio track.
+        audio_codec = (
+            ["-c:a", "copy"]
+            if meta["audio_codec"] == "aac"
+            else ["-c:a", "aac", "-b:a", "192k"]
+        )
         ffmpeg(
             [
                 *base,
                 "-ss",
-                str(window_start),
+                str(start),
                 "-i",
                 str(source),
                 "-t",
-                str(window_end - window_start),
+                str(end - start),
                 "-map",
-                "0:v:0",
-                "-an",
-                "-c:v",
-                "copy",
-                "-avoid_negative_ts",
-                "disabled",
+                "0:a:0",
+                "-vn",
+                *audio_codec,
+                "-threads",
+                str(threads),
+                "-map_metadata",
+                "-1",
+                "-movie_timescale",
+                "1000000",
                 "-progress",
                 "pipe:1",
                 "-nostats",
-                str(window),
+                str(audio),
             ],
-            lambda t: emit(
-                progress=min(10, 10 * t / max(0.001, window_end - window_start))
-            ),
+            cancel_event=stop_audio,
         )
-        container = MediaContainer(str(window))
-        segments = [
-            (
-                Fraction(str(start - window_start)) - container.start_time,
-                Fraction(str(end - window_start)) - container.start_time,
-            )
-        ]
+        with av.open(str(audio)) as encoded:
+            return float(Fraction(encoded.start_time or 0, av.time_base))
+
+    audio_future = executor.submit(encode_audio) if meta["audio"] else None
+    try:
+        container = index_video_window(source, start, end, threads)
+        segments = [(Fraction(str(start)), Fraction(str(end)))]
         cuts = make_cut_segments(
             container, make_adjusted_segment_times(segments, container)
         )
@@ -153,15 +175,18 @@ def smart_trim(source, destination, start, end, threads):
         ) - bisect_left(
             container.video_frame_times, segments[0][0] + container.start_time
         )
-        if copied < max(2, (end - start) * 0.5):
-            container.av_container.close()
+        if copied < max(1, (end - start) * 0.3):
             raise app.MediaError(
                 "Boundary-only processing would not save work for this cut"
             )
         emit(
-            stage="Trimming video",
+            stage="Copying video and rendering cut edges",
             smart_copied_seconds=copied,
             smart_boundary_segments=sum(c.require_recode for c in cuts),
+            indexed_video_frames=len(container.video_frame_times),
+            audio_processing=("copy" if meta["audio_codec"] == "aac" else "encode")
+            if meta["audio"]
+            else "none",
         )
 
         class Progress:
@@ -171,7 +196,7 @@ def smart_trim(source, destination, start, end, threads):
                 if self.total is None:
                     self.total = max(1, value)
                 else:
-                    emit(progress=min(75, 10 + 65 * value / self.total))
+                    emit(progress=min(90, 5 + 85 * value / self.total))
 
         original_cutter = engine.VideoCutter
         engine.VideoCutter = BudgetedCutter
@@ -189,7 +214,6 @@ def smart_trim(source, destination, start, end, threads):
                 raise error
         finally:
             engine.VideoCutter = original_cutter
-            container.av_container.close()
         video_meta = app.probe(video)
         if video_meta["video_frames"] != expected_frames:
             raise app.MediaError("Boundary renderer returned an unexpected frame count")
@@ -197,46 +221,48 @@ def smart_trim(source, destination, start, end, threads):
             0.025, 1.25 / max(1, meta.get("fps", 25))
         ):
             raise app.MediaError("Boundary renderer returned an unexpected duration")
-        emit(stage="Finishing cut", progress=75)
-        # Keep copied video; encode audio only to preserve sample-accurate cut points.
+        emit(
+            stage="Finishing audio"
+            if audio_future and not audio_future.done()
+            else "Saving cut",
+            progress=90,
+        )
+        audio_start = audio_future.result() if audio_future else 0
+        emit(stage="Saving cut", progress=95)
+        inputs = ["-itsoffset", str(video_meta["start_time"]), "-i", str(video)]
+        if audio_future:
+            inputs += ["-itsoffset", str(audio_start), "-i", str(audio)]
+        # Both tracks are already finished: the last pass only muxes/copies them.
         ffmpeg(
             [
                 *base,
-                "-itsoffset",
-                str(video_meta["start_time"]),
-                "-i",
-                str(video),
-                "-ss",
-                str(start),
-                "-i",
-                str(source),
+                *inputs,
                 "-t",
                 str(end - start),
                 "-map",
                 "0:v:0",
-                "-map",
-                "1:a:0?",
-                "-c:v",
+                *(["-map", "1:a:0"] if audio_future else []),
+                "-c",
                 "copy",
-                "-c:a",
-                "aac",
-                "-b:a",
-                "192k",
-                "-threads",
-                str(threads),
                 "-map_metadata",
                 "-1",
                 "-movflags",
                 "+faststart",
+                "-movie_timescale",
+                "1000000",
                 "-progress",
                 "pipe:1",
                 "-nostats",
                 str(destination),
             ],
-            lambda t: emit(progress=min(99, 75 + 24 * t / (end - start))),
+            lambda t: emit(progress=min(99, 95 + 4 * t / (end - start))),
         )
         emit(progress=100)
     finally:
+        stop_audio.set()
+        executor.shutdown(wait=True, cancel_futures=True)
+        if container is not None:
+            container.close()
         shutil.rmtree(temporary, ignore_errors=True)
 
 

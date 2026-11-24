@@ -66,16 +66,16 @@ Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. P
 
 There is **one accurate cut workflow**, optimized automatically. Your selected start/end times stay in place, within the source's frame/audio-sample precision.
 
-- Longer compatible H.264 cuts copy complete video sections and re-encode only the boundaries. Audio is encoded for accurate timing.
-- Shorter cuts and other codecs use a fast accurate encoder automatically. If boundary processing cannot preserve the requested timing, the app uses that encoder instead.
+- Compatible H.264 cuts copy complete video sections and re-encode only the boundaries. Compatible AAC audio is copied with precise start timing; other audio is converted alongside the video work.
+- Very short cuts and other codecs use a fast accurate encoder automatically. If boundary processing cannot preserve the requested timing, the app uses that encoder instead.
 - Exporting the whole source copies compatible tracks when possible. Originals remain intact.
 - MP3 cuts are encoded at 192 kbps to retain precise timing without compressed-frame cut shifts.
 
-Boundary processing uses smartcut on Python 3.11–3.14; other supported Python versions retain the accurate FFmpeg path. Performance depends on the codec, resolution, keyframe spacing and selected range. Faster encoding can produce larger files than slower presets.
+Boundary processing uses smartcut on Python 3.11–3.14; other supported Python versions retain the accurate FFmpeg path. Processing seeks directly to the selected range instead of copying a temporary video or scanning the beginning of a long source. Performance depends on the codec, resolution, keyframe spacing and selected range. The queue shows when full encoding is required. Faster encoding can produce larger files than slower presets.
 
 For **batch trimming**, check files in the media library, then enable **Apply this range to all checked library files**. All selected files use the same time range and output format. An invalid range or incompatible file prevents the entire batch from being queued, with an explanation. Leave End blank to use each file's own end.
 
-Times accept seconds (`83.5`), minutes/seconds (`01:23.500`) or hours/minutes/seconds (`00:01:23.500`). Audio-only media exports as MP3; video with no audio cannot export as MP3. Some imported codecs cannot preview in a particular browser but can still be converted.
+AAC exports can retain up to one compressed audio frame at the end (normally about 21–23 ms); video timing follows the source frames. Times accept seconds (`83.5`), minutes/seconds (`01:23.500`) or hours/minutes/seconds (`00:01:23.500`). Audio-only media exports as MP3; video with no audio cannot export as MP3. Some imported codecs cannot preview in a particular browser but can still be converted.
 
 Original files are never overwritten. Imports are copied into the library, and each export has a separate folder. Imports stream to disk rather than loading an entire large file into memory.
 
