@@ -26,7 +26,7 @@ Existing worlds are supported; new village buildings require new chunks.
 
 ## Media downloader & trimmer
 
-**[Media Workshop](tools/media-workshop/README.md)** converts YouTube/Twitch links to MP4 or MP3 and includes a preview, trimmer and batch queue. Runs independently of Minecraft. **[Download the program ZIP](releases/tools/Media-Workshop-1.4.1.zip)**.
+**[Media Workshop](tools/media-workshop/README.md)** converts YouTube/Twitch links to MP4 or MP3 and includes a preview, trimmer and batch queue. Runs independently of Minecraft. **[Download the program ZIP](releases/tools/Media-Workshop-1.5.0.zip)**.
 
 <details>
 <summary>Source code, building and documentation maintenance</summary>

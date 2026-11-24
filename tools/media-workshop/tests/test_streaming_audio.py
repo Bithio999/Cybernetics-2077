@@ -58,6 +58,26 @@ class StreamingAudio(unittest.TestCase):
             ],
             check=True,
         )
+        cls.seekable = cls.root / "seekable-only.m4a"
+        cls.opus = cls.root / "audio.webm"
+        for path, args in (
+            (cls.seekable, ["-c:a", "copy"]),
+            (cls.opus, ["-c:a", "libopus"]),
+        ):
+            subprocess.run(
+                [
+                    app.executable("ffmpeg"),
+                    "-v",
+                    "error",
+                    "-i",
+                    str(cls.audio),
+                    *args,
+                    str(path),
+                ],
+                check=True,
+            )
+        cls.full_transfers = {}
+        cls.transfer_lock = threading.Lock()
         root = cls.root
 
         class Handler(SimpleHTTPRequestHandler):
@@ -77,6 +97,9 @@ class StreamingAudio(unittest.TestCase):
                 while chunk := source.read(4096):
                     destination.write(chunk)
                     time.sleep(0.01 if "slow=1" in self.path else 0.001)
+                with cls.transfer_lock:
+                    key = self.path.split("?")[0]
+                    cls.full_transfers[key] = cls.full_transfers.get(key, 0) + 1
 
         cls.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
@@ -177,41 +200,100 @@ class StreamingAudio(unittest.TestCase):
             any(e.get("encoder_started_before_download_finished") for e in events)
         )
 
-    def test_real_nonstreamable_input_requests_seekable_fallback(self):
-        source = self.root / "seekable-only.m4a"
-        subprocess.run(
-            [
-                app.executable("ffmpeg"),
-                "-v",
-                "error",
-                "-y",
-                "-i",
-                str(self.audio),
-                "-c:a",
-                "copy",
-                str(source),
-            ],
-            check=True,
-        )
-        with self.assertRaisesRegex(app.MediaError, "STREAM_FALLBACK:"):
-            self.run_stream(source)
+    def test_real_nonstreamable_input_reuses_one_complete_download(self):
+        key = "/" + self.seekable.name
+        before = self.full_transfers.get(key, 0)
+        output, events = self.run_stream(self.seekable)
+        self.assertTrue(any(e.get("reused_audio_download") for e in events))
+        self.assertEqual(self.full_transfers[key] - before, 1)
+        self.assertAlmostEqual(app.probe(output)["duration"], 20, delta=0.1)
+        self.assertFalse((output.parent / "audio-source.cache").exists())
+
+        def decoded(path):
+            return subprocess.check_output(
+                [
+                    app.executable("ffmpeg"),
+                    "-v",
+                    "error",
+                    "-i",
+                    str(path),
+                    "-map",
+                    "0:a:0",
+                    "-ac",
+                    "1",
+                    "-ar",
+                    "48000",
+                    "-f",
+                    "s16le",
+                    "-",
+                ]
+            )
+
+        self.assertEqual(len(decoded(output)), len(decoded(self.seekable)))
+
+    def test_opus_download_converts_without_a_seekable_fallback(self):
+        output, events = self.run_stream(self.opus)
+        self.assertFalse(any(e.get("reused_audio_download") for e in events))
+        self.assertEqual(app.probe(output)["audio_codec"], "mp3")
+        self.assertAlmostEqual(app.probe(output)["duration"], 20, delta=0.1)
 
     def test_failed_downloader_never_succeeds_even_with_decodable_audio(self):
-        with tempfile.TemporaryDirectory() as directory:
-            folder = Path(directory)
-            metadata = folder / "meta.json"
-            script = "import sys,json;from pathlib import Path;Path(sys.argv[2]).write_text(json.dumps({'title':'fixture','ext':'mp3','duration':20}));sys.stdout.buffer.write(Path(sys.argv[1]).read_bytes());raise SystemExit(3)"
-            command = [sys.executable, "-c", script, str(self.native), str(metadata)]
+        for source, extension in ((self.native, "mp3"), (self.audio, "m4a")):
             with (
-                patch.object(
-                    media_worker,
-                    "stream_source_command",
-                    return_value=(command, metadata),
-                ),
-                patch.object(media_worker, "emit"),
+                self.subTest(extension=extension),
+                tempfile.TemporaryDirectory() as directory,
             ):
-                with self.assertRaises(app.MediaError):
-                    media_worker.mp3_stream("fixture", folder / "out.mp3", folder)
+                folder = Path(directory)
+                metadata = folder / "meta.json"
+                script = "import sys,json;from pathlib import Path;Path(sys.argv[2]).write_text(json.dumps({'title':'fixture','ext':sys.argv[3],'duration':20}));sys.stdout.buffer.write(Path(sys.argv[1]).read_bytes());raise SystemExit(3)"
+                command = [
+                    sys.executable,
+                    "-c",
+                    script,
+                    str(source),
+                    str(metadata),
+                    extension,
+                ]
+                with (
+                    patch.object(
+                        media_worker,
+                        "stream_source_command",
+                        return_value=(command, metadata),
+                    ),
+                    patch.object(media_worker, "emit"),
+                ):
+                    with self.assertRaises(app.MediaError):
+                        media_worker.mp3_stream("fixture", folder / "out.mp3", folder)
+
+    def test_queue_reuses_cached_input_without_starting_a_second_downloader(self):
+        from media_fixtures import local_stream_command
+        from test_workshop import completed
+
+        with tempfile.TemporaryDirectory() as directory:
+            instance = app.Workshop(Path(directory) / "library")
+            try:
+                url = f"http://127.0.0.1:{self.server.server_address[1]}/{self.seekable.name}"
+                with (
+                    patch.object(
+                        app,
+                        "streaming_mp3_command",
+                        side_effect=lambda ignored, out, folder: local_stream_command(
+                            url, out, folder
+                        ),
+                    ),
+                    patch.object(
+                        app,
+                        "download_command",
+                        side_effect=AssertionError("Unnecessary second download"),
+                    ),
+                ):
+                    ids = instance.download(["https://youtu.be/fixture"], "mp3")
+                    job = completed(instance, ids)[0]
+                self.assertEqual(job["state"], "complete", job["error"])
+                self.assertTrue(job["reused_audio_download"])
+                self.assertTrue(job["audio_stream_fallback"])
+            finally:
+                instance.close()
 
     def test_nonstreamable_container_uses_the_safe_existing_download_path(self):
         temporary = tempfile.TemporaryDirectory()
@@ -266,6 +348,36 @@ class StreamingAudio(unittest.TestCase):
                     until(
                         lambda: instance.snapshot()["jobs"][0].get(
                             "encoder_started_before_download_finished"
+                        )
+                    )
+                    instance.cancel(ids[0])
+                    job = completed(instance, ids)[0]
+                self.assertEqual(job["state"], "cancelled")
+                self.assertFalse(instance.assets)
+                self.assertFalse(instance.processes)
+                self.assertFalse((instance.directory / "jobs" / ids[0]).exists())
+            finally:
+                instance.close()
+
+    def test_cancelling_cached_conversion_stops_its_child_and_removes_cache(self):
+        from media_fixtures import local_stream_command
+        from test_workshop import until, completed
+
+        with tempfile.TemporaryDirectory() as directory:
+            instance = app.Workshop(Path(directory) / "library")
+            try:
+                url = f"http://127.0.0.1:{self.server.server_address[1]}/{self.seekable.name}"
+                with patch.object(
+                    app,
+                    "streaming_mp3_command",
+                    side_effect=lambda ignored, out, folder: local_stream_command(
+                        url, out, folder, pace_cached=True
+                    ),
+                ):
+                    ids = instance.download(["https://youtu.be/fixture"], "mp3")
+                    until(
+                        lambda: instance.snapshot()["jobs"][0].get(
+                            "reused_audio_download"
                         )
                     )
                     instance.cancel(ids[0])

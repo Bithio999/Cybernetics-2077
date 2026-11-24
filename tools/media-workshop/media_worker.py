@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import subprocess
 import shutil
+import signal
 import sys
 import threading
 import time
@@ -340,11 +341,14 @@ def stream_source_command(url, folder):
 
 
 def mp3_stream(url, destination, folder):
+    from source_relay import SourceRelay
+
     command, metadata_path = stream_source_command(url, folder)
     downloader = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **window_options()
     )
-    converter = None
+    converter = relay = None
+    cache_path = folder / "audio-source.cache"
     messages = deque(maxlen=12)
     state = {"download": 0.0, "encode": 0.0, "duration": 0.0, "native": False}
     state_lock = threading.Lock()
@@ -415,6 +419,8 @@ def mp3_stream(url, destination, folder):
             encoder_started_before_download_finished=not native
             and downloader.poll() is None,
         )
+        unseekable = False
+        detail = ""
         if native:
             with destination.open("wb") as output:
                 while chunk := downloader.stdout.read(1024 * 1024):
@@ -424,6 +430,7 @@ def mp3_stream(url, destination, folder):
             encoding = (
                 ["-c:a", "copy"] if copying else ["-c:a", "libmp3lame", "-b:a", "192k"]
             )
+            cache_input = data.get("ext") in {"mp4", "m4a", "m4b", "mov", "3gp", "ismv"}
             converter = subprocess.Popen(
                 [
                     app.executable("ffmpeg"),
@@ -449,18 +456,19 @@ def mp3_stream(url, destination, folder):
                     "-nostats",
                     str(destination),
                 ],
-                stdin=downloader.stdout,
+                stdin=subprocess.PIPE if cache_input else downloader.stdout,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
                 **window_options(),
             )
-            downloader.stdout.close()
+            if cache_input:
+                relay = SourceRelay(downloader.stdout, converter.stdin, cache_path)
+                relay.start()
+            else:
+                downloader.stdout.close()
             errors = deque(maxlen=12)
-            unseekable = False
-            for line in converter.stdout:
+            for raw in converter.stdout:
+                line = raw.decode("utf-8", "replace")
                 errors.append(line.strip())
                 if any(
                     text in line.lower()
@@ -471,43 +479,97 @@ def mp3_stream(url, destination, folder):
                     ]
                 ):
                     unseekable = True
-                if line.startswith("out_time_us=") and duration > 0:
+                if line.startswith("out_time_us="):
                     try:
-                        with state_lock:
-                            state["encode"] = max(
-                                0, min(1, float(line.split("=", 1)[1]) / 1e6 / duration)
-                            )
-                        report()
+                        seconds = float(line.split("=", 1)[1]) / 1e6
+                        if seconds > 0 and relay is not None and not unseekable:
+                            relay.release_cache.set()
+                        if duration > 0:
+                            with state_lock:
+                                state["encode"] = max(0, min(1, seconds / duration))
+                            report()
                     except ValueError:
                         pass
             failed = converter.wait()
-            if failed or unseekable:
-                detail = "\n".join(errors)
-                if unseekable:
-                    raise app.MediaError("STREAM_FALLBACK: " + detail)
+            detail = "\n".join(errors)
+            if failed and not unseekable:
                 raise app.MediaError(detail)
+        if relay is not None:
+            relay.join()
+            if relay.error is not None:
+                raise app.MediaError(
+                    f"The audio transfer could not finish: {relay.error}"
+                )
+            unseekable = unseekable or relay.pipe_error
         if downloader.wait():
             reader.join(timeout=2)
             raise app.MediaError(
                 "\n".join(messages)[-2400:] or "The audio download failed"
             )
-        emit(stage="Finishing MP3", progress=99)
-        try:
-            output = app.probe(destination)
-        except app.MediaError as error:
-            raise app.MediaError("STREAM_FALLBACK: " + str(error)) from error
+        reader.join(timeout=2)
+
+        def finish_cached_audio():
+            if relay is None or not relay.reusable:
+                raise app.MediaError(
+                    "STREAM_FALLBACK: " + (detail or "Input requires a seekable file")
+                )
+            source_meta = app.probe(cache_path)
+            if not source_meta["audio"]:
+                raise app.MediaError("The downloaded source has no audio track")
+            method, command = app.download_finish_plan(
+                cache_path, destination, "mp3", source_meta, 1080
+            )
+            emit(
+                stage="Converting downloaded audio",
+                method=method,
+                audio_stream_fallback=True,
+                reused_audio_download=True,
+            )
+            if command is None:
+                cache_path.replace(destination)
+            else:
+                ffmpeg(
+                    command,
+                    lambda t: emit(
+                        progress=min(99, 90 + 9 * t / source_meta["duration"])
+                    ),
+                )
+            return app.probe(destination)
+
+        if unseekable:
+            output = finish_cached_audio()
+        else:
+            emit(stage="Finishing MP3", progress=99)
+            try:
+                output = app.probe(destination)
+            except app.MediaError:
+                output = finish_cached_audio()
         if output["audio_codec"] != "mp3":
             raise app.MediaError("The source did not produce a valid MP3")
         emit(progress=100)
     finally:
         for process in [converter, downloader]:
             if process and process.poll() is None:
-                process.terminate()
+                if process is downloader and os.name == "nt":
+                    subprocess.run(
+                        ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                        stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL,
+                        **window_options(),
+                    )
+                elif process is downloader:
+                    # Let yt-dlp unwind its subprocess context and stop an
+                    # external HLS/FFmpeg downloader as well as its Python parent.
+                    process.send_signal(signal.SIGINT)
+                else:
+                    process.terminate()
                 try:
                     process.wait(timeout=3)
                 except subprocess.TimeoutExpired:
                     process.kill()
                     process.wait()
+        if relay is not None:
+            relay.join(timeout=3)
         reader.join(timeout=2)
         for stream in [
             downloader.stdout,
@@ -516,6 +578,10 @@ def mp3_stream(url, destination, folder):
         ]:
             if stream and not stream.closed:
                 stream.close()
+        try:
+            cache_path.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 def main():

@@ -49,11 +49,13 @@ When updating from an older version, replace the program files and retain your *
 
 Each job has its own progress, cancellation and retry controls. One failed link does not stop the rest. **Cancel unfinished** stops active and waiting jobs; **Clear finished** clears history while retaining library files.
 
-MP4 downloads prefer H.264 video and AAC audio while retaining the selected resolution/frame rate. Ready-to-use, fast-start MP4s are saved directly. Other compatible files are remuxed using **stream copy**, preserving their compressed audio and video without re-encoding. If one track is incompatible, only that track is converted. Necessary video conversions use a faster preset and a bounded CPU-thread budget shared between the configured workers.
+MP4 downloads prefer H.264 video and AAC audio while retaining the selected resolution/frame rate. Compatible separate tracks are merged directly into a fast-start MP4, avoiding an extra MKV-to-MP4 pass. Other combinations retain a compatible intermediate container. Ready-to-use, fast-start MP4s are saved directly. Other compatible files are remuxed using **stream copy**, preserving their compressed audio and video without re-encoding. If one track is incompatible, only that track is converted. Necessary video conversions use a faster preset and a bounded CPU-thread budget shared between the configured workers.
 
 The queue shows **Direct save**, **Stream copy**, or which tracks require conversion. Resolution still respects your quality ceiling, and sources are not upscaled. A 4K source is not replaced with a lower-resolution H.264 source just to avoid conversion.
 
-**MP3 conversion starts during the download**, rather than waiting for the entire source to finish. Existing MP3 downloads are preserved at their source bitrate without encoding; other audio downloads are converted to **192 kbps**. If a source requires a seekable file, the app automatically downloads it first and then converts it.
+**MP3 conversion starts during the download**, rather than waiting for the entire source to finish. Existing MP3 downloads are preserved at their source bitrate without encoding; other audio downloads are converted to **192 kbps**. For M4A/MP4 inputs, a temporary source cache is retained until decoding starts. If the input needs backward seeking, the completed download is reused for conversion instead of fetching it again. Normal streaming conversion discards the cache once it is no longer needed.
+
+Downloads share a version-aware yt-dlp extractor cache inside the library, and use small progress reports rather than repeatedly serializing full source metadata. The queue identifies when separate tracks are being combined.
 
 Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. Playlist/channel URLs are not expanded into batches, and ongoing live streams are not recorded. Site availability, authentication requirements and network restrictions can still prevent a download. This app has no login or DRM-unlocking feature.
 

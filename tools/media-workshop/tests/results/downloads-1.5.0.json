@@ -1,0 +1,87 @@
+{
+  "environment": "Linux / Python 3.12.14 / FFmpeg 7.1.5 / yt-dlp 2026.11.23",
+  "mp4": {
+    "source": "Separate 60-second 1280x720/30fps H.264 and AAC component files",
+    "scope": "Three sequential local post-download runs per path. Actual yt-dlp FFmpegMergerPP, finishing plan, probes and rename/remux. Excludes extraction/network transfer and fixture generation.",
+    "seconds": {
+      "1.4.1": [
+        0.6340550089989847,
+        0.5670919679978397,
+        0.4752992690009705
+      ],
+      "1.5.0": [
+        0.37073889699968277,
+        0.3428845159978664,
+        0.2977991190018656
+      ]
+    },
+    "finishingMethod": {
+      "1.4.1": "Stream copy",
+      "1.5.0": "Direct save"
+    },
+    "medianSeconds": {
+      "1.4.1": 0.5670919679978397,
+      "1.5.0": 0.3428845159978664
+    }
+  },
+  "mp3": {
+    "source": "90-second 48kHz stereo AAC 160kbps M4A; MP3 output 192kbps CBR",
+    "scope": "Actual queue/downloader/encoder over local HTTP, 4096 bytes per 8ms, three sequential runs per version/container layout. Counts completed media-body transfers, excluding partial generic-extractor header inspections. Not a public-site/network speed guarantee.",
+    "streamable": {
+      "1.4.1": {
+        "seconds": [
+          4.787836475999939,
+          4.596207261998643,
+          4.534900110000308
+        ],
+        "medianSeconds": 4.596207261998643,
+        "completeTransfers": [
+          1,
+          1,
+          1
+        ]
+      },
+      "1.5.0": {
+        "seconds": [
+          4.586179144000198,
+          4.552532385001541,
+          4.60031311000057
+        ],
+        "medianSeconds": 4.586179144000198,
+        "completeTransfers": [
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "seek_required": {
+      "1.4.1": {
+        "seconds": [
+          9.432934305001254,
+          9.512231970998982,
+          9.440867436998815
+        ],
+        "medianSeconds": 9.440867436998815,
+        "completeTransfers": [
+          2,
+          2,
+          2
+        ]
+      },
+      "1.5.0": {
+        "seconds": [
+          5.388985532001243,
+          5.582430589998694,
+          5.257596326999192
+        ],
+        "medianSeconds": 5.388985532001243,
+        "completeTransfers": [
+          1,
+          1,
+          1
+        ]
+      }
+    }
+  }
+}

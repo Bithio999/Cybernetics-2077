@@ -1,22 +1,41 @@
-# Media Workshop 1.4.1 — validation
+# Media Workshop 1.5 — validation
 
 Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, PyAV 16.0.1, FFmpeg/ffprobe 7.1.5, Node.js 24.19.0 and Chromium 154 on Linux.
 
 ## Automated checks
 
-**53 tests pass**, using actual FFmpeg processes and temporary media:
+**59 tests pass**, using actual FFmpeg processes and temporary media:
 
 - Accurate MP4/MP3 cuts, fractional timing, decoded audio sample counts, batches and unchanged original files.
 - Direct bounded H.264 indexing and boundary-only processing: matching source packet hashes through the copied middle, expected frame counts, first-frame comparison, full decoding without errors, nonzero timestamps and cutting an already-edited result again.
 - AAC packet preservation and decoded-sample agreement at fractional starts for 44.1/48 kHz noise, preservation of a delayed audio track, Opus-to-AAC conversion, silent late-source cuts, six-second smart cuts, end-of-source frame preservation, and cancellation of parallel audio work.
 - Correct video/audio track ends, lossless repair of duration-summary errors, rejection of actually shifted timestamps, and automatic accurate fallback after boundary processing fails; whole-source exports preserve their originals; old cut-mode settings cannot change timing.
 - Actual yt-dlp subprocess downloads over local HTTP. MP3 conversion starts before download completion, retains every decoded sample, and produces 192 kbps audio. Native MP3 downloads remain byte-identical.
-- A real nonstreamable M4A requests a seekable-file fallback; a separate queue test verifies that fallback completes. Failed downloads cannot publish apparently playable partial output.
+- A real nonstreamable M4A reuses one complete download for seekable conversion, with matching decoded sample counts. A real queue test rejects starting a second downloader. Opus streaming, failed native/non-native producers and cancellation during cached conversion are covered. Legacy uncached fallback remains available. Failed downloads cannot publish apparently playable partial output.
 - Cancellation kills the streaming worker/process group and removes partial files. Queue retry, interrupted-job recovery, persistent libraries and exclusive library locking remain covered.
 - HTTP imports/downloads, seeking, deletion, URL/host/token checks, invalid ranges, filenames and prevention of playlist expansion.
 - Existing MP4 direct-save, stream-copy and selective-conversion tests, including compatible-track packet preservation and the requested resolution ceiling.
 
 Reproduce with `python -m unittest discover -s tests -v` after installing `requirements.txt`. Ruff undefined/unused-name checks and JavaScript syntax checks also pass.
+
+## Download-path review
+
+**MP4:** retain the existing resolution/frame-rate and codec preferences; download components with yt-dlp; prefer a compatible MP4 merge, with MKV as the fallback. yt-dlp's real FFmpeg merger already writes fast-start output. Compatible H.264/AAC therefore enters the library with a same-filesystem rename instead of another complete remux. Incompatible tracks still receive the existing selective conversion. Real local HTTP component tests verify packet identity, direct-save output, the incompatible-container fallback and the combining-tracks status.
+
+Three sequential local runs using separate 60-second **1280×720/30 fps H.264 + AAC** component files took **0.567 s median** for the prior MKV merge plus MP4 finalization, and **0.343 s** for the direct MP4 merge/save: approximately **40% less post-download time**. This excludes extraction and network transfer. It is not a measurement of public-site throughput.
+
+**MP3:** keep native MP3 byte-identical, stream other audio into the existing 192 kbps LAME encoder, and require both download/conversion to succeed. M4A/MP4 inputs temporarily retain a seekable source while decoding begins; ordinary decoding releases this cache. If the input cannot be decoded through a pipe, the relay completes that same download and converts the cached file. WebM/Opus retains the direct pipe path. Cancellation covers cached conversion as well as downloading, and failed producers cannot publish partial audio.
+
+For a 90-second stereo AAC source over local HTTP, throttled to **4,096 bytes per 8 ms**, three runs per layout/version produced these medians:
+
+| Source layout | 1.4.1 | 1.5 | Completed media transfers |
+| --- | ---: | ---: | --- |
+| Streamable M4A | 4.596 s | 4.586 s | 1 → 1 |
+| M4A needing seeking | 9.441 s | 5.389 s | 2 → 1 |
+
+The seeking case used about **43% less elapsed time**, while ordinary streaming was effectively unchanged. These are real yt-dlp/FFmpeg queue runs against a local generic-extractor fixture, including extraction, transfer and conversion. Header inspections that do not complete the media body are excluded from the transfer count. No public-service or universal speedup is implied. [Raw measurements](tests/results/downloads-1.5.0.json).
+
+**Shared overhead:** replace disabled caching with yt-dlp's version-aware extractor cache under `data/jobs/.extractor-cache`; real cache store/reopen tests confirm reuse across jobs. Progress output contains only status/byte counts at a 0.2-second cadence, plus postprocessor status, instead of the full info dictionary. Native MP3 bitrate, converted audio's 192 kbps settings, requested resolution ceiling, playlist restrictions and retry limits are unchanged. FFmpeg's MP3 encoder remains single-threaded; extra encoder threads do not accelerate it.
 
 ## One accurate cut workflow
 
@@ -42,7 +61,7 @@ The prior [1.3 measurements](tests/results/unified-1.3.0.json), [1.2 trimming me
 
 ## MP3 download conversion
 
-yt-dlp's audio stream now feeds FFmpeg directly through a bounded pipe. Download and conversion overlap instead of running as two complete sequential stages, and no full intermediate source is needed on the streaming path. Both processes must succeed before the file enters the library. Nonstreamable source containers automatically use the existing seekable-file path. Cancellation covers the downloader, encoder and worker together.
+yt-dlp's audio stream feeds FFmpeg through a bounded pipe, with the M4A/MP4 recovery relay described above. Download and conversion overlap; the temporary recovery cache is discarded once ordinary decoding starts. Both processes must succeed before the file enters the library. A completed seekable cache avoids downloading nonstreamable input again. Cancellation covers the downloader, encoder and worker together.
 
 MP3 remains **192 kbps CBR** using the existing LAME quality settings; native MP3 is copied without encoding. FFmpeg reports that libmp3lame has no threading capability: assigning it extra threads does not make one conversion faster. The optimization overlaps work and removes intermediate file I/O, rather than lowering audio quality or joining separately encoded chunks.
 

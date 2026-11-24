@@ -13,7 +13,7 @@ SOURCE = ROOT / "tools/media-workshop"
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--output", type=Path, default=ROOT / "releases/tools/Media-Workshop-1.4.1.zip"
+        "--output", type=Path, default=ROOT / "releases/tools/Media-Workshop-1.5.0.zip"
     )
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -23,6 +23,7 @@ def main():
             "app.py",
             "media_worker.py",
             "video_index.py",
+            "source_relay.py",
             "launch.py",
             "Start.bat",
             "start.sh",

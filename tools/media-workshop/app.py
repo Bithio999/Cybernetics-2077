@@ -246,16 +246,21 @@ def download_command(url, directory, fmt, height):
         "-m",
         "yt_dlp",
         "--ignore-config",
-        "--no-cache-dir",
+        "--cache-dir",
+        str(directory.parent / ".extractor-cache"),
         "--no-playlist",
         "--no-colors",
         "--encoding",
         "utf-8",
         "--newline",
         "--progress",
+        "--progress-delta",
+        "0.2",
         "--no-simulate",
         "--progress-template",
-        "download:PROGRESS:%(progress)j",
+        'download:PROGRESS:{"status":%(progress.status)j,"downloaded_bytes":%(progress.downloaded_bytes|null)j,"total_bytes":%(progress.total_bytes|null)j,"total_bytes_estimate":%(progress.total_bytes_estimate|null)j}',
+        "--progress-template",
+        'postprocess:POSTPROCESS:{"status":%(progress.status)j,"postprocessor":%(progress.postprocessor|null)j}',
         "--print",
         "before_dl:TITLE:%(title)j",
         "--print",
@@ -291,7 +296,7 @@ def download_command(url, directory, fmt, height):
             "--format-sort",
             "lang,quality,res,fps,vcodec:h264,acodec:aac",
             "--merge-output-format",
-            "mkv",
+            "mp4/mkv",
         ]
     return [*command, "--", supported_url(url)]
 
@@ -880,6 +885,8 @@ class Workshop:
             "audio_processing",
             "duration_metadata_repair",
             "expected_video_duration",
+            "reused_audio_download",
+            "audio_stream_fallback",
         }
         values = {k: v for k, v in values.items() if k in allowed}
         if "progress" in values:
@@ -937,6 +944,16 @@ class Workshop:
                         self.update(job_id, title=safe_name(json.loads(line[6:])))
                     elif line.startswith("FILE:"):
                         paths.append(Path(json.loads(line[5:])).resolve())
+                    elif line.startswith("POSTPROCESS:"):
+                        info = json.loads(line[len("POSTPROCESS:") :])
+                        if info.get("status") in {"started", "processing"}:
+                            self.update(
+                                job_id,
+                                progress=90,
+                                stage="Combining tracks"
+                                if info.get("postprocessor") == "Merger"
+                                else "Preparing media",
+                            )
                     elif line.startswith("PROGRESS:"):
                         info = json.loads(line[9:])
                         total = (
