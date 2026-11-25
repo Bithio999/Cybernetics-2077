@@ -1,14 +1,15 @@
 package dev.cybernetics2077.client.temporal;
 
-/** Time-based spectrum and opacity envelopes are independent, so the tail keeps its colors. */
+/** Capture hue once; only opacity changes while the saved pose ages. */
 public final class TrailStyle {
   public static final double WORLD_LIFETIME = 42, WORLD_INTERVAL = 3.5;
   public static final int WORLD_HISTORY = 12, WORLD_DRAW_LIMIT = 48;
   public static final double HAND_LIFETIME = 12, HAND_INTERVAL = 3;
   public static final int HAND_HISTORY = 4;
+  public static final double COLOR_INTERVAL = 6;
   private static final int[] SPECTRUM = {
-    0xff9c3b, 0xffd447, 0xd9ff50, 0x79ff60, 0x32f69e, 0x25e6cf, 0x32ccff, 0x578aff, 0x8868ff,
-    0xc65bff, 0xff65cb
+    0x31e7ae, 0x2edbd4, 0x41c7e5, 0x459fdf, 0x546dd0, 0x856cc8, 0xbb78a9, 0xd88a85, 0xe2ad70,
+    0xe0d17b, 0x79dc93
   };
 
   private static double ease(double low, double high, double value) {
@@ -16,20 +17,33 @@ public final class TrailStyle {
     return t * t * (3 - 2 * t);
   }
 
-  public static int color(double age, boolean hands) {
-    double life = hands ? HAND_LIFETIME : WORLD_LIFETIME;
-    double progress = Math.clamp((age - (hands ? 1.5 : 3)) / (hands ? 7.5 : 28), 0, 1);
-    double stop = progress * (SPECTRUM.length - 1);
-    int index = Math.min(SPECTRUM.length - 2, (int) stop);
-    double blend = ease(0, 1, stop - index);
-    int a = SPECTRUM[index], b = SPECTRUM[index + 1], rgb = 0;
+  public static final double COLOR_CYCLE = SPECTRUM.length * COLOR_INTERVAL;
+
+  /** Birth time and RGB belong to the captured pose, not the frame drawing it. */
+  public record PoseTint(double bornAt, int rgb) {
+    public double age(double now) {
+      return Math.max(0, now - bornAt);
+    }
+
+    public int color(double now, boolean hands) {
+      double age = age(now), life = hands ? HAND_LIFETIME : WORLD_LIFETIME;
+      double opacity =
+          ease(hands ? 1 : 1.5, hands ? 2.5 : 4, age) * (1 - ease(hands ? 8 : 36, life, age));
+      return ((int) Math.round((hands ? 58 : 140) * opacity) << 24) | rgb;
+    }
+  }
+
+  /** Each activation starts mint/cyan; later captures advance around the palette. */
+  public static PoseTint capture(double now, double activationAge) {
+    double phase = Math.max(0, activationAge) % COLOR_CYCLE / COLOR_INTERVAL;
+    int index = (int) phase;
+    double blend = ease(0, 1, phase - index);
+    int a = SPECTRUM[index], b = SPECTRUM[(index + 1) % SPECTRUM.length], rgb = 0;
     for (int shift = 0; shift <= 16; shift += 8)
       rgb |=
           (int) Math.round(((a >> shift) & 255) * (1 - blend) + ((b >> shift) & 255) * blend)
               << shift;
-    double opacity =
-        ease(hands ? 1 : 1.5, hands ? 2.5 : 4, age) * (1 - ease(hands ? 8 : 36, life, age));
-    return ((int) Math.round((hands ? 58 : 140) * opacity) << 24) | rgb;
+    return new PoseTint(now, rgb);
   }
 
   public static boolean bodyVisible(boolean own, boolean firstPerson) {

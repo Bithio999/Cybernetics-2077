@@ -2,6 +2,16 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Captured Sandevistan colors (0.15.2)
+
+The supplied Edgerunners clip was inspected in sequential frames. Older cyan snapshots remain cyan as newer blue/violet snapshots appear. The renderer now captures each pose's birth time and RGB once; only alpha changes afterward. New poses advance through a shared hand/body palette per observed activation. [Reference observations and implementation](research/SANDEVISTAN-FIXED-TINTS-0.15.2.md) · [Player guide](wiki/dynalar-sandevistan.md).
+
+**75 JVM tests and the native trail review pass.** The tests cover immutable birth hues during later frames, different hues for successive captures, fade without RGB rotation, smooth palette wrapping, independent activation timing, first-person opacity, LOD limits and local-body suppression. The native review repeats stationary first/third-person views, actual Mantis attacks, camera overlap, reversal and view switching in a disposable integrated world. It reached 12 simultaneous echoes / 70,944 replayed vertices, retaining the existing 48-pose global limit. [Results](review/results/trails-0.15.2.json).
+
+The new [native screenshot](images/sandevistan-fixed-tints.png) is from that running client. The third-party reference clip and extracted frames are not redistributed. This adapts the observed snapshot behavior; it is not a claim of pixel-identical anime colors, shot timing, or matching colors between different networked observers. Existing two-second trail lengths, clipping safeguards and all server gameplay/battery rules remain. Dedicated-server GameTests were not rerun for this client-only change.
+
+The native run used 1280×720 software OpenGL and had no working OpenAL audio device or Mojang session-service connection. It validates the local visual scenarios, not audio, authenticated skins, hardware performance, or a two-computer connection. The older previews below document their respective versions and show the previous age-based color behavior.
+
 ## Sandevistan trail corrections (0.15.1)
 
 **74 JVM tests, 99 dedicated-server GameTests, the native trail review and clean package audit pass.** [Results](review/results/trails-0.15.1.json) · [Rendering changes and root causes](research/SANDEVISTAN-TRAILS-0.15.1.md) · [Player guide](wiki/dynalar-sandevistan.md).

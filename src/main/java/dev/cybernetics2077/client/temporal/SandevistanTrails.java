@@ -15,9 +15,10 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 public final class SandevistanTrails {
   public static boolean capturing;
 
-  private record Echo(Vec3 position, double time, List<TemporalMesh> mesh) {}
+  private record Echo(Vec3 position, TrailStyle.PoseTint tint, List<TemporalMesh> mesh) {}
 
   private static final Map<UUID, ArrayDeque<Echo>> HISTORY = new LinkedHashMap<>();
+  private static final Map<UUID, Double> COLOR_ORIGINS = new HashMap<>();
   private static final Map<UUID, Float> LAST_SWING = new HashMap<>();
   private static final Map<UUID, Float> LAST_YAW = new HashMap<>();
   private static final ArrayDeque<Echo> LEFT = new ArrayDeque<>(), RIGHT = new ArrayDeque<>();
@@ -36,6 +37,11 @@ public final class SandevistanTrails {
     while (history.size() > count) discard(history.removeFirst());
   }
 
+  private static TrailStyle.PoseTint captureTint(AbstractClientPlayer player, double now) {
+    double origin = COLOR_ORIGINS.computeIfAbsent(player.getUUID(), id -> now);
+    return TrailStyle.capture(now, now - origin);
+  }
+
   private static void emit(PoseStack pose, List<TemporalMesh> mesh, int color, AABB exclude) {
     for (var batch : mesh) {
       batch.draw(pose, color, exclude);
@@ -51,6 +57,13 @@ public final class SandevistanTrails {
       level = m.level;
     }
     double now = m.level.getGameTime() + e.getPartialTick().getGameTimeDeltaPartialTick(false);
+    COLOR_ORIGINS
+        .keySet()
+        .removeIf(
+            id -> {
+              var player = m.level.getPlayerByUUID(id);
+              return player == null || !Sandevistan.active(player);
+            });
     var candidates =
         m.level.players().stream()
             .filter(
@@ -63,6 +76,7 @@ public final class SandevistanTrails {
             .toList();
     int captured = 0;
     for (var p : candidates) {
+      COLOR_ORIGINS.putIfAbsent(p.getUUID(), now);
       var history = HISTORY.computeIfAbsent(p.getUUID(), id -> new ArrayDeque<>());
       var last = history.peekLast();
       float swing = p.getAttackAnim(0), yaw = p.yBodyRot;
@@ -75,7 +89,7 @@ public final class SandevistanTrails {
                           yaw - LAST_YAW.getOrDefault(p.getUUID(), yaw)))
                   > 8;
       if (motion
-          && (last == null || now - last.time >= TrailStyle.WORLD_INTERVAL)
+          && (last == null || last.tint.age(now) >= TrailStyle.WORLD_INTERVAL)
           && captured < 3) {
         var mesh = new PoseMesh();
         capturing = true;
@@ -96,7 +110,7 @@ public final class SandevistanTrails {
           history.addLast(
               new Echo(
                   p.getPosition(e.getPartialTick().getGameTimeDeltaPartialTick(false)),
-                  now,
+                  captureTint(p, now),
                   batches));
           captured++;
         }
@@ -114,7 +128,7 @@ public final class SandevistanTrails {
     while (iterator.hasNext()) {
       var entry = iterator.next();
       var history = entry.getValue();
-      while (!history.isEmpty() && now - history.peekFirst().time >= TrailStyle.WORLD_LIFETIME)
+      while (!history.isEmpty() && history.peekFirst().tint.age(now) >= TrailStyle.WORLD_LIFETIME)
         discard(history.removeFirst());
       if (history.isEmpty()) {
         iterator.remove();
@@ -139,7 +153,7 @@ public final class SandevistanTrails {
       int index = 0;
       for (var echo : history) {
         int ordinal = index++;
-        double age = now - echo.time;
+        double age = echo.tint.age(now);
         if (age < 1.5 || !TrailStyle.selected(ordinal, history.size(), budget)) continue;
         if (lastEchoes >= TrailStyle.WORLD_DRAW_LIMIT) break;
         pose.pushPose();
@@ -157,7 +171,7 @@ public final class SandevistanTrails {
                             .subtract(owner.position()))
                     .inflate(.09)
                     .move(echo.position.scale(-1));
-        emit(pose, echo.mesh, TrailStyle.color(age, false), exclude);
+        emit(pose, echo.mesh, echo.tint.color(now, false), exclude);
         if (exclude != null) lastBodyExclusions++;
         pose.popPose();
         lastEchoes++;
@@ -184,7 +198,7 @@ public final class SandevistanTrails {
     boolean active = Sandevistan.active(player);
     var last = history.peekLast();
     boolean moving = player.getDeltaMovement().lengthSqr() > .0005 || motion.trail() > 0;
-    if (active && moving && (last == null || now - last.time >= TrailStyle.HAND_INTERVAL)) {
+    if (active && moving && (last == null || last.tint.age(now) >= TrailStyle.HAND_INTERVAL)) {
       var recorder = new PoseMesh();
       capturing = true;
       try {
@@ -192,16 +206,16 @@ public final class SandevistanTrails {
       } finally {
         capturing = false;
       }
-      history.addLast(new Echo(Vec3.ZERO, now, upload(recorder.finish())));
+      history.addLast(new Echo(Vec3.ZERO, captureTint(player, now), upload(recorder.finish())));
       trim(history, TrailStyle.HAND_HISTORY);
     }
-    while (!history.isEmpty() && now - history.peekFirst().time > TrailStyle.HAND_LIFETIME)
+    while (!history.isEmpty() && history.peekFirst().tint.age(now) > TrailStyle.HAND_LIFETIME)
       discard(history.removeFirst());
     var identity = new PoseStack();
     var types = new HashSet<RenderType>();
     for (var echo : history)
-      if (now - echo.time >= 1.5) {
-        emit(identity, echo.mesh, TrailStyle.color(now - echo.time, true), null);
+      if (echo.tint.age(now) >= 1.5) {
+        emit(identity, echo.mesh, echo.tint.color(now, true), null);
         for (var b : echo.mesh) types.add(b.type);
       }
     if (source instanceof MultiBufferSource.BufferSource buffers) types.forEach(buffers::endBatch);
@@ -220,7 +234,7 @@ public final class SandevistanTrails {
     boolean active = Sandevistan.active(player);
     var last = history.peekLast();
     boolean moving = player.getDeltaMovement().lengthSqr() > .0005 || player.getAttackAnim(0) > .01;
-    if (active && moving && (last == null || now - last.time >= TrailStyle.HAND_INTERVAL)) {
+    if (active && moving && (last == null || last.tint.age(now) >= TrailStyle.HAND_INTERVAL)) {
       var recorder = new PoseMesh();
       capturing = true;
       try {
@@ -228,15 +242,15 @@ public final class SandevistanTrails {
       } finally {
         capturing = false;
       }
-      history.addLast(new Echo(Vec3.ZERO, now, upload(recorder.finish())));
+      history.addLast(new Echo(Vec3.ZERO, captureTint(player, now), upload(recorder.finish())));
       trim(history, TrailStyle.HAND_HISTORY);
     }
-    while (!history.isEmpty() && now - history.peekFirst().time > TrailStyle.HAND_LIFETIME)
+    while (!history.isEmpty() && history.peekFirst().tint.age(now) > TrailStyle.HAND_LIFETIME)
       discard(history.removeFirst());
     var types = new HashSet<RenderType>();
     for (var echo : history)
-      if (now - echo.time >= 1.5) {
-        emit(new PoseStack(), echo.mesh, TrailStyle.color(now - echo.time, true), null);
+      if (echo.tint.age(now) >= 1.5) {
+        emit(new PoseStack(), echo.mesh, echo.tint.color(now, true), null);
         for (var b : echo.mesh) types.add(b.type);
       }
     if (source instanceof MultiBufferSource.BufferSource buffers) types.forEach(buffers::endBatch);
@@ -247,6 +261,7 @@ public final class SandevistanTrails {
     LEFT.forEach(SandevistanTrails::discard);
     RIGHT.forEach(SandevistanTrails::discard);
     HISTORY.clear();
+    COLOR_ORIGINS.clear();
     LAST_SWING.clear();
     LAST_YAW.clear();
     LEFT.clear();

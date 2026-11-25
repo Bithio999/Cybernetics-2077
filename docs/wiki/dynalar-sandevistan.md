@@ -35,11 +35,9 @@ Two active Dynalar users have equal temporal pace, regardless of tier. Overlappi
 
 Server PvP settings and team protections prevent slowing protected players or their projectiles. Creative players and spectators are protected. Mounted entities retain normal vehicle physics. Normal defensive effects still work; Sandevistan does not grant invulnerability or ignore armor.
 
-[Watch the native preview (silent)](../media/sandevistan-trails-0.15.1.mp4)
-
 ## Effects
 
-Movement and attacks leave a roughly **two-second trail** of textured poses, including your skin, armor and deployed Mantis Blades. Eleven smoothly blended color stops run from **orange and gold → green → turquoise and cyan → blue → violet and pink**. The older colors stay visible before the trail fades.
+Movement and attacks leave a roughly **two-second trail** of textured poses, including your skin, armor and deployed Mantis Blades. Each pose receives its color when created and keeps that color until it fades. New poses advance through **mint and cyan → blue and violet → muted pink and amber → yellow-green**, then repeat. Older poses do not cycle through the palette. A new activation starts the palette again; hands and body use the same color timing.
 
 Your full-body trail is visible in third person and to other players. First person uses subtler hand and blade echoes, keeping the view clear.
 
@@ -47,6 +45,6 @@ Activation adds a brief lens pulse, restrained color separation, a small FOV tra
 
 ![Dynalar implant details](../images/sandevistan-details.png)
 
-![Colored pose trails](../images/sandevistan-long-trails.png)
+![Colored pose trails](../images/sandevistan-fixed-tints.png)
 
 [Controls](controls.md) · [Installing cyberware](installation.md) · [Ripperdoc stock](ripperdocs.md)

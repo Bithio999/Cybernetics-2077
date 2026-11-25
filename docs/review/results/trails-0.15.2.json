@@ -1,0 +1,45 @@
+{
+  "version": "0.15.2",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "status": "passed",
+  "jvmTests": {
+    "tests": 75,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "nativeStatus": "PASS: longer spectrum and bounded GPU histories; stationary first-person exclusion; stationary third-person body clipping; camera inside saved head; reversal across own history; return to first person; opaque hands/player render after echoes. Maximum echoes=12, vertices=70944, clipped=12.",
+  "nativeFrameTiming": {
+    "frames": 140,
+    "medianMs": 35.543259,
+    "p95Ms": 51.311056,
+    "renderer": "Mesa software OpenGL, 1280x720, LP_NUM_THREADS=3",
+    "hardwareBenchmark": false
+  },
+  "releaseVerifier": "passed",
+  "jarSha256": "3e587b26836f124258566f11a571933d663f0792b035bdf761e9e24442ac17f0",
+  "reference": {
+    "description": "User-provided 85.13-second trimmed Edgerunners compilation",
+    "observedWindowSeconds": [
+      9,
+      10.75
+    ],
+    "observation": "Older cyan poses keep their tint while new blue/violet poses appear; source video and extracted frames are not redistributed."
+  },
+  "checks": [
+    "Immutable captured RGB shared by world, vanilla hand and Mantis hand replay",
+    "Hue chosen by observed activation phase; no age-based recoloring",
+    "Opacity fades independently; palette wraps continuously",
+    "Existing draw/capture limits and camera/body exclusion scenarios pass",
+    "Clean release excludes review fixtures"
+  ],
+  "limitations": [
+    "Palette colors/timing are a Minecraft adaptation, not exact sampled anime values.",
+    "Integrated server with a scripted second runner, not two-computer multiplayer testing.",
+    "Separate observers begin their color clock when they first observe an activation.",
+    "No working OpenAL audio device or Mojang session-service connection in this visual run.",
+    "Dedicated-server GameTests were not rerun for this client-only change."
+  ],
+  "screenshot": "docs/images/sandevistan-fixed-tints.png"
+}

@@ -20,42 +20,56 @@ class TrailStyleTest {
   }
 
   @Test
-  void completeSpectrumRemainsVisibleBeforeHistoryEviction() {
-    double oldest = (TrailStyle.WORLD_HISTORY - 1) * TrailStyle.WORLD_INTERVAL;
-    assertTrue(oldest > 31 && oldest < TrailStyle.WORLD_LIFETIME);
-    int orange = TrailStyle.color(4, false),
-        green = TrailStyle.color(12, false),
-        cyan = TrailStyle.color(17, false),
-        blue = TrailStyle.color(23, false),
-        pink = TrailStyle.color(32, false);
-    assertTrue(r(orange) > b(orange) + 100);
-    assertTrue(g(green) > r(green) + 80);
-    assertTrue(g(cyan) > r(cyan) + 80 && b(cyan) > r(cyan) + 80);
-    assertTrue(b(blue) > g(blue) + 60);
-    assertTrue(r(pink) > g(pink) + 100 && b(pink) > g(pink) + 100);
-    assertTrue((pink >>> 24) >= 130, "Tail color faded before being visible");
+  void savedPoseKeepsItsBirthHueWhileNewerPosesChangeColor() {
+    var cyan = TrailStyle.capture(100, 12);
+    var blue = TrailStyle.capture(112, 24);
+    var violet = TrailStyle.capture(118, 30);
+    assertNotEquals(cyan.rgb(), blue.rgb());
+    assertNotEquals(blue.rgb(), violet.rgb());
+    for (double now = 100; now <= 143; now += .25) {
+      assertEquals(cyan.rgb(), cyan.color(now, false) & 0xffffff);
+      assertEquals(blue.rgb(), blue.color(now, false) & 0xffffff);
+      assertEquals(violet.rgb(), violet.color(now, false) & 0xffffff);
+    }
+    assertTrue(g(cyan.rgb()) > r(cyan.rgb()) + 80 && b(cyan.rgb()) > r(cyan.rgb()) + 80);
+    assertTrue(b(blue.rgb()) > g(blue.rgb()) + 60);
   }
 
   @Test
-  void spectrumChangesSmoothlyRatherThanJumpingBetweenSwatches() {
+  void birthPaletteBlendsSmoothlyIncludingItsCycleBoundary() {
     var seen = new HashSet<Integer>();
-    for (double age = 5; age < 32; age += .05) {
-      int a = TrailStyle.color(age, false), next = TrailStyle.color(age + .05, false);
-      seen.add(a & 0xffffff);
+    for (double phase = 0; phase < TrailStyle.COLOR_CYCLE * 2; phase += .05) {
+      int a = TrailStyle.capture(1000, phase).rgb();
+      int next = TrailStyle.capture(1000, phase + .05).rgb();
+      seen.add(a);
       assertTrue(
           Math.abs(r(a) - r(next)) < 10
               && Math.abs(g(a) - g(next)) < 10
               && Math.abs(b(a) - b(next)) < 10);
     }
     assertTrue(seen.size() > 300);
+    assertEquals(
+        TrailStyle.capture(0, 0).rgb(), TrailStyle.capture(1000, TrailStyle.COLOR_CYCLE).rgb());
   }
 
   @Test
-  void opacityHasSmoothEntryAndExitWithoutHidingTheOlderColors() {
-    assertEquals(0, TrailStyle.color(0, false) >>> 24);
-    assertEquals(0, TrailStyle.color(TrailStyle.WORLD_LIFETIME, false) >>> 24);
-    assertEquals(TrailStyle.color(10, false) >>> 24, TrailStyle.color(31, false) >>> 24);
-    assertTrue((TrailStyle.color(39, false) >>> 24) < (TrailStyle.color(35, false) >>> 24));
+  void opacityFadesWithoutRotatingSavedRgb() {
+    var tint = TrailStyle.capture(100, 24);
+    assertEquals(0, tint.color(100, false) >>> 24);
+    assertEquals(0, tint.color(100 + TrailStyle.WORLD_LIFETIME, false) >>> 24);
+    assertEquals(tint.color(110, false) >>> 24, tint.color(131, false) >>> 24);
+    assertTrue((tint.color(139, false) >>> 24) < (tint.color(135, false) >>> 24));
+    assertEquals(tint.color(135, false) & 0xffffff, tint.color(139, false) & 0xffffff);
+  }
+
+  @Test
+  void activationPhaseIsIndependentOfWorldAgeAndFirstPersonLifetime() {
+    var first = TrailStyle.capture(9_000_000, 0);
+    var other = TrailStyle.capture(10, 0);
+    assertEquals(first.rgb(), other.rgb());
+    assertTrue(g(first.rgb()) > r(first.rgb()) + 100);
+    assertEquals(first.color(9_000_006, false) & 0xffffff, first.color(9_000_006, true) & 0xffffff);
+    assertEquals(0, first.age(8_999_999));
   }
 
   @Test
@@ -77,9 +91,12 @@ class TrailStyleTest {
   }
 
   @Test
-  void firstPersonEchoesRemainSubtleAndFadeOut() {
-    for (int i = 0; i < 12; i++) assertTrue((TrailStyle.color(i, true) >>> 24) <= 58);
-    assertEquals(0, TrailStyle.color(12, true) >>> 24);
-    assertTrue((TrailStyle.color(9, true) & 0xffffff) != (TrailStyle.color(3, true) & 0xffffff));
+  void firstPersonEchoesKeepTheirTintAndFadeOut() {
+    var tint = TrailStyle.capture(50, 18);
+    for (double now = 50; now <= 62; now += .25) {
+      assertTrue((tint.color(now, true) >>> 24) <= 58);
+      assertEquals(tint.rgb(), tint.color(now, true) & 0xffffff);
+    }
+    assertEquals(0, tint.color(62, true) >>> 24);
   }
 }
