@@ -21,6 +21,8 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.16.2 afterimage camera anchoring and pixel regressions](../research/SANDEVISTAN-CAMERA-0.16.2.md).
 
+[0.17.0 local time scheduler, rain clocks and first-person trails](../research/SANDEVISTAN-BUBBLE-0.17.0.md).
+
 ## Edit the wiki
 
 The 65 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.

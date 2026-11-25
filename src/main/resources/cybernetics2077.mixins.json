@@ -17,7 +17,11 @@
     "TemporalTextureInvoker",
     "SandevistanLensMixin",
     "SandevistanSoundMixin",
-    "SandevistanHandMixin"
+    "SandevistanHandMixin",
+    "TemporalRainMixin",
+    "TemporalParticleAccess",
+    "TemporalParticlesMixin",
+    "TemporalBlockAnimationMixin"
   ],
   "injectors": {
     "defaultRequire": 1

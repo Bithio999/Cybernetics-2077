@@ -84,10 +84,13 @@ class TrailStyleTest {
   }
 
   @Test
-  void firstPersonNeverDrawsTheLocalFullBody() {
-    assertFalse(TrailStyle.bodyVisible(true, true));
-    assertTrue(TrailStyle.bodyVisible(true, false));
-    assertTrue(TrailStyle.bodyVisible(false, true));
+  void firstPersonShowsSeparatedOwnPosesAndSuppressesCameraOverlap() {
+    assertFalse(TrailStyle.bodyVisible(true, true, 0));
+    assertFalse(TrailStyle.bodyVisible(true, true, 1.24));
+    assertTrue(TrailStyle.bodyVisible(true, true, 1.25));
+    assertTrue(TrailStyle.bodyVisible(true, true, 8));
+    assertTrue(TrailStyle.bodyVisible(true, false, 0));
+    assertTrue(TrailStyle.bodyVisible(false, true, 0));
   }
 
   @Test

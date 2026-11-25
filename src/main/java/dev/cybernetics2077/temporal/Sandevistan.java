@@ -162,6 +162,24 @@ public final class Sandevistan {
     return TemporalRules.pace(personal, strongest);
   }
 
+  public static java.util.List<net.minecraft.world.phys.Vec3> fieldOrigins(Level level) {
+    return fields(level).stream().map(f -> f.owner.position()).toList();
+  }
+
+  /** Environmental updates have no personal acceleration and use the strongest local field. */
+  public static double environmentPace(Level level, double x, double y, double z, boolean blend) {
+    double result = 1;
+    for (var field : fields(level)) {
+      double distance = field.owner.distanceToSqr(x, y, z);
+      if (distance >= TemporalRules.RADIUS * TemporalRules.RADIUS) continue;
+      double pace = Math.min(1, TemporalRules.pace(1, field.strength));
+      double edge = blend ? Math.clamp((TemporalRules.RADIUS - Math.sqrt(distance)) / 6, 0, 1) : 1;
+      edge = edge * edge * (3 - 2 * edge);
+      result = Math.min(result, 1 - (1 - pace) * edge);
+    }
+    return result;
+  }
+
   public static double playerPace(Player p) {
     return p instanceof ServerPlayer ? pace(p) : client.apply(p).pace;
   }
@@ -210,7 +228,14 @@ public final class Sandevistan {
   }
 
   public static boolean controlled(Entity e) {
-    return (e instanceof Mob || e instanceof Projectile)
+    return (e instanceof Mob
+            || e instanceof Projectile
+            || e instanceof net.minecraft.world.entity.item.ItemEntity
+            || e instanceof net.minecraft.world.entity.ExperienceOrb
+            || e instanceof net.minecraft.world.entity.item.FallingBlockEntity
+            || e instanceof net.minecraft.world.entity.item.PrimedTnt
+            || e instanceof net.minecraft.world.entity.vehicle.Boat
+            || e instanceof net.minecraft.world.entity.vehicle.AbstractMinecart)
         && e.isAlive()
         && !e.isPassenger()
         && !e.isVehicle();

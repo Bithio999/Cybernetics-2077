@@ -1,0 +1,58 @@
+{
+  "version": "0.17.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "status": "passed",
+  "jvmTests": {
+    "tests": 89,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "addedJvmTests": 5,
+  "serverGameTests": {
+    "tests": 121,
+    "added": 9,
+    "failures": 0,
+    "status": "All 121 required tests passed"
+  },
+  "nativeBubbleStatus": "PASS: local rain UV phase, paced splashes, first-person own full-body echoes with clearance, third-person rendering, normal pace after off, unchanged sun clock.",
+  "nativeBubbleMeasurements": {
+    "sunClock": "normal",
+    "slowedSplashTicks": 67493,
+    "slowedRainColumns": 29988,
+    "finalRainPace": 1.0,
+    "visibleOwnEchoes": 10
+  },
+  "nativeTrailReview": {
+    "status": "passed",
+    "maximumEchoes": 12,
+    "maximumVertices": 76728,
+    "maximumBodyExclusions": 12,
+    "checks": [
+      "Stationary first-person body clearance",
+      "Third-person live-body exclusion",
+      "Camera inside saved head",
+      "Reversal across own trail",
+      "Switching between first and third person",
+      "Opaque live render after echoes"
+    ]
+  },
+  "releaseVerifier": "passed",
+  "wiki": {
+    "pages": 65,
+    "itemProgramEntries": 48,
+    "strictBuild": "passed"
+  },
+  "jarSha256": "35d70ea65927cf02aa7b8082a12d6ca1e489e41269bfc68c82c8c3d0a3f9beda",
+  "screenshots": {
+    "sandevistan-bubble-first-person-0.17.0.png": "3ecdd8c1265c22bde40891b1cf66ee99926c52c64f0c4e76e55a97b045876eab",
+    "sandevistan-bubble-third-person-0.17.0.png": "c3c7e3e6285e7069db941c5e5696dae8b0e4f3526d0fa08a13bb8ec40ce9a0c6"
+  },
+  "limitations": [
+    "Native captures used a disposable integrated world at 1280x720 with software OpenGL; not a hardware performance benchmark or authenticated two-computer multiplayer test.",
+    "Audio and session services unavailable in the native environment.",
+    "Scheduled-delay persistence covered by NBT round trips, not a full process restart.",
+    "Standard block entity, scheduled block/fluid, random update and vanilla precipitation paths covered; custom global machine timers, texture-atlas animations and replacement weather renderers may keep their own clocks."
+  ]
+}

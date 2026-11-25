@@ -27,7 +27,12 @@ public final class SandevistanTrails {
   private static final Map<UUID, Float> LAST_YAW = new HashMap<>();
   private static final ArrayDeque<Echo> LEFT = new ArrayDeque<>(), RIGHT = new ArrayDeque<>();
   private static Object level;
-  public static int lastActors, lastEchoes, lastVertices, lastBodyExclusions, lastSelfSuppressed;
+  public static int lastActors,
+      lastEchoes,
+      lastVertices,
+      lastBodyExclusions,
+      lastSelfSuppressed,
+      lastOwnEchoes;
 
   private static List<TemporalMesh> upload(List<PoseMesh.Batch> source) {
     return source.stream().map(TemporalMesh::new).toList();
@@ -128,7 +133,8 @@ public final class SandevistanTrails {
     var source = m.renderBuffers().bufferSource();
     source.endBatch();
     var camera = e.getCamera().getPosition();
-    lastActors = lastEchoes = lastVertices = lastBodyExclusions = lastSelfSuppressed = 0;
+    lastActors =
+        lastEchoes = lastVertices = lastBodyExclusions = lastSelfSuppressed = lastOwnEchoes = 0;
     var iterator = HISTORY.entrySet().iterator();
     while (iterator.hasNext()) {
       var entry = iterator.next();
@@ -142,12 +148,6 @@ public final class SandevistanTrails {
         continue;
       }
       var owner = m.level.getPlayerByUUID(entry.getKey());
-      // The body renderer is for observers/third person. First person has its own arm echoes.
-      if (!TrailStyle.bodyVisible(
-          entry.getKey().equals(m.player.getUUID()), m.options.getCameraType().isFirstPerson())) {
-        lastSelfSuppressed++;
-        continue;
-      }
       if (lastActors >= 6 || lastEchoes >= TrailStyle.WORLD_DRAW_LIMIT) continue;
       lastActors++;
       int budget =
@@ -160,6 +160,14 @@ public final class SandevistanTrails {
         int ordinal = index++;
         double age = echo.tint.age(now);
         if (age < 1.5 || !TrailStyle.selected(ordinal, history.size(), budget)) continue;
+        if (!TrailStyle.bodyVisible(
+            entry.getKey().equals(m.player.getUUID()),
+            m.options.getCameraType().isFirstPerson(),
+            echo.position.distanceTo(
+                m.player.getPosition(e.getPartialTick().getGameTimeDeltaPartialTick(false))))) {
+          lastSelfSuppressed++;
+          continue;
+        }
         if (lastEchoes >= TrailStyle.WORLD_DRAW_LIMIT) break;
         var delta = echo.position.subtract(camera);
         var modelView =
@@ -179,6 +187,7 @@ public final class SandevistanTrails {
         emit(modelView, e.getProjectionMatrix(), echo.mesh, echo.tint.color(now, false), exclude);
         if (exclude != null) lastBodyExclusions++;
         lastEchoes++;
+        if (entry.getKey().equals(m.player.getUUID())) lastOwnEchoes++;
       }
     }
     source.endBatch();

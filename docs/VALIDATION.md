@@ -2,6 +2,28 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Local time bubble and first-person body trails (0.17.0)
+
+**89 JVM tests, 121 dedicated-server GameTests, the native bubble review, the established trail review, clean release audit and strict wiki build pass.** [Results](review/results/bubble-0.17.0.json) · [Clock/scheduler design and compatibility](research/SANDEVISTAN-BUBBLE-0.17.0.md) · [Player guide](wiki/dynalar-sandevistan.md).
+
+The 32-block field now paces standard block-entity tickers, existing/new scheduled block/fluid delays, random updates and loose world entities. Native tick queues retain ownership, duplicate checks, priorities and chunk serialization. Remaining local delays are persisted separately, indexed by loaded chunk, and preserved across area copy/clear and chunk lifecycle. Deferred callbacks run once when ready; the field does not accumulate a backlog of missed update calls.
+
+Five added JVM cases cover complete local delays, exit behavior, visual-clock continuity, frame subdivision and restoring fractional timers. Nine added server cases exercise local block/fluid scheduling, activation after scheduling, field exit, saved NBT/cancellation, overlap/range/random frequency, real furnace/control progress, copied unfinished delays, real water flow and real repeater timing. Native furnace measurements confirm unchanged game/sun clocks. Saved-delay persistence is verified through NBT round trips, not a full external process restart.
+
+The native client review validates actual rain UV hooks, paced WaterDropParticle updates, visible own full-body poses in first person, third-person rendering and normal rain speed after deactivation. It asserts the sun continues with world time. The trail review repeats camera/body overlap, camera inside an old head, reversal and view switching with the new 1.25-block own-body clearance. The first-person trail screenshot is direct native output.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PbubbleReview
+./gradlew runClient -I docs/review/client.init.gradle -PtrailReview
+./gradlew clean test build
+python3 scripts/verify-release.py
+python3 scripts/check-wiki.py
+mkdocs build --strict
+```
+
+Native review uses a disposable integrated world and software OpenGL at 1280×720, without working audio or session-service connectivity. It is not authenticated two-computer testing or a hardware performance benchmark. Vanilla/standard ticker, scheduler and weather paths are covered; custom global machine timers and replacement weather renderers may keep their own clocks. The sun/shared weather cycle and global server tick rate are not changed. Review fixtures are excluded from the clean release.
+
 ## Sandevistan camera anchoring (0.16.2)
 
 **84 JVM tests, eight native pixel camera scenes, the established native trail suite, clean release audit and strict wiki build pass.** [Results](review/results/trail-camera-0.16.2.json) · [Root causes](research/SANDEVISTAN-CAMERA-0.16.2.md) · [Visible before/after](images/sandevistan-camera-comparison-0.16.2.png).

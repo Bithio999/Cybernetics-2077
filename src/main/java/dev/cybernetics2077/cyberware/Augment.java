@@ -201,7 +201,8 @@ public enum Augment {
       case DYNALAR_SANDEVISTAN ->
           List.of(
               "O: toggle Sandevistan. 50% relative slowing at every tier.",
-              "32-block encounter radius; overlapping fields never stack.",
+              "32-block time bubble; overlapping fields never stack.",
+              "Slows machines, block/fluid updates, loose objects and rain.",
               "Maximum duration: "
                   + dev.cybernetics2077.temporal.TemporalRules.duration(t)
                   + " seconds.",

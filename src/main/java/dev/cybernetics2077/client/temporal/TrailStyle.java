@@ -46,8 +46,8 @@ public final class TrailStyle {
     return new PoseTint(now, rgb);
   }
 
-  public static boolean bodyVisible(boolean own, boolean firstPerson) {
-    return !own || !firstPerson;
+  public static boolean bodyVisible(boolean own, boolean firstPerson, double separation) {
+    return !own || !firstPerson || separation >= 1.25;
   }
 
   /** Draw samples across the complete history, retaining both head and tail at lower detail. */
