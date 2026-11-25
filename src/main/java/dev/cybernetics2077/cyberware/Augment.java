@@ -33,7 +33,13 @@ public enum Augment {
   PAIN_EDITOR("pain_editor", CyberwareCategory.INTEGUMENTARY_SYSTEM, 4, 35),
   LYNX_PAWS("lynx_paws", CyberwareCategory.LEGS, 2, 5),
   JENKINS_TENDONS("jenkins_tendons", CyberwareCategory.LEGS, 2, 6),
-  DYNALAR_SANDEVISTAN("dynalar_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 2, 18);
+  DYNALAR_SANDEVISTAN("dynalar_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 2, 18),
+  SMART_LINK("smart_link", CyberwareCategory.HANDS, 1, 4),
+  BALLISTIC_COPROCESSOR("ballistic_coprocessor", CyberwareCategory.HANDS, 1, 2),
+  MICROGENERATOR("microgenerator", CyberwareCategory.HANDS, 1, 9),
+  HANDLE_WRAP("handle_wrap", CyberwareCategory.HANDS, 3, 8),
+  SHOCK_ABSORBER("shock_absorber", CyberwareCategory.HANDS, 1, 12),
+  IMMOVABLE_FORCE("immovable_force", CyberwareCategory.HANDS, 2, 35);
 
   public final String id;
   public final CyberwareCategory category;
@@ -94,6 +100,44 @@ public enum Augment {
 
   public List<String> details(int t) {
     return switch (this) {
+      case SMART_LINK ->
+          List.of(
+              "Scanning an enemy locks arrows / thrown tridents onto it.",
+              "Lock: " + (2 + t) + " seconds; range: " + (24 + 4 * t) + " blocks.",
+              "Limited steering; requires optics, line of sight and an unobstructed flight path.");
+      case BALLISTIC_COPROCESSOR ->
+          List.of(
+              "Arrows ricochet once from solid surfaces; preview while drawing a bow.",
+              "Retains " + (60 + 5 * t) + "% speed; +" + (5 * t) + "% damage after ricochet.",
+              "Bank shots follow the reflected trajectory. Tridents are not bounced.");
+      case MICROGENERATOR ->
+          List.of(
+              "A successful weapon hit discharges "
+                  + (2 + 2 * t)
+                  + " electrical damage within 3 blocks.",
+              "At most 4 enemies; recharge: " + (12 - t) + " seconds.",
+              "Supports melee, Mantis Blades, arrows and thrown tridents; cannot chain itself.");
+      case HANDLE_WRAP ->
+          List.of(
+              "Drawing a melee weapon, deploying blades or throwing a trident primes a 6-second"
+                  + " critical window.",
+              "+" + (t * 4) + "% weapon crit chance during that window; 10-second rearm.",
+              "Shares the existing 50% cyberware critical-chance cap.");
+      case SHOCK_ABSORBER ->
+          List.of(
+              "Reduces knockback by "
+                  + (30 + 10 * t)
+                  + "% while drawing a bow, crossbow or trident.",
+              "Does not grant damage reduction or affect other knockback.");
+      case IMMOVABLE_FORCE ->
+          List.of(
+              "Standing still on the ground accelerates bow/crossbow/trident charging.",
+              "One extra charge tick every "
+                  + (8 - t)
+                  + " ticks; fired arrows lose "
+                  + (20 + 5 * t)
+                  + "% less height to gravity.",
+              "Charges and projectile flight remain server-authoritative.");
       case EX_DISK ->
           List.of(
               "+" + t + " maximum RAM with a cyberdeck.",

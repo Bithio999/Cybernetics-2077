@@ -58,7 +58,17 @@ nav:
           - BioDyne Berserk: biodyne-berserk.md
           - Dynalar Sandevistan: dynalar-sandevistan.md
       - Arms:
-          - Mantis Blades: mantis-blades.md
+          - Physical Mantis Blades: mantis-blades.md
+          - Thermal Mantis Blades: thermal-mantis-blades.md
+          - Electrifying Mantis Blades: electrifying-mantis-blades.md
+          - Toxic Mantis Blades: toxic-mantis-blades.md
+      - Hands:
+          - Smart Link: smart-link.md
+          - Ballistic Coprocessor: ballistic-coprocessor.md
+          - Microgenerator: microgenerator.md
+          - Handle Wrap: handle-wrap.md
+          - Shock Absorber: shock-absorber.md
+          - Immovable Force: immovable-force.md
       - Face:
           - Basic Kiroshi Optics: kiroshi-optics.md
           - Clairvoyant Optics: clairvoyant-optics.md

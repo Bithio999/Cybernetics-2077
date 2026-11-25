@@ -138,7 +138,14 @@ public final class AugmentExpansion {
             ? dev.cybernetics2077.temporal.TemporalRules.critChance(
                 dev.cybernetics2077.temporal.Sandevistan.tier(p))
             : 0;
-    return Math.min(.5f, 1 - (1 - stab) * (1 - visual) * (1 - berserk) * (1 - sandy));
+    return Math.min(
+        .5f,
+        1
+            - (1 - stab)
+                * (1 - visual)
+                * (1 - berserk)
+                * (1 - sandy)
+                * (1 - dev.cybernetics2077.combat.HandsRuntime.wrapChance(p)));
   }
 
   public static float critMultiplier(ServerPlayer p) {
@@ -156,7 +163,8 @@ public final class AugmentExpansion {
   @SubscribeEvent
   public static void incoming(LivingIncomingDamageEvent e) {
     if (e.getSource().getEntity() instanceof ServerPlayer attacker) {
-      if (e.getSource().is(DamageTypes.PLAYER_ATTACK) && e.getAmount() > 0) {
+      if ((e.getSource().is(DamageTypes.PLAYER_ATTACK) || MantisVariant.elemental(e.getSource()))
+          && e.getAmount() > 0) {
         int dense = AugmentRuntime.tier(attacker, DENSE_MARROW);
         if (dense > 0) {
           e.setAmount(e.getAmount() * (1 + dense * .06f));

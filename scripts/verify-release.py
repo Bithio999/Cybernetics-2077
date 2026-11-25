@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.15.2.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.16.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.15.2'
+    assert metadata['mods'][0]['version']=='0.16.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -145,9 +145,29 @@ with ZipFile(jar) as z:
         'pain_editor': 4,
         'lynx_paws': 2,
         'jenkins_tendons': 2,
+        'smart_link': 1, 'ballistic_coprocessor': 1, 'microgenerator': 1,
+        'handle_wrap': 3, 'shock_absorber': 1, 'immovable_force': 2,
     }
     assert 'data/cybernetics2077/recipe/mantis_claws_tier_1.json' not in names
-    assert not any('microgenerator' in n or 'CrossbowReloadMixin' in n for n in names), 'Withdrawn hands content shipped'
+    assert not any('CrossbowReloadMixin' in n for n in names), 'Obsolete crossbow reload hook shipped'
+    for variant, title in [('thermal', 'Thermal'), ('electrical', 'Electrifying'), ('toxic', 'Toxic')]:
+        icon = variant + '_mantis_blades'
+        assert struct.unpack('>II', z.read(f'assets/cybernetics2077/textures/item/{icon}.png')[16:24]) == (32, 32)
+        assert struct.unpack('>II', z.read(f'assets/cybernetics2077/textures/entity/mantis_{variant}.png')[16:24]) == (512, 544)
+        for lod in ('near', 'far'):
+            assert f'assets/cybernetics2077/meshes/mantis/{variant}_{lod}.cymesh' in names
+        for tier in range(2, 6):
+            item = f'{icon}_tier_{tier}'
+            assert lang['item.cybernetics2077.' + item] == title + ' Mantis Blades'
+            assert f'assets/cybernetics2077/models/item/{item}.json' in names
+        assert f'assets/cybernetics2077/models/item/{icon}_tier_1.json' not in names
+    for cls in ('combat/HandsRuntime', 'combat/HandsRules', 'combat/MantisEffects',
+                'combat/SecondaryDamage', 'cyberware/MantisVariant', 'client/ui/HandsClient',
+                'mixin/LivingDamageMemory'):
+        assert f'dev/cybernetics2077/{cls}.class' in names
+    for damage in ('mantis_thermal', 'mantis_electrical', 'mantis_toxic', 'mantis_bleed', 'hand_discharge'):
+        assert f'data/cybernetics2077/damage_type/{damage}.json' in names
+
     for implant, first in augment_starts.items():
         png = z.read(f'assets/cybernetics2077/textures/item/{implant}.png')
         assert struct.unpack('>II', png[16:24]) == (32, 32)

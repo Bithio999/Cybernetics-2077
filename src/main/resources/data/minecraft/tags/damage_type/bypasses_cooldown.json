@@ -1,9 +1,7 @@
 {
   "replace": false,
   "values": [
-    "cybernetics2077:short_circuit",
-    "cybernetics2077:overheat",
-    "cybernetics2077:contagion",
-    "cybernetics2077:synapse_burnout"
+    "cybernetics2077:hand_discharge",
+    "cybernetics2077:mantis_bleed"
   ]
 }

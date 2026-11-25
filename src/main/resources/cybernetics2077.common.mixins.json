@@ -8,7 +8,8 @@
     "VillagePoolAccess",
     "LynxStepsMixin",
     "TemporalServerMixin",
-    "TemporalSwingMixin"
+    "TemporalSwingMixin",
+    "LivingDamageMemory"
   ],
   "injectors": {
     "defaultRequire": 1

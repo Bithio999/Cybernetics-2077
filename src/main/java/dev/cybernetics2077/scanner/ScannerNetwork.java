@@ -180,7 +180,10 @@ public final class ScannerNetwork {
     long now = p.serverLevel().getGameTime();
     if (now - LAST.getOrDefault(p, Long.MIN_VALUE / 2) < 4) return;
     LAST.put(p, now);
-    PacketDistributor.sendToPlayer(p, new State(inspect(p, id)));
+    var data = inspect(p, id);
+    if (data.contains("id") && p.serverLevel().getEntity(id) instanceof LivingEntity target)
+      dev.cybernetics2077.combat.HandsRuntime.lock(p, target);
+    PacketDistributor.sendToPlayer(p, new State(data));
   }
 
   private ScannerNetwork() {}

@@ -36,6 +36,9 @@ public final class CyberwareCatalogue {
       for (var kind : Augment.values())
         if (kind.ordinal() > Augment.FORTIFIED_ANKLES.ordinal())
           for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
+      for (var variant : MantisVariant.values())
+        if (variant != MantisVariant.PHYSICAL)
+          for (var entry : Cybernetics2077.MANTIS_VARIANTS.get(variant)) add(list, entry.get());
       offers = List.copyOf(list);
     }
     return offers;

@@ -420,8 +420,9 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
             loadout.isHoveredOrFocused() ? 0xff244454 : 0xff172632,
             loadout.isHoveredOrFocused() ? WHITE : CYAN);
         c.text("MANAGE QUICKHACKS  >", 452, 649, 23, CYAN);
-      } else if (stack.getItem() instanceof MantisBladesItem) {
-        c.glowText("PAIRED ARM BLADES", 434, 548, 23, CYAN);
+      } else if (stack.getItem() instanceof MantisBladesItem blades) {
+        c.glowText(
+            blades.variant().title.toUpperCase(Locale.ROOT) + " ARM BLADES", 434, 548, 23, CYAN);
         c.body(
             String.format(
                 Locale.ROOT,
@@ -433,6 +434,12 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
             589,
             19,
             WHITE);
+        c.body(
+            c.fit(blades.variant().effect(), 466, 14, false),
+            434,
+            571,
+            14,
+            0xff000000 | blades.variant().color);
         c.body(
             String.format(
                 Locale.ROOT,

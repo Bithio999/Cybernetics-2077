@@ -41,3 +41,16 @@ Deployment uses separate eased channels: covers begin at 6% of the sequence; the
 The 0.5.9 first-person placement keeps the shoulder ends below the viewport, correcting the floating-arm appearance of 0.5.8. The Blender asset and third-person pose are unchanged in this correction.
 
 In 0.5.10 the first-person pose and lens are independent of the third-person rig: the hands sit at different heights, the mounts roll outward/up, and the blade profiles sit toward the screen edges. The 68° vertical weapon lens changes apparent size and foreshortening without rescaling the implant. A smooth view anchor keeps the original finite shoulder ends off-screen; no skin extension or model edits are needed. The earlier 52° lens describes the 0.5.8–0.5.9 framing.
+
+## Elemental variants (0.16.0)
+
+The Thermal, Electrifying and Toxic variants reuse the accepted base assembly and its six pivots. Their Blender files contain only the added hardware: cooling fins/heat shields, coils/conductor rails, or reservoirs/injectors. Open the original `mantis_blades.blend` for the base assembly. All runtime exports include both the base and the respective additions.
+
+```sh
+blender -b -t 4 --python art/mantis/build_variants.py -- "$PWD"
+python3 art/hands/build.py
+```
+
+The first command exports hardware `.blend` scenes, meshes and `variant-report.json`; the second rebuilds original pixel icons, model/localization entries and the 512×544 variant atlases. These atlases preserve the baked base with a new hardware swatch strip. Physical uses the original 512×512 atlas.
+
+Near/far triangles per arm: **Thermal 3,708 / 720**, **Electrifying 4,016 / 880**, **Toxic 3,900 / 948**. Each LOD stays within six groups and one shared material; the same far switch/caching applies. [Research and design](../../docs/research/HANDS-MANTIS-0.16.0.md).

@@ -27,7 +27,7 @@ Base cyberware capacity is **100** and can be changed in the world's server conf
 | Integumentary System | 3 |
 | Legs | 1 |
 
-Hands cyberware is reserved for a future firearms update. Operating System holds **one cyberdeck or Berserk**, so these cannot be equipped together.
+Choose up to **two different [Hands implants](cyberware.md)**. Operating System holds **one cyberdeck, Berserk or Sandevistan**, so these cannot be equipped together.
 
 ## View your loadout
 

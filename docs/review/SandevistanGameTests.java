@@ -149,39 +149,48 @@ public final class SandevistanGameTests {
     var center = new net.minecraft.world.level.ChunkPos(p.blockPosition());
     for (int x = center.x - 1; x <= center.x + 1; x++)
       for (int z = center.z - 1; z <= center.z + 1; z++) h.getLevel().setChunkForced(x, z, true);
-    var mob = EntityType.ZOMBIE.create(h.getLevel());
-    mob.setPos(p.position().add(0, 0, 5));
-    mob.setNoAi(true);
-    mob.setNoGravity(true);
-    h.getLevel().addFreshEntity(mob);
-    var arrow = EntityType.ARROW.create(h.getLevel());
-    arrow.setPos(p.position().add(2, 0, 5));
-    arrow.setNoGravity(true);
-    arrow.setDeltaMovement(0, 0, .1);
-    h.getLevel().addFreshEntity(arrow);
-    long start = h.getLevel().getGameTime();
-    h.runAfterDelay(
-        20,
-        () -> {
-          try {
-            h.assertTrue(
-                mob.tickCount >= 11
-                    && mob.tickCount <= 14
-                    && arrow.tickCount >= 11
-                    && arrow.tickCount <= 14,
-                "Native ticks not paced: " + mob.tickCount + "/" + arrow.tickCount);
-            h.assertTrue(h.getLevel().getGameTime() - start >= 20, "World clock slowed");
-            h.assertTrue(arrow.getZ() - p.getZ() < 7, "Projectile physics did not slow");
-          } finally {
-            mob.discard();
-            arrow.discard();
-            cleanup(p);
-            for (int x = center.x - 1; x <= center.x + 1; x++)
-              for (int z = center.z - 1; z <= center.z + 1; z++)
-                h.getLevel().setChunkForced(x, z, false);
-          }
-          h.succeed();
-        });
+    h.startSequence()
+        .thenWaitUntil(
+            () ->
+                h.assertTrue(
+                    h.getLevel().isPositionEntityTicking(p.blockPosition()),
+                    "Waiting for forced chunk to tick entities"))
+        .thenExecute(
+            () -> {
+              var mob = EntityType.ZOMBIE.create(h.getLevel());
+              mob.setPos(p.position().add(0, 0, 5));
+              mob.setNoAi(true);
+              mob.setNoGravity(true);
+              h.getLevel().addFreshEntity(mob);
+              var arrow = EntityType.ARROW.create(h.getLevel());
+              arrow.setPos(p.position().add(2, 0, 5));
+              arrow.setNoGravity(true);
+              arrow.setDeltaMovement(0, 0, .1);
+              h.getLevel().addFreshEntity(arrow);
+              long start = h.getLevel().getGameTime();
+              h.runAfterDelay(
+                  20,
+                  () -> {
+                    try {
+                      h.assertTrue(
+                          mob.tickCount >= 11
+                              && mob.tickCount <= 14
+                              && arrow.tickCount >= 11
+                              && arrow.tickCount <= 14,
+                          "Native ticks not paced: " + mob.tickCount + "/" + arrow.tickCount);
+                      h.assertTrue(h.getLevel().getGameTime() - start >= 20, "World clock slowed");
+                      h.assertTrue(arrow.getZ() - p.getZ() < 7, "Projectile physics did not slow");
+                    } finally {
+                      mob.discard();
+                      arrow.discard();
+                      cleanup(p);
+                      for (int x = center.x - 1; x <= center.x + 1; x++)
+                        for (int z = center.z - 1; z <= center.z + 1; z++)
+                          h.getLevel().setChunkForced(x, z, false);
+                    }
+                    h.succeed();
+                  });
+            });
   }
 
   @GameTest(template = "empty", batch = "sandevistan", timeoutTicks = 60)

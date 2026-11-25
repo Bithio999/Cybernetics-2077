@@ -10,7 +10,16 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 public final class MantisBlenderMesh {
   public static final net.minecraft.resources.ResourceLocation ATLAS =
       Cybernetics2077.id("textures/entity/mantis_blender.png");
-  private static MantisMeshData near, far;
+
+  public static net.minecraft.resources.ResourceLocation atlas(
+      dev.cybernetics2077.cyberware.MantisVariant variant) {
+    return variant == dev.cybernetics2077.cyberware.MantisVariant.PHYSICAL
+        ? ATLAS
+        : Cybernetics2077.id("textures/entity/mantis_" + variant.id + ".png");
+  }
+
+  private static final java.util.Map<dev.cybernetics2077.cyberware.MantisVariant, MantisMeshData[]>
+      MODELS = new java.util.EnumMap<>(dev.cybernetics2077.cyberware.MantisVariant.class);
 
   private static MantisMeshData load(
       net.minecraft.server.packs.resources.ResourceManager manager, String name) {
@@ -25,24 +34,28 @@ public final class MantisBlenderMesh {
   }
 
   public static void reload() {
-    near = null;
-    far = null;
+    MODELS.clear();
   }
 
   public static void preload(net.minecraft.server.packs.resources.ResourceManager manager) {
-    var newNear = load(manager, "near");
-    var newFar = load(manager, "far");
-    near = newNear;
-    far = newFar;
+    MODELS.clear();
+    for (var variant : dev.cybernetics2077.cyberware.MantisVariant.values()) {
+      String prefix =
+          variant == dev.cybernetics2077.cyberware.MantisVariant.PHYSICAL ? "" : variant.id + "_";
+      MODELS.put(
+          variant,
+          new MantisMeshData[] {load(manager, prefix + "near"), load(manager, prefix + "far")});
+    }
   }
 
   public static MantisMeshData model(boolean distant) {
-    if (distant) {
-      if (far == null) far = load(Minecraft.getInstance().getResourceManager(), "far");
-      return far;
-    }
-    if (near == null) near = load(Minecraft.getInstance().getResourceManager(), "near");
-    return near;
+    return model(dev.cybernetics2077.cyberware.MantisVariant.PHYSICAL, distant);
+  }
+
+  public static MantisMeshData model(
+      dev.cybernetics2077.cyberware.MantisVariant variant, boolean distant) {
+    if (!MODELS.containsKey(variant)) preload(Minecraft.getInstance().getResourceManager());
+    return MODELS.get(variant)[distant ? 1 : 0];
   }
 
   private static void part(
@@ -63,8 +76,9 @@ public final class MantisBlenderMesh {
       int light,
       MantisMotion.Pose motion,
       boolean distant,
-      float depth) {
-    var model = model(distant);
+      float depth,
+      dev.cybernetics2077.cyberware.MantisVariant variant) {
+    var model = model(variant, distant);
     p.pushPose();
     p.mulPose(MantisArticulation.mount(motion.blade(), depth));
     part(p, out, light, model, "mount");

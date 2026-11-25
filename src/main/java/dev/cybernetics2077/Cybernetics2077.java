@@ -92,6 +92,34 @@ public final class Cybernetics2077 {
                   ITEMS.register(
                       "mantis_blades_tier_" + t, () -> new MantisBladesItem(CyberwareTier.of(t))))
           .toList();
+  public static final java.util.Map<MantisVariant, java.util.List<Supplier<MantisBladesItem>>>
+      MANTIS_VARIANTS = registerMantisVariants();
+
+  private static java.util.Map<MantisVariant, java.util.List<Supplier<MantisBladesItem>>>
+      registerMantisVariants() {
+    var result =
+        new java.util.EnumMap<MantisVariant, java.util.List<Supplier<MantisBladesItem>>>(
+            MantisVariant.class);
+    result.put(MantisVariant.PHYSICAL, MANTIS_TIERS);
+    for (var variant : MantisVariant.values())
+      if (variant != MantisVariant.PHYSICAL) {
+        var entries = new java.util.ArrayList<Supplier<MantisBladesItem>>();
+        for (int t = 2; t <= 5; t++) {
+          var tier = CyberwareTier.of(t);
+          entries.add(
+              ITEMS.register(
+                  variant.id + "_mantis_blades_tier_" + t,
+                  () -> new MantisBladesItem(tier, variant)));
+        }
+        result.put(variant, java.util.List.copyOf(entries));
+      }
+    return java.util.Collections.unmodifiableMap(result);
+  }
+
+  public static MantisBladesItem mantis(MantisVariant variant, int tier) {
+    return MANTIS_VARIANTS.get(variant).get(tier - 2).get();
+  }
+
   // Compatibility alias: existing stacks are tier TWO immediately, never tier one.
   public static final Supplier<MantisBladesItem> LEGACY_MANTIS =
       ITEMS.register("mantis_claws_tier_1", () -> new MantisBladesItem(CyberwareTier.TWO));
@@ -201,6 +229,9 @@ public final class Cybernetics2077 {
           java.util.List.of(
               OPTICS_TIERS, CYBERDECK_TIERS, RAVEN_TIERS, SHORT_CIRCUIT_TIERS, MANTIS_TIERS))
         for (var item : family) e.accept(item.get());
+      for (var variant : MantisVariant.values())
+        if (variant != MantisVariant.PHYSICAL)
+          for (var item : MANTIS_VARIANTS.get(variant)) e.accept(item.get());
       for (var family : AUGMENTS.values()) for (var item : family) e.accept(item.get());
       for (var part : DAMAGED_PARTS) e.accept(part.get());
       for (var kind : QuickhackKind.values())

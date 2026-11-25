@@ -116,6 +116,8 @@ public final class AugmentRuntime {
       s.berserkEnd = s.camoEnd = s.pumpEnd = s.adrenalineEnd = s.scanUntil = 0;
       s.berserkKills = 0;
       s.highlights.clear();
+      s.wrapEnd = s.smartUntil = 0;
+      s.smartTarget = null;
     }
     int b = tier(p, BIODYNE_BERSERK), pump = tier(p, BLOOD_PUMP), camo = tier(p, OPTICAL_CAMO);
     if (s.berserkEnd != 0 && (time >= s.berserkEnd || b == 0)) {
@@ -348,10 +350,14 @@ public final class AugmentRuntime {
       }
     if (s.scanProfile != optic) {
       s.highlights.clear();
+      s.smartUntil = 0;
+      s.smartTarget = null;
       s.scanProfile = optic;
     }
     if (optic == null) {
       s.highlights.clear();
+      s.smartUntil = 0;
+      s.smartTarget = null;
       return;
     }
     if (s.scanUntil <= time || !CyberwareRuntime.usable(p) || time % 4 != 0) return;
@@ -402,6 +408,7 @@ public final class AugmentRuntime {
     var s = state(p);
     long time = now(p);
     dev.cybernetics2077.temporal.Sandevistan.snapshot(p, t);
+    HandsRuntime.snapshot(p, t);
     t.putLong("augmentTime", time);
     t.putBoolean("berserk", berserk(p));
     t.putLong("berserkEnd", s.berserkEnd);
@@ -503,6 +510,8 @@ public final class AugmentRuntime {
       s.berserkEnd = s.camoEnd = s.pumpEnd = s.adrenalineEnd = s.scanUntil = 0;
       s.berserkKills = 0;
       s.highlights.clear();
+      s.wrapEnd = s.smartUntil = 0;
+      s.smartTarget = null;
     }
     if (!(e.getSource().getEntity() instanceof ServerPlayer p)
         || p.isAlliedTo(e.getEntity())

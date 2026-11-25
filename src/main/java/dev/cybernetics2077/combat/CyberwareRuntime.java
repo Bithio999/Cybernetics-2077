@@ -67,6 +67,14 @@ public final class CyberwareRuntime {
     return stack.getItem() instanceof MantisBladesItem item ? item.tier() : null;
   }
 
+  public static MantisVariant bladeVariant(Player p) {
+    var stack =
+        p.getData(Cybernetics2077.CYBERWARE).getStackInSlot(CyberwareCategory.ARMS.firstSlot());
+    return stack.getItem() instanceof MantisBladesItem item
+        ? item.variant()
+        : MantisVariant.PHYSICAL;
+  }
+
   public static CyberwareTier deckTier(Player p) {
     return deck(p).getItem() instanceof CyberdeckItem item ? item.tier() : CyberwareTier.ONE;
   }
@@ -128,6 +136,7 @@ public final class CyberwareRuntime {
     t.putFloat("hackDamage", program == null ? 0 : quickhackDamage(p, program));
     t.putInt("uploadTicks", program == null ? 0 : AugmentRuntime.uploadTicks(p, program));
     AugmentRuntime.snapshot(p, t);
+    t.putInt("bladeVariant", bladeVariant(p).ordinal());
     t.putBoolean("claws", claws(p));
     t.putBoolean("deployed", s.deployed);
     t.putFloat("ram", s.ram);
@@ -223,6 +232,7 @@ public final class CyberwareRuntime {
       if (now - s.changed < 6) return;
       long elapsed = Math.clamp(now - s.changed, 0, CombatRules.DEPLOY);
       s.deployed = !s.deployed;
+      if (s.deployed) HandsRuntime.primeWrap(p);
       s.changed = now - (CombatRules.DEPLOY - elapsed);
       s.charge = -1;
       s.pendingHit = false;
@@ -489,9 +499,10 @@ public final class CyberwareRuntime {
     var tier = bladeTier(p);
     if (tier != null
         && target.hurt(
-            p.damageSources().playerAttack(p),
+            bladeVariant(p).source(p),
             AugmentRuntime.bladeDamage(
                 p, target, CombatRules.damage(combo) * tier.bladeMultiplier()))) {
+      MantisEffects.hit(p, target, bladeVariant(p), tier.level, combo == 3);
       target.knockback(combo == 3 ? .55 : .2, p.getX() - target.getX(), p.getZ() - target.getZ());
       p.serverLevel()
           .sendParticles(

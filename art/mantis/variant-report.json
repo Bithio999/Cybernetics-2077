@@ -1,0 +1,14 @@
+{
+  "thermal": {
+    "near_triangles": 3708,
+    "far_triangles": 720
+  },
+  "electrical": {
+    "near_triangles": 4016,
+    "far_triangles": 880
+  },
+  "toxic": {
+    "near_triangles": 3900,
+    "far_triangles": 948
+  }
+}

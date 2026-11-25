@@ -1,0 +1,6 @@
+{
+  "message_id": "mantis_thermal",
+  "exhaustion": 0.1,
+  "scaling": "never",
+  "effects": "burning"
+}

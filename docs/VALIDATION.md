@@ -2,6 +2,29 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Hands cyberware and Mantis variants (0.16.0)
+
+**81 JVM tests, 112 dedicated-server GameTests, the native client review, clean release audit and strict wiki build pass.** [Results](review/results/hands-mantis-0.16.0.json) · [References and Minecraft adaptations](research/HANDS-MANTIS-0.16.0.md) · [Player guides](wiki/cyberware.md).
+
+The new rules tests cover bounded homing, preserved speed, reflection, no reverse tracking, degenerate vectors, charge periods and distinct per-variant geometry/LOD budgets. The existing exported-triangle test now checks all three elemental near/far meshes against the moving forearm covers throughout deployment, on both normal and slim arm depths. Every checked mesh clears those plate surfaces.
+
+Thirteen added server scenarios cover all six Hands families and four blade families, preserved old shop indexes, scan/optics requirements, solid-wall obstruction, real-arrow ricochets without tunneling, deferred rebounds after owner loss, landed trident guidance, real secondary electrical damage and primary hurt-memory preservation, saved cooldowns, Handle Wrap without optics and anti-refresh behavior, ranged knockback, stationary/airborne charging, no-gravity arrows, elemental statuses, non-stacking bleed, killing-hit bursts, four-target limits and passive-bystander exclusion. The new burst damage still respects armor; it does not clear ordinary weapon hit protection. Existing server coverage continues to check PvP, installation, shops and all prior systems.
+
+The server run exposed a timing assumption in an old Sandevistan test: forced chunks were not always entity-ticking before the sample began. The fixture now waits for ticking readiness. The new bleed fixture retains its fake owner and explicitly delivers the due entity-post event if the fake environment has not ticked the mob. Production Sandevistan/bleed clocks are unchanged by these fixture corrections.
+
+The native review runs actual deployment/retraction and attack input for each variant, checks synchronized equipped types and six rigid groups, and captures first/third-person views. It renders every new tier item without missing models or translation keys and draws the bow trajectory with two installed Hands implants. A first capture had the old combat target obscuring the front camera; the final capture clears that fixture before inspecting the player. [Variant comparison](images/mantis-variants-0.16.png) · [Native item gallery](images/hands-catalogue-0.16.png) · [Bow preview](images/hands-bow-preview-0.16.png).
+
+```sh
+./gradlew runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PhandsReview
+./gradlew clean test build
+python3 scripts/verify-release.py
+python3 scripts/check-wiki.py
+mkdocs build --strict
+```
+
+The client uses a disposable integrated world at 1280×720 with Mesa software OpenGL. No working OpenAL device or Mojang session-service connection was available. This validates these native visual/input paths and a dedicated-server launch, not hardware frame rates, sound, authenticated skins or a two-computer multiplayer session. New models retain cached six-group meshes, one atlas per variant and the existing 16-block far-LOD switch. The bow preview is bounded to 40 segments and one rebound. Review classes, reference downloads and Blender/Python source files are excluded from the clean release JAR.
+
 ## Captured Sandevistan colors (0.15.2)
 
 The supplied Edgerunners clip was inspected in sequential frames. Older cyan snapshots remain cyan as newer blue/violet snapshots appear. The renderer now captures each pose's birth time and RGB once; only alpha changes afterward. New poses advance through a shared hand/body palette per observed activation. [Reference observations and implementation](research/SANDEVISTAN-FIXED-TINTS-0.15.2.md) · [Player guide](wiki/dynalar-sandevistan.md).

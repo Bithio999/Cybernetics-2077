@@ -55,6 +55,16 @@ families = {
     'optical_scanner':'kiroshi-optics', 'cyberdeck_tier_1':'militech-paraline',
     'raven_microcyber':'raven-microcyber', 'mantis_claws_tier_1':'mantis-blades',
     'dynalar_sandevistan':'dynalar-sandevistan',
+    'thermal_mantis_blades':'thermal-mantis-blades',
+    'electrical_mantis_blades':'electrifying-mantis-blades',
+    'toxic_mantis_blades':'toxic-mantis-blades',
+    'smart_link':'smart-link',
+    'ballistic_coprocessor':'ballistic-coprocessor',
+    'microgenerator':'microgenerator',
+    'handle_wrap':'handle-wrap',
+    'shock_absorber':'shock-absorber',
+    'immovable_force':'immovable-force',
+
     'ex_disk':'ex-disk', 'memory_boost':'memory-boost', 'biodyne_berserk':'biodyne-berserk',
     'kiroshi_clairvoyant_optics':'clairvoyant-optics', 'bionic_joints':'bionic-joints',
     'epimorphic_skeleton':'epimorphic-skeleton', 'neofiber':'neofiber',
@@ -91,7 +101,7 @@ for icon, page in families.items():
         errors.append(f'Missing item page: {page}')
     if not (WIKI / 'assets/icons' / (icon+'.png')).is_file():
         errors.append(f'Missing item icon: {icon}')
-for page in ['short-circuit','overheat','contagion','reboot-optics','cripple-movement','synapse-burnout']:
+for page in ['short-circuit','overheat','contagion','reboot-optics','cripple-movement','synapse-burnout','mantis-blades','thermal-mantis-blades','electrifying-mantis-blades','toxic-mantis-blades','ballistic-coprocessor','microgenerator']:
     if '**Damage type:**' not in (WIKI / (page+'.md')).read_text():
         errors.append(f'Missing damage type: {page}')
 
@@ -99,4 +109,4 @@ if errors:
     print('\n'.join(errors), file=sys.stderr)
     sys.exit(1)
 print(f'PASS: {len(pages)} pages, complete navigation, local links/anchors, '
-      f'{len(families)} item/program entries and six damage classifications')
+      f'{len(families)} item/program entries and damage classifications')

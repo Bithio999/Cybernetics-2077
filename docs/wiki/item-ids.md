@@ -26,6 +26,15 @@ Replace `<tier>` only with a tier listed in the table.
 | Militech Paraline | `cybernetics2077:militech_paraline_tier_<tier>` | 2–5 |
 | Raven Microcyber | `cybernetics2077:raven_microcyber_tier_<tier>` | 3–5 |
 | Mantis Blades | `cybernetics2077:mantis_blades_tier_<tier>` | 2–5 |
+| Thermal Mantis Blades | `cybernetics2077:thermal_mantis_blades_tier_<tier>` | 2–5 |
+| Electrifying Mantis Blades | `cybernetics2077:electrical_mantis_blades_tier_<tier>` | 2–5 |
+| Toxic Mantis Blades | `cybernetics2077:toxic_mantis_blades_tier_<tier>` | 2–5 |
+| Smart Link | `cybernetics2077:smart_link_tier_<tier>` | 1–5 |
+| Ballistic Coprocessor | `cybernetics2077:ballistic_coprocessor_tier_<tier>` | 1–5 |
+| Microgenerator | `cybernetics2077:microgenerator_tier_<tier>` | 1–5 |
+| Handle Wrap | `cybernetics2077:handle_wrap_tier_<tier>` | 3–5 |
+| Shock Absorber | `cybernetics2077:shock_absorber_tier_<tier>` | 1–5 |
+| Immovable Force | `cybernetics2077:immovable_force_tier_<tier>` | 2–5 |
 | Ex-Disk | `cybernetics2077:ex_disk_tier_<tier>` | 3–5 |
 | Memory Boost | `cybernetics2077:memory_boost_tier_<tier>` | 2–5 |
 | Dynalar Sandevistan | `cybernetics2077:dynalar_sandevistan_tier_<tier>` | 2–5 |
@@ -41,7 +50,6 @@ Replace `<tier>` only with a tier listed in the table.
 | Optical Camo | `cybernetics2077:optical_camo_tier_<tier>` | 2–5 |
 | Reinforced Tendons | `cybernetics2077:reinforced_tendons_tier_<tier>` | 2–5 |
 | Fortified Ankles | `cybernetics2077:fortified_ankles_tier_<tier>` | 2–5 |
-
 | RAM Upgrade | `cybernetics2077:ram_upgrade_tier_<tier>` | 1–5 |
 | Self-ICE | `cybernetics2077:self_ice_tier_<tier>` | 3–5 |
 | Kiroshi “Doomsayer” Optics | `cybernetics2077:kiroshi_doomsayer_optics_tier_<tier>` | 1–5 |

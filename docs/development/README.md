@@ -15,9 +15,11 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.14.0 implant research and adaptation notes](../research/CYBERWARE-EXPANSION-0.14.0.md) · Original pixel sprites: `python3 art/expansion/build.py`.
 
+[0.16.0 Hands and blade-variant research](../research/HANDS-MANTIS-0.16.0.md) · Original sprites/atlases: `python3 art/hands/build.py`.
+
 ## Edit the wiki
 
-The 56 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
+The 65 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
 
 ```sh
 python3 -m venv .venv-docs

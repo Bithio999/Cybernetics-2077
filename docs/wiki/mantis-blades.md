@@ -11,7 +11,13 @@
 
 Press **G** with **both hands empty** to deploy. Press G again to retract. Left-click for alternating slashes and a rising third hit. Hold right-click for at least **0.4 seconds**, then release to lunge.
 
-**Damage type: physical.**
+**Damage type:** Physical.
+
+Slashes have a **20% chance** to cause bleeding: four pulses over 4 seconds, each dealing **1 + 0.25 × tier** physical damage. Lunges guarantee the status if the target survives. Repeated applications refresh the bleed instead of stacking it.
+
+Choose one installed variant: **Physical**, [Thermal](thermal-mantis-blades.md), [Electrifying](electrifying-mantis-blades.md) or [Toxic](toxic-mantis-blades.md). All use the same controls and base hit damage, with different hardware and secondary effects.
+
+![Four Mantis Blade variants in Minecraft](../images/mantis-variants-0.16.png)
 
 | Tier | Capacity | Slashes 1–2 | Rising cut | Lunge |
 | --- | ---: | ---: | ---: | ---: |

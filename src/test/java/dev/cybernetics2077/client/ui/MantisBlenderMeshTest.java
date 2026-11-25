@@ -287,62 +287,76 @@ final class MantisBlenderMeshTest {
 
   @Test
   void emergingMechanismDoesNotCutThroughMovingDermalPlates() throws Exception {
-    var model = read("near");
-    for (float width : new float[] {3 / 16f, 4 / 16f}) {
-      for (float age = 0; age <= 30; age += .5f) {
-        var pose = MantisMotion.sample(true, age, 100, 0, false, 0, false);
-        var elbow = MantisRig.elbow(pose);
-        var bone = new Matrix4f(elbow).mul(MantisArticulation.mount(pose.blade(), width));
-        for (String name : new String[] {"mount", "carriage", "support", "blade", "tip", "edge"}) {
-          if (name.equals("carriage")) bone.mul(MantisArticulation.carriage(pose.slide()));
-          if (name.equals("support"))
-            bone.mul(MantisArticulation.support(pose.blade(), pose.extension()));
-          if (name.equals("blade"))
-            bone.mul(MantisArticulation.blade(pose.blade(), pose.extension()));
-          if (name.equals("tip")) bone.mul(MantisArticulation.tip(pose.tip()));
-          if (name.equals("edge")) bone.mul(MantisArticulation.edge(pose.tip()));
-          var data = model.parts().get(name).vertices();
-          for (var panel : MantisSkinPanels.ALL) {
-            var plate =
-                panel == MantisSkinPanels.Panel.PROXIMAL ? new Matrix4f() : new Matrix4f(elbow);
-            plate.mul(MantisSkinPanels.transform(panel, width, pose.panels(), false));
-            var relative = plate.invert().mul(bone);
-            var region = MantisSkinPanels.region(panel, width);
-            boolean side =
-                panel == MantisSkinPanels.Panel.SIDE_LEFT
-                    || panel == MantisSkinPanels.Panel.SIDE_RIGHT;
-            float plane =
-                side
-                    ? (panel == MantisSkinPanels.Panel.SIDE_LEFT
-                        ? -MantisRig.ARM_WIDTH / 2
-                        : MantisRig.ARM_WIDTH / 2)
-                    : -width / 2;
-            var a = new Vector3f();
-            var b = new Vector3f();
-            var c = new Vector3f();
-            var q = new Vector3f();
-            for (int i = 0; i < data.length; i += 24) {
-              relative.transformPosition(a.set(data[i], data[i + 1], data[i + 2]));
-              relative.transformPosition(b.set(data[i + 8], data[i + 9], data[i + 10]));
-              relative.transformPosition(c.set(data[i + 16], data[i + 17], data[i + 18]));
-              for (int edge = 0; edge < 3; edge++) {
-                var u = edge == 0 ? a : edge == 1 ? b : c;
-                var v = edge == 0 ? b : edge == 1 ? c : a;
-                float du = (side ? u.x : u.z) - plane, dv = (side ? v.x : v.z) - plane;
-                if (du * dv >= 0
-                    || java.lang.Math.abs(du) < .00001
-                    || java.lang.Math.abs(dv) < .00001) continue;
-                q.set(u).lerp(v, du / (du - dv));
-                assertFalse(
-                    region.contains(q.x, q.y, q.z),
-                    "Moving cover collision: "
-                        + panel
-                        + " / "
-                        + name
-                        + " at "
-                        + age
-                        + " local "
-                        + q);
+    for (String mesh :
+        new String[] {
+          "near",
+          "thermal_near",
+          "thermal_far",
+          "electrical_near",
+          "electrical_far",
+          "toxic_near",
+          "toxic_far"
+        }) {
+      var model = read(mesh);
+      for (float width : new float[] {3 / 16f, 4 / 16f}) {
+        for (float age = 0; age <= 30; age += .5f) {
+          var pose = MantisMotion.sample(true, age, 100, 0, false, 0, false);
+          var elbow = MantisRig.elbow(pose);
+          var bone = new Matrix4f(elbow).mul(MantisArticulation.mount(pose.blade(), width));
+          for (String name :
+              new String[] {"mount", "carriage", "support", "blade", "tip", "edge"}) {
+            if (name.equals("carriage")) bone.mul(MantisArticulation.carriage(pose.slide()));
+            if (name.equals("support"))
+              bone.mul(MantisArticulation.support(pose.blade(), pose.extension()));
+            if (name.equals("blade"))
+              bone.mul(MantisArticulation.blade(pose.blade(), pose.extension()));
+            if (name.equals("tip")) bone.mul(MantisArticulation.tip(pose.tip()));
+            if (name.equals("edge")) bone.mul(MantisArticulation.edge(pose.tip()));
+            var data = model.parts().get(name).vertices();
+            for (var panel : MantisSkinPanels.ALL) {
+              var plate =
+                  panel == MantisSkinPanels.Panel.PROXIMAL ? new Matrix4f() : new Matrix4f(elbow);
+              plate.mul(MantisSkinPanels.transform(panel, width, pose.panels(), false));
+              var relative = plate.invert().mul(bone);
+              var region = MantisSkinPanels.region(panel, width);
+              boolean side =
+                  panel == MantisSkinPanels.Panel.SIDE_LEFT
+                      || panel == MantisSkinPanels.Panel.SIDE_RIGHT;
+              float plane =
+                  side
+                      ? (panel == MantisSkinPanels.Panel.SIDE_LEFT
+                          ? -MantisRig.ARM_WIDTH / 2
+                          : MantisRig.ARM_WIDTH / 2)
+                      : -width / 2;
+              var a = new Vector3f();
+              var b = new Vector3f();
+              var c = new Vector3f();
+              var q = new Vector3f();
+              for (int i = 0; i < data.length; i += 24) {
+                relative.transformPosition(a.set(data[i], data[i + 1], data[i + 2]));
+                relative.transformPosition(b.set(data[i + 8], data[i + 9], data[i + 10]));
+                relative.transformPosition(c.set(data[i + 16], data[i + 17], data[i + 18]));
+                for (int edge = 0; edge < 3; edge++) {
+                  var u = edge == 0 ? a : edge == 1 ? b : c;
+                  var v = edge == 0 ? b : edge == 1 ? c : a;
+                  float du = (side ? u.x : u.z) - plane, dv = (side ? v.x : v.z) - plane;
+                  if (du * dv >= 0
+                      || java.lang.Math.abs(du) < .00001
+                      || java.lang.Math.abs(dv) < .00001) continue;
+                  q.set(u).lerp(v, du / (du - dv));
+                  assertFalse(
+                      region.contains(q.x, q.y, q.z),
+                      "Moving cover collision in "
+                          + mesh
+                          + ": "
+                          + panel
+                          + " / "
+                          + name
+                          + " at "
+                          + age
+                          + " local "
+                          + q);
+                }
               }
             }
           }

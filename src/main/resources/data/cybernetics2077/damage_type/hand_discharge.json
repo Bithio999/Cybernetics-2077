@@ -1,0 +1,6 @@
+{
+  "message_id": "hand_discharge",
+  "exhaustion": 0.1,
+  "scaling": "never",
+  "effects": "hurt"
+}

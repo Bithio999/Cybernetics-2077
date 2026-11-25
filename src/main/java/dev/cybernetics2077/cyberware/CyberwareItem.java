@@ -78,7 +78,14 @@ public class CyberwareItem extends Item {
                     Math.round(deck.relayDamage() * 100))
                 .withStyle(net.minecraft.ChatFormatting.AQUA));
     }
-    if (this instanceof MantisBladesItem) {
+    if (this instanceof MantisBladesItem blades) {
+      lines.add(
+          net.minecraft.network.chat.Component.literal(blades.variant().effect())
+              .withColor(blades.variant().color));
+      lines.add(
+          net.minecraft.network.chat.Component.literal(
+                  "Lunges always apply the variant status on a successful hit.")
+              .withStyle(net.minecraft.ChatFormatting.GRAY));
       lines.add(
           net.minecraft.network.chat.Component.translatable("cybernetics2077.mantis.description")
               .withStyle(net.minecraft.ChatFormatting.AQUA));

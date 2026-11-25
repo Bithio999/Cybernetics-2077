@@ -18,16 +18,19 @@ public final class MantisMesh {
       MODEL_MEMORY = new ByteBufferBuilder(1024 * 1024);
   private static MultiBufferSource.BufferSource isolated;
   private static net.minecraft.resources.ResourceLocation currentSkin;
+  private static dev.cybernetics2077.cyberware.MantisVariant currentVariant;
 
   private static MultiBufferSource.BufferSource source(
-      net.minecraft.resources.ResourceLocation skin) {
-    if (isolated == null || !skin.equals(currentSkin)) {
+      net.minecraft.resources.ResourceLocation skin,
+      dev.cybernetics2077.cyberware.MantisVariant variant) {
+    if (isolated == null || !skin.equals(currentSkin) || variant != currentVariant) {
       var fixed = new java.util.LinkedHashMap<RenderType, ByteBufferBuilder>();
       fixed.put(RenderType.entityCutoutNoCull(skin), SKIN_MEMORY);
       fixed.put(RenderType.entityCutoutNoCull(METAL), METAL_MEMORY);
-      fixed.put(MantisMaterial.TYPE, MODEL_MEMORY);
+      fixed.put(MantisMaterial.type(variant), MODEL_MEMORY);
       isolated = MultiBufferSource.immediateWithBuffers(fixed, FALLBACK_MEMORY);
       currentSkin = skin;
+      currentVariant = variant;
     }
     return isolated;
   }
@@ -53,10 +56,13 @@ public final class MantisMesh {
     boolean slim = player.getSkin().model() == PlayerSkin.Model.SLIM;
     float depth = slim ? 3 / 16f : 4 / 16f;
     boolean capture = dev.cybernetics2077.client.temporal.SandevistanTrails.capturing;
-    MultiBufferSource local = capture ? buffers : source(player.getSkin().texture());
+    var variant =
+        dev.cybernetics2077.cyberware.MantisVariant.of(
+            CyberwareClient.state(player.getId()).getInt("bladeVariant"));
+    MultiBufferSource local = capture ? buffers : source(player.getSkin().texture(), variant);
     var skin = local.getBuffer(RenderType.entityCutoutNoCull(player.getSkin().texture()));
     var metal = local.getBuffer(RenderType.entityCutoutNoCull(METAL));
-    var modelBuffer = local.getBuffer(MantisMaterial.TYPE);
+    var modelBuffer = local.getBuffer(MantisMaterial.type(variant));
     var sleeveFlag =
         left
             ? net.minecraft.world.entity.player.PlayerModelPart.LEFT_SLEEVE
@@ -76,7 +82,7 @@ public final class MantisMesh {
                           .getPosition()
                           .distanceToSqr(player.position())
                       > 256;
-      MantisBlenderMesh.render(p, modelBuffer, light, motion, distant, depth);
+      MantisBlenderMesh.render(p, modelBuffer, light, motion, distant, depth, variant);
     }
     p.popPose();
     if (!capture) ((MultiBufferSource.BufferSource) local).endBatch();

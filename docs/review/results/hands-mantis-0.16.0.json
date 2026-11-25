@@ -1,0 +1,68 @@
+{
+  "version": "0.16.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "status": "passed",
+  "jvmTests": {
+    "tests": 81,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "serverTests": {
+    "required": 112,
+    "passed": 112,
+    "failed": 0,
+    "newScenarios": 13
+  },
+  "nativeStatus": "PASS: all four variant meshes, synced equipped types, native first/third person deployment and attacks, original item icons and every tier model, bow preview with two installed hands implants.",
+  "wiki": {
+    "pages": 65,
+    "itemProgramEntries": 48,
+    "linksAndNavigation": "passed",
+    "strictBuild": "passed"
+  },
+  "releaseVerifier": "passed",
+  "jarSha256": "28580a5a9409101113e376341a60aa29d3eaeacb14a5e5e1db4e233f75126ec7",
+  "checks": [
+    "Existing item IDs, Augment ordinals and old catalogue prefix retained",
+    "Six Hands implant families with researched starting tiers, capacity, daily stock and Street Cred gates",
+    "Server-owned target validation, bounded guidance, one ricochet, projectile/ammo/enchantment retention",
+    "Preserved primary hurt memory around typed secondary electrical/bleed damage",
+    "Saved cooldown/rearm; no optics dependency for Handle Wrap",
+    "Thermal/electrical/toxic sources and status immunities; Physical bleeding refreshes without stacking",
+    "Distinct original Blender hardware, original 32px icons, cached near/far LODs, six articulated groups",
+    "Exported triangle clearance against moving forearm covers on regular/slim arms",
+    "Native first/third person deployment, attack, retraction, full tier item gallery and bow preview",
+    "No crafting recipes or review fixtures in clean JAR"
+  ],
+  "limitations": [
+    "Native client used integrated world/scripted review, not two-computer multiplayer.",
+    "Software OpenGL at 1280x720 is not a hardware performance benchmark.",
+    "No functioning OpenAL device or Mojang session-service connection in the native run.",
+    "Bow preview models block collisions/gravity, not target motion, shot spread or Smart Link steering.",
+    "Blade variants reuse accepted articulation and have distinct appended hardware; the new .blend files contain hardware additions only."
+  ],
+  "screenshots": {
+    "hands-bow-preview-0.16.png": "3bc433062ecb2357c8b259f52360de15afc7021debbe19744bdb2429f7067cff",
+    "hands-catalogue-0.16.png": "6b2531109df06a24633fa30e63b28cce95bf97643726fbceb8aebb0439bf3682",
+    "mantis-electrical-0.16.png": "31d790e6d1c5801102c329bbf21f654a7ab9eba1b1bf81bc69f96582aa69292f",
+    "mantis-thermal-0.16.png": "e801d2616ad61e38385c650d30f8aa51b815e3aa26e05127cff952878ff62ab8",
+    "mantis-toxic-0.16.png": "e0f6b7c27375d4d17b8c522c0ab7693371dd1190c418352a33aa7b97ac36fa91",
+    "mantis-variants-0.16.png": "1baeaa0040969a01d35b6ca0cd683d9cd11e80bdc82cae99661d6a045f9be3c5"
+  },
+  "meshBudgets": {
+    "thermal": {
+      "near_triangles": 3708,
+      "far_triangles": 720
+    },
+    "electrical": {
+      "near_triangles": 4016,
+      "far_triangles": 880
+    },
+    "toxic": {
+      "near_triangles": 3900,
+      "far_triangles": 948
+    }
+  }
+}

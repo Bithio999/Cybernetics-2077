@@ -21,6 +21,8 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
   public double sandyCharge = 1, lastSandyPace = 1;
   public int sandyProfile = 2;
   public boolean wasSandy;
+  public long microReady, wrapReady, wrapEnd, smartUntil;
+  public UUID smartTarget;
   public long pumpPulse;
   public long iceReady, heartReady, biomonitorReady, shockReady, jenkinsClock;
   public int jenkinsFatigue;
@@ -36,6 +38,9 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
   @Override
   public CompoundTag serializeNBT(HolderLookup.Provider registries) {
     var t = new CompoundTag();
+    t.putLong("microReady", microReady);
+    t.putLong("wrapReady", wrapReady);
+    t.putLong("wrapEnd", wrapEnd);
     t.putLong("sandyEnd", sandyEnd);
     t.putLong("sandyClock", sandyClock);
     t.putLong("sandyRearm", sandyRearm);
@@ -65,6 +70,9 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
 
   @Override
   public void deserializeNBT(HolderLookup.Provider registries, CompoundTag t) {
+    microReady = t.getLong("microReady");
+    wrapReady = t.getLong("wrapReady");
+    wrapEnd = t.getLong("wrapEnd");
     sandyEnd = t.getLong("sandyEnd");
     sandyClock = t.getLong("sandyClock");
     sandyRearm = t.getLong("sandyRearm");

@@ -70,10 +70,9 @@ public final class AugmentGameTests {
   }
 
   @GameTest(template = "empty", timeoutTicks = 80)
-  public static void researchedStartingTiersAndNoHandImplant(GameTestHelper h) {
+  public static void researchedStartingTiersAndHandsCoverage(GameTestHelper h) {
     int count = 0;
     for (var kind : Augment.values()) {
-      h.assertTrue(kind.category != CyberwareCategory.HANDS, "Unrequested hand implant registered");
       for (int t = kind.firstTier; t <= 5; t++) {
         var item = Cybernetics2077.augment(kind, t);
         h.assertTrue(
@@ -87,7 +86,7 @@ public final class AugmentGameTests {
                 == Items.AIR,
             "Unavailable lower tier registered");
     }
-    h.assertTrue(Augment.values().length == 29 && count == 115, "Wrong expansion size");
+    h.assertTrue(Augment.values().length == 35 && count == 142, "Wrong expansion size");
     h.assertTrue(
         Cybernetics2077.LEGACY_MANTIS.get().tier() == CyberwareTier.TWO
             && Cybernetics2077.MANTIS_TIERS.size() == 4,
