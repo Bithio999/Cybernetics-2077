@@ -1,0 +1,58 @@
+{
+  "version": "0.16.1",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "status": "passed",
+  "jvmTests": {
+    "tests": 81,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "nativeStatus": "PASS: all four variant meshes, synced equipped types, native first/third person deployment and attacks, original item icons and every tier model, bow preview with two installed hands implants; bounded live-only elemental ribbons in daylight/night views.",
+  "nativeSceneChecks": [
+    "Original Physical receiver has no elemental effect",
+    "All four types deploy, attack and retract with synchronized variants",
+    "Daylight, night and third-person rendering, item model/localization gallery",
+    "Nonzero elemental ribbon counts, at most 72 quads per arm asserted",
+    "Client fixture time is synchronized immediately for the short night capture instead of waiting for periodic time packets"
+  ],
+  "geometryBudgets": {
+    "thermal": {
+      "near_triangles": 3756,
+      "far_triangles": 744
+    },
+    "electrical": {
+      "near_triangles": 4064,
+      "far_triangles": 928
+    },
+    "toxic": {
+      "near_triangles": 3956,
+      "far_triangles": 980
+    }
+  },
+  "effectQuadsPerArm": {
+    "thermal": 54,
+    "electrical": 66,
+    "toxic": 42
+  },
+  "releaseVerifier": "passed",
+  "wiki": {
+    "pages": 65,
+    "strictBuild": "passed"
+  },
+  "jarSha256": "0053a3c87b4ed7cdb43f11701a5b956634b913daf5401ac8c47623fdb95b0bb9",
+  "screenshots": {
+    "mantis-electrical-0.16.1.png": "6b2a7c29c15b84ee727d0e9aa4e727a81c32363323f92c6de52812cf355d721c",
+    "mantis-elements-0.16.1.png": "16dde343c34958e1306437df4fae21299d39c6a8e7e2283373a243294d966ca8",
+    "mantis-thermal-0.16.1.png": "28680a7debd8ee470051b085585f5ef4913adbbcf872cd7ae556879e7d1aed94",
+    "mantis-toxic-0.16.1.png": "f97e77335d827b6552871dcfdb8e47f042520844d330491076dcc767e494fd6e",
+    "mantis-variants-0.16.1.png": "26239e2e7993ca8f4afb2c41d627e216fff1f890b243b39312b212046a0bce6a"
+  },
+  "limitations": [
+    "Native review used 1280x720 software OpenGL in an integrated test world, not a hardware benchmark or two-computer multiplayer test.",
+    "No functioning audio device or Mojang session-service connection in native review.",
+    "Server combat tests were not repeated for the client/art-only update; the prior gameplay release passed 112.",
+    "Elemental effects are local emissive ribbons, not dynamic light sources; they fade at range and are omitted from captured afterimages."
+  ]
+}

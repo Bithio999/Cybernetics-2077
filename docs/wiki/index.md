@@ -2,9 +2,9 @@
 
 A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod inspired by Cyberpunk 2077.
 
-**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.16.0**
+**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.16.1**
 
-[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.16.0.jar)
+[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.16.1.jar)
 [Start playing](getting-started.md)
 
 ## Find what you need

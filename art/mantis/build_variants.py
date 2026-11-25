@@ -31,34 +31,52 @@ for variant in ('thermal','electrical','toxic'):
   obj.name=name;obj['part']=part;obj['swatch']=swatch;additions[part].append(obj)
   # Local groups use runtime axes; each remains editable in the source scene.
   return obj
+ def wedge(name,part,y,z,length,height,swatch):
+  # Thin triangular cooling vane / injector tooth: a real silhouette, eight triangles.
+  mesh=bpy.data.meshes.new(name)
+  verts=[(x,Y,Z) for x in (-.023,.023) for Y,Z in [(y,z),(y+length,z),(y+length*.22,z-height)]]
+  mesh.from_pydata(verts,[],[(0,2,1),(3,4,5),(0,1,4,3),(1,2,5,4),(2,0,3,5)])
+  obj=bpy.data.objects.new(name,mesh);bpy.context.collection.objects.link(obj)
+  obj['part']=part;obj['swatch']=swatch;additions[part].append(obj)
  if variant=='thermal':
   for side in (-1,1):
-   shape('Ceramic heat shield', 'blade',(side*.023,.14,-.033),(.005,.21,.023),0)
+   shape('Ceramic heat shield', 'blade',(side*.023,.14,-.018),(.012,.26,.040),0)
    for i in range(6):shape('Copper heat exchanger louver','blade',(side*.025,.055+i*.032,-.047),(.008,.008,.016),2)
    shape('Incandescent heater strip','blade',(side*.026,.15,-.050),(.003,.22,.004),3)
+  for i in range(6):wedge('Swept radiator vane','blade',.035+i*.049,-.020,.045,.027,2)
   shape('Heat manifold','mount',(0,-.12,.081),(.08,.10,.012),0)
  elif variant=='electrical':
   for side in (-1,1):
-   shape('Insulated conductor rail','blade',(side*.024,.18,-.038),(.006,.30,.012),0)
-   shape('Live electrode','blade',(side*.028,.18,-.041),(.003,.27,.005),3)
+   shape('Fork electrode standoff','blade',(side*.036,.34,-.024),(.006,.13,.018),1)
+   shape('Fork electrode crossbrace','blade',(side*.024,.28,-.024),(.026,.012,.012),0)
+   shape('Insulated conductor rail','blade',(side*.024,.18,-.038),(.008,.34,.014),0)
+   shape('Live electrode','blade',(side*.036,.20,-.030),(.004,.34,.008),3)
    for i in range(5):shape('Induction coil','support',(side*.056,.10+i*.043,-.03),(.011,.012,.011),2,True)
    shape('Ceramic contact block','mount',(side*.06,-.15,.08),(.024,.08,.014),1)
  else:
   for side in (-1,1):
-   shape('Chemical reservoir','mount',(side*.062,-.18,.075),(.025,.15,.025),2,True)
-   for y in (-.265,-.095):shape('Reservoir seal','mount',(side*.062,y,.075),(.029,.016,.029),0,True)
+   shape('Chemical reservoir','mount',(side*.062,-.18,.075),(.032,.18,.032),2,True)
+   for y in (-.265,-.095):shape('Reservoir seal','mount',(side*.062,y,.075),(.036,.016,.036),0,True)
    shape('Fluid delivery line','support',(side*.058,.20,-.045),(.006,.30,.008),3)
    shape('Injection channel','blade',(side*.024,.18,-.043),(.004,.27,.006),2)
+  for i in range(7):wedge('Swept injection barb','blade',.025+i*.050,-.022,.041,.025,1)
   for i in range(7):
    o=shape('Micro serration','edge',(0,.025+i*.032,-.043),(.012,.012,.007),1);o.rotation_euler.x=.35
  bpy.context.view_layer.update()
  for lod in ('near','far'):
   model=read(OUT/(lod+'.cymesh'))
+  # Change the receiver's cross section, not just its accent hardware or tint.
+  sx,sz={'thermal':(1.55,.78),'electrical':(.72,.65),'toxic':(1.15,.66)}[variant]
+  for part in ('blade','tip','edge'):
+   for v in model[part][0]:
+    v[0]*=sx;v[2]*=sz
+    nx,ny,nz=v[5]/sx,v[6],v[7]/sz;n=math.sqrt(nx*nx+ny*ny+nz*nz)
+    v[5:8]=[nx/n,ny/n,nz/n]
   for part,objects in additions.items():
    vs,ids=model[part]
    for k,obj in enumerate(objects):
     # Distant variants retain the signature silhouette, with fewer small fins/coils.
-    if lod=='far' and ('louver' in obj.name or 'coil' in obj.name or 'serration' in obj.name) and k%2:continue
+    if lod=='far' and ('louver' in obj.name or 'coil' in obj.name or 'serration' in obj.name or 'vane' in obj.name or 'barb' in obj.name) and k%2:continue
     mesh=obj.data;mesh.calc_loop_triangles();mat=obj.matrix_world;normal=mat.to_3x3().inverted().transposed();sw=obj['swatch']
     for tri in mesh.loop_triangles:
      for corner in tri.vertices:

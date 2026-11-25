@@ -2,6 +2,22 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Distinct Mantis receivers and elemental effects (0.16.1)
+
+**81 JVM tests, the native client review, clean release audit and strict wiki build pass.** [Results](review/results/mantis-appearance-0.16.1.json) · [Design and render budgets](research/MANTIS-APPEARANCE-0.16.1.md) · [Visual comparison](images/mantis-variants-0.16.1.png).
+
+All elemental receivers now have different cross sections, material treatments, hardware and inventory silhouettes. A shared small emissive texture supplies three local animation patterns: heat wisps, electrical filaments and green vapor. Their transforms follow the actual blade/tip/edge animation; the Physical model has no elemental effect. The full native review checks deployment, attacks, retraction, daylight/night and third-person views, synchronized types, valid item models/translations and bounded effect counts. All variant near/far meshes pass moving-cover intersection checks on regular/slim arms. The same six groups, cached mesh pipeline and near/far switch remain.
+
+Maximum effect geometry is 54 / 66 / 42 quads per arm for Thermal / Electrifying / Toxic, using one cached render type and one reused buffer. Distance fading and omission from far LODs and captured Sandevistan poses bound the extra cost. No persistent particle entities or dynamic lights are spawned. The native run uses 1280×720 software OpenGL in an integrated test world, without working audio or session services; it does not establish hardware performance or authenticated two-computer multiplayer. Server gameplay is unchanged, so the previous 112 server scenarios were not repeated. Review fixtures are excluded from the clean release.
+
+```sh
+./gradlew runClient -I docs/review/client.init.gradle -PhandsReview
+./gradlew clean test build
+python3 scripts/verify-release.py
+python3 scripts/check-wiki.py
+mkdocs build --strict
+```
+
 ## Hands cyberware and Mantis variants (0.16.0)
 
 **81 JVM tests, 112 dedicated-server GameTests, the native client review, clean release audit and strict wiki build pass.** [Results](review/results/hands-mantis-0.16.0.json) · [References and Minecraft adaptations](research/HANDS-MANTIS-0.16.0.md) · [Player guides](wiki/cyberware.md).

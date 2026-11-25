@@ -12,7 +12,7 @@
 
 **On-hit status:** Ignites the target for **4 seconds**. Fire-immune targets and Fire Resistance retain their normal protection. Slashes have a **20% chance** to apply it; lunges guarantee it if the target survives. The direct hit can still kill.
 
-**Appearance:** Ceramic heat shields, copper cooling fins and orange heating strips.
+**Appearance:** A wider dark receiver with swept copper radiator fins, ceramic heat shields and orange heating strips. Faint heat wisps rise just above the cutting assembly.
 
 | Tier | Slashes 1–2 | Rising cut | Lunge |
 | --- | --- | --- | --- |
@@ -23,6 +23,6 @@
 
 [Deploy, attack and lunge controls](mantis-blades.md) are shared across all four variants. Equip one at a ripperdoc or Cybernetics Bench; changing the implant changes both its mechanics and model.
 
-![Thermal Mantis Blades in Minecraft](../images/mantis-thermal-0.16.png)
+![Thermal Mantis Blades in Minecraft](../images/mantis-thermal-0.16.1.png)
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

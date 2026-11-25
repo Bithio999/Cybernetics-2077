@@ -12,7 +12,7 @@
 
 **On-hit status:** Applies **Poison I for 5 seconds**. Poison retains its normal immunities and cannot deliver a killing blow. Slashes have a **20% chance** to apply it; lunges guarantee it if the target survives. The direct hit can still kill.
 
-**Appearance:** Toxin reservoirs, metering lines, injection channels and green serrated rails.
+**Appearance:** An olive receiver with larger toxin reservoirs, metering lines and pronounced swept injector barbs. Light green vapor drifts along the blade.
 
 | Tier | Slashes 1–2 | Rising cut | Lunge |
 | --- | --- | --- | --- |
@@ -23,6 +23,6 @@
 
 [Deploy, attack and lunge controls](mantis-blades.md) are shared across all four variants. Equip one at a ripperdoc or Cybernetics Bench; changing the implant changes both its mechanics and model.
 
-![Toxic Mantis Blades in Minecraft](../images/mantis-toxic-0.16.png)
+![Toxic Mantis Blades in Minecraft](../images/mantis-toxic-0.16.1.png)
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

@@ -15,7 +15,8 @@ public final class MantisMesh {
   private static final ByteBufferBuilder SKIN_MEMORY = new ByteBufferBuilder(65536),
       METAL_MEMORY = new ByteBufferBuilder(262144),
       FALLBACK_MEMORY = new ByteBufferBuilder(256),
-      MODEL_MEMORY = new ByteBufferBuilder(1024 * 1024);
+      MODEL_MEMORY = new ByteBufferBuilder(1024 * 1024),
+      EFFECT_MEMORY = new ByteBufferBuilder(16384);
   private static MultiBufferSource.BufferSource isolated;
   private static net.minecraft.resources.ResourceLocation currentSkin;
   private static dev.cybernetics2077.cyberware.MantisVariant currentVariant;
@@ -28,6 +29,7 @@ public final class MantisMesh {
       fixed.put(RenderType.entityCutoutNoCull(skin), SKIN_MEMORY);
       fixed.put(RenderType.entityCutoutNoCull(METAL), METAL_MEMORY);
       fixed.put(MantisMaterial.type(variant), MODEL_MEMORY);
+      fixed.put(MantisElementalEffects.TYPE, EFFECT_MEMORY);
       isolated = MultiBufferSource.immediateWithBuffers(fixed, FALLBACK_MEMORY);
       currentSkin = skin;
       currentVariant = variant;
@@ -83,6 +85,38 @@ public final class MantisMesh {
                           .distanceToSqr(player.position())
                       > 256;
       MantisBlenderMesh.render(p, modelBuffer, light, motion, distant, depth, variant);
+      // Omit effects from captured Sandevistan poses and the distant LOD. The live blades
+      // stay readable without duplicating vapor/arcs across every afterimage.
+      if (!capture && !distant) {
+        var minecraft = net.minecraft.client.Minecraft.getInstance();
+        double time =
+            player.tickCount
+                + minecraft.getTimer().getGameTimeDeltaPartialTick(false)
+                + player.getId() * 17.0
+                + (left ? 23 : 0);
+        float visibility =
+            firstPerson
+                ? 1
+                : (float)
+                    Math.clamp(
+                        (16
+                                - minecraft
+                                    .gameRenderer
+                                    .getMainCamera()
+                                    .getPosition()
+                                    .distanceTo(player.position()))
+                            / 6,
+                        0,
+                        1);
+        MantisElementalEffects.render(
+            p,
+            local.getBuffer(MantisElementalEffects.TYPE),
+            motion,
+            depth,
+            variant,
+            time,
+            visibility);
+      }
     }
     p.popPose();
     if (!capture) ((MultiBufferSource.BufferSource) local).endBatch();

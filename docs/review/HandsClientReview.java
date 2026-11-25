@@ -28,6 +28,7 @@ final class HandsClientReview {
               Sandevistan.stop(p, AugmentRuntime.now(p));
               if (SandevistanClientReview.actor != null)
                 Sandevistan.stop(SandevistanClientReview.actor, AugmentRuntime.now(p));
+              p.serverLevel().setDayTime(11000);
               p.getInventory().clearContent();
               for (var mob :
                   p.serverLevel()
@@ -56,11 +57,25 @@ final class HandsClientReview {
             "Variant was not synced/deployed: " + type);
         var model = MantisBlenderMesh.model(MantisVariant.of(type), false);
         check(model.parts().size() == 6, "Variant rigid parts missing");
+        check(
+            type == 0
+                ? MantisElementalEffects.lastQuads == 0
+                : MantisElementalEffects.lastQuads > 0 && MantisElementalEffects.lastQuads <= 72,
+            "Missing or unbounded elemental effect geometry: " + type);
         shot("hands-" + MantisVariant.of(type).id + "-ready");
       }
       if (phase == 51) ContentClientReview.attack();
       if (phase == 55) shot("hands-" + MantisVariant.of(type).id + "-slash");
-      if (phase == 65) m.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+      if (phase == 59) server(p -> p.serverLevel().setDayTime(18000));
+      // Time packets normally arrive every twenty ticks. Set the fixture client clock
+      // too so this short capture cannot precede its server's night-time packet.
+      if (phase >= 59 && phase <= 64) m.level.setDayTime(18000);
+      if (phase == 64) shot("hands-" + MantisVariant.of(type).id + "-night");
+      if (phase == 65) {
+        server(p -> p.serverLevel().setDayTime(11000));
+        m.level.setDayTime(11000);
+        m.options.setCameraType(CameraType.THIRD_PERSON_FRONT);
+      }
       if (phase == 78) {
         check(
             m.options.getCameraType() == CameraType.THIRD_PERSON_FRONT,
@@ -98,7 +113,8 @@ final class HandsClientReview {
           OUT.resolve("hands-passed.txt"),
           "PASS: all four variant meshes, synced equipped types, native first/third person"
               + " deployment and attacks, original item icons and every tier model, bow preview"
-              + " with two installed hands implants.\n");
+              + " with two installed hands implants; bounded live-only elemental ribbons in"
+              + " daylight/night views.\n");
       finished = true;
       m.stop();
     }

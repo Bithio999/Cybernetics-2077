@@ -54,3 +54,11 @@ python3 art/hands/build.py
 The first command exports hardware `.blend` scenes, meshes and `variant-report.json`; the second rebuilds original pixel icons, model/localization entries and the 512×544 variant atlases. These atlases preserve the baked base with a new hardware swatch strip. Physical uses the original 512×512 atlas.
 
 Near/far triangles per arm: **Thermal 3,708 / 720**, **Electrifying 4,016 / 880**, **Toxic 3,900 / 948**. Each LOD stays within six groups and one shared material; the same far switch/caching applies. [Research and design](../../docs/research/HANDS-MANTIS-0.16.0.md).
+
+## Distinct receivers and local effects (0.16.1)
+
+Elemental variants now change the underlying receiver cross section as well as their hardware. Thermal has a broader dark receiver and swept copper fins; Electrifying has a narrow receiver with forked electrodes; Toxic has an olive receiver, larger reservoirs and visible swept injector barbs. The generator exports recalculated normals after scaling the cross sections. All variant near/far meshes pass the existing moving-cover intersection checks for normal and slim arms.
+
+Current near/far triangle counts per arm: **Thermal 3,756 / 744**, **Electrifying 4,064 / 928**, **Toxic 3,956 / 980**. The Physical source is unchanged. Rebuild with the same two commands above.
+
+`MantisElementalEffects` draws small soft emissive ribbons using one original 64×32 texture, attached to the actual blade/tip/edge transforms. Thermal uses heat wisps, Electrifying uses crawling arcs, and Toxic uses green vapor. Maximum quads per arm: **54 / 66 / 42** respectively. Effects fade in as deployment finishes, fade out from 10–16 blocks, and are omitted from distant LODs and captured Sandevistan poses. The live assembly keeps its effect while afterimages retain their saved metal/skin appearance. No persistent particles, extra entities or per-frame texture generation. Effects share a cached render type and a reused 16 KiB buffer, and are drawn before returning from the existing hand rendering pass.

@@ -12,7 +12,7 @@
 
 **On-hit status:** Applies **Slowness II and Weakness I for 2 seconds**. Slashes have a **20% chance** to apply it; lunges guarantee it if the target survives. The direct hit can still kill.
 
-**Appearance:** Insulated conductor rails, induction coils and cyan contact strips.
+**Appearance:** A slimmer silver receiver with forked electrodes, induction coils and cyan conductor rails. Thin electrical filaments crawl between the electrodes.
 
 | Tier | Slashes 1–2 | Rising cut | Lunge |
 | --- | --- | --- | --- |
@@ -23,6 +23,6 @@
 
 [Deploy, attack and lunge controls](mantis-blades.md) are shared across all four variants. Equip one at a ripperdoc or Cybernetics Bench; changing the implant changes both its mechanics and model.
 
-![Electrifying Mantis Blades in Minecraft](../images/mantis-electrical-0.16.png)
+![Electrifying Mantis Blades in Minecraft](../images/mantis-electrical-0.16.1.png)
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

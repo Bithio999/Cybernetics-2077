@@ -17,6 +17,8 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.16.0 Hands and blade-variant research](../research/HANDS-MANTIS-0.16.0.md) · Original sprites/atlases: `python3 art/hands/build.py`.
 
+[0.16.1 Mantis appearance and elemental rendering](../research/MANTIS-APPEARANCE-0.16.1.md).
+
 ## Edit the wiki
 
 The 65 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.

@@ -17,7 +17,9 @@ Slashes have a **20% chance** to cause bleeding: four pulses over 4 seconds, eac
 
 Choose one installed variant: **Physical**, [Thermal](thermal-mantis-blades.md), [Electrifying](electrifying-mantis-blades.md) or [Toxic](toxic-mantis-blades.md). All use the same controls and base hit damage, with different hardware and secondary effects.
 
-![Four Mantis Blade variants in Minecraft](../images/mantis-variants-0.16.png)
+![Four Mantis Blade variants in Minecraft](../images/mantis-variants-0.16.1.png)
+
+[Compare elemental effects in daylight and at night](../images/mantis-elements-0.16.1.png).
 
 | Tier | Capacity | Slashes 1–2 | Rising cut | Lunge |
 | --- | ---: | ---: | ---: | ---: |

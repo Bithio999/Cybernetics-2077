@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.16.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.16.1.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.16.0'
+    assert metadata['mods'][0]['version']=='0.16.1'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -50,6 +50,8 @@ with ZipFile(jar) as z:
                      'dev/cybernetics2077/client/mantis/MantisSkinPanels.class',
                      'assets/cybernetics2077/meshes/mantis/near.cymesh',
                      'assets/cybernetics2077/meshes/mantis/far.cymesh',
+                     'dev/cybernetics2077/client/mantis/MantisElementalEffects.class',
+                     'assets/cybernetics2077/textures/entity/mantis_elemental.png',
                      'assets/cybernetics2077/textures/entity/mantis_blender.png',
                      'dev/cybernetics2077/client/mantis/MantisRig.class',
                      'dev/cybernetics2077/client/mantis/MantisView.class',
@@ -86,6 +88,7 @@ with ZipFile(jar) as z:
     for icon in ('optical_scanner','cyberdeck_tier_1','mantis_claws_tier_1','short_circuit_tier_1'):
         png=z.read('assets/cybernetics2077/textures/item/'+icon+'.png')
         assert struct.unpack('>II',png[16:24]) == (32,32), 'Equipment sprite is not 32px pixel art: '+icon
+    assert struct.unpack('>II', z.read('assets/cybernetics2077/textures/entity/mantis_elemental.png')[16:24]) == (64, 32)
     recipes = {n for n in names if n.startswith('data/cybernetics2077/recipe/') and n.endswith('.json')}
     unlocks = {n for n in names if n.startswith('data/cybernetics2077/advancement/recipes/') and n.endswith('.json')}
     assert recipes == {'data/cybernetics2077/recipe/cybernetics_bench.json'}, 'Cyberware crafting/upgrade recipes shipped'

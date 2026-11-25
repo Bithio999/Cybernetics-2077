@@ -42,17 +42,28 @@ base=Image.open(ASSET/'textures/entity/mantis_blender.png').convert('RGBA')
 for variant,color in [('thermal',(255,125,42)),('electrical',(75,195,255)),('toxic',(150,218,67))]:
  # Preserve baked surface detail and UVs; new hardware uses four dedicated swatches.
  gray=ImageOps.grayscale(base).convert('RGB');grade=Image.new('RGB',base.size,color)
- tint=Image.blend(base.convert('RGB'),Image.blend(gray,grade,.20),.26)
+ if variant=='thermal':
+  tint=Image.blend(base.convert('RGB'),Image.new('RGB',base.size,(19,25,30)),.52)
+ elif variant=='electrical':
+  tint=Image.blend(base.convert('RGB'),Image.new('RGB',base.size,(156,191,205)),.27)
+ else:
+  tint=Image.blend(base.convert('RGB'),Image.new('RGB',base.size,(74,85,43)),.40)
  atlas=Image.new('RGBA',(512,544));atlas.paste(tint,(0,0));atlas.putalpha(255)
  draw=ImageDraw.Draw(atlas)
  for k,c in enumerate([(24,34,42),(183,209,215),color,tuple(min(255,int(v*.5+125)) for v in color)]):draw.rectangle((k*128,512,k*128+127,543),fill=(*c,255))
  atlas.save(ASSET/'textures/entity'/f'mantis_{variant}.png')
  im=Image.new('RGBA',(32,32));d=ImageDraw.Draw(im)
- d.polygon([(4,25),(8,28),(14,22),(18,17),(27,7),(29,3),(25,4),(14,14),(10,18)],fill=LIGHT,outline=STEEL)
+ profile={
+  'thermal':[(4,25),(8,29),(16,23),(22,17),(29,7),(28,3),(24,4),(14,13),(9,19)],
+  'electrical':[(4,25),(7,28),(14,21),(17,15),(26,6),(26,3),(23,5),(14,14),(10,19)],
+  'toxic':[(4,25),(8,29),(15,21),(19,19),(18,16),(23,14),(22,11),(27,8),(29,3),(24,5),(14,14),(9,20)]
+ }[variant]
+ d.polygon(profile,fill=({'thermal':'#535355','electrical':LIGHT,'toxic':'#8b9872'}[variant]),outline=STEEL)
  d.line([(6,26),(12,20),(17,17)],fill=GOLD,width=2)
  if variant=='thermal':
   for x,y in [(13,18),(17,14),(21,10)]:d.line((x-1,y-2,x+3,y),fill=color,width=2)
  elif variant=='electrical':
+  d.line([(18,17),(29,6),(29,3)],fill=CYAN,width=2)
   d.line([(12,20),(15,18),(15,15),(20,11),(20,9),(26,4)],fill=color,width=2)
   for x,y in [(6,22),(9,19)]:d.ellipse((x-1,y-2,x+2,y+1),outline=color)
  else:
@@ -66,4 +77,15 @@ for variant,color in [('thermal',(255,125,42)),('electrical',(75,195,255)),('tox
 for ident in ['mantis_thermal','mantis_electrical','mantis_toxic','mantis_bleed','hand_discharge']:
  lang['death.attack.'+ident]='%1$s was overcome by cyberware'
  lang['death.attack.'+ident+'.player']='%1$s was overcome by %2$s’s cyberware'
+# One small soft ribbon texture, shared by all articulated elemental effects.
+# No persistent particles or per-frame texture generation.
+import math
+fx=Image.new('RGBA',(64,32));pixels=fx.load()
+for y in range(32):
+ for x in range(64):
+  u=x/63;v=y/31
+  core=max(0,1-abs(v-.5)*2)**2.4
+  taper=math.sin(math.pi*u)**.55
+  pixels[x,y]=(255,255,255,round(235*core*taper))
+fx.save(ASSET/'textures/entity/mantis_elemental.png')
 langpath.write_text(json.dumps(lang,ensure_ascii=False,indent=2)+'\n')
