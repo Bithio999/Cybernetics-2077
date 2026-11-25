@@ -1,10 +1,10 @@
-# Media Workshop 1.5 — validation
+# Media Workshop 1.6 — validation
 
 Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, PyAV 16.0.1, FFmpeg/ffprobe 7.1.5, Node.js 24.19.0 and Chromium 154 on Linux.
 
 ## Automated checks
 
-**59 tests pass**, using actual FFmpeg processes and temporary media:
+**73 tests pass**, using actual FFmpeg processes and temporary media:
 
 - Accurate MP4/MP3 cuts, fractional timing, decoded audio sample counts, batches and unchanged original files.
 - Direct bounded H.264 indexing and boundary-only processing: matching source packet hashes through the copied middle, expected frame counts, first-frame comparison, full decoding without errors, nonzero timestamps and cutting an already-edited result again.
@@ -17,6 +17,16 @@ Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, 
 - Existing MP4 direct-save, stream-copy and selective-conversion tests, including compatible-track packet preservation and the requested resolution ceiling.
 
 Reproduce with `python -m unittest discover -s tests -v` after installing `requirements.txt`. Ruff undefined/unused-name checks and JavaScript syntax checks also pass.
+
+## Account access
+
+MP4 and MP3 accept an explicitly selected browser/profile through yt-dlp's `--cookies-from-browser`, or a locally imported Netscape cookie file through `--cookies`. The latter is parsed into memory and copied to a separate private jar for each job. Public downloads read no browser profile. Authenticated downloads disable the shared extractor cache.
+
+Fourteen account tests cover real yt-dlp/FFmpeg downloads against a local HTTP fixture requiring a synthetic cookie: the public attempt gets 403, while authenticated MP4 and streaming MP3 succeed. Other checks cover browser argument parsing, concurrent jar isolation, cookie normalization/session expiry, rejection of invalid input without logging its contents, missing-session retry, replacement sign-ins, redaction, cancellation and crash cleanup (including orphaned job folders). Cookie imports enforce the existing local Host/token/Origin guards and a 4 MB limit. Neither upload responses, saved library history nor the public state response contains cookie values. Test values are synthetic and confer no real account access.
+
+The Chromium review imports a synthetic cookie through the real file picker/API and verifies that the batch submits only an opaque account reference. It checks browser/profile preference persistence, exclusion of imported cookies/references from localStorage, both account layouts at 390px, and normal import/export/playback/diagnostics. It never opens an installed browser profile.
+
+**Not verified:** a real YouTube membership or Twitch subscription, native Windows/macOS browser-cookie decryption, or site-specific subscriber availability. The installed yt-dlp Twitch extractor reads the signed-in `auth-token` cookie for its GraphQL requests. This supplies normal account authentication; it does not circumvent subscriptions or DRM. Chrome/Edge cookie protection on Windows may require the documented Firefox or cookie-file alternative. Imported credentials remain in memory until shutdown; temporary files are unencrypted, Unix mode 0600 / Windows inherited library ACLs. The user's original cookie export is never modified or deleted.
 
 ## Download-path review
 
@@ -35,7 +45,7 @@ For a 90-second stereo AAC source over local HTTP, throttled to **4,096 bytes pe
 
 The seeking case used about **43% less elapsed time**, while ordinary streaming was effectively unchanged. These are real yt-dlp/FFmpeg queue runs against a local generic-extractor fixture, including extraction, transfer and conversion. Header inspections that do not complete the media body are excluded from the transfer count. No public-service or universal speedup is implied. [Raw measurements](tests/results/downloads-1.5.0.json).
 
-**Shared overhead:** replace disabled caching with yt-dlp's version-aware extractor cache under `data/jobs/.extractor-cache`; real cache store/reopen tests confirm reuse across jobs. Progress output contains only status/byte counts at a 0.2-second cadence, plus postprocessor status, instead of the full info dictionary. Native MP3 bitrate, converted audio's 192 kbps settings, requested resolution ceiling, playlist restrictions and retry limits are unchanged. FFmpeg's MP3 encoder remains single-threaded; extra encoder threads do not accelerate it.
+**Shared overhead (public downloads):** replace disabled caching with yt-dlp's version-aware extractor cache under `data/jobs/.extractor-cache`; real cache store/reopen tests confirm reuse across jobs. Progress output contains only status/byte counts at a 0.2-second cadence, plus postprocessor status, instead of the full info dictionary. Native MP3 bitrate, converted audio's 192 kbps settings, requested resolution ceiling, playlist restrictions and retry limits are unchanged. FFmpeg's MP3 encoder remains single-threaded; extra encoder threads do not accelerate it.
 
 ## One accurate cut workflow
 

@@ -43,6 +43,28 @@ function saveLink(a) {
   return link;
 }
 const jobRows = new Map();
+let importedAccount = null, accountChanged = false;
+function selectedAccount() {
+  const source = $("account-source").value;
+  if (source === "public") return null;
+  if (source === "cookies") {
+    if (!importedAccount) throw new Error("Choose a cookies.txt file before downloading.");
+    return importedAccount;
+  }
+  return {kind: "browser", browser: source, profile: $("account-profile").value.trim()};
+}
+function accountFields() {
+  const source = $("account-source").value;
+  $("account-profile-fields").hidden = ["public", "cookies"].includes(source);
+  $("account-file-fields").hidden = source !== "cookies";
+  $("account-summary").textContent = source === "public" ? "Public videos" : source === "cookies" ? "Cookie file" : $("account-source").selectedOptions[0].textContent.split(" · ")[0];
+  try { localStorage.setItem("mw.account", JSON.stringify({source: source === "cookies" ? "public" : source, profile: $("account-profile").value})); } catch (_) {}
+}
+function retryRequest(job) {
+  const body = {id: job.id};
+  if (job.spec.kind === "download" && (accountChanged || $("account-source").value !== "public")) body.auth = selectedAccount();
+  return request("/api/retry", body);
+}
 function renderJobDetails(row, job) {
   const reason = job.error || job.fallback_reason;
   if (!reason) return;
@@ -99,7 +121,7 @@ function renderJobs() {
       row.dataset.actionKey = actionKey;
       const actions = row.querySelector(".job-actions"); actions.replaceChildren();
       if (["queued", "running"].includes(job.state)) actions.append(button("Cancel", () => request("/api/cancel", {id: job.id})));
-      if (["failed", "cancelled", "interrupted"].includes(job.state)) actions.append(button("Retry", () => request("/api/retry", {id: job.id})));
+      if (["failed", "cancelled", "interrupted"].includes(job.state)) actions.append(button("Retry", () => retryRequest(job)));
       if (file) actions.append(button("Open in editor", () => openAsset(file.id)), saveLink(file));
     }
     if (queue.children[index] !== row) queue.insertBefore(row, queue.children[index] || null);
@@ -175,9 +197,36 @@ $("urls").addEventListener("input", () => { const n = urls().length; $("link-cou
 $("download-format").addEventListener("change", () => { $("height").disabled = $("download-format").value === "mp3"; });
 $("download-form").addEventListener("submit", (event) => { event.preventDefault(); action(async () => {
   const links = urls(); if (!links.length) throw new Error("Paste at least one link.");
-  const result = await request("/api/download", {urls: links, format: $("download-format").value, height: Number($("height").value)});
+  const result = await request("/api/download", {urls: links, format: $("download-format").value, height: Number($("height").value), auth: selectedAccount()});
   $("urls").value = ""; $("link-count").textContent = "0 links"; notify(`${result.ids.length} download${result.ids.length === 1 ? "" : "s"} queued.`);
 }); });
+$("account-source").addEventListener("change", () => { accountChanged = true; accountFields(); });
+$("account-profile").addEventListener("input", () => { accountChanged = true; accountFields(); });
+$("account-file").addEventListener("change", () => action(async () => {
+  importedAccount = null; accountChanged = true;
+  const file = $("account-file").files[0];
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) throw new Error("Choose a cookies.txt file no larger than 4 MB.");
+  $("account-file-status").textContent = "Importing locally…";
+  try {
+    const response = await fetch("/api/account-cookies", {method: "POST", headers: {"X-Workshop-Token": token}, body: file});
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Cookie import failed.");
+    importedAccount = result.auth;
+    $("account-file-status").textContent = "Sign-in ready for this app session. Cookie contents are not saved in queue history.";
+  } catch (error) {
+    $("account-file-status").textContent = "Import failed. Choose a fresh Netscape cookies.txt file.";
+    throw error;
+  }
+}));
+try {
+  const preference = JSON.parse(localStorage.getItem("mw.account") || "null");
+  if (preference && preference.source !== "cookies" && [...$("account-source").options].some(o => o.value === preference.source)) {
+    $("account-source").value = preference.source;
+    $("account-profile").value = typeof preference.profile === "string" ? preference.profile : "";
+  }
+} catch (_) {}
+accountFields();
 $("source").addEventListener("change", () => openAsset($("source").value, false));
 for (const field of ["start", "end"]) $(field).addEventListener("input", syncRange);
 for (const [range, field] of [["in-range", "start"], ["out-range", "end"]]) $(range).addEventListener("input", () => { $(field).value = clock(Number($(range).value)); syncRange(); });

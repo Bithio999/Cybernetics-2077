@@ -88,6 +88,69 @@ def main():
                 )
                 assert page.locator("#link-count").inner_text() == "2 links"
                 page.locator("#urls").fill("")
+                # Exercise account controls with a synthetic local-only cookie.
+                # Never open the machine's actual browser profiles.
+                page.locator(".account-access summary").click()
+                assert not page.locator("#account-profile").is_visible()
+                page.locator("#account-source").select_option("firefox")
+                page.locator("#account-profile").fill("Review Profile")
+                page.reload(wait_until="networkidle")
+                page.locator(".account-access summary").click()
+                assert page.locator("#account-source").input_value() == "firefox"
+                assert (
+                    page.locator("#account-profile").input_value() == "Review Profile"
+                )
+                page.screenshot(path=str(root / "account-access.png"), full_page=True)
+                page.locator("#account-source").select_option("cookies")
+                fixture_secret = "synthetic-browser-review-cookie-not-real"
+                page.locator("#account-file").set_input_files(
+                    {
+                        "name": "cookies.txt",
+                        "mimeType": "text/plain",
+                        "buffer": (
+                            "# Netscape HTTP Cookie File\n127.0.0.1\tFALSE\t/\tFALSE\t0\tfixture\t"
+                            + fixture_secret
+                            + "\n"
+                        ).encode(),
+                    }
+                )
+                page.wait_for_function(
+                    '() => document.querySelector("#account-file-status").textContent.startsWith("Sign-in ready")'
+                )
+                submitted = []
+
+                def account_request(route):
+                    submitted.append(route.request.post_data_json)
+                    route.fulfill(status=202, json={"ids": []})
+
+                page.route("**/api/download", account_request)
+                page.locator("#urls").fill("https://youtu.be/account-fixture")
+                page.locator('#download-form button[type="submit"]').click()
+                page.wait_for_function(
+                    '() => document.querySelector("#urls").value === ""'
+                )
+                assert submitted[0]["auth"]["kind"] == "cookies"
+                assert len(submitted[0]["auth"]["session"]) == 32
+                assert fixture_secret not in json.dumps(submitted)
+                assert fixture_secret not in page.content()
+                assert (
+                    fixture_secret not in page.request.get(base + "/api/state").text()
+                )
+                remembered = page.evaluate("JSON.stringify(localStorage)")
+                assert fixture_secret not in remembered
+                assert submitted[0]["auth"]["session"] not in remembered
+                page.unroute("**/api/download", account_request)
+                page.set_viewport_size({"width": 390, "height": 844})
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= window.innerWidth"
+                )
+                page.locator("#account-source").select_option("firefox")
+                assert page.evaluate(
+                    "document.documentElement.scrollWidth <= window.innerWidth"
+                )
+                page.set_viewport_size({"width": 1440, "height": 1100})
+                page.locator("#account-source").select_option("public")
+                page.locator(".account-access summary").click()
                 page.locator("#files").set_input_files([str(fixture), str(second)])
                 page.wait_for_function(
                     '() => document.querySelector("#library-count").textContent === "2"'
@@ -209,7 +272,9 @@ def main():
                 )
                 assert "Source: h264" in details.locator("pre").inner_text()
                 assert "WORKSHOP:" not in details.locator("pre").inner_text()
-                assert "Selected range: 1.25–3.75 s" in details.locator("pre").inner_text()
+                assert (
+                    "Selected range: 1.25–3.75 s" in details.locator("pre").inner_text()
+                )
                 assert details.bounding_box()["width"] > 200
                 details.evaluate("n => window.testDetails=n")
                 page.wait_for_timeout(1200)
@@ -235,6 +300,9 @@ def main():
                             "browser": "system Chromium / Playwright",
                             "checks": [
                                 "empty state",
+                                "account browser/profile selection and persistence without reading real profiles",
+                                "synthetic cookie import and opaque download selection without credential persistence",
+                                "responsive account controls",
                                 "batch link count and deduplication",
                                 "multi-file import",
                                 "native video preview and selected-range playback",

@@ -26,6 +26,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlsplit
 import uuid
 import webbrowser
+from download_auth import (
+    AccountSessions,
+    BROWSERS,
+    MAX_COOKIE_BYTES,
+    account_arguments,
+    cleanup_job_account,
+    browser_selection,
+)
 
 ROOT = Path(__file__).resolve().parent
 FORMATS = {"mp4", "mp3"}
@@ -44,6 +52,7 @@ INPUTS = {
 }
 TERMINAL = {"complete", "failed", "cancelled", "interrupted"}
 MAX_BATCH = 100
+UNCHANGED_ACCOUNT = object()
 
 
 class MediaError(Exception):
@@ -298,7 +307,14 @@ def download_command(url, directory, fmt, height):
             "--merge-output-format",
             "mp4/mkv",
         ]
-    return [*command, "--", supported_url(url)]
+    auth = account_arguments(directory)
+    return [
+        *command,
+        *(["--no-cache-dir"] if auth else []),
+        *auth,
+        "--",
+        supported_url(url),
+    ]
 
 
 def convert_command(
@@ -619,11 +635,20 @@ class Workshop:
             ) from None
         self.jobs = {}
         self.assets = {}
+        self.accounts = AccountSessions()
         self.lock = threading.RLock()
         self.cancels = {}
         self.processes = {}
         self.closing = False
         self.last_save = 0
+        # Remove crash leftovers even if the queue entry was already cleared.
+        for folder in (self.directory / "jobs").glob("*"):
+            if (
+                re.fullmatch(r"[a-f0-9]{32}", folder.name)
+                and folder.is_dir()
+                and not folder.is_symlink()
+            ):
+                cleanup_job_account(folder)
         state = self.directory / "library.json"
         if state.exists():
             try:
@@ -743,8 +768,9 @@ class Workshop:
                 self.pool.submit(self.work, job_id)
             return ids
 
-    def download(self, urls, fmt, height=1080):
+    def download(self, urls, fmt, height=1080, auth=None):
         fmt, height = options(fmt, height)
+        auth = self.accounts.validate(auth)
         if not isinstance(urls, list) or not 1 <= len(urls) <= MAX_BATCH:
             raise MediaError("Add between 1 and 100 links.")
         # Validate the entire batch before queuing anything; deduplicate without losing order.
@@ -757,6 +783,7 @@ class Workshop:
                     "format": fmt,
                     "height": height,
                     "title": url,
+                    **({"auth": auth} if auth is not None else {}),
                 }
                 for url in links
             ]
@@ -830,7 +857,7 @@ class Workshop:
             for line in process.stdout:
                 text = line.strip()
                 if text:
-                    lines.append(text)
+                    lines.append(self.accounts.redact(text))
                     callback(text)
             code = process.wait()
             self.check_cancel(job_id)
@@ -889,6 +916,8 @@ class Workshop:
             "audio_stream_fallback",
         }
         values = {k: v for k, v in values.items() if k in allowed}
+        if "title" in values:
+            values["title"] = self.accounts.redact(values["title"])
         if "progress" in values:
             values["progress"] = max(0, min(99, values["progress"]))
         self.update(job_id, **values)
@@ -918,6 +947,8 @@ class Workshop:
             self.check_cancel(job_id)
             folder.mkdir(parents=True, exist_ok=True)
             spec = self.jobs[job_id]["spec"]
+            if spec["kind"] == "download":
+                self.accounts.prepare(folder, spec.get("auth"))
             self.update(job_id, state="running", stage="Preparing", error="")
             executable("ffmpeg")
             executable("ffprobe")
@@ -941,7 +972,10 @@ class Workshop:
 
                 def progress(line):
                     if line.startswith("TITLE:"):
-                        self.update(job_id, title=safe_name(json.loads(line[6:])))
+                        self.update(
+                            job_id,
+                            title=safe_name(self.accounts.redact(json.loads(line[6:]))),
+                        )
                     elif line.startswith("FILE:"):
                         paths.append(Path(json.loads(line[5:])).resolve())
                     elif line.startswith("POSTPROCESS:"):
@@ -979,7 +1013,7 @@ class Workshop:
                 files = [p for p in paths if p.is_relative_to(folder) and p.is_file()]
                 if not files:
                     raise MediaError(
-                        "No finished video was returned. Use a public video, Twitch VOD or clip; live streams are not recorded."
+                        "No finished video was returned. Use an individual video, Twitch VOD or clip; live streams are not recorded."
                     )
                 source = files[-1]
                 meta = probe(source)
@@ -1111,9 +1145,15 @@ class Workshop:
             self.update(job_id, state="cancelled", stage="Cancelled")
             shutil.rmtree(folder, ignore_errors=True)
         except Exception as error:
-            self.update(job_id, state="failed", stage="Failed", error=str(error))
+            self.update(
+                job_id,
+                state="failed",
+                stage="Failed",
+                error=self.accounts.redact(str(error)),
+            )
             shutil.rmtree(folder, ignore_errors=True)
         finally:
+            cleanup_job_account(folder)
             with self.lock:
                 self.cancels.pop(job_id, None)
 
@@ -1130,7 +1170,7 @@ class Workshop:
         if process:
             self.stop_process(process)
 
-    def retry(self, job_id):
+    def retry(self, job_id, auth=UNCHANGED_ACCOUNT):
         with self.lock:
             job = self.jobs.get(job_id)
             if not job or job["state"] not in {"failed", "cancelled", "interrupted"}:
@@ -1139,7 +1179,14 @@ class Workshop:
                 )
             if job["spec"]["kind"] == "trim":
                 self.asset(job["spec"]["source"])
-            return self.enqueue([dict(job["spec"])])
+            spec = dict(job["spec"])
+            if spec["kind"] == "download":
+                selected = spec.get("auth") if auth is UNCHANGED_ACCOUNT else auth
+                selected = self.accounts.validate(selected)
+                spec.pop("auth", None)
+                if selected is not None:
+                    spec["auth"] = selected
+            return self.enqueue([spec])
 
     def remove_asset(self, asset_id):
         with self.lock:
@@ -1163,6 +1210,7 @@ class Workshop:
             self.cancel(job_id)
         self.pool.shutdown(wait=True)
         self.save()
+        self.accounts.close()
         self.library_lock.close()
 
 
@@ -1305,6 +1353,17 @@ class Handler(BaseHTTPRequestHandler):
             if self.path == "/api/import":
                 self.upload(size)
                 return
+            if self.path == "/api/account-cookies":
+                if size > MAX_COOKIE_BYTES:
+                    raise MediaError("Choose a cookies.txt file no larger than 4 MB.")
+                raw = self.rfile.read(size)
+                if len(raw) != size:
+                    raise MediaError(
+                        "Cookie import was interrupted. Choose the file again."
+                    )
+                selection = self.server.workshop.accounts.import_cookies(raw)
+                self.reply(201, {"auth": selection})
+                return
             if size > 256 * 1024:
                 raise MediaError("This request is too large.")
             data = json.loads(self.rfile.read(size))
@@ -1319,6 +1378,7 @@ class Handler(BaseHTTPRequestHandler):
                             data.get("urls"),
                             data.get("format"),
                             data.get("height", 1080),
+                            data.get("auth"),
                         )
                     },
                 )
@@ -1338,7 +1398,15 @@ class Handler(BaseHTTPRequestHandler):
                 app.cancel(data.get("id"))
                 self.reply(200, {"ok": True})
             elif self.path == "/api/retry":
-                self.reply(202, {"ids": app.retry(data.get("id"))})
+                self.reply(
+                    202,
+                    {
+                        "ids": app.retry(
+                            data.get("id"),
+                            data.get("auth") if "auth" in data else UNCHANGED_ACCOUNT,
+                        )
+                    },
+                )
             elif self.path == "/api/delete":
                 app.remove_asset(data.get("id"))
                 self.reply(200, {"ok": True})
@@ -1432,6 +1500,20 @@ def main():
     download.add_argument("urls", nargs="+")
     download.add_argument("--format", choices=sorted(FORMATS), default="mp4")
     download.add_argument("--height", type=int, choices=sorted(HEIGHTS), default=1080)
+    account = download.add_mutually_exclusive_group()
+    account.add_argument(
+        "--browser",
+        choices=sorted(BROWSERS),
+        help="Use this browser's signed-in session.",
+    )
+    account.add_argument(
+        "--cookies", type=Path, help="Import a local Netscape cookies.txt for this run."
+    )
+    download.add_argument(
+        "--browser-profile",
+        default="",
+        help="Optional profile name/path for --browser.",
+    )
     trim = commands.add_parser("trim", help="Trim/convert one or several local files.")
     trim.add_argument("files", nargs="+", type=Path)
     trim.add_argument("--start", default="0")
@@ -1446,7 +1528,17 @@ def main():
     server = None
     try:
         if args.command == "download":
-            return wait_for_jobs(app, app.download(args.urls, args.format, args.height))
+            auth = None
+            if args.browser:
+                auth = browser_selection(args.browser, args.browser_profile)
+            elif args.browser_profile:
+                raise MediaError("Use --browser-profile together with --browser.")
+            elif args.cookies:
+                with args.cookies.open("rb") as file:
+                    auth = app.accounts.import_cookies(file.read(MAX_COOKIE_BYTES + 1))
+            return wait_for_jobs(
+                app, app.download(args.urls, args.format, args.height, auth)
+            )
         if args.command == "trim":
             assets = []
             # Copy inputs into the library; source files are never modified.

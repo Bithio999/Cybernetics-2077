@@ -57,7 +57,23 @@ The queue shows **Direct save**, **Stream copy**, or which tracks require conver
 
 Downloads share a version-aware yt-dlp extractor cache inside the library, and use small progress reports rather than repeatedly serializing full source metadata. The queue identifies when separate tracks are being combined.
 
-Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. Playlist/channel URLs are not expanded into batches, and ongoing live streams are not recorded. Site availability, authentication requirements and network restrictions can still prevent a download. This app has no login or DRM-unlocking feature.
+Individual videos, Shorts, Twitch VODs and clips are supported through yt-dlp. Playlist/channel URLs are not expanded into batches, and ongoing live streams are not recorded. Site availability, authentication requirements and network restrictions can still prevent a download. Account access is optional, as described below. DRM-protected media is unsupported.
+
+## Subscriber/member-only videos and clips
+
+![Account access in Media Workshop](account-access.png)
+
+1. Sign into YouTube or Twitch in a browser on **the same computer** and check that your account can play the video.
+2. Expand **Account access** in the downloader. Select that browser; **Firefox is recommended**, especially on Windows. If needed, enter its profile name or full profile-folder path.
+3. Paste the link, choose MP4 or MP3, and queue it as usual. The account selection applies to every link in the batch. No password is entered in Media Workshop.
+
+If browser-cookie extraction fails, close the browser and retry. Chrome/Edge's cookie protection can still prevent extraction on Windows; use a signed-in Firefox profile, or choose **Import cookies.txt** and select a Netscape-format cookie export from your signed-in browser. Export only the relevant site's cookies using a tool you trust. The file contains account credentials: keep it on your computer and never post it in chat or GitHub.
+
+Imported cookies are held in memory until the app quits. Each active download gets a separate temporary cookie file, removed on success, failure or cancellation; startup removes leftovers from interrupted jobs. Cookie contents are not saved in queue history, and authenticated downloads do not use the shared extractor cache. Temporary files use owner-only permissions on Unix; on Windows they inherit your library folder's access controls. These files are not encrypted. The original exported file remains yours to delete.
+
+Browser/profile preferences are remembered locally; imported cookie contents are not stored in browser storage. After quitting the app, import the file again before retrying an interrupted cookie-authenticated download. You can also change **Account access** before clicking **Retry** to replace a failed job's sign-in. Leave **Public videos** selected when no sign-in is needed.
+
+This uses the access your account already has. Availability still depends on yt-dlp/site support, an active subscription, and valid cookies; it does not unlock videos your account cannot view. Real subscriber-account access has not been tested in this development environment.
 
 ## Trim or convert
 
@@ -112,6 +128,9 @@ The same queue/encoder is available without the browser:
 ```sh
 python launch.py download "https://youtu.be/VIDEO_ID" "https://www.twitch.tv/videos/VOD_ID" --format mp4 --height 1080
 python launch.py download "https://clips.twitch.tv/CLIP_ID" --format mp3
+python launch.py download "https://www.twitch.tv/videos/VOD_ID" --format mp4 --browser firefox
+python launch.py download "https://youtu.be/VIDEO_ID" --format mp3 --browser firefox --browser-profile "Personal"
+python launch.py download "https://clips.twitch.tv/CLIP_ID" --format mp4 --cookies "cookies.txt"
 python launch.py trim "first.mp4" "second.mp4" --start 00:00:10 --end 00:00:25.500 --format mp4
 python launch.py trim "recording.mp4" --start 10.250 --end 25.500 --format mp4
 python launch.py trim "recording.mp4" --format mp3
