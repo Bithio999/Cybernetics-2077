@@ -1,10 +1,10 @@
-# Media Workshop 1.6 — validation
+# Media Workshop 1.7 — validation
 
 Checked 24 November 2026 using Python 3.12.14, yt-dlp 2026.11.23, smartcut 1.7, PyAV 16.0.1, FFmpeg/ffprobe 7.1.5, Node.js 24.19.0 and Chromium 154 on Linux.
 
 ## Automated checks
 
-**73 tests pass**, using actual FFmpeg processes and temporary media:
+**81 tests pass**, using actual FFmpeg processes and temporary media:
 
 - Accurate MP4/MP3 cuts, fractional timing, decoded audio sample counts, batches and unchanged original files.
 - Direct bounded H.264 indexing and boundary-only processing: matching source packet hashes through the copied middle, expected frame counts, first-frame comparison, full decoding without errors, nonzero timestamps and cutting an already-edited result again.
@@ -27,6 +27,18 @@ Fourteen account tests cover real yt-dlp/FFmpeg downloads against a local HTTP f
 The Chromium review imports a synthetic cookie through the real file picker/API and verifies that the batch submits only an opaque account reference. It checks browser/profile preference persistence, exclusion of imported cookies/references from localStorage, both account layouts at 390px, and normal import/export/playback/diagnostics. It never opens an installed browser profile.
 
 **Not verified:** a real YouTube membership or Twitch subscription, native Windows/macOS browser-cookie decryption, or site-specific subscriber availability. The installed yt-dlp Twitch extractor reads the signed-in `auth-token` cookie for its GraphQL requests. This supplies normal account authentication; it does not circumvent subscriptions or DRM. Chrome/Edge cookie protection on Windows may require the documented Firefox or cookie-file alternative. Imported credentials remain in memory until shutdown; temporary files are unencrypted, Unix mode 0600 / Windows inherited library ACLs. The user's original cookie export is never modified or deleted.
+
+## Opera GX support
+
+There is now a dedicated Opera GX entry, with **Live connector** and **Direct profile** choices. Direct profile selects GX's Windows/macOS folder separately from regular Opera, supports an explicit full-path override, and preserves yt-dlp's normal cookie handling. It does not silently read regular Opera when GX is absent. Eight additional tests cover profile resolution, argument parsing, missing/unsupported layouts, the exact reported database-copy error, and extension formatting/sender rules. Errors retain their original cause and add a GX-specific recommendation for locked/protected databases.
+
+The bundled Manifest V3 connector uses the normal `cookies` permission for only YouTube/Twitch, and content scripts on loopback pages. It requires a trusted click in the local app; messages from other origins, other extensions or subframes are rejected. Cookies travel through an isolated content script to the existing Host/Origin/token-protected `/api/account-cookies` endpoint. Only an opaque session reference returns to the page. No export file, credential storage permission, external service, administrator access, process termination, security-setting changes or cookie decryption code is introduced. The normal per-job cookie lifecycle remains in place.
+
+**Browser review limit:** cloud Chromium policy blocks unpacked extension loading. The default real-extension review therefore could not run successfully here. The explicitly selected `--fixture` review uses the actual connector content script and formatter in an isolated browser world, with a simulated runtime/cookies API. It verifies trusted-click gating, protected local import, site filtering, opaque batch references, a private cookie jar that supplies the synthetic Twitch cookie to `gql.twitch.tv`, reconnection with changed fixture credentials, no cookie values in DOM/history/state/localStorage, and responsive method selection. Node tests exercise the actual background handler with a simulated cookies API and reject invalid senders without reading cookies. These are not a claim of native Opera GX/Windows compatibility or real subscriber-account access.
+
+[Recorded check results and limitations](tests/results/opera-gx-1.7.0.json).
+
+The existing full download/trim browser review also passes. Native GX extension installation, OS behavior and real site authentication still require validation on the user's machine. The connector uses documented browser APIs; it does not overcome site-side restrictions or provide universal download guarantees.
 
 ## Download-path review
 

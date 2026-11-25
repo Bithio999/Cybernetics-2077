@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8"><meta name="application-name" content="Media Workshop"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Media Workshop</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script>
 </head>
 <body>
@@ -20,8 +20,18 @@
           <div class="two-columns"><div><label for="download-format">Save as</label><select id="download-format"><option value="mp4">MP4 · video + audio</option><option value="mp3">MP3 · audio only</option></select></div><div><label for="height">Maximum quality</label><select id="height"><option value="480">480p</option><option value="720">720p</option><option value="1080" selected>1080p · recommended</option><option value="1440">1440p</option><option value="2160">2160p · 4K</option></select></div></div>
           <details class="account-access"><summary>Account access <span class="muted" id="account-summary">Public videos</span></summary>
             <p class="hint">For subscriber/member-only videos, use a browser signed in to your subscribed account.</p>
-            <label for="account-source">Sign-in source</label><select id="account-source"><option value="public">Public videos · no sign-in</option><option value="firefox">Firefox · recommended</option><option value="chrome">Chrome</option><option value="edge">Edge</option><option value="brave">Brave</option><option value="chromium">Chromium</option><option value="opera">Opera</option><option value="vivaldi">Vivaldi</option><option value="safari">Safari</option><option value="whale">Whale</option><option value="cookies">Import cookies.txt</option></select>
+            <label for="account-source">Sign-in source</label><select id="account-source"><option value="public">Public videos · no sign-in</option><option value="firefox">Firefox · recommended</option><option value="chrome">Chrome</option><option value="edge">Edge</option><option value="brave">Brave</option><option value="chromium">Chromium</option><option value="opera">Opera</option><option value="opera-gx">Opera GX</option><option value="vivaldi">Vivaldi</option><option value="safari">Safari</option><option value="whale">Whale</option><option value="cookies">Import cookies.txt</option></select>
             <div id="account-profile-fields" hidden><label for="account-profile">Browser profile <span class="muted">optional</span></label><input id="account-profile" maxlength="500" placeholder="Leave blank to use the browser's default profile" autocomplete="off"><p class="hint">Firefox works well on Windows. If Chrome/Edge cannot read cookies, use Firefox or import cookies.txt.</p></div>
+            <div id="gx-fields" hidden>
+              <label for="gx-method">Opera GX connection</label><select id="gx-method"><option value="connector">Live connector · keep GX open</option><option value="profile">Direct profile · close GX first</option></select>
+              <div id="gx-live-fields">
+                <p class="hint">One-time setup in GX: open <b>opera://extensions</b>, enable Developer mode, choose <b>Load unpacked</b>, and select the <b>opera-gx-connector</b> folder inside Media Workshop.</p>
+                <div class="gx-actions"><button type="button" id="gx-copy-folder" class="quiet">Copy connector folder</button><button type="button" id="gx-connect" class="quiet">Connect Opera GX</button></div>
+                <p class="hint" id="gx-status" role="status">Reload this app in GX after enabling the connector. Sign into YouTube/Twitch in the same GX profile, then Connect. No cookie file needed.</p>
+                <p class="hint">Connect reads only YouTube/Twitch cookies and sends them to this local app. Reconnect after reloading or changing your login.</p>
+              </div>
+              <p class="hint" id="gx-profile-hint" hidden>GX's profile is detected automatically on Windows/macOS. If needed, enter the full Profile path from opera://about. Fully exit GX before queuing or retrying; use Live connector if Windows locks or protects the database.</p>
+            </div>
             <div id="account-file-fields" hidden><label for="account-file">Netscape cookies.txt</label><input id="account-file" type="file" accept=".txt,.cookies"><p class="hint" id="account-file-status">Imported cookies stay local and are cleared when this app closes. Don’t share this file in chat or GitHub.</p></div>
           </details>
           <button class="primary full" id="add-batch" type="submit">↓ Add to download queue</button>
@@ -50,6 +60,6 @@
     </section>
     <section class="panel queue-panel" aria-labelledby="queue-heading"><div class="section-heading"><span class="number">03</span><div><h2 id="queue-heading">The queue <span id="queue-count" class="count">0</span></h2><p id="queue-summary">Ready when you are.</p></div><div class="actions"><button class="quiet" id="cancel-all">Cancel unfinished</button><button class="quiet" id="clear">Clear finished</button></div></div><div id="queue"><div class="empty-list">No jobs yet. Add links or export a cut to get started.</div></div></section>
     <section class="panel library-panel" aria-labelledby="library-heading"><div class="section-heading"><span class="number">04</span><div><h2 id="library-heading">Media library <span id="library-count" class="count">0</span></h2><p>Ready to preview, cut or save to your computer.</p></div><label class="checkbox"><input type="checkbox" id="select-all"> Select all</label></div><div id="library"><div class="empty-list">Your files will appear here.</div></div></section>
-    <footer><span>MEDIA WORKSHOP <b>1.6</b> · LOCAL TO YOUR COMPUTER</span><span id="footer-status">Connecting…</span><p id="storage"></p></footer>
+    <footer><span>MEDIA WORKSHOP <b>1.7</b> · LOCAL TO YOUR COMPUTER</span><span id="footer-status">Connecting…</span><p id="storage"></p></footer>
   </main>
 </body></html>

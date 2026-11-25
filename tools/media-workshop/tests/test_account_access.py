@@ -74,6 +74,8 @@ class AccountRules(unittest.TestCase):
         from yt_dlp.cookies import YoutubeDLCookieJar
 
         selection = self.accounts.import_cookies(COOKIES)
+        self.assertEqual(self.accounts.import_cookies(COOKIES), selection)
+        self.assertEqual(len(self.accounts.sessions), 1)
         self.assertNotIn(SECRET, json.dumps(selection))
         self.assertFalse(list(self.root.iterdir()))
         files = []

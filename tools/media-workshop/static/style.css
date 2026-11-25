@@ -5,3 +5,5 @@
 #trim-form #cut-note{margin-bottom:16px}
 .account-access{margin:16px 0;color:var(--ink);font-size:12px;border:1px solid var(--line);border-radius:7px;padding:12px}.account-access summary{display:flex;justify-content:space-between;gap:10px}.account-access[open] summary{margin-bottom:12px}.account-access label{margin-top:12px}.account-access input[type=file]{font-size:11px;padding:10px;max-width:100%}
 @media(max-width:720px){.job{display:grid;grid-template-columns:38px minmax(0,1fr);align-items:start}.job-actions{grid-column:2;margin-left:0;flex-wrap:wrap}.job-main details{width:100%}}
+
+.gx-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.gx-actions button{flex:1 1 170px}.account-access .hint b{overflow-wrap:anywhere}

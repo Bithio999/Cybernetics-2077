@@ -3,8 +3,10 @@
 import io
 import json
 import os
+from pathlib import Path
 import re
 import secrets
+import sys
 import threading
 import warnings
 
@@ -15,6 +17,7 @@ BROWSERS = {
     "brave",
     "chromium",
     "opera",
+    "opera-gx",
     "vivaldi",
     "safari",
     "whale",
@@ -59,6 +62,57 @@ def cleanup_job_account(folder):
             pass
 
 
+def opera_gx_profile(profile=""):
+    """Resolve GX separately from regular Opera, without opening a cookie store."""
+    if profile:
+        root = Path(os.path.expandvars(os.path.expanduser(profile.strip('"'))))
+        if not root.is_absolute():
+            raise AccountError(
+                "For Opera GX, enter the full Profile path from opera://about."
+            )
+    elif sys.platform in {"win32", "cygwin"}:
+        roaming = os.environ.get("APPDATA")
+        root = (
+            Path(roaming) if roaming else Path.home() / "AppData/Roaming"
+        ) / "Opera Software/Opera GX Stable"
+    elif sys.platform == "darwin":
+        root = Path.home() / "Library/Application Support/com.operasoftware.OperaGX"
+    else:
+        raise AccountError(
+            "Use Opera GX's live connector, or enter its full Profile path from opera://about."
+        )
+    if not root.is_dir():
+        raise AccountError(
+            "Opera GX's profile was not found. Use the live connector, or enter the Profile path shown in opera://about."
+        )
+    return str(root)
+
+
+def account_error(message, config):
+    if not isinstance(config, dict) or config.get("kind") != "browser":
+        return message
+    lowered = message.lower()
+    if any(
+        phrase in lowered
+        for phrase in (
+            "could not copy chrome cookie database",
+            "failed to decrypt",
+            "could not decrypt",
+            "cookie database is locked",
+        )
+    ):
+        if config.get("browser") == "opera-gx":
+            return (
+                "Opera GX's cookie database is locked or protected. Select Opera GX → Live connector and connect from GX; this works without opening its database. For direct profile access, fully exit GX before retrying.\n\n"
+                + message
+            )
+        return (
+            "The browser's cookie database is locked or protected. Opera GX users can select Opera GX → Live connector. Otherwise fully exit the selected browser or import cookies.txt.\n\n"
+            + message
+        )
+    return message
+
+
 def account_arguments(folder):
     path = folder / CONFIG_NAME
     if not path.is_file():
@@ -73,6 +127,11 @@ def account_arguments(folder):
         ) from None
     if config.get("kind") == "browser":
         browser = browser_selection(config.get("browser"), config.get("profile", ""))
+        if browser["browser"] == "opera-gx":
+            browser = {
+                "browser": "opera",
+                "profile": opera_gx_profile(browser["profile"]),
+            }
         value = browser["browser"] + (
             ":" + browser["profile"] if browser["profile"] else ""
         )
@@ -141,6 +200,10 @@ class AccountSessions:
         except Exception:
             raise AccountError(message) from None
         with self.lock:
+            # Reconnecting an unchanged live session must not consume another slot.
+            for session, existing in self.sessions.items():
+                if existing == raw:
+                    return {"kind": "cookies", "session": session}
             if len(self.sessions) >= 8:
                 raise AccountError(
                     "Finish your downloads and restart the app before importing more sign-ins."

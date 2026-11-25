@@ -31,6 +31,7 @@ from download_auth import (
     BROWSERS,
     MAX_COOKIE_BYTES,
     account_arguments,
+    account_error,
     cleanup_job_account,
     browser_selection,
 )
@@ -712,6 +713,7 @@ class Workshop:
                         "dependencies": dependencies(),
                         "workers": self.workers,
                         "directory": str(self.directory),
+                        "gx_connector_directory": str(ROOT / "opera-gx-connector"),
                     }
                 )
             )
@@ -1149,7 +1151,9 @@ class Workshop:
                 job_id,
                 state="failed",
                 stage="Failed",
-                error=self.accounts.redact(str(error)),
+                error=self.accounts.redact(
+                    account_error(str(error), self.jobs[job_id]["spec"].get("auth"))
+                ),
             )
             shutil.rmtree(folder, ignore_errors=True)
         finally:

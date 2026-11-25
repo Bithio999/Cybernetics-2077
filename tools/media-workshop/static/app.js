@@ -43,7 +43,7 @@ function saveLink(a) {
   return link;
 }
 const jobRows = new Map();
-let importedAccount = null, accountChanged = false;
+let importedAccount = null, gxAccount = null, gxPending = null, accountChanged = false;
 function selectedAccount() {
   const source = $("account-source").value;
   if (source === "public") return null;
@@ -51,14 +51,22 @@ function selectedAccount() {
     if (!importedAccount) throw new Error("Choose a cookies.txt file before downloading.");
     return importedAccount;
   }
+  if (source === "opera-gx" && $("gx-method").value === "connector") {
+    if (!gxAccount) throw new Error("Click Connect Opera GX before downloading or retrying.");
+    return gxAccount;
+  }
   return {kind: "browser", browser: source, profile: $("account-profile").value.trim()};
 }
 function accountFields() {
   const source = $("account-source").value;
-  $("account-profile-fields").hidden = ["public", "cookies"].includes(source);
+  const gx = source === "opera-gx", live = $("gx-method").value === "connector";
+  $("gx-fields").hidden = !gx;
+  $("gx-live-fields").hidden = !live;
+  $("gx-profile-hint").hidden = live;
+  $("account-profile-fields").hidden = ["public", "cookies"].includes(source) || (gx && live);
   $("account-file-fields").hidden = source !== "cookies";
   $("account-summary").textContent = source === "public" ? "Public videos" : source === "cookies" ? "Cookie file" : $("account-source").selectedOptions[0].textContent.split(" · ")[0];
-  try { localStorage.setItem("mw.account", JSON.stringify({source: source === "cookies" ? "public" : source, profile: $("account-profile").value})); } catch (_) {}
+  try { localStorage.setItem("mw.account", JSON.stringify({source: source === "cookies" ? "public" : source, profile: $("account-profile").value, gxMethod: $("gx-method").value})); } catch (_) {}
 }
 function retryRequest(job) {
   const body = {id: job.id};
@@ -200,6 +208,39 @@ $("download-form").addEventListener("submit", (event) => { event.preventDefault(
   const result = await request("/api/download", {urls: links, format: $("download-format").value, height: Number($("height").value), auth: selectedAccount()});
   $("urls").value = ""; $("link-count").textContent = "0 links"; notify(`${result.ids.length} download${result.ids.length === 1 ? "" : "s"} queued.`);
 }); });
+$("gx-method").addEventListener("change", () => { accountChanged = true; accountFields(); });
+$("gx-copy-folder").addEventListener("click", () => action(async () => {
+  await navigator.clipboard.writeText(state.gx_connector_directory);
+  notify("Connector folder copied. Choose this folder in GX's Load unpacked dialog.");
+}));
+function finishGx(result) {
+  if (!gxPending || result.nonce !== gxPending.nonce) return;
+  clearTimeout(gxPending.timer); gxPending = null;
+  const btn = $("gx-connect"); btn.disabled = false;
+  delete btn.dataset.gxNonce; delete btn.dataset.gxToken;
+  if (result.error || result.auth?.kind !== "cookies" || !/^[a-f0-9]{32}$/.test(result.auth?.session || "")) {
+    gxAccount = null;
+    $("gx-status").textContent = result.error || "Connection failed. Reload Media Workshop in GX and try again.";
+    notify($("gx-status").textContent, true); return;
+  }
+  gxAccount = {kind: "cookies", session: result.auth.session}; accountChanged = true;
+  $("gx-status").textContent = "Opera GX connected. Keep GX open; downloads use this session. Reconnect after reloading or changing your login.";
+  notify("Opera GX connected. You can queue downloads or Retry now.");
+}
+document.addEventListener("media-workshop:gx:result", event => {
+  try { finishGx(JSON.parse(event.detail)); } catch (_) {}
+});
+$("gx-connect").addEventListener("click", () => action(async () => {
+  if (document.documentElement.dataset.workshopGxConnector !== "1") {
+    throw new Error("Open this app in Opera GX, enable the bundled connector, then reload this page. See the setup steps above Connect.");
+  }
+  if (!token) throw new Error("Wait for the app to connect, then try again.");
+  const nonce = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, "0")).join("");
+  const btn = $("gx-connect"); gxAccount = null;
+  btn.dataset.gxNonce = nonce; btn.dataset.gxToken = token; btn.disabled = true;
+  $("gx-status").textContent = "Connecting your GX session locally…";
+  gxPending = {nonce, timer: setTimeout(() => finishGx({nonce, error: "The GX connector did not respond. Reload this app in GX and reconnect."}), 25000)};
+}));
 $("account-source").addEventListener("change", () => { accountChanged = true; accountFields(); });
 $("account-profile").addEventListener("input", () => { accountChanged = true; accountFields(); });
 $("account-file").addEventListener("change", () => action(async () => {
@@ -223,6 +264,7 @@ try {
   const preference = JSON.parse(localStorage.getItem("mw.account") || "null");
   if (preference && preference.source !== "cookies" && [...$("account-source").options].some(o => o.value === preference.source)) {
     $("account-source").value = preference.source;
+    $("gx-method").value = preference.gxMethod === "profile" ? "profile" : "connector";
     $("account-profile").value = typeof preference.profile === "string" ? preference.profile : "";
   }
 } catch (_) {}

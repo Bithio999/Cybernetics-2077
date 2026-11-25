@@ -1,0 +1,50 @@
+{
+  "automated_tests": {
+    "passed": 81,
+    "scope": "Synthetic local media/account fixtures; no real browser profiles or subscriptions"
+  },
+  "normal_browser_review": {
+    "status": "passed",
+    "browser": "system Chromium / Playwright",
+    "checks": [
+      "empty state",
+      "account browser/profile selection and persistence without reading real profiles",
+      "synthetic cookie import and opaque download selection without credential persistence",
+      "responsive account controls",
+      "batch link count and deduplication",
+      "multi-file import",
+      "native video preview and selected-range playback",
+      "real MP4 export and duration",
+      "two-file MP3 batch export",
+      "browser Save file download",
+      "stable queue action DOM during polling",
+      "mobile layout without horizontal overflow",
+      "one accurate workflow without a cut-mode selector",
+      "accurate boundary-only video cut and native playback",
+      "copyable fallback reason/source diagnostics with stable expanded details"
+    ],
+    "jobs": 5,
+    "assets": 7,
+    "consoleErrors": []
+  },
+  "gx_fixture_browser_review": {
+    "status": "passed",
+    "browser": "fresh Chromium; isolated content script with simulated runtime/cookies API",
+    "checks": [
+      "real protected loopback cookie import; simulated browser API",
+      "requires trusted click",
+      "site-scoped cookie permissions",
+      "opaque queue references",
+      "private jar preserves Twitch authentication",
+      "no cookie values in DOM/state/history/localStorage",
+      "responsive connection/direct-profile UI",
+      "reconnect reads changed session"
+    ],
+    "pageErrors": []
+  },
+  "native_extension_review": {
+    "status": "blocked",
+    "reason": "Cloud Chromium policy: Loading of unpacked extensions is disabled by the administrator. No policy changes were made.",
+    "native_opera_gx_or_windows_tested": false
+  }
+}

@@ -75,6 +75,22 @@ Browser/profile preferences are remembered locally; imported cookie contents are
 
 This uses the access your account already has. Availability still depends on yt-dlp/site support, an active subscription, and valid cookies; it does not unlock videos your account cannot view. Real subscriber-account access has not been tested in this development environment.
 
+### Opera GX: keep the browser open
+
+**Opera GX → Live connector** uses GX's own extension API instead of copying the locked cookie database. This is the recommended GX option. It needs a one-time extension setup:
+
+1. Extract the **entire** updated program ZIP and start Media Workshop.
+2. In GX, open **opera://extensions**, enable **Developer mode**, and click **Load unpacked**.
+3. Select the **opera-gx-connector** folder inside the extracted program. The app's **Copy connector folder** button gives its full location. Allow the connector's YouTube/Twitch site access.
+4. Open or reload Media Workshop **in GX**, choose **Account access → Opera GX → Live connector**, and click **Connect Opera GX**. Sign into the site in that same GX profile first.
+5. Queue your links or click **Retry** on the old failed download. GX can stay open.
+
+![Opera GX connection](opera-gx.png)
+
+No cookie export file is created. The connector reads only YouTube/Twitch cookies, only on an actual Connect click, and sends them directly to the local app's protected import endpoint. It stores no credentials and does not contact an external service. Reconnect after reloading the app, restarting it, or changing your login. Native Opera GX/Windows execution remains unverified here; see [validation](VALIDATION.md#opera-gx-support).
+
+**Direct profile** is the alternative if you prefer no extension: GX's separate Windows/macOS profile location is detected automatically, with an optional full-path override from **opera://about → Profile**. Fully exit GX before downloading this way. Locked or protected databases produce specific guidance to use the live connector; the app does not terminate GX, change browser security or request administrator access. [Connector setup and permissions](opera-gx-connector/README.md).
+
 ## Trim or convert
 
 1. Download media or choose **Choose audio or video** to import files from your computer. Multiple selection is supported.
@@ -129,12 +145,15 @@ The same queue/encoder is available without the browser:
 python launch.py download "https://youtu.be/VIDEO_ID" "https://www.twitch.tv/videos/VOD_ID" --format mp4 --height 1080
 python launch.py download "https://clips.twitch.tv/CLIP_ID" --format mp3
 python launch.py download "https://www.twitch.tv/videos/VOD_ID" --format mp4 --browser firefox
+python launch.py download "https://www.twitch.tv/videos/VOD_ID" --format mp4 --browser opera-gx
 python launch.py download "https://youtu.be/VIDEO_ID" --format mp3 --browser firefox --browser-profile "Personal"
 python launch.py download "https://clips.twitch.tv/CLIP_ID" --format mp4 --cookies "cookies.txt"
 python launch.py trim "first.mp4" "second.mp4" --start 00:00:10 --end 00:00:25.500 --format mp4
 python launch.py trim "recording.mp4" --start 10.250 --end 25.500 --format mp4
 python launch.py trim "recording.mp4" --format mp3
 ```
+
+The CLI `--browser opera-gx` uses direct profile access and requires GX to be closed. Use the browser interface for the live connector.
 
 Use `python app.py --help` for commands. Each command accepts `--data-dir` and `--workers`. The CLI uses the same automatic accurate workflow, prints the cut start and output duration, and exits nonzero if any job fails. Old saved cut-mode settings are ignored.
 
@@ -156,5 +175,13 @@ python tests/browser_review.py
 ```
 
 Use `--browser /path/to/chromium` for an existing Chromium installation, or `--output /path/to/review` to change the capture directory.
+
+GX connector review in a fresh profile with synthetic cookies:
+
+```sh
+python tests/opera_gx_review.py --browser /path/to/chromium
+```
+
+If browser policy blocks unpacked extensions, `--fixture` explicitly tests the actual content script in an isolated world with a simulated extension/runtime API. This checks the local import/UI path, not native extension loading or cookie extraction. The default review never silently switches to simulation.
 
 Download backend: [yt-dlp](https://github.com/yt-dlp/yt-dlp) · YouTube runtime requirements: [yt-dlp EJS](https://github.com/yt-dlp/yt-dlp/wiki/EJS) · Encoding: [FFmpeg](https://ffmpeg.org/ffmpeg.html) · Boundary processing: [smartcut](https://github.com/skeskinen/smartcut) by Santtu Keskinen ([MIT license](https://github.com/skeskinen/smartcut/blob/main/LICENSE)) using [PyAV](https://pyav.org/). Dependencies are installed separately; their source and binaries are not bundled in the ZIP.
