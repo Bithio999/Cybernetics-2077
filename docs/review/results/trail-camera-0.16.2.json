@@ -1,0 +1,156 @@
+{
+  "version": "0.16.2",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "status": "passed",
+  "jvmTests": {
+    "tests": 84,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "cameraPixelScenes": [
+    {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "camera": "FIRST_PERSON",
+      "changedPixels": 4799,
+      "scene": 0
+    },
+    {
+      "yaw": 45.0,
+      "pitch": 0.0,
+      "camera": "FIRST_PERSON",
+      "changedPixels": 4423,
+      "scene": 1
+    },
+    {
+      "yaw": 90.0,
+      "pitch": 0.0,
+      "camera": "FIRST_PERSON",
+      "changedPixels": 4875,
+      "scene": 2
+    },
+    {
+      "yaw": 180.0,
+      "pitch": 0.0,
+      "camera": "FIRST_PERSON",
+      "changedPixels": 4650,
+      "scene": 3
+    },
+    {
+      "yaw": 270.0,
+      "pitch": 0.0,
+      "camera": "FIRST_PERSON",
+      "changedPixels": 7484,
+      "scene": 4
+    },
+    {
+      "yaw": 135.0,
+      "pitch": 25.0,
+      "camera": "FIRST_PERSON",
+      "changedPixels": 4152,
+      "scene": 5
+    },
+    {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "camera": "THIRD_PERSON_FRONT",
+      "changedPixels": 8136,
+      "scene": 6
+    },
+    {
+      "yaw": 0.0,
+      "pitch": 0.0,
+      "camera": "THIRD_PERSON_BACK",
+      "changedPixels": 5397,
+      "scene": 7
+    }
+  ],
+  "cameraStatus": "PASS: pixel-visible saved poses at six first-person yaw/pitch angles and front/back third person.",
+  "isolatedShippedRendererDiagnostic": [
+    {
+      "yaw": 0.0,
+      "scene": 0,
+      "changedPixels": 0,
+      "camera": "FIRST_PERSON",
+      "pitch": 0.0
+    },
+    {
+      "yaw": 45.0,
+      "scene": 1,
+      "changedPixels": 0,
+      "camera": "FIRST_PERSON",
+      "pitch": 0.0
+    },
+    {
+      "yaw": 90.0,
+      "scene": 2,
+      "changedPixels": 0,
+      "camera": "FIRST_PERSON",
+      "pitch": 0.0
+    },
+    {
+      "yaw": 180.0,
+      "scene": 3,
+      "changedPixels": 4729,
+      "camera": "FIRST_PERSON",
+      "pitch": 0.0
+    },
+    {
+      "yaw": 270.0,
+      "scene": 4,
+      "changedPixels": 3613,
+      "camera": "FIRST_PERSON",
+      "pitch": 0.0
+    },
+    {
+      "yaw": 135.0,
+      "scene": 5,
+      "changedPixels": 0,
+      "camera": "FIRST_PERSON",
+      "pitch": 25.0
+    },
+    {
+      "yaw": 0.0,
+      "scene": 6,
+      "changedPixels": 7495,
+      "camera": "THIRD_PERSON_FRONT",
+      "pitch": 0.0
+    },
+    {
+      "yaw": 0.0,
+      "scene": 7,
+      "changedPixels": 994,
+      "camera": "THIRD_PERSON_BACK",
+      "pitch": 0.0
+    }
+  ],
+  "cameraFixtureNotes": [
+    "The first broad pixel comparison was discarded because moving hands/clouds could trigger it.",
+    "Final comparisons hide hands/HUD, disable clouds and test only the known ghost region.",
+    "The corrected final fixture waits for the scripted remote pose to be tracked/interpolated and holds its activation longer before moving it away."
+  ],
+  "nativeTrailStatus": "PASS: longer spectrum and bounded GPU histories; stationary first-person exclusion; stationary third-person body clipping; camera inside saved head; reversal across own history; return to first person; opaque hands/player render after echoes. Maximum echoes=12, vertices=70944, clipped=12.",
+  "nativeFrameSample": {
+    "p95Ms": 51.038951,
+    "medianMs": 37.178278,
+    "frames": 130
+  },
+  "releaseVerifier": "passed",
+  "wiki": {
+    "pages": 65,
+    "strictBuild": "passed"
+  },
+  "jarSha256": "5d4d3fe04b43d6b604486ceb436e24992f4717d0b94478112cb23dceb9d05e90",
+  "screenshots": {
+    "sandevistan-camera-comparison-0.16.2.png": "489c8667dded186781191e971f779aedd73db0cc3cdd7e20b439c3bd296c3a88",
+    "sandevistan-trails-0.16.2.png": "b80f7e11b54680dc51db639466ffe84c83df7f337b3a09e8ab88bf8020ccf420"
+  },
+  "limitations": [
+    "Native review used an integrated disposable world and 1280x720 software OpenGL, not a hardware benchmark or authenticated two-computer multiplayer.",
+    "No working audio device or session-service connection in this native environment.",
+    "Native pixel camera scenes measure remote world poses; saved first-person arm camera transforms have separate JVM regressions and the established native arm-rendering scenes.",
+    "Server combat tests were not rerun for this client-only correction; time-slow gameplay and sun/weather clocks remain unchanged."
+  ]
+}

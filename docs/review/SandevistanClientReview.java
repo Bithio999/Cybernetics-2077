@@ -45,10 +45,14 @@ final class SandevistanClientReview {
     m.gui.getChat().clearMessages(true);
     if (t == 0) {
       m.setScreen(null);
+      m.options.hideGui = false;
       m.options.setCameraType(CameraType.FIRST_PERSON);
       server(
           p -> {
             p.closeContainer();
+            p.getAbilities().flying = false;
+            p.getAbilities().mayfly = false;
+            p.onUpdateAbilities();
             p.server.setPvpAllowed(true);
             p.setHealth(p.getMaxHealth());
             p.setData(Cybernetics2077.AUGMENT_STATE, new AugmentState());
@@ -228,6 +232,10 @@ final class SandevistanClientReview {
       maxGhosts = Math.max(maxGhosts, SandevistanTrails.lastEchoes);
       maxVertices = Math.max(maxVertices, SandevistanTrails.lastVertices);
       maxActors = Math.max(maxActors, SandevistanTrails.lastActors);
+    }
+    if (t >= 325 && Boolean.getBoolean("cybernetics2077.cameraReview")) {
+      TrailCameraReview.tick(t);
+      return;
     }
     if (t >= 325 && Boolean.getBoolean("cybernetics2077.handsReview")) {
       HandsClientReview.tick(t);

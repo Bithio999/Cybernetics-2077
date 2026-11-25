@@ -1,5 +1,6 @@
 package dev.cybernetics2077.client.temporal;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.cybernetics2077.client.mantis.*;
 import dev.cybernetics2077.temporal.Sandevistan;
@@ -10,12 +11,15 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 /** Bounded pose history. No duplicate entities, recursive rendering or unbounded ghost buffers. */
 public final class SandevistanTrails {
   public static boolean capturing;
 
-  private record Echo(Vec3 position, TrailStyle.PoseTint tint, List<TemporalMesh> mesh) {}
+  private record Echo(
+      Vec3 position, TrailStyle.PoseTint tint, List<TemporalMesh> mesh, Quaternionf birthCamera) {}
 
   private static final Map<UUID, ArrayDeque<Echo>> HISTORY = new LinkedHashMap<>();
   private static final Map<UUID, Double> COLOR_ORIGINS = new HashMap<>();
@@ -42,9 +46,10 @@ public final class SandevistanTrails {
     return TrailStyle.capture(now, now - origin);
   }
 
-  private static void emit(PoseStack pose, List<TemporalMesh> mesh, int color, AABB exclude) {
+  private static void emit(
+      Matrix4f modelView, Matrix4f projection, List<TemporalMesh> mesh, int color, AABB exclude) {
     for (var batch : mesh) {
-      batch.draw(pose, color, exclude);
+      batch.draw(modelView, projection, color, exclude);
       lastVertices += batch.count;
     }
   }
@@ -111,7 +116,8 @@ public final class SandevistanTrails {
               new Echo(
                   p.getPosition(e.getPartialTick().getGameTimeDeltaPartialTick(false)),
                   captureTint(p, now),
-                  batches));
+                  batches,
+                  null));
           captured++;
         }
         LAST_SWING.put(p.getUUID(), swing);
@@ -119,7 +125,6 @@ public final class SandevistanTrails {
         trim(history, TrailStyle.WORLD_HISTORY);
       }
     }
-    var pose = e.getPoseStack();
     var source = m.renderBuffers().bufferSource();
     source.endBatch();
     var camera = e.getCamera().getPosition();
@@ -156,9 +161,9 @@ public final class SandevistanTrails {
         double age = echo.tint.age(now);
         if (age < 1.5 || !TrailStyle.selected(ordinal, history.size(), budget)) continue;
         if (lastEchoes >= TrailStyle.WORLD_DRAW_LIMIT) break;
-        pose.pushPose();
         var delta = echo.position.subtract(camera);
-        pose.translate(delta.x, delta.y, delta.z);
+        var modelView =
+            TrailTransform.modelView(e.getModelViewMatrix(), delta.x, delta.y, delta.z, null);
         // The live body's volume is expressed in the saved mesh's world-aligned local space.
         var exclude =
             owner == null
@@ -171,9 +176,8 @@ public final class SandevistanTrails {
                             .subtract(owner.position()))
                     .inflate(.09)
                     .move(echo.position.scale(-1));
-        emit(pose, echo.mesh, echo.tint.color(now, false), exclude);
+        emit(modelView, e.getProjectionMatrix(), echo.mesh, echo.tint.color(now, false), exclude);
         if (exclude != null) lastBodyExclusions++;
-        pose.popPose();
         lastEchoes++;
       }
     }
@@ -206,16 +210,21 @@ public final class SandevistanTrails {
       } finally {
         capturing = false;
       }
-      history.addLast(new Echo(Vec3.ZERO, captureTint(player, now), upload(recorder.finish())));
+      var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+      history.addLast(
+          new Echo(
+              camera.getPosition(),
+              captureTint(player, now),
+              upload(recorder.finish()),
+              new Quaternionf(camera.rotation())));
       trim(history, TrailStyle.HAND_HISTORY);
     }
     while (!history.isEmpty() && history.peekFirst().tint.age(now) > TrailStyle.HAND_LIFETIME)
       discard(history.removeFirst());
-    var identity = new PoseStack();
     var types = new HashSet<RenderType>();
     for (var echo : history)
       if (echo.tint.age(now) >= 1.5) {
-        emit(identity, echo.mesh, echo.tint.color(now, true), null);
+        emitHand(echo, now);
         for (var b : echo.mesh) types.add(b.type);
       }
     if (source instanceof MultiBufferSource.BufferSource buffers) types.forEach(buffers::endBatch);
@@ -242,7 +251,13 @@ public final class SandevistanTrails {
       } finally {
         capturing = false;
       }
-      history.addLast(new Echo(Vec3.ZERO, captureTint(player, now), upload(recorder.finish())));
+      var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+      history.addLast(
+          new Echo(
+              camera.getPosition(),
+              captureTint(player, now),
+              upload(recorder.finish()),
+              new Quaternionf(camera.rotation())));
       trim(history, TrailStyle.HAND_HISTORY);
     }
     while (!history.isEmpty() && history.peekFirst().tint.age(now) > TrailStyle.HAND_LIFETIME)
@@ -250,10 +265,19 @@ public final class SandevistanTrails {
     var types = new HashSet<RenderType>();
     for (var echo : history)
       if (echo.tint.age(now) >= 1.5) {
-        emit(new PoseStack(), echo.mesh, echo.tint.color(now, true), null);
+        emitHand(echo, now);
         for (var b : echo.mesh) types.add(b.type);
       }
     if (source instanceof MultiBufferSource.BufferSource buffers) types.forEach(buffers::endBatch);
+  }
+
+  private static void emitHand(Echo echo, double now) {
+    var camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+    var delta = echo.position.subtract(camera.getPosition());
+    var view = new Matrix4f().rotation(new Quaternionf(camera.rotation()).conjugate());
+    var modelView = TrailTransform.modelView(view, delta.x, delta.y, delta.z, echo.birthCamera);
+    emit(
+        modelView, RenderSystem.getProjectionMatrix(), echo.mesh, echo.tint.color(now, true), null);
   }
 
   public static void clear() {

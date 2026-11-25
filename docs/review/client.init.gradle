@@ -5,6 +5,7 @@ gradle.projectsEvaluated {
  def reviewRoot=rootProject.findProperty('cyberReviewRoot') ?: '/tmp/cybernetics2077-review'
  rootProject.neoForge.runs.client.gameDirectory=rootProject.file(reviewRoot+'/client')
  rootProject.neoForge.runs.client.systemProperty('cybernetics2077.reviewRoot',reviewRoot.toString())
+ if(rootProject.hasProperty('cameraReview')) {rootProject.neoForge.runs.client.systemProperty('cybernetics2077.cameraReview','true');rootProject.neoForge.runs.client.systemProperty('cybernetics2077.sandevistanReview','true')}
  if(rootProject.hasProperty('handsReview')) {rootProject.neoForge.runs.client.systemProperty('cybernetics2077.handsReview','true');rootProject.neoForge.runs.client.systemProperty('cybernetics2077.sandevistanReview','true')}
  if(rootProject.hasProperty('trailReview')) { rootProject.neoForge.runs.client.systemProperty('cybernetics2077.trailReview','true');rootProject.neoForge.runs.client.systemProperty('cybernetics2077.sandevistanReview','true') }
  if(rootProject.hasProperty('sandevistanReview')) rootProject.neoForge.runs.client.systemProperty('cybernetics2077.sandevistanReview','true')

@@ -32,7 +32,8 @@ final class TemporalMesh implements AutoCloseable {
     VertexBuffer.unbind();
   }
 
-  void draw(PoseStack pose, int color, net.minecraft.world.phys.AABB exclude) {
+  void draw(
+      Matrix4f modelView, Matrix4f projection, int color, net.minecraft.world.phys.AABB exclude) {
     type.setupRenderState();
     RenderSystem.setShaderColor(
         ((color >> 16) & 255) / 255f,
@@ -50,10 +51,7 @@ final class TemporalMesh implements AutoCloseable {
           .set((float) exclude.maxX, (float) exclude.maxY, (float) exclude.maxZ);
     }
     gpu.bind();
-    gpu.drawWithShader(
-        new Matrix4f(RenderSystem.getModelViewMatrix()).mul(pose.last().pose()),
-        RenderSystem.getProjectionMatrix(),
-        RenderSystem.getShader());
+    gpu.drawWithShader(modelView, projection, RenderSystem.getShader());
     VertexBuffer.unbind();
     RenderSystem.setShaderColor(1, 1, 1, 1);
     type.clearRenderState();

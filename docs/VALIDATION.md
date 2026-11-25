@@ -2,6 +2,27 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Sandevistan camera anchoring (0.16.2)
+
+**84 JVM tests, eight native pixel camera scenes, the established native trail suite, clean release audit and strict wiki build pass.** [Results](review/results/trail-camera-0.16.2.json) · [Root causes](research/SANDEVISTAN-CAMERA-0.16.2.md) · [Visible before/after](images/sandevistan-camera-comparison-0.16.2.png).
+
+World replay previously read a global model-view matrix before Minecraft had applied the camera view at that render stage. It now uses the render event's view/projection explicitly. First-person arms save their camera position/quaternion at capture and transform through the current view during replay. Saved positions no longer follow the camera. Birth colors, draw/history budgets and anti-overlap/proximity fading remain.
+
+Three added JVM regressions check 24 compass/pitch views, turning away from a captured hand and camera translation past a known saved point. The isolated native pixel test checks six first-person yaw/pitch angles and both third-person modes. It moves the live owner away, measures the saved pose's region, clears history, then measures the same background. Held hands/HUD and animated clouds are disabled to isolate ghost pixels. An earlier broad framebuffer comparison included moving hands/clouds, so its figures are discarded. The final fixture confirms that the scripted actor is tracked/interpolated at the expected position before moving it away; an initially short window missed this at a chunk boundary.
+
+The shipped renderer reproduced missing ghost pixels at several angles. The corrected renderer produces **4,152–8,136 changed pixels** in the expected region across all eight final cases. These figures validate visible output for those scenes, not every graphics-mod combination. The established suite also passes stationary first/third person, camera inside a saved head, reversal and returning to first person, reaching 12 echoes / 70,944 replayed vertices within existing budgets. First-person arm camera anchoring has separate mathematical regression coverage; the camera pixel scenes measure remote world poses.
+
+```sh
+./gradlew test runClient -I docs/review/client.init.gradle -PcameraReview
+./gradlew runClient -I docs/review/client.init.gradle -PtrailReview
+./gradlew clean test build
+python3 scripts/verify-release.py
+python3 scripts/check-wiki.py
+mkdocs build --strict
+```
+
+Native review uses 1280×720 software OpenGL in a disposable integrated world, without working audio or session-service connectivity. It is not a hardware benchmark or authenticated two-computer multiplayer test. Combat timing, sun/weather clocks and server gameplay are unchanged; previous server combat tests are not rerun for this client-only correction. Review classes are excluded from the clean release.
+
 ## Distinct Mantis receivers and elemental effects (0.16.1)
 
 **81 JVM tests, the native client review, clean release audit and strict wiki build pass.** [Results](review/results/mantis-appearance-0.16.1.json) · [Design and render budgets](research/MANTIS-APPEARANCE-0.16.1.md) · [Visual comparison](images/mantis-variants-0.16.1.png).

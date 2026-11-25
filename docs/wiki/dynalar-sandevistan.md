@@ -31,13 +31,15 @@ The HUD shows remaining active time or charge percentage. Death, dimension chang
 
 The encounter radius is **32 blocks**. Nearby non-allied mobs and projectiles slow in movement, attacks and reaction time. Your walking and weapon recovery accelerate by 25%; the shared encounter clock keeps ordinary opponents at half your pace. Mantis attack animations and lunges follow that same clock. Camera input, the world tick rate, redstone, weather and battery timing remain normal.
 
+With one Dynalar active, the user runs at **125%** normal movement/weapon recovery while affected ordinary opponents run at **62.5%**. Opponents therefore run at half the user's pace. This changes nearby combat updates, not the server's 20 TPS. Players' regeneration and battery timers use normal game time.
+
 Two active Dynalar users have equal temporal pace, regardless of tier. Overlapping fields apply their strongest strength once; they do not multiply. The relative-speed system supports other slowing strengths for future models, but **tier upgrades never increase Dynalar’s slowing**.
 
 Server PvP settings and team protections prevent slowing protected players or their projectiles. Creative players and spectators are protected. Mounted entities retain normal vehicle physics. Normal defensive effects still work; Sandevistan does not grant invulnerability or ignore armor.
 
 ## Effects
 
-Movement and attacks leave a roughly **two-second trail** of textured poses, including your skin, armor and deployed Mantis Blades. Each pose receives its color when created and keeps that color until it fades. New poses advance through **mint and cyan → blue and violet → muted pink and amber → yellow-green**, then repeat. Older poses do not cycle through the palette. A new activation starts the palette again; hands and body use the same color timing.
+Movement and attacks leave a roughly **two-second trail** of textured poses, including your skin, armor and deployed Mantis Blades. Each pose receives its color when created and keeps that color until it fades. New poses advance through **mint and cyan → blue and violet → muted pink and amber → yellow-green**, then repeat. Saved poses stay at their captured locations when you turn or move the camera. Older poses do not cycle through the palette. A new activation starts the palette again; hands and body use the same color timing.
 
 Your full-body trail is visible in third person and to other players. First person uses subtler hand and blade echoes, keeping the view clear.
 
@@ -45,6 +47,6 @@ Activation adds a brief lens pulse, restrained color separation, a small FOV tra
 
 ![Dynalar implant details](../images/sandevistan-details.png)
 
-![Colored pose trails](../images/sandevistan-fixed-tints.png)
+![Colored pose trails](../images/sandevistan-trails-0.16.2.png)
 
 [Controls](controls.md) · [Installing cyberware](installation.md) · [Ripperdoc stock](ripperdocs.md)

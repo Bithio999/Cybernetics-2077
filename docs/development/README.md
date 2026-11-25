@@ -19,6 +19,8 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.16.1 Mantis appearance and elemental rendering](../research/MANTIS-APPEARANCE-0.16.1.md).
 
+[0.16.2 afterimage camera anchoring and pixel regressions](../research/SANDEVISTAN-CAMERA-0.16.2.md).
+
 ## Edit the wiki
 
 The 65 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
