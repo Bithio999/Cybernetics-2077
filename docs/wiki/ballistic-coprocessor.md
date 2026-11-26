@@ -24,6 +24,8 @@ The preview covers up to **160 blocks** and stops at a second surface or an enti
 
 ![TaCZ aiming preview after a reflected wall hit](../images/neo023-gun-ricochet.png)
 
-With TaCZ, non-explosive bullets ricochet once with the same retained-speed and damage bonuses. The aiming preview uses the gun’s speed, gravity, friction and attachment properties. Explosive rounds retain their native impact behavior. [Gun integration](compatibility.md).
+With TaCZ, non-explosive bullets ricochet once with the same retained-speed and damage bonuses. The aiming preview uses the gun’s speed, global speed setting, gravity, friction and attachment properties. A short light streak shows the reflected flight, including rounds that immediately hit a target. Explosive rounds retain their native impact behavior. [Gun integration](compatibility.md).
+
+![Desert Eagle round after bouncing into a mob](../images/ricochet-0231-desert-eagle.png)
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

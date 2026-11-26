@@ -11,6 +11,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Pseudo
 @Mixin(targets = "com.tacz.guns.entity.EntityKineticBullet", remap = false)
 public abstract class TacZBulletMixin {
+  @Inject(method = "tick", at = @At("HEAD"))
+  private void cybernetics$flightStart(CallbackInfo ci) {
+    TacZCompat.beginFlight((Entity) (Object) this);
+  }
+
+  @Inject(method = "onHitEntity", at = @At("HEAD"))
+  private void cybernetics$hit(
+      @Coerce Object hit,
+      net.minecraft.world.phys.Vec3 start,
+      net.minecraft.world.phys.Vec3 end,
+      CallbackInfo ci) {
+    if (hit instanceof net.minecraft.world.phys.HitResult result)
+      TacZCompat.flightHit((Entity) (Object) this, result.getLocation());
+  }
+
+  @Inject(method = "onHitBlock", at = @At("HEAD"))
+  private void cybernetics$block(
+      net.minecraft.world.phys.BlockHitResult hit,
+      net.minecraft.world.phys.Vec3 start,
+      net.minecraft.world.phys.Vec3 end,
+      CallbackInfo ci) {
+    if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS)
+      TacZCompat.flightHit((Entity) (Object) this, hit.getLocation());
+  }
+
   @Inject(
       method = "tick",
       at =
@@ -20,6 +45,7 @@ public abstract class TacZBulletMixin {
               shift = At.Shift.AFTER),
       cancellable = true)
   private void cybernetics$bank(CallbackInfo ci) {
+    TacZCompat.finishFlight((Entity) (Object) this);
     if (TacZCompat.completeBounce((Entity) (Object) this)) ci.cancel();
   }
 

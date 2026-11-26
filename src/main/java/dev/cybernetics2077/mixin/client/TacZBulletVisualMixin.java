@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class TacZBulletVisualMixin {
   @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
   private void cybernetics$authoritative(CallbackInfo ci) {
-    if (GuidedBulletClient.managed((Entity) (Object) this)) ci.cancel();
+    if (GuidedBulletClient.guard((Entity) (Object) this)) ci.cancel();
   }
 }

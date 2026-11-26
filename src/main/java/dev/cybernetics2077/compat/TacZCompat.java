@@ -25,6 +25,19 @@ public final class TacZCompat {
   private static final Map<String, Method> METHODS = new ConcurrentHashMap<>();
   private static Class<?> gunClass, bulletClass;
   private static boolean loaded;
+  private static Method blockClip;
+  private static Field explosiveField;
+  private static final Map<Entity, FlightStep> FLIGHT = new WeakHashMap<>();
+
+  private static final class FlightStep {
+    final Vec3 start;
+    Vec3 hit;
+
+    FlightStep(Vec3 start) {
+      this.start = start;
+    }
+  }
+
   public static java.util.function.Predicate<LivingEntity> clientBlocked = e -> false;
   public static java.util.function.ToDoubleFunction<LivingEntity> clientRecoil = e -> 1;
 
@@ -36,6 +49,14 @@ public final class TacZCompat {
       bulletClass =
           Class.forName(
               "com.tacz.guns.entity.EntityKineticBullet", false, TacZCompat.class.getClassLoader());
+      blockClip =
+          Class.forName("com.tacz.guns.util.block.BlockRayTrace")
+              .getMethod(
+                  "rayTraceBlocks",
+                  net.minecraft.world.level.Level.class,
+                  net.minecraft.world.level.ClipContext.class);
+      explosiveField = bulletClass.getDeclaredField("explosion");
+      explosiveField.setAccessible(true);
       listen("common.GunShootEvent", TacZCompat::fire);
       listen("common.GunFireEvent", TacZCompat::fire);
       listen("common.GunReloadEvent", TacZCompat::reload);
@@ -220,6 +241,73 @@ public final class TacZCompat {
     if (tag.getBoolean("controlled")) sync(entity);
   }
 
+  /** Capture only the first two physical steps after a confirmed bounce. */
+  public static void beginFlight(Entity entity) {
+    if (!(entity.level() instanceof ServerLevel)) return;
+    var tag = entity.getPersistentData().getCompound(DATA);
+    if (tag.getBoolean("bounced")
+        && tag.getInt("traceSteps") < 2
+        && entity.getDeltaMovement().lengthSqr() > .0001)
+      FLIGHT.put(entity, new FlightStep(entity.position()));
+  }
+
+  public static void flightHit(Entity entity, Vec3 point) {
+    if (!(entity.level() instanceof ServerLevel)) return;
+    var step = FLIGHT.get(entity);
+    if (step != null) step.hit = point;
+  }
+
+  /**
+   * Runs before removal reaches clients; endpoints come from real collision results.
+   */
+  public static void finishFlight(Entity entity) {
+    if (!(entity.level() instanceof ServerLevel)) return;
+    var step = FLIGHT.remove(entity);
+    if (step == null) return;
+    Vec3 end =
+        entity.isRemoved() && step.hit != null
+            ? step.hit
+            : entity.position().add(entity.getDeltaMovement());
+    var tag = entity.getPersistentData().getCompound(DATA);
+    tag.putInt("traceSteps", tag.getInt("traceSteps") + 1);
+    rebound(entity, step.start, end);
+  }
+
+  private static void rebound(Entity entity, Vec3 from, Vec3 to) {
+    var level = (ServerLevel) entity.level();
+    // The short-lived visual must reach observers even when the native entity is already removed.
+    net.neoforged.neoforge.network.PacketDistributor.sendToPlayersNear(
+        level,
+        null,
+        from.x,
+        from.y,
+        from.z,
+        128,
+        new CyberwareNetwork.Rebound(entity.getUUID(), from.x, from.y, from.z, to.x, to.y, to.z));
+  }
+
+  /** Same read-only collision query TaCZ uses, including its pass-through block settings. */
+  public static BlockHitResult clip(
+      net.minecraft.world.level.Level level, Vec3 from, Vec3 to, Entity context) {
+    var query =
+        new net.minecraft.world.level.ClipContext(
+            from,
+            to,
+            net.minecraft.world.level.ClipContext.Block.COLLIDER,
+            net.minecraft.world.level.ClipContext.Fluid.NONE,
+            context);
+    if (!loaded) return level.clip(query);
+    try {
+      return (BlockHitResult) blockClip.invoke(null, level, query);
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException("TaCZ collision query failed", ex);
+    }
+  }
+
+  public static boolean kinetic(Entity entity) {
+    return bullet(entity) && !explosive(entity);
+  }
+
   public static boolean completeBounce(Entity entity) {
     if (!(entity.level() instanceof ServerLevel)) return false;
     var tag = entity.getPersistentData().getCompound(DATA);
@@ -229,6 +317,7 @@ public final class TacZCompat {
     tag.remove("pending");
     tag.putBoolean("controlled", true);
     sync(entity);
+    rebound(entity, entity.position(), entity.position());
     return true;
   }
 
@@ -236,13 +325,13 @@ public final class TacZCompat {
     if (!(call(event, "getAmmo") instanceof Projectile bullet)
         || !(bullet.level() instanceof ServerLevel level)
         || !(bullet.getOwner() instanceof ServerPlayer player)) return;
+    BlockHitResult hit = (BlockHitResult) call(event, "getHitResult");
     int tier = AugmentRuntime.tier(player, BALLISTIC_COPROCESSOR);
     var tag = bullet.getPersistentData().getCompound(DATA);
     if (tier == 0
         || tag.getBoolean("bounced")
         || explosive(bullet)
         || bullet.getDeltaMovement().lengthSqr() < .04) return;
-    BlockHitResult hit = (BlockHitResult) call(event, "getHitResult");
     if (hit.getType() == HitResult.Type.MISS) return;
     var n = Vec3.atLowerCornerOf(hit.getDirection().getNormal());
     var v = bullet.getDeltaMovement();
@@ -275,9 +364,7 @@ public final class TacZCompat {
 
   private static boolean explosive(Entity bullet) {
     try {
-      Field field = bulletClass.getDeclaredField("explosion");
-      field.setAccessible(true);
-      return field.getBoolean(bullet);
+      return explosiveField.getBoolean(bullet);
     } catch (ReflectiveOperationException ex) {
       return true;
     } // Unknown explosive metadata must never enable a ricochet.
@@ -368,6 +455,25 @@ public final class TacZCompat {
                   String.class,
                   Class.class,
                   Object.class);
+          velocity =
+              ((Number)
+                      modify.invoke(
+                          stack.getItem(),
+                          holder,
+                          stack,
+                          shooter,
+                          "ammo_speed",
+                          Float.class,
+                          velocity))
+                  .floatValue();
+          double globalSpeed =
+              ((Number)
+                      call(
+                          Class.forName("com.tacz.guns.config.common.AmmoConfig")
+                              .getField("GLOBAL_BULLET_SPEED_MODIFIER")
+                              .get(null),
+                          "get"))
+                  .doubleValue();
           float gravity =
               ((Number)
                       modify.invoke(
@@ -397,7 +503,7 @@ public final class TacZCompat {
               && Float.isFinite(friction))
             result =
                 new BallisticProfile(
-                    velocity / 20,
+                    velocity * globalSpeed / 20,
                     Math.max(0, gravity),
                     Math.clamp(friction, 0, 1),
                     Math.clamp((int) (life * 20), 1, 200));

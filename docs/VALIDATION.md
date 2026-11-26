@@ -1,5 +1,9 @@
 # Validation
 
+## Full-speed ricochet display (NeoForge 0.23.1)
+
+**103 JVM tests, 150 standalone GameTests and 15 optional TaCZ GameTests pass.** The native client fires the AKM and Desert Eagle through normal trigger requests, verifies reflected damage and ammunition consumption, and checks the visible reflected path after native entity removal. [Reproduction and correction](development/RICOCHET-0.23.1.md) · [Results](review/results/ricochet-0.23.1.json). Forge remains unchanged.
+
 ## Hands integration and service menus (NeoForge 0.23.0)
 
 **103 JVM tests, 150 standalone GameTests and 13 TaCZ GameTests pass.** Native TaCZ ricochets now continue outside the wall and deal real damage on the reflected path. Gun ADS previews, guided-round visuals, Iconic Immovable Force, Street Cred capacity and compact service menus are covered by dedicated and native client checks. [Implementation and scope](development/HANDS-SERVICES-0.23.0.md) · [Results](review/results/hands-services-0.23.0.json). Forge remains 0.20.0.

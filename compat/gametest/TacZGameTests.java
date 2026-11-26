@@ -338,6 +338,77 @@ public final class TacZGameTests {
   }
 
   @GameTest(template = "empty", timeoutTicks = 80)
+  public static void gunPreviewIncludesNativeGlobalSpeed(GameTestHelper h) throws Exception {
+    var p = player(h);
+    double multiplier =
+        ((Number)
+                call(
+                    Class.forName("com.tacz.guns.config.common.AmmoConfig")
+                        .getField("GLOBAL_BULLET_SPEED_MODIFIER")
+                        .get(null),
+                    "get"))
+            .doubleValue();
+    for (String id : List.of("ak47", "deagle")) {
+      var builder =
+          Class.forName("com.tacz.guns.api.item.builder.GunItemBuilder")
+              .getMethod("create")
+              .invoke(null);
+      call(builder, "setId", net.minecraft.resources.ResourceLocation.parse("tacz:" + id));
+      var gun = (ItemStack) call(builder, "build", p.registryAccess());
+      p.getInventory().setItem(0, gun);
+      p.getInventory().selected = 0;
+      var index =
+          (Optional<?>)
+              Class.forName("com.tacz.guns.api.TimelessAPI")
+                  .getMethod("getCommonGunIndex", net.minecraft.resources.ResourceLocation.class)
+                  .invoke(null, net.minecraft.resources.ResourceLocation.parse("tacz:" + id));
+      var data = call(index.orElseThrow(), "getGunData");
+      var cache =
+          Class.forName("com.tacz.guns.resource.modifier.AttachmentCacheProperty")
+              .getConstructor()
+              .newInstance();
+      call(cache, "eval", gun, data);
+      var operator =
+          Class.forName("com.tacz.guns.api.entity.IGunOperator")
+              .getMethod("fromLivingEntity", LivingEntity.class)
+              .invoke(null, p);
+      call(operator, "updateCacheProperty", cache);
+      var profile = TacZCompat.ballistics(p);
+      double speed = ((Number) call(call(data, "getBulletData"), "getSpeed")).doubleValue();
+      h.assertTrue(
+          profile != null && Math.abs(profile.speed() - speed * multiplier / 20) < .0001,
+          "Preview ignored the native global speed for " + id);
+    }
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", batch = "fastSecondWall", timeoutTicks = 80)
+  public static void fastRicochetStopsAtSecondWallEvenAfterOwnerLeaves(GameTestHelper h)
+      throws Exception {
+    var p = player(h);
+    equip(p, Augment.BALLISTIC_COPROCESSOR, 1, 0);
+    var first = p.blockPosition().offset(0, 1, 4);
+    var second = first.offset(0, 0, -10);
+    for (int x = -2; x <= 2; x++)
+      for (int y = -2; y <= 2; y++) {
+        h.getLevel().setBlock(first.offset(x, y, 0), Blocks.STONE.defaultBlockState(), 3);
+        h.getLevel().setBlock(second.offset(x, y, 0), Blocks.STONE.defaultBlockState(), 3);
+      }
+    var b = bullet(h, p);
+    b.setPos(first.getX() + .5, first.getY() + .5, first.getZ() - .4);
+    b.setDeltaMovement(0, 0, 25);
+    b.tick();
+    h.assertTrue(b.isAlive() && b.getDeltaMovement().z < 0, "Fast Tier 1 shot failed to rebound");
+    b.setOwner(null);
+    b.tick();
+    h.assertTrue(!b.isAlive(), "Fast round passed through its second wall");
+    h.assertTrue(
+        b.getPersistentData().getCompound(TacZCompat.DATA).getInt("traceSteps") == 1,
+        "Completed flight was lost with the owner");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
   public static void deployedBladesBlockNativeGunActions(GameTestHelper h) throws Exception {
     var p = player(h);
     p.getData(Cybernetics2077.CYBERWARE)

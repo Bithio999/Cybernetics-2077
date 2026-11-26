@@ -119,6 +119,7 @@ with PortZip(jar) as z:
         for required in (
             'dev/cybernetics2077/cyberware/CyberwareCapacity.class',
             'dev/cybernetics2077/client/GuidedBulletClient.class',
+            'dev/cybernetics2077/client/ReboundTrailClient.class',
             'dev/cybernetics2077/client/ui/ServiceStyle.class',
             'dev/cybernetics2077/mixin/TacZBulletMixin.class',
             'dev/cybernetics2077/mixin/client/TacZBulletVisualMixin.class',

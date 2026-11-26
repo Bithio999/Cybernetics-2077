@@ -158,9 +158,11 @@ public final class HandsClient {
     for (int i = 0; i < Math.min(96, life) && distance < 160 && v.lengthSqr() > .0001; i++) {
       Vec3 next = point.add(v.scale(Math.min(1, (160 - distance) / v.length())));
       var hit =
-          m.level.clip(
-              new ClipContext(
-                  point, next, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, m.player));
+          TacZCompat.gun(m.player.getMainHandItem())
+              ? TacZCompat.clip(m.level, point, next, m.player)
+              : m.level.clip(
+                  new ClipContext(
+                      point, next, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, m.player));
       Vec3 end = hit.getType() == HitResult.Type.MISS ? next : hit.getLocation();
       var entity =
           net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(
@@ -238,8 +240,10 @@ public final class HandsClient {
     @SubscribeEvent
     public static void setup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
       event.enqueueWork(
-          () ->
-              CyberwareNetwork.trajectory = dev.cybernetics2077.client.GuidedBulletClient::receive);
+          () -> {
+            CyberwareNetwork.trajectory = dev.cybernetics2077.client.GuidedBulletClient::receive;
+            CyberwareNetwork.rebound = dev.cybernetics2077.client.ReboundTrailClient::receive;
+          });
     }
   }
 

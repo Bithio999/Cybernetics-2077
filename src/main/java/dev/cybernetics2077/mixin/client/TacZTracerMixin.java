@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class TacZTracerMixin {
   @Unique private boolean cybernetics$managed;
 
-  @Inject(method = "renderTracerAmmo", at = @At("HEAD"))
+  @Inject(method = "renderTracerAmmo", at = @At("HEAD"), cancellable = true)
   private void cybernetics$begin(
       @Coerce Object bullet,
       float[] color,
@@ -23,6 +23,8 @@ public abstract class TacZTracerMixin {
       int light,
       CallbackInfo ci) {
     cybernetics$managed = bullet instanceof Entity e && GuidedBulletClient.managed(e);
+    if (bullet instanceof Entity e && dev.cybernetics2077.client.ReboundTrailClient.covers(e))
+      ci.cancel();
   }
 
   @ModifyExpressionValue(
