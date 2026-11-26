@@ -256,7 +256,7 @@ public final class TacZGameTests {
   }
 
   @GameTest(template = "empty", timeoutTicks = 80)
-  public static void nativeGunIntervalUsesPersonalTimeWithoutChangingSharedGunData(GameTestHelper h)
+  public static void nativeGunIntervalsFollowWorldTimeAndPreserveReloadData(GameTestHelper h)
       throws Exception {
     var p = player(h);
     var mob = h.spawn(EntityType.HUSK, new BlockPos(4, 90, 4));
@@ -280,19 +280,86 @@ public final class TacZGameTests {
     Object data = call(index.orElseThrow(), "getGunData"),
         mode = call(gun.getItem(), "getFireMode", gun);
     long nativeInterval = ((Number) call(data, "getShootInterval", mob, mode, gun)).longValue();
-    equip(p, Augment.MILITECH_APOGEE, 5, 0);
+    Object reload = call(data, "getReloadData"),
+        feed = call(reload, "getFeed"),
+        cooldown = call(reload, "getCooldown");
+    float emptyFeed = ((Number) call(feed, "getEmptyTime")).floatValue();
+    float tacticalFeed = ((Number) call(feed, "getTacticalTime")).floatValue();
+    float emptyCooldown = ((Number) call(cooldown, "getEmptyTime")).floatValue();
+    float tacticalCooldown = ((Number) call(cooldown, "getTacticalTime")).floatValue();
+    h.getLevel().addNewPlayer(p);
+    try {
+      var models =
+          List.of(Augment.DYNALAR_SANDEVISTAN, Augment.MILITECH_APOGEE, Augment.DAVIDS_SANDEVISTAN);
+      double[] worldPaces = {.625, .1875, .0625};
+      for (int i = 0; i < models.size(); i++) {
+        equip(p, models.get(i), 5, 0);
+        AugmentRuntime.state(p).sandyRearm = 0;
+        AugmentRuntime.state(p).sandyCharge = 1;
+        h.assertTrue(Sandevistan.toggle(p), "Failed to activate " + models.get(i));
+        Sandevistan.invalidate(h.getLevel());
+        long expected = Math.round(nativeInterval / worldPaces[i]);
+        long nearby = ((Number) call(data, "getShootInterval", mob, mode, gun)).longValue();
+        long own = ((Number) call(data, "getShootInterval", p, mode, gun)).longValue();
+        h.assertTrue(
+            own == expected && nearby == expected && own > nativeInterval,
+            "Owner gun inherited personal time instead of world time: "
+                + models.get(i)
+                + " / "
+                + own);
+        h.assertTrue(
+            Math.abs(Sandevistan.playerPace(p) - 1.25) < .00001,
+            "Gun correction changed player movement/recovery");
+        h.assertTrue(
+            call(data, "getReloadData") == reload
+                && ((Number) call(feed, "getEmptyTime")).floatValue() == emptyFeed
+                && ((Number) call(feed, "getTacticalTime")).floatValue() == tacticalFeed
+                && ((Number) call(cooldown, "getEmptyTime")).floatValue() == emptyCooldown
+                && ((Number) call(cooldown, "getTacticalTime")).floatValue() == tacticalCooldown,
+            "Sandevistan changed native reload timing");
+        var reloadEvent = event("common.GunReloadEvent", p, gun, LogicalSide.SERVER);
+        post(reloadEvent);
+        h.assertTrue(
+            !((net.neoforged.bus.api.ICancellableEvent) reloadEvent).isCanceled(),
+            "Sandevistan blocked an ordinary reload");
+        Sandevistan.stop(p, AugmentRuntime.now(p));
+      }
+      h.assertTrue(
+          ((Number) call(data, "getShootInterval", p, mode, gun)).longValue() == nativeInterval,
+          "Firing interval did not return to normal");
+    } finally {
+      Sandevistan.stop(p, AugmentRuntime.now(p));
+      h.getLevel().removePlayerImmediately(p, Entity.RemovalReason.DISCARDED);
+      Sandevistan.invalidate(h.getLevel());
+    }
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void ownGunBulletsUseWorldClockWhileArrowsKeepPersonalClock(GameTestHelper h)
+      throws Exception {
+    var p = player(h);
+    equip(p, Augment.DAVIDS_SANDEVISTAN, 5, 0);
     h.getLevel().addNewPlayer(p);
     try {
       Sandevistan.toggle(p);
       Sandevistan.invalidate(h.getLevel());
-      long slowed = ((Number) call(data, "getShootInterval", mob, mode, gun)).longValue();
+      var b = bullet(h, p);
+      var arrow = EntityType.ARROW.create(h.getLevel());
+      arrow.setOwner(p);
+      arrow.setPos(p.position());
       h.assertTrue(
-          slowed > nativeInterval, "Native TaCZ interval ignored nearby Sandevistan field");
-      long own = ((Number) call(data, "getShootInterval", p, mode, gun)).longValue();
+          Math.abs(Sandevistan.pace(b) - .0625) < .00001,
+          "Owner's native TaCZ bullet bypassed slow motion");
       h.assertTrue(
-          own == TacZCompat.interval(p, nativeInterval),
-          "Native gun interval did not use the owner's relative pace");
+          Math.abs(Sandevistan.pace(arrow) - 1.25) < .00001, "Gun change also altered arrows");
+      int[] steps = {0};
+      for (int i = 0; i < 160; i++) Sandevistan.tickEntity(b, () -> steps[0]++);
+      h.assertTrue(steps[0] == 10, "Gun bullet physics did not follow fractional world clock");
+      b.setPos(p.position().add(40, 0, 0));
+      h.assertTrue(Sandevistan.pace(b) == 1, "Gun bullet remained slowed outside the bubble");
     } finally {
+      Sandevistan.stop(p, AugmentRuntime.now(p));
       h.getLevel().removePlayerImmediately(p, Entity.RemovalReason.DISCARDED);
       Sandevistan.invalidate(h.getLevel());
     }

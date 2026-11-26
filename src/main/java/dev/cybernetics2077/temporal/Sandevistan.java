@@ -167,14 +167,27 @@ public final class Sandevistan {
   }
 
   public static double pace(Entity entity) {
+    // A firearm projectile stays on the world clock, even when fired by an accelerated owner.
+    return pace(entity, !dev.cybernetics2077.compat.TacZCompat.bullet(entity));
+  }
+
+  /** Gun mechanisms do not inherit their wielder's personal acceleration. */
+  public static double weaponPace(LivingEntity entity) {
+    return Math.min(1, pace(entity, false));
+  }
+
+  private static double pace(Entity entity, boolean personalClock) {
     if (!entity.isAlive() || entity.isSpectator()) return 1;
     double personal =
-        entity instanceof Player p
-            ? strength(p)
-            : entity instanceof Projectile projectile && projectile.getOwner() instanceof Player p
+        !personalClock
+            ? 1
+            : entity instanceof Player p
                 ? strength(p)
-                : 1;
-    double strongest = entity instanceof Player ? personal : 1;
+                : entity instanceof Projectile projectile
+                        && projectile.getOwner() instanceof Player p
+                    ? strength(p)
+                    : 1;
+    double strongest = entity instanceof Player p ? strength(p) : 1;
     for (var field : fields(entity.level())) {
       var owner = field.owner;
       if (owner.level() != entity.level()) continue;

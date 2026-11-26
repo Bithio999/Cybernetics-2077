@@ -12,6 +12,8 @@ Buy it with **ACQUIRE** when it appears in a ripperdoc's daily stock, then insta
 
 ![Apogee equipment details](../images/apogee-details-0.18.0.png)
 
+With [TaCZ](compatibility.md#tacz-gun-integration), your gunfire and bullets slow with the world; **reload speed stays normal**. Guns do not receive your personal speed increase.
+
 ## Activation
 
 Press **O** to toggle. Apogee slows affected opponents to **15% of your temporal pace** within 32 blocks. Your movement and weapon recovery run at **125% of normal**; ordinary affected entities and environmental updates run at **18.75%**. The [time bubble](dynalar-sandevistan.md#time-bubble) includes standard machine tickers, scheduled blocks/fluids, smooth piston movement, loose objects, animated vanilla block textures and visual rain slowing. The sun and shared weather clock keep normal time.

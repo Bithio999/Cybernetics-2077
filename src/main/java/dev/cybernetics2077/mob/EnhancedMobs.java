@@ -37,13 +37,6 @@ public final class EnhancedMobs {
           EntityType.BOGGED,
           EntityType.PILLAGER,
           EntityType.VINDICATOR);
-  private static final List<Augment> POOL =
-      List.of(
-          Augment.BIONIC_JOINTS,
-          Augment.ADRENALINE_CONVERTER,
-          Augment.BLOOD_PUMP,
-          Augment.NEOFIBER,
-          Augment.EPIMORPHIC_SKELETON);
 
   public record Loadout(int count, double averageTier) {}
 
@@ -69,7 +62,7 @@ public final class EnhancedMobs {
     var inv = mob.getData(Cybernetics2077.CYBERWARE);
     int count = 0, sum = 0;
     for (int i = 0; i < inv.getSlots(); i++)
-      if (inv.getStackInSlot(i).getItem() instanceof AugmentItem item) {
+      if (inv.getStackInSlot(i).getItem() instanceof CyberwareItem item) {
         count++;
         sum += item.tier().level;
       }
@@ -103,27 +96,18 @@ public final class EnhancedMobs {
       int tier = r < .62 ? 1 : r < .87 ? 2 : r < .97 ? 3 : r < .997 ? 4 : 5;
       double c = mob.getRandom().nextDouble();
       int count = c < .40 ? 1 : c < .72 ? 2 : c < .90 ? 3 : c < .97 ? 4 : c < .995 ? 5 : 6;
-      var pool = new ArrayList<>(POOL.stream().filter(a -> a.firstTier <= tier).toList());
-      Collections.shuffle(pool, new Random(mob.getRandom().nextLong()));
-      var implants = new ArrayList<AugmentItem>();
-      implants.add(Cybernetics2077.augment(Augment.SUBDERMAL_ARMOR, tier));
-      for (int i = 0; i < Math.min(count - 1, pool.size()); i++) {
-        var kind = pool.get(i);
-        int t = Math.max(kind.firstTier, tier - mob.getRandom().nextInt(2));
-        implants.add(Cybernetics2077.augment(kind, t));
-      }
-      install(mob, implants);
+      install(mob, MobCyberwarePool.roll(tier, count, mob.getRandom()));
     } else if (enhanced(mob)) apply(mob, false);
   }
 
   /** Also used by the review fixture; rejects invalid loadouts before touching the entity. */
-  public static void install(Mob mob, List<AugmentItem> implants) {
+  public static void install(Mob mob, List<? extends CyberwareItem> implants) {
     if (enhanced(mob)) return;
     if (!TYPES.contains(mob.getType()) || implants.isEmpty() || implants.size() > 6)
       throw new IllegalArgumentException("Unsupported enhanced mob/loadout");
     var inv = new CyberwareInventory();
     for (var implant : implants) {
-      if (implant.augment() != Augment.SUBDERMAL_ARMOR && !POOL.contains(implant.augment()))
+      if (!MobCyberwarePool.pool().contains(implant))
         throw new IllegalArgumentException("Unsupported mob implant");
       boolean inserted = false;
       for (int s = implant.category().firstSlot();

@@ -21,6 +21,8 @@ Press **O** to activate or deactivate. Dynalar replaces your cyberdeck or Berser
 
 Critical bonuses apply to weapons and Mantis Blades while active, not quickhacks or retaliation damage. Critical chance combines with other implants under the existing 50% cyberware chance limit.
 
+With [TaCZ](compatibility.md#tacz-gun-integration), your gunfire and bullets slow with the world; **reload speed stays normal**. Guns do not receive your personal speed increase.
+
 ## Charge
 
 Deactivating early preserves unused charge. Charge refills while inactive, including elapsed server time while logged out. You need **20% charge** and a **1-second rearm** before activating again. A partially charged implant provides a shorter activation.

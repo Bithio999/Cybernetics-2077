@@ -191,6 +191,7 @@ with PortZip(jar) as z:
         'handle_wrap': 3, 'shock_absorber': 1, 'immovable_force': 2,
     }
     if not forge:
+        assert 'dev/cybernetics2077/mob/MobCyberwarePool.class' in names
         augment_starts['davids_sandevistan'] = 5
     assert 'data/cybernetics2077/recipe/mantis_claws_tier_1.json' not in names
     assert not any('CrossbowReloadMixin' in n for n in names), 'Obsolete crossbow reload hook shipped'

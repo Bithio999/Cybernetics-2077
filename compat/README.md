@@ -1,5 +1,10 @@
 # Port and gun compatibility
 
+## NeoForge 0.21.1
+
+Gun cadence and burst spacing now follow the slowed world clock rather than inheriting the owner's Sandevistan acceleration. TaCZ bullets do the same; native reload duration remains normal. Chromed mobs draw from current non-Iconic implant families; this does not enable player-only controls on mob AI. [Validation and implementation](../docs/development/GUN-CLOCK-0.21.1.md).
+
+
 Active development targets **1.21.1 NeoForge (0.20.1)**. The **1.20.1 Forge release remains 0.20.0** and is updated only when explicitly requested. The root-source generator is not an automatic promise of port compatibility.
 
 The previous 0.20.0 port validation below covers two independent platforms:

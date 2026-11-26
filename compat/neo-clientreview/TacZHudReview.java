@@ -20,6 +20,8 @@ import net.minecraft.world.item.ItemStack;
     value = net.neoforged.api.distmarker.Dist.CLIENT)
 public final class TacZHudReview {
   private static int hiddenCrosshairFrames, canceledCrosshairFrames;
+  private static long normalInterval;
+  private static float normalReload;
 
   @net.neoforged.bus.api.SubscribeEvent(
       priority = net.neoforged.bus.api.EventPriority.LOWEST,
@@ -142,12 +144,63 @@ public final class TacZHudReview {
               .invoke(null, mc.player.getMainHandItem());
       if (((Number) call(api, "getCurrentAmmoCount", mc.player.getMainHandItem())).intValue() != 30)
         throw new IllegalStateException("Scanner/ADS changed ammunition");
+      var gun = mc.player.getMainHandItem();
+      Object data = gunData(gun), mode = call(gun.getItem(), "getFireMode", gun);
+      normalInterval = ((Number) call(data, "getShootInterval", mc.player, mode, gun)).longValue();
+      normalReload =
+          ((Number) call(call(call(data, "getReloadData"), "getFeed"), "getEmptyTime"))
+              .floatValue();
+      mc.getSingleplayerServer()
+          .execute(
+              () -> {
+                var p = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
+                p.getData(Cybernetics2077.CYBERWARE)
+                    .setStackInSlot(
+                        CyberwareCategory.OPERATING_SYSTEM.firstSlot(),
+                        new ItemStack(Cybernetics2077.augment(Augment.DAVIDS_SANDEVISTAN, 5)));
+                AugmentRuntime.state(p).sandyRearm = 0;
+                AugmentRuntime.state(p).sandyCharge = 1;
+                dev.cybernetics2077.temporal.Sandevistan.toggle(p);
+              });
+    }
+    if (tick == 140) {
+      var gun = mc.player.getMainHandItem();
+      Object data = gunData(gun), mode = call(gun.getItem(), "getFireMode", gun);
+      long slowed = ((Number) call(data, "getShootInterval", mc.player, mode, gun)).longValue();
+      float reload =
+          ((Number) call(call(call(data, "getReloadData"), "getFeed"), "getEmptyTime"))
+              .floatValue();
+      if (normalInterval <= 0
+          || slowed != normalInterval * 16
+          || reload != normalReload
+          || !dev.cybernetics2077.temporal.Sandevistan.active(mc.player))
+        throw new IllegalStateException(
+            "Client firing clock or reload speed incorrect: " + normalInterval + " -> " + slowed);
+      shot(out, "gun-david-world-clock");
+      mc.getSingleplayerServer()
+          .execute(
+              () -> {
+                var p = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
+                dev.cybernetics2077.temporal.Sandevistan.stop(p, AugmentRuntime.now(p));
+              });
+    }
+    if (tick == 160) {
       Files.writeString(
           out.resolve("passed.txt"),
-          "NeoForge client, TaCZ AK47: native ADS, Smart Link HUD, scanner opening/closing, ammo"
-              + " preservation, no UI crash.\n");
+          "PASS: native ADS, Smart Link HUD, scanner handover and ammo preservation; client David"
+              + " gun interval x16 with native reload timing unchanged.\n");
       mc.stop();
     }
+  }
+
+  private static Object gunData(ItemStack gun) throws Exception {
+    var id = call(gun.getItem(), "getGunId", gun);
+    var index =
+        (java.util.Optional<?>)
+            Class.forName("com.tacz.guns.api.TimelessAPI")
+                .getMethod("getCommonGunIndex", ResourceLocation.class)
+                .invoke(null, id);
+    return call(index.orElseThrow(), "getGunData");
   }
 
   private static void aim(boolean aiming) throws Exception {

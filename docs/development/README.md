@@ -35,6 +35,8 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.21.0 David’s Sandevistan implementation and validation](DAVID-0.21.0.md).
 
+[0.21.1 firearm clocks and non-Iconic chromed loadouts](GUN-CLOCK-0.21.1.md).
+
 ## Edit the wiki
 
 The 69 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.

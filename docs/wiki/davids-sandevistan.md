@@ -12,6 +12,8 @@ An original **Tier 5 Iconic Operating System** for extended bursts of overwhelmi
 | Street Cred | 50 |
 | Purchase | €$150,000 + one Tier 5 Iconic Requisition Chip + one Militech “Apogee” Sandevistan |
 
+With [TaCZ](compatibility.md#tacz-gun-integration), your gunfire and bullets slow with the world; **reload speed stays normal**. Guns do not receive your personal speed increase.
+
 ## Obtaining and installing
 
 At Street Cred **50**, David’s can appear in a ripperdoc’s rotating daily stock. Bring the chip and an **unequipped Apogee in your main inventory or hotbar**, then choose **ACQUIRE**. Both items and the eddies are consumed together. An installed Apogee does not count; remove it through the **Install** tab first.

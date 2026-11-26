@@ -143,6 +143,108 @@ public final class EnhancedMobGameTests {
     h.succeed();
   }
 
+  @GameTest(template = "empty", timeoutTicks = 100)
+  public static void fullCataloguePoolRollsValidFamiliesAndAllStartingTiers(GameTestHelper h) {
+    var expected =
+        new HashSet<>(
+            CyberwareCatalogue.offers().stream()
+                .map(CyberwareCatalogue.Offer::item)
+                .filter(CyberwareItem.class::isInstance)
+                .filter(i -> !((CyberwareItem) i).iconic())
+                .toList());
+    h.assertTrue(
+        new HashSet<>(MobCyberwarePool.pool()).equals(expected),
+        "Chromed pool is missing current implant families or includes quickhack chips");
+    h.assertTrue(
+        MobCyberwarePool.pool().stream().noneMatch(CyberwareItem::iconic),
+        "Iconics entered the chromed loadout pool");
+    var untouched = mob(h, 8);
+    for (var iconic : List.of(Augment.MILITECH_APOGEE, Augment.DAVIDS_SANDEVISTAN)) {
+      boolean rejected = false;
+      try {
+        EnhancedMobs.install(untouched, List.of(Cybernetics2077.augment(iconic, 5)));
+      } catch (IllegalArgumentException expectedError) {
+        rejected = true;
+      }
+      h.assertTrue(
+          rejected
+              && !EnhancedMobs.enhanced(untouched)
+              && untouched.getData(Cybernetics2077.CYBERWARE).capacityUsed() == 0,
+          "An Iconic was accepted or rejection modified the mob");
+    }
+    var seen = new HashSet<CyberwareItem>();
+    var rng = net.minecraft.util.RandomSource.create(91514811);
+    for (int tier = 1; tier <= 5; tier++) {
+      for (int iteration = 0; iteration < 600; iteration++) {
+        int count = iteration % 6 + 1;
+        var roll = MobCyberwarePool.roll(tier, count, rng);
+        h.assertTrue(roll.size() == count, "Roll failed to fill requested implant count");
+        var inventory = new CyberwareInventory();
+        var kinds = new HashSet<Augment>();
+        for (var item : roll) {
+          seen.add(item);
+          h.assertTrue(
+              item.tier().level <= tier && item.tier().level >= Math.max(1, tier - 1),
+              "Loadout contains an unavailable tier");
+          if (item instanceof AugmentItem a)
+            h.assertTrue(kinds.add(a.augment()), "Duplicate family");
+          boolean inserted = false;
+          for (int slot = item.category().firstSlot();
+              slot < item.category().firstSlot() + item.category().sockets;
+              slot++) {
+            if (inventory.getStackInSlot(slot).isEmpty()
+                && inventory.isItemValid(slot, new ItemStack(item))) {
+              inventory.setStackInSlot(slot, new ItemStack(item));
+              inserted = true;
+              break;
+            }
+          }
+          h.assertTrue(inserted, "Roll overflowed category sockets");
+        }
+        h.assertTrue(kinds.contains(Augment.SUBDERMAL_ARMOR), "Mandatory armor lost");
+      }
+    }
+    h.assertTrue(
+        seen.containsAll(MobCyberwarePool.pool()), "Some implant tiers/families never roll");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 60)
+  public static void mixedArmsOpticsAndDeckLoadoutsCountAndPersist(GameTestHelper h) {
+    var m = mob(h, 1);
+    var items =
+        List.of(
+            Cybernetics2077.augment(Augment.SUBDERMAL_ARMOR, 5),
+            Cybernetics2077.MANTIS_VARIANTS.get(MantisVariant.THERMAL).get(1).get(),
+            Cybernetics2077.OPTICS_TIERS.get(4).get(),
+            Cybernetics2077.augment(Augment.DYNALAR_SANDEVISTAN, 5),
+            Cybernetics2077.augment(Augment.DENSE_MARROW, 5),
+            Cybernetics2077.augment(Augment.SECOND_HEART, 5));
+    EnhancedMobs.install(m, items);
+    int sum = items.stream().mapToInt(i -> i.tier().level).sum();
+    h.assertTrue(
+        EnhancedMobs.loadout(m).equals(new EnhancedMobs.Loadout(6, sum / 6.)),
+        "Non-Augment implants were omitted from chassis/salvage calculation");
+    m.setHealth(7);
+    var saved = m.saveWithoutId(new CompoundTag());
+    var restored = EntityType.HUSK.create(h.getLevel());
+    restored.load(saved);
+    EnhancedMobs.join(new EntityJoinLevelEvent(restored, h.getLevel()));
+    h.assertTrue(
+        EnhancedMobs.loadout(restored).equals(EnhancedMobs.loadout(m)) && restored.getHealth() == 7,
+        "Mixed loadout save/load changed implants or refilled health");
+    var deckMob = mob(h, 4);
+    EnhancedMobs.install(
+        deckMob,
+        List.of(
+            Cybernetics2077.augment(Augment.SUBDERMAL_ARMOR, 4),
+            Cybernetics2077.RAVEN_TIERS.get(1).get()));
+    h.assertTrue(
+        EnhancedMobs.loadout(deckMob).equals(new EnhancedMobs.Loadout(2, 4)),
+        "Deck did not contribute to actual loadout");
+    h.succeed();
+  }
+
   @GameTest(template = "empty", timeoutTicks = 60)
   public static void statsLoadoutsHealthAndCooldownsSurviveSaveLoad(GameTestHelper h) {
     var m = mob(h, 1);

@@ -293,10 +293,7 @@ public final class TacZCompat {
   }
 
   public static long interval(LivingEntity shooter, long nativeInterval) {
-    double pace =
-        shooter instanceof net.minecraft.world.entity.player.Player player
-            ? Sandevistan.playerPace(player)
-            : Sandevistan.pace(shooter);
+    double pace = Sandevistan.weaponPace(shooter);
     return Math.max(1, Math.round(nativeInterval / Math.max(.05, pace)));
   }
 

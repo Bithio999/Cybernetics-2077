@@ -1,5 +1,10 @@
 # Validation
 
+## Firearm timing and chromed equipment (NeoForge 0.21.1)
+
+**99 JVM tests, 138 standalone GameTests and 10 optional TaCZ GameTests.** Native client review checks the synchronized David firing interval and unchanged reload data. [Results](review/results/gun-clock-0.21.1.json) · [Implementation and test scope](development/GUN-CLOCK-0.21.1.md). Forge remains unchanged.
+
+
 ## David’s Sandevistan (NeoForge 0.21.0)
 
 **99 JVM tests, 136 standalone GameTests, 9 TaCZ GameTests, native shop/install/activation review, clean package audit and strict wiki build pass.** [Results](review/results/david-0.21.0.json) · [Implementation](development/DAVID-0.21.0.md) · [Player guide](wiki/davids-sandevistan.md).

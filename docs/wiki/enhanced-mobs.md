@@ -10,7 +10,11 @@ Rare **Chromed** variants of zombies, husks, drowned, skeletons, strays, bogged,
 
 Each has **1–6 installed implants**, with most carrying only a few. Their cyan name shows their average implant tier and count. Scanning also reveals these values. Metal plates, illuminated circuitry and small combat sparks distinguish them from ordinary mobs.
 
-Every variant has **Subdermal Armor**. Available additions depend on its loadout tier:
+Every variant has **Subdermal Armor**. Additional implants draw from the **full current non-Iconic cyberware catalogue**, including optics, cyberdecks, Mantis variants, hands, legs and ordinary Operating Systems. **Iconics never roll.** Quickhack chips are programs, not implants, so they are excluded from the equipment pool.
+
+A family can only roll at tiers where it exists. Loadouts respect body-system sockets and do not repeat an implant family. Every equipped implant contributes to chassis strength, average tier and loot quality, including optics, decks and arms.
+
+These implants also retain their existing mob-specific effects:
 
 | Implant | Effect on the mob |
 | --- | --- |
@@ -20,7 +24,7 @@ Every variant has **Subdermal Armor**. Available additions depend on its loadout
 | NeoFiber | Chance to reduce an incoming hit |
 | Epimorphic Skeleton | More armor and maximum health |
 
-The reinforced chassis also adds **15% maximum health and 8% attack damage per total implant tier**. Ranged weapon attacks receive the same damage bonus. Existing AI and normal equipment remain in use. Loadouts and implant cooldowns persist through saves and ordinary mob conversions. Normal hostile despawning still applies.
+The reinforced chassis also adds **15% maximum health and 8% attack damage per total implant tier**. Ranged weapon attacks receive the same damage bonus. Existing AI and normal equipment remain in use. Player-only scanner interfaces, quickhack queues and manually activated cyberware are not automatically operated by mob AI. Loadouts and implant cooldowns persist through saves and ordinary mob conversions. Normal hostile despawning still applies.
 
 Low-tier loadouts are common among variants. The initial loadout-tier roll is **62% Tier 1, 25% Tier 2, 10% Tier 3, 2.7% Tier 4 and 0.3% Tier 5**. Individual additional implants can be one tier lower, so their displayed average may differ.
 
