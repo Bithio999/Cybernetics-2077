@@ -24,7 +24,7 @@ public final class CyberwareMenu extends AbstractContainerMenu {
             int value =
                 switch (index / 2) {
                   case 0 -> implants.capacityUsed();
-                  case 1 -> Cybernetics2077.CAPACITY.get();
+                  case 1 -> CyberwareCapacity.limit(inventory.player);
                   case 2 -> Math.round((float) inventory.player.getArmorValue() * 100);
                   default -> 0;
                 };

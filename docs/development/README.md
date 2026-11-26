@@ -67,3 +67,5 @@ With cheats enabled, stand at the intended street/floor height. These commands p
 ```
 
 Ripperdoc and Fixer spawn eggs are available in Creative. [Building design and audits](../research/VILLAGE-SERVICES.md).
+
+- [Hands integration and service menus — NeoForge 0.23.0](HANDS-SERVICES-0.23.0.md)

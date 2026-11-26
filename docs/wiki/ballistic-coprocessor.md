@@ -8,9 +8,9 @@
 | --- | --- | ---: |
 | Hands | 1–5 | 2 |
 
-Arrows can **ricochet once** from a solid surface. The rebound follows the reflected angle. Draw a bow to see a dotted trajectory: **gold before** the bounce and **green after** it.
+Arrows can **ricochet once** from a solid surface. The rebound follows the reflected angle. Draw a bow or aim a TaCZ gun to see the trajectory: **gold before** the bounce and **cyan after** it.
 
-The preview estimates block collisions; enemy movement, spread and Smart Link guidance can change the actual path. Tridents do not ricochet. Enchantments, ammunition and arrow pickup remain intact.
+The preview covers up to **160 blocks** and stops at a second surface or an entity. It estimates the centre of the shot; enemy movement, spread and Smart Link guidance can change the actual path. Tridents do not ricochet. Enchantments, ammunition and arrow pickup remain intact.
 
 | Tier | Speed retained | Arrow base-damage bonus after bounce |
 | --- | --- | --- |
@@ -22,8 +22,8 @@ The preview estimates block collisions; enemy movement, spread and Smart Link gu
 
 **Damage type:** Physical/projectile, using the arrow's normal damage rules. The bonus increases the arrow's base-damage coefficient; slower rebound speed also affects the final hit.
 
-![Bow trajectory preview in Minecraft](../images/hands-bow-preview-0.16.png)
+![TaCZ aiming preview after a reflected wall hit](../images/neo023-gun-ricochet.png)
 
-With TaCZ, non-explosive bullets can ricochet once with the same retained-speed and damage bonuses. Explosive rounds retain their native impact behavior. [Gun integration](compatibility.md).
+With TaCZ, non-explosive bullets ricochet once with the same retained-speed and damage bonuses. The aiming preview uses the gun’s speed, gravity, friction and attachment properties. Explosive rounds retain their native impact behavior. [Gun integration](compatibility.md).
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

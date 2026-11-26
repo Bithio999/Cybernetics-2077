@@ -18,6 +18,6 @@ Open **Operating System → Manage Quickhacks** in the inventory cyberware menu,
 - Programs stay on the physical deck when you remove it.
 - Removing a program or switching decks cancels affected uploads and refunds reserved RAM, up to your current capacity.
 
-![Raven loaded with six different quickhacks](../images/raven-six-program-loadout.png)
+![Quickhack loadout editor](../images/neo023-quickhack-loadout.png)
 
 [Programs and costs](quickhacks.md) · [How scanning works](scanning.md)

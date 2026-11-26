@@ -6,7 +6,7 @@ Talk to **Mara Voss** or **Ren Calder** at the Afterlife. Their menu has **Bount
 
 ## Bounties
 
-Available on **NeoForge 0.22.0**. Forge 0.20.0 retains the introductory delivery only.
+Available on **NeoForge 0.22.0 and later**. Forge 0.20.0 retains the introductory delivery only.
 
 Each fixer has **three offers per player each Minecraft day**. Offers rotate at Overworld dawn. Reopening the menu does not reroll them. Street Cred unlocks stronger marks; some lower-difficulty work remains available.
 
@@ -27,7 +27,7 @@ The mark wears **real non-Iconic implants at the listed tier**. Guards are one t
 4. Return to the issuing fixer, or another fixer in the same network, and **Claim Payment**. The shard can also be used on the correct fixer when payment is ready.
 5. Read your rating, payment breakdown and optional results in **Debrief**.
 
-![Daily bounty dossiers](../images/bounty-board-0.22.0.png)
+![Daily bounty dossiers](../images/neo023-fixer-board.png)
 
 ### Fixer specialties and optional bonuses
 
@@ -42,7 +42,7 @@ Optical identification requires an installed scanner; navigation alone does not 
 
 Every **third completed bounty for the same fixer network** adds a **25% base-payment loyalty bonus**. Separately, your first **three Elite Tier 5 completions** award **one Tier 5 Iconic Requisition Chip**, once per player. If your inventory is full, the bonus chip drops at your feet. This grants purchase authorization, not an Iconic implant; eddies, stock, Street Cred and other purchase requirements still apply.
 
-![Payment and optional-objective debrief](../images/bounty-debrief-0.22.0.png)
+
 
 ### Active jobs and recovery
 

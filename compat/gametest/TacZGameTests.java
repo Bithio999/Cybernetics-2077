@@ -212,6 +212,131 @@ public final class TacZGameTests {
     h.succeed();
   }
 
+  @GameTest(template = "empty", batch = "realBank", timeoutTicks = 80)
+  public static void nativeBulletActuallyRicochetsAndLeavesTheWall(GameTestHelper h)
+      throws Exception {
+    var p = player(h);
+    equip(p, Augment.BALLISTIC_COPROCESSOR, 5, 0);
+    var wall = p.blockPosition().offset(0, 1, 4);
+    for (int x = -3; x <= 3; x++)
+      for (int y = -2; y <= 3; y++)
+        h.getLevel().setBlock(wall.offset(x, y, 0), Blocks.STONE.defaultBlockState(), 3);
+    var b = bullet(h, p);
+    b.setPos(wall.getX() + .5, wall.getY() + .5, wall.getZ() - .4);
+    b.setDeltaMovement(0, 0, 2);
+    b.tick();
+    h.assertTrue(
+        b.isAlive()
+            && b.getPersistentData().getCompound(TacZCompat.DATA).getBoolean("bounced")
+            && !b.getPersistentData().getCompound(TacZCompat.DATA).getBoolean("pending")
+            && b.getZ() < wall.getZ()
+            && b.getDeltaMovement().z < 0,
+        "Native collision did not complete ricochet outside wall");
+    double first = b.getZ();
+    b.tick();
+    h.assertTrue(
+        b.isAlive() && b.getZ() < first - .5,
+        "Native round did not continue moving after ricochet");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", batch = "realBankDamage", timeoutTicks = 80)
+  public static void ricochetedNativeGunRoundDamagesAnEnemy(GameTestHelper h) throws Exception {
+    var p = player(h);
+    equip(p, Augment.BALLISTIC_COPROCESSOR, 5, 0);
+    var builder =
+        Class.forName("com.tacz.guns.api.item.builder.GunItemBuilder")
+            .getMethod("create")
+            .invoke(null);
+    call(builder, "setId", net.minecraft.resources.ResourceLocation.parse("tacz:ak47"));
+    var stack = (ItemStack) call(builder, "build", p.registryAccess());
+    p.getInventory().setItem(0, stack);
+    p.getInventory().selected = 0;
+    var index =
+        (Optional<?>)
+            Class.forName("com.tacz.guns.api.TimelessAPI")
+                .getMethod("getCommonGunIndex", net.minecraft.resources.ResourceLocation.class)
+                .invoke(null, net.minecraft.resources.ResourceLocation.parse("tacz:ak47"));
+    var data = call(index.orElseThrow(), "getGunData");
+    var bulletData = call(data, "getBulletData");
+    var cache =
+        Class.forName("com.tacz.guns.resource.modifier.AttachmentCacheProperty")
+            .getConstructor()
+            .newInstance();
+    call(cache, "eval", stack, data);
+    var operatorApi = Class.forName("com.tacz.guns.api.entity.IGunOperator");
+    var operator = operatorApi.getMethod("fromLivingEntity", LivingEntity.class).invoke(null, p);
+    call(operator, "updateCacheProperty", cache);
+    var profile = TacZCompat.ballistics(p);
+    h.assertTrue(
+        profile != null && profile.speed() > 1 && profile.gravity() >= 0,
+        "Native gun preview properties unavailable");
+    var type = Class.forName("com.tacz.guns.entity.EntityKineticBullet");
+    var ctor =
+        Arrays.stream(type.getConstructors())
+            .filter(c -> c.getParameterCount() == 8)
+            .findFirst()
+            .orElseThrow();
+    var b =
+        (Projectile)
+            ctor.newInstance(
+                p.level(),
+                p,
+                stack,
+                net.minecraft.resources.ResourceLocation.parse("tacz:762x39"),
+                net.minecraft.resources.ResourceLocation.parse("tacz:ak47"),
+                true,
+                data,
+                bulletData);
+    var wall = p.blockPosition().offset(0, 1, 4);
+    for (int x = -2; x <= 2; x++)
+      for (int y = -2; y <= 2; y++)
+        h.getLevel().setBlock(wall.offset(x, y, 0), Blocks.STONE.defaultBlockState(), 3);
+    var target = EntityType.HUSK.create(h.getLevel());
+    target.moveTo(wall.getX() + .5, wall.getY() - 1, wall.getZ() - 2, 0, 0);
+    target.setNoAi(true);
+    target.setNoGravity(true);
+    h.getLevel().addFreshEntity(target);
+    b.setPos(wall.getX() + .5, wall.getY() + .5, wall.getZ() - .4);
+    b.setDeltaMovement(0, 0, 2);
+    b.tick();
+    h.assertTrue(b.isAlive() && b.getDeltaMovement().z < 0, "Native shot failed to bounce");
+    for (int i = 0; i < 4 && b.isAlive(); i++) b.tick();
+    h.assertTrue(
+        target.getHealth() < target.getMaxHealth(),
+        "Ricochet produced movement without a real native damage hit");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void iconicSpreadUsesTheNativeLaunchMethodOnce(GameTestHelper h) throws Exception {
+    var p = player(h);
+    var ordinary = bullet(h, p);
+    var stable = bullet(h, p);
+    var launch =
+        ordinary
+            .getClass()
+            .getMethod(
+                "shootFromRotation",
+                Entity.class,
+                float.class,
+                float.class,
+                float.class,
+                float.class,
+                org.joml.Vector2d.class);
+    launch.invoke(ordinary, p, 0f, 0f, 0f, 2f, new org.joml.Vector2d(10, 0));
+    equip(p, Augment.IMMOVABLE_FORCE, 5, 0);
+    launch.invoke(stable, p, 0f, 0f, 0f, 2f, new org.joml.Vector2d(10, 0));
+    var a = ordinary.getDeltaMovement();
+    var b = stable.getDeltaMovement();
+    double first = Math.abs(a.x / a.z), second = Math.abs(b.x / b.z);
+    h.assertTrue(
+        first > .01 && Math.abs(second / first - .6) < .002,
+        "Native spread was not reduced exactly once by 40%");
+    h.assertTrue(Math.abs(a.length() - b.length()) < .0001, "Spread modifier changed bullet speed");
+    h.succeed();
+  }
+
   @GameTest(template = "empty", timeoutTicks = 80)
   public static void deployedBladesBlockNativeGunActions(GameTestHelper h) throws Exception {
     var p = player(h);

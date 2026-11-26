@@ -14,6 +14,7 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
   private final ContainerLevelAccess access;
   private final CyberwareInventory implants;
   private final Player owner;
+  private final ContainerData capacity;
 
   public CyberneticsBenchMenu(int id, Inventory inv) {
     this(id, inv, ContainerLevelAccess.NULL);
@@ -42,6 +43,21 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
         owner.level().isClientSide
             ? new CyberwareInventory()
             : owner.getData(Cybernetics2077.CYBERWARE);
+    capacity =
+        owner.level().isClientSide
+            ? new SimpleContainerData(2)
+            : new ContainerData() {
+              public int get(int i) {
+                return StatWords.word(CyberwareCapacity.limit(owner), i);
+              }
+
+              public void set(int i, int value) {}
+
+              public int getCount() {
+                return 2;
+              }
+            };
+    addDataSlots(capacity);
     for (var category : CyberwareCategory.values())
       for (int n = 0; n < category.sockets; n++) {
         int index = category.firstSlot() + n;
@@ -50,7 +66,7 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
                 implants,
                 index,
                 x(category) + 76 + n * 18,
-                (compact ? 31 + (category.ordinal() / 2) * 18 : y(category)) + offset) {
+                (compact ? 25 + (category.ordinal() / 2) * 18 : y(category)) + offset) {
               @Override
               public boolean isActive() {
                 return installationActive();
@@ -76,9 +92,9 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
       for (int col = 0; col < 9; col++)
         addSlot(
             inventorySlot(
-                inv, col + row * 9 + 9, 84 + col * 18, 143 + row * 18 + (compact ? 0 : offset)));
+                inv, col + row * 9 + 9, 84 + col * 18, (compact ? 137 : 119 + offset) + row * 18));
     for (int col = 0; col < 9; col++)
-      addSlot(inventorySlot(inv, col, 84 + col * 18, 205 + (compact ? 0 : offset)));
+      addSlot(inventorySlot(inv, col, 84 + col * 18, (compact ? 195 : 177 + offset)));
   }
 
   protected boolean installationActive() {
@@ -109,11 +125,15 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
   }
 
   public static int y(CyberwareCategory c) {
-    return 31 + (c.ordinal() / 2) * 21;
+    return 25 + (c.ordinal() / 2) * 18;
   }
 
   public int capacityUsed() {
     return implants.capacityUsed();
+  }
+
+  public int capacityLimit() {
+    return StatWords.combine(capacity.get(0), capacity.get(1));
   }
 
   public boolean fits(int index, ItemStack stack) {
@@ -121,7 +141,7 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
     int previous =
         implants.getStackInSlot(index).getItem() instanceof CyberwareItem i ? i.capacityCost() : 0;
     return (long) capacityUsed() - previous + ((CyberwareItem) stack.getItem()).capacityCost()
-        <= Cybernetics2077.CAPACITY.get();
+        <= capacityLimit();
   }
 
   public boolean hasDeck() {

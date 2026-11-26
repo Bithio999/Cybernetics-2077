@@ -75,8 +75,21 @@ public final class CyberwareNetwork {
       double z,
       double vx,
       double vy,
-      double vz)
+      double vz,
+      long tick)
       implements CustomPacketPayload {
+    public Ballistics(
+        int entity,
+        java.util.UUID uuid,
+        double x,
+        double y,
+        double z,
+        double vx,
+        double vy,
+        double vz) {
+      this(entity, uuid, x, y, z, vx, vy, vz, -1);
+    }
+
     public static final Type<Ballistics> TYPE = new Type<>(Cybernetics2077.id("ballistics"));
     public static final StreamCodec<RegistryFriendlyByteBuf, Ballistics> CODEC =
         StreamCodec.of(
@@ -89,6 +102,7 @@ public final class CyberwareNetwork {
               b.writeDouble(p.vx);
               b.writeDouble(p.vy);
               b.writeDouble(p.vz);
+              b.writeLong(p.tick);
             },
             b ->
                 new Ballistics(
@@ -99,7 +113,8 @@ public final class CyberwareNetwork {
                     b.readDouble(),
                     b.readDouble(),
                     b.readDouble(),
-                    b.readDouble()));
+                    b.readDouble(),
+                    b.readLong()));
 
     public Type<Ballistics> type() {
       return TYPE;
@@ -107,7 +122,7 @@ public final class CyberwareNetwork {
   }
 
   public static void register(RegisterPayloadHandlersEvent e) {
-    var r = e.registrar("11");
+    var r = e.registrar("12");
     r.playToClient(
         Ballistics.TYPE, Ballistics.CODEC, (p, c) -> c.enqueueWork(() -> trajectory.accept(p)));
     r.playToServer(

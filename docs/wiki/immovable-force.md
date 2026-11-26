@@ -8,17 +8,19 @@
 | --- | --- | ---: |
 | Hands | 2–5 | 35 |
 
-While standing still on the ground, bows, crossbows and tridents charge faster. Fired arrows also follow a flatter trajectory. Moving or becoming airborne removes the charging benefit; the arrow-flight benefit remains.
+**NeoForge 0.23.0 · Iconic.** Faster bow, crossbow and trident charging, flatter arrow flight, and improved gun control. Benefits remain active while moving or airborne.
 
-| Tier | Extra charge tick | Arrow gravity reduction |
-| --- | --- | --- |
-| 2 | Every 6 ticks | 30% |
-| 3 | Every 5 ticks | 35% |
-| 4 | Every 4 ticks | 40% |
-| 5 | Every 3 ticks | 45% |
+| Tier | Extra charge tick | Arrow gravity reduction | TaCZ recoil reduction | TaCZ spread reduction | Price |
+| --- | --- | --- | --- | --- | ---: |
+| 2 | Every 4 ticks | 36% | 20% | 16% | €$12,000 |
+| 3 | Every 3 ticks | 44% | 30% | 24% | €$27,000 |
+| 4 | Every 2 ticks | 52% | 40% | 32% | €$48,000 |
+| 5 | Every 2 ticks | 60% | 50% | 40% | €$75,000 |
 
-No-gravity projectiles retain their existing flight. The flatter-flight effect applies to arrows, not tridents.
+Purchase from [daily ripperdoc stock](ripperdocs.md) with **one matching-tier Iconic Requisition Chip** and eddies. Normal tier Street Cred requirements apply. Damaged-part discounts cannot be used. Chromed mobs do not equip it.
 
-With TaCZ, camera recoil is reduced by 7% per tier while grounded and still. This stacks multiplicatively with Shock Absorber, with an 85% combined reduction limit. [Gun integration](compatibility.md).
+No-gravity projectiles retain their flight. The flatter-flight effect applies to arrows; it does not alter TaCZ bullet gravity. Gun recoil stacks multiplicatively with Shock Absorber, up to 85% total reduction. [Gun integration](compatibility.md).
+
+![Immovable Force in the ripperdoc’s Iconic stock](../images/neo023-immovable-iconic.png)
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

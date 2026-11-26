@@ -28,7 +28,9 @@
     "TemporalBlockShadersMixin",
     "TacZRecoilMixin",
     "TacZClientBurstMixin",
-    "TacZCrosshairMixin"
+    "TacZCrosshairMixin",
+    "TacZBulletVisualMixin",
+    "TacZTracerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

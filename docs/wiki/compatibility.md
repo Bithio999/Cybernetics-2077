@@ -9,11 +9,11 @@ TaCZ is optional. Tested versions are **1.1.8-hotfix2 on Forge 1.20.1** and **1.
 | Cyberware | Effect with TaCZ |
 | --- | --- |
 | Smart Link | Bullets gently steer toward your scanner lock for their first two seconds. Requires optics, a valid enemy and clear sight; bullets cannot turn through walls. |
-| Ballistic Coprocessor | Non-explosive bullets can ricochet once, retaining 60% + 5% per tier of their speed. A bounced hit gains 5% damage per tier. |
+| Ballistic Coprocessor | Non-explosive bullets can ricochet once, retaining 60% + 5% per tier of their speed. A bounced hit gains 5% damage per tier. Aim a gun to preview the reflected centre trajectory. |
 | Microgenerator | Confirmed gun hits trigger the normal electric discharge, with its existing cooldown and target limit. Blocked hits do not trigger it. |
 | Handle Wrap | Drawing a gun primes the implant's temporary critical-hit bonus. |
 | Shock Absorber | Reduces camera recoil by 8% per tier. Its knockback resistance also works while aiming a gun. |
-| Immovable Force | Reduces camera recoil by 7% per tier while grounded and still. Stacks multiplicatively with Shock Absorber; combined recoil reduction is capped at 85%. |
+| Immovable Force | Iconic: reduces camera recoil by 10% and bullet spread by 8% per tier, including while moving. Recoil stacks multiplicatively with Shock Absorber, capped at 85% combined reduction. |
 | Weapon critical bonuses | Apply once to a gun hit, including the native headshot multiplier. |
 | Apogee / David’s | Their +20% / +25% headshot bonuses also apply to TaCZ headshots. David’s requires NeoForge 0.21.0. |
 | Sandevistan | Gun firing intervals, burst spacing and TaCZ bullets follow the slowed world clock, including your own guns and bullets. Reload speed stays normal. Attachments, heat and native ammunition handling remain owned by TaCZ. |

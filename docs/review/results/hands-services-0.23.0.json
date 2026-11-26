@@ -1,0 +1,52 @@
+{
+  "version": "0.23.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "unitTests": {
+    "tests": 103,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "standaloneGameTests": {
+    "tests": 150,
+    "failures": 0,
+    "newServiceScenarios": 3,
+    "shutdown": "clean"
+  },
+  "taczGameTests": {
+    "tests": 13,
+    "failures": 0,
+    "version": "1.2.0-hotfix",
+    "nativeChecks": [
+      "real kinetic round reflects outside stone wall and continues flight",
+      "real AK47 round damages mob after reflected flight",
+      "native launch spread reduced once without changing speed",
+      "explosive and second-impact behavior preserved"
+    ]
+  },
+  "nativeClient": {
+    "status": "passed",
+    "withTacz": true,
+    "checks": [
+      "login and unchanged cyberware viewer",
+      "compact ripperdoc purchase/install, bench and quickhack editor",
+      "all three fixer tabs",
+      "SC50 capacity 150 synchronized to installation menu",
+      "native AK47 ADS reflection preview",
+      "target-following Smart Link brackets",
+      "one server-guided native bullet entity with bounded client pose samples",
+      "visible widgets remain inside 640x480 window for all redesigned menus",
+      "shop page changes select a visible offer before purchase"
+    ],
+    "guidedFixture": "slower zero-gravity native round for sustained visual-path inspection; real gun stats unchanged"
+  },
+  "forge": {
+    "updated": false,
+    "version": "0.20.0",
+    "sha256": "95aa30a182e2c4046d9390da2a0c0d824f328c59204d45249541775eba580b4a"
+  },
+  "releaseAudit": "passed; no review fixtures or optional gun dependency bundled",
+  "wiki": "69 pages, 50 item/program entries; coverage and strict build passed",
+  "sha256": "098079a98e39c2b09e9f32f9bf3c46091a3b35a41686ca15f40b97c7f536c711"
+}

@@ -35,7 +35,15 @@ public final class HandsRules {
   }
 
   public static int chargePeriod(int tier) {
-    return 8 - Math.clamp(tier, 2, 5);
+    return Math.max(2, 6 - Math.clamp(tier, 2, 5));
+  }
+
+  public static double gravityReduction(int tier) {
+    return tier <= 0 ? 0 : .2 + .08 * Math.clamp(tier, 2, 5);
+  }
+
+  public static double spreadMultiplier(int tier) {
+    return 1 - .08 * Math.clamp(tier, 0, 5);
   }
 
   private HandsRules() {}

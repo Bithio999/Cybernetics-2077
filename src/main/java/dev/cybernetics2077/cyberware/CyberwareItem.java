@@ -51,14 +51,10 @@ public class CyberwareItem extends Item {
               .withStyle(net.minecraft.ChatFormatting.GOLD));
     lines.add(
         net.minecraft.network.chat.Component.translatable(
-                "cybernetics2077.implant.tier", tier.level)
+                "cybernetics2077.implant.meta", tier.level, capacity)
             .withColor(tier.color & 0xffffff));
     lines.add(
         net.minecraft.network.chat.Component.translatable(category.translation())
-            .withStyle(net.minecraft.ChatFormatting.GRAY));
-    lines.add(
-        net.minecraft.network.chat.Component.translatable(
-                "cybernetics2077.implant.capacity", capacity)
             .withStyle(net.minecraft.ChatFormatting.GRAY));
     if (this instanceof OpticsItem)
       lines.add(
@@ -91,8 +87,7 @@ public class CyberwareItem extends Item {
           net.minecraft.network.chat.Component.literal(blades.variant().effect())
               .withColor(blades.variant().color));
       lines.add(
-          net.minecraft.network.chat.Component.literal(
-                  "Lunges always apply the variant status on a successful hit.")
+          net.minecraft.network.chat.Component.literal("Lunges guarantee the variant effect.")
               .withStyle(net.minecraft.ChatFormatting.GRAY));
       lines.add(
           net.minecraft.network.chat.Component.translatable("cybernetics2077.mantis.description")

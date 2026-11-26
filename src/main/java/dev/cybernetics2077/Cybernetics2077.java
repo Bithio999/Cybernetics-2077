@@ -208,7 +208,7 @@ public final class Cybernetics2077 {
   private static final ModConfigSpec.Builder CONFIG = new ModConfigSpec.Builder();
   public static final ModConfigSpec.IntValue CAPACITY =
       CONFIG
-          .comment("Maximum total capacity available for installed cyberware.")
+          .comment("Base cyberware capacity; Street Cred adds 10 capacity per 10 levels.")
           .defineInRange("baseCapacity", 100, 1, 100000);
   public static final ModConfigSpec.DoubleValue ENHANCED_SPAWN_CHANCE =
       CONFIG

@@ -115,6 +115,16 @@ with PortZip(jar) as z:
                      'cybernetics2077.mixins.json',
                      'assets/cybernetics2077/font/rajdhani-license.txt'):
         assert versioned(required) in names, required
+    if not forge:
+        for required in (
+            'dev/cybernetics2077/cyberware/CyberwareCapacity.class',
+            'dev/cybernetics2077/client/GuidedBulletClient.class',
+            'dev/cybernetics2077/client/ui/ServiceStyle.class',
+            'dev/cybernetics2077/mixin/TacZBulletMixin.class',
+            'dev/cybernetics2077/mixin/client/TacZBulletVisualMixin.class',
+            'dev/cybernetics2077/mixin/client/TacZTracerMixin.class',
+        ):
+            assert required in names, required
     assert not any(n.endswith(('.blend','.py','.cyh')) or 'DiagnosticModel' in n for n in names), 'Replaced hologram pipeline leaked into release'
     assert 'assets/cybernetics2077/textures/entity/diagnostic.png' not in names, 'Diagnostic placeholder skin still shipped'
     for icon in ('optical_scanner','cyberdeck_tier_1','mantis_claws_tier_1','short_circuit_tier_1'):

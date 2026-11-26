@@ -7,12 +7,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 public final class CyberdeckScreen extends AbstractContainerScreen<CyberdeckMenu> {
-  public CyberdeckScreen(CyberdeckMenu menu, Inventory inv, Component title) {
-    super(menu, inv, title);
-    imageWidth = 276;
-    imageHeight = 227;
-    titleLabelY = -1000;
-    inventoryLabelY = -1000;
+  public CyberdeckScreen(CyberdeckMenu menu, Inventory inventory, Component title) {
+    super(menu, inventory, title);
+    imageWidth = 220;
+    imageHeight = 202;
+    titleLabelY = inventoryLabelY = -1000;
   }
 
   @Override
@@ -20,7 +19,7 @@ public final class CyberdeckScreen extends AbstractContainerScreen<CyberdeckMenu
     super.init();
     addRenderableWidget(
         new CyberActionButton(
-            leftPos + 12, topPos + 9, 26, 20, Component.literal("<"), this::onClose));
+            leftPos + 192, topPos + 6, 18, 14, Component.literal("<"), this::onClose));
   }
 
   @Override
@@ -41,53 +40,38 @@ public final class CyberdeckScreen extends AbstractContainerScreen<CyberdeckMenu
   }
 
   @Override
-  protected void renderBg(GuiGraphics g, float partial, int mx, int my) {
+  protected void renderLabels(GuiGraphics g, int x, int y) {}
+
+  @Override
+  protected void renderBg(GuiGraphics g, float partial, int x, int y) {
     CyberBatch.begin();
     g.pose().pushPose();
     g.pose().translate(leftPos, topPos, 0);
     try {
       var c = new CyberCanvas(g, 1);
-      c.panel(0, 0, 276, 227, 8, 0xfb080e19, 0xffb44b59);
-      c.glowText("QUICKHACKS", 46, 9, 20, 0xffef6b77);
-      c.right("TIER " + menu.tier().level, 263, 15, 11, menu.tier().color);
-      c.line(12, 35, 264, 35, 1, 0xff693642);
-      c.tracked("RAM", 15, 48, 9, 0xff70e1ee, .5f);
-      for (int i = 0; i < menu.cyberdeck().ram(); i++) {
-        int x = 15 + i % 4 * 18, y = 61 + i / 4 * 13;
-        c.panel(x, y, 14, 9, 2, 0xff235163, 0xff63cadd);
-        c.line(x + 3, y + 3, x + 9, y + 3, .5f, 0xff9aebf4);
-      }
-      c.body(menu.cyberdeck().ram() + " units", 15, 103, 9, 0xffa0b9c4);
-      c.text(
-          c.fit(
-              menu.cyberdeck().getDescription().getString().toUpperCase(java.util.Locale.ROOT),
-              158,
-              12,
-              true),
-          106,
-          42,
-          12,
-          0xff7ce4ee);
-      for (int i = 0; i < menu.programSlots(); i++) {
-        int x = CyberdeckMenu.slotX(i), y = CyberdeckMenu.slotY(i);
-        c.panel(x - 6, y - 6, 28, 28, 4, 0xff101b29, 0xff66868e);
-        c.text("" + (i + 1), x + 15, y + 15, 6, 0xff658695);
-      }
+      ServiceStyle.frame(c, imageWidth, imageHeight, 0xffdf6c78);
+      c.text("QUICKHACK LOADOUT", 17, 7, 12, ServiceStyle.INK);
       c.body(
-          "Chips: tier " + menu.tier().level + " or lower. One per program.",
-          106,
-          119,
-          8,
-          0xffa5b4c3);
+          c.fit(menu.cyberdeck().getDescription().getString(), 166, 9, false),
+          12,
+          29,
+          9,
+          ServiceStyle.CYAN);
+      c.right("T" + menu.tier().level, 208, 29, 9, menu.tier().color);
+      for (int i = 0; i < menu.programSlots(); i++) {
+        int sx = CyberdeckMenu.slotX(i), sy = CyberdeckMenu.slotY(i);
+        ServiceStyle.slot(c, sx - 1, sy - 1, false);
+        c.body("" + (i + 1), sx + 18, sy + 5, 6, ServiceStyle.MUTED);
+      }
+      c.text("RAM", 138, 48, 8, ServiceStyle.MUTED);
+      c.text("" + menu.cyberdeck().ram(), 138, 60, 20, ServiceStyle.CYAN);
+      c.body("Queue " + menu.tier().queueLimit(), 138, 85, 8, ServiceStyle.MUTED);
+      c.body("Tier " + menu.tier().level + " chips or lower", 12, 100, 8, ServiceStyle.MUTED);
+      c.line(12, 111, 208, 111, .5f, ServiceStyle.LINE);
       for (int row = 0; row < 3; row++)
         for (int col = 0; col < 9; col++)
-          c.panel(57 + col * 18, 133 + row * 18, 18, 18, 2, 0xff09121c, 0xff374954);
-      for (int col = 0; col < 9; col++)
-        c.panel(57 + col * 18, 195, 18, 18, 2, 0xff101d28, 0xff526977);
-      c.text("LOADOUT", 12, 142, 10, 0xffda7783);
-      c.body("Chips stay", 12, 161, 8, 0xffa5b4c3);
-      c.body("with this", 12, 172, 8, 0xffa5b4c3);
-      c.body("cyberdeck.", 12, 183, 8, 0xffa5b4c3);
+          ServiceStyle.slot(c, 29 + col * 18, 115 + row * 18, false);
+      for (int col = 0; col < 9; col++) ServiceStyle.slot(c, 29 + col * 18, 173, true);
     } finally {
       CyberBatch.flush(g);
       g.pose().popPose();

@@ -247,3 +247,7 @@ The character sheet uses Minecraft's inventory entity renderer as a test fixture
 [Held surgical chair](images/held-surgical-chair.png) · [Held wall block](images/held-reinforced-panel.png) · [Held sign](images/held-afterlife-sign.png). Native checks measure every furniture item's baked bounds in all seven display contexts.
 
 Credit chips now deposit **100 eddies**. Existing placed buildings retain their layout; generate or place a new copy to inspect the architectural changes.
+
+## NeoForge 0.23.0 — hands and services
+
+Native in-game captures: [Ricochet preview](images/neo023-gun-ricochet.png) · [Smart Link](images/neo023-smart-lock.png) · [Ripperdoc](images/neo023-ripperdoc-shop.png) · [Install](images/neo023-ripperdoc-install.png) · [Bench](images/neo023-bench.png) · [Quickhacks](images/neo023-quickhack-loadout.png) · [Fixer](images/neo023-fixer-board.png) · [Small window](images/neo023-fixer-small.png) · [Iconic Immovable Force](images/neo023-immovable-iconic.png).

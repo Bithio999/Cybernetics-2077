@@ -44,7 +44,7 @@ final class HandsRulesTest {
   void everyTierKeepsBouncesSlowerAndHasABoundedChargingRate() {
     for (int t = 1; t <= 5; t++) {
       assertTrue(HandsRules.bounceSpeed(t) < 1 && HandsRules.bounceSpeed(t) > .6);
-      assertTrue(HandsRules.chargePeriod(t) >= 3);
+      assertTrue(HandsRules.chargePeriod(t) >= 2);
     }
     assertTrue(HandsRules.bounceSpeed(5) > HandsRules.bounceSpeed(1));
   }

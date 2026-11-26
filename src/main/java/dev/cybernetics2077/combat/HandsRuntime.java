@@ -101,6 +101,7 @@ public final class HandsRuntime {
     t.putLong("wrapEnd", s.wrapEnd);
     t.putInt("smartTarget", target == null ? -1 : target.getId());
     t.putString("smartName", target == null ? "" : target.getName().getString());
+    t.putLong("smartUntil", s.smartUntil);
   }
 
   public static boolean clear(ServerLevel level, Vec3 from, Vec3 to, Entity context) {
@@ -188,9 +189,7 @@ public final class HandsRuntime {
     }
     if (t.getInt("flat") > 0 && !arrow.isNoGravity())
       arrow.setDeltaMovement(
-          arrow
-              .getDeltaMovement()
-              .add(0, .05 * (.2 + .05 * Math.clamp(t.getInt("flat"), 2, 5)), 0));
+          arrow.getDeltaMovement().add(0, .05 * HandsRules.gravityReduction(t.getInt("flat")), 0));
   }
 
   public static Vec3 bounceDirection(AbstractArrow arrow, BlockHitResult hit, int tier) {
@@ -264,9 +263,7 @@ public final class HandsRuntime {
   @SubscribeEvent
   public static void charging(LivingEntityUseItemEvent.Tick e) {
     var entity = e.getEntity();
-    if (!ranged(e.getItem())
-        || !entity.onGround()
-        || entity.getDeltaMovement().horizontalDistanceSqr() > .005) return;
+    if (!ranged(e.getItem())) return;
     int tier =
         entity instanceof ServerPlayer p
             ? AugmentRuntime.tier(p, IMMOVABLE_FORCE)

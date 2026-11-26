@@ -2,6 +2,10 @@
 
 [Wiki home](index.md) · [Cyberware](cyberware.md) · [Quickhacks](quickhacks.md) · [Village services](ripperdocs.md)
 
+## Capacity
+
+Every **10 Street Cred adds 10 cyberware capacity**. With the default base of 100, the limits are **100 / 110 / 120 / 130 / 140 / 150** at Street Cred **0 / 10 / 20 / 30 / 40 / 50**. A custom server base receives the same bonuses.
+
 ## Eddies
 
 Eddies (**€$**) pay for cyberware and chips. Your wallet is saved and retained on death.

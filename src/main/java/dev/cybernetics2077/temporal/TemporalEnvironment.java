@@ -27,9 +27,22 @@ public final class TemporalEnvironment {
       ThreadLocal.withInitial(WeakHashMap::new);
 
   public static double pace(Level level, BlockPos pos) {
+    // A scheduled-tick container can be removed after its chunk leaves the loaded map.
+    // Never request/reload that same chunk while the unload operation is waiting to finish.
+    var chunk =
+        level instanceof net.minecraft.server.level.ServerLevel server
+            ? server.getChunkSource().getChunkNow(pos.getX() >> 4, pos.getZ() >> 4)
+            : level
+                .getChunkSource()
+                .getChunk(
+                    pos.getX() >> 4,
+                    pos.getZ() >> 4,
+                    net.minecraft.world.level.chunk.status.ChunkStatus.FULL,
+                    false);
+    if (chunk == null) return 1;
     String namespace =
         net.minecraft.core.registries.BuiltInRegistries.BLOCK
-            .getKey(level.getBlockState(pos).getBlock())
+            .getKey(chunk.getBlockState(pos).getBlock())
             .getNamespace();
     if (Cybernetics2077.TIME_BUBBLE_EXCLUDED_BLOCK_NAMESPACES.get().contains(namespace)) return 1;
     return Sandevistan.environmentPace(

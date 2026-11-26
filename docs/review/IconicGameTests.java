@@ -30,7 +30,8 @@ import net.neoforged.neoforge.gametest.*;
 public final class IconicGameTests {
   static int offer() {
     var all = CyberwareCatalogue.offers();
-    for (int i = 0; i < all.size(); i++) if (all.get(i).iconic()) return i;
+    for (int i = 0; i < all.size(); i++)
+      if (all.get(i).item() == Cybernetics2077.augment(MILITECH_APOGEE, 5)) return i;
     throw new AssertionError("Missing Iconic offer");
   }
 

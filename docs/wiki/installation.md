@@ -8,11 +8,11 @@ Talk to a **[ripperdoc](ripperdocs.md)** and choose **Install**, or right-click 
 
 Carrying an implant gives no effects. Installed equipment stays with your character on death.
 
-![Ripperdoc installation menu](../images/ripperdoc-install.png)
+![Ripperdoc installation menu](../images/neo023-ripperdoc-install.png)
 
 ## Capacity and sockets
 
-Base cyberware capacity is **100** and can be changed in the world's server configuration. Each implant lists its cost. Only one version of each implant family can be installed.
+Base cyberware capacity is **100** and can be changed in the world's server configuration. Each full **10 Street Cred adds 10 capacity**, up to **150** at Street Cred 50 with the default base. Each implant lists its cost. Only one version of each implant family can be installed.
 
 | Body system | Sockets |
 | --- | ---: |

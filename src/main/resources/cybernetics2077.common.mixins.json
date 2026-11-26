@@ -15,7 +15,8 @@
     "TemporalBlockEntityMixin",
     "TemporalPistonMixin",
     "TacZGunDataMixin",
-    "TacZBurstMixin"
+    "TacZBurstMixin",
+    "TacZBulletMixin"
   ],
   "injectors": {
     "defaultRequire": 1

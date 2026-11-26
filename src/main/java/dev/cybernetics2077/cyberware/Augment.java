@@ -68,7 +68,7 @@ public enum Augment {
   }
 
   public boolean iconic() {
-    return this == MILITECH_APOGEE || this == DAVIDS_SANDEVISTAN;
+    return this == MILITECH_APOGEE || this == DAVIDS_SANDEVISTAN || this == IMMOVABLE_FORCE;
   }
 
   public boolean optics() {
@@ -110,203 +110,162 @@ public enum Augment {
     return switch (this) {
       case DAVIDS_SANDEVISTAN ->
           List.of(
-              "O: toggle David's Sandevistan. 95% relative slowing; 32-block bubble.",
-              "Battery: 10 seconds. Full recharge: 40 seconds. Charge is saved.",
-              "+25% weapon critical chance; +30% critical damage; +25% projectile headshot damage.",
-              "Hostile kills: +1 second (max 10); remove 0.88 food exhaustion.",
-              "Second Wind: hostile kills heal 10% maximum health, at most once per second.",
-              "Rearm: 1 second. At least one tick of charge required.",
-              "Purchase: Street Cred 50, Tier 5 Iconic chip, inventory Apogee and eddies.");
+              "O: 95% slow / 32 blocks. Battery 10s / recharge 40s.",
+              "+25% crit chance, +30% crit damage, +25% headshot damage.",
+              "Kills: +1s battery, heal 10% HP (1s cooldown), -0.88 exhaustion.",
+              "Early deactivation saves charge. Rearm: 1s.");
       case MILITECH_APOGEE ->
           List.of(
-              "O: toggle Apogee. 85% relative slowing; 32-block bubble.",
-              "Battery: 6 seconds. Full recharge: 25 seconds. Charge is saved.",
-              "+20% weapon critical chance and critical damage.",
-              "+20% arrow / thrown trident headshot damage.",
-              "Enemy kills: +0.6 seconds (max 6); remove 0.88 food exhaustion.",
-              "Rearm: 1 second. Any charge of at least one tick can activate.",
-              "Iconic purchase: Street Cred 40, one Tier 5 chip and eddies.");
-      case SMART_LINK ->
-          List.of(
-              "Scanning an enemy locks arrows / thrown tridents onto it.",
-              "Lock: " + (2 + t) + " seconds; range: " + (24 + 4 * t) + " blocks.",
-              "Limited steering; requires optics, line of sight and an unobstructed flight path.");
-      case BALLISTIC_COPROCESSOR ->
-          List.of(
-              "Arrows ricochet once from solid surfaces; preview while drawing a bow.",
-              "Retains " + (60 + 5 * t) + "% speed; +" + (5 * t) + "% damage after ricochet.",
-              "Bank shots follow the reflected trajectory. Tridents are not bounced.");
-      case MICROGENERATOR ->
-          List.of(
-              "A successful weapon hit discharges "
-                  + (2 + 2 * t)
-                  + " electrical damage within 3 blocks.",
-              "At most 4 enemies; recharge: " + (12 - t) + " seconds.",
-              "Supports melee, Mantis Blades, arrows and thrown tridents; cannot chain itself.");
-      case HANDLE_WRAP ->
-          List.of(
-              "Drawing a melee weapon, deploying blades or throwing a trident primes a 6-second"
-                  + " critical window.",
-              "+" + (t * 4) + "% weapon crit chance during that window; 10-second rearm.",
-              "Shares the existing 50% cyberware critical-chance cap.");
-      case SHOCK_ABSORBER ->
-          List.of(
-              "Reduces knockback by "
-                  + (30 + 10 * t)
-                  + "% while drawing a bow, crossbow or trident.",
-              "Does not grant damage reduction or affect other knockback.");
-      case IMMOVABLE_FORCE ->
-          List.of(
-              "Standing still on the ground accelerates bow/crossbow/trident charging.",
-              "One extra charge tick every "
-                  + (8 - t)
-                  + " ticks; fired arrows lose "
-                  + (20 + 5 * t)
-                  + "% less height to gravity.",
-              "Charges and projectile flight remain server-authoritative.");
-      case EX_DISK ->
-          List.of(
-              "+" + t + " maximum RAM with a cyberdeck.",
-              "+" + (t * 5) + "% quickhack upload speed.");
-      case MEMORY_BOOST ->
-          List.of(
-              "+1 maximum RAM with a cyberdeck.",
-              "Kills restore " + number(.35 + .2 * t) + " RAM.");
-      case BIODYNE_BERSERK ->
-          List.of(
-              "I: activate Berserk for " + (6 + t) + " seconds.",
-              (t * 10) + "% damage reduction; 25% HP floor.",
-              "+" + (5 + t * 5) + "% melee attack speed.",
-              (t * 5 - 5) + "% crit chance; +" + ((t - 1) * 25) + "% crit damage.",
-              "Melee only; no item use while active.",
-              "On expiry: heal 25% HP per enemy killed.",
-              "Cooldown: " + (60 - t * 5) + " seconds.");
-      case CLAIRVOYANT ->
-          List.of(
-              "Enables optical scanning (" + CyberwareTier.of(t).scanRange() + " blocks).",
-              "Scanning marks visible enemies within " + (t * 4) + " blocks.",
-              "Marks remain highlighted for 60 seconds.");
-      case BIONIC_JOINTS ->
-          List.of("+" + (t + 1) + " armor and +" + number(toughness(t)) + " armor toughness.");
-      case EPIMORPHIC_SKELETON ->
-          List.of(
-              "+" + (t * 2 - 2) + " armor and +" + number(toughness(t)) + " armor toughness.",
-              "+" + ((t - 2) * 5) + "% maximum health.");
-      case NEOFIBER ->
-          List.of(
-              (t * 2) + "% chance to mitigate incoming damage.",
-              "Mitigation reduces that hit by " + (50 + t * 2) + "%.");
-      case ADRENALINE_CONVERTER ->
-          List.of(
-              "Entering combat grants +" + (t * 8) + "% speed.",
-              "Duration: " + (4 + t) + " seconds; 20-second rearm.",
-              "Requires 5 quiet seconds before a new fight.");
-      case BLOOD_PUMP ->
-          List.of(
-              "H: restore " + (10 + t * 5) + "% maximum HP immediately.",
-              "Then heal " + number(t * .5) + "% HP/s for 6 seconds.",
-              "2 charges; recharge: " + (50 - t * 5) + " seconds.");
-      case HEAL_ON_KILL -> List.of("Kills restore " + (t + 1) + "% maximum HP.");
-      case SUBDERMAL_ARMOR ->
-          List.of("+" + t + " armor and +" + number(toughness(t)) + " armor toughness.");
-      case OPTICAL_CAMO ->
-          List.of(
-              "C: cloak for " + (3 + t) + " seconds.",
-              "Distant mobs cannot acquire you while cloaked.",
-              "Cooldown: " + (70 - t * 5) + " seconds.");
-      case REINFORCED_TENDONS ->
-          List.of(
-              "Press jump again in midair to double-jump.",
-              "Second-jump impulse: " + number(.42 + t * .035) + ".",
-              "Once per landing; normal fall damage applies.");
-      case FORTIFIED_ANKLES ->
-          List.of(
-              "Hold jump on ground, then release to launch.",
-              "Full charge: 1 second. Maximum impulse: " + number(.6 + t * .08) + ".",
-              "Normal jumps work with a quick tap.");
+              "O: 85% slow / 32 blocks. Battery 6s / recharge 25s.",
+              "+20% crit chance, crit damage and projectile headshot damage.",
+              "Kills: +0.6s battery, -0.88 exhaustion. Rearm: 1s.");
       case DYNALAR_SANDEVISTAN ->
           List.of(
-              "O: toggle Sandevistan. 50% relative slowing at every tier.",
-              "32-block time bubble; overlapping fields never stack.",
-              "Slows machines, block/fluid updates, loose objects and rain.",
-              "Maximum duration: "
-                  + dev.cybernetics2077.temporal.TemporalRules.duration(t)
-                  + " seconds.",
-              "Full recharge: "
-                  + dev.cybernetics2077.temporal.TemporalRules.recharge(t)
-                  + " seconds; charge is saved.",
-              "+" + (t * 3) + "% weapon critical chance and critical damage while active.",
-              "Early deactivation preserves charge; rearm: 1 second, minimum 20% charge.");
+              "O: 50% slow / 32 blocks. Battery " + (5 + t) + "s / recharge " + (55 - t * 5) + "s.",
+              "+" + (t * 3) + "% weapon crit chance and crit damage while active.",
+              "Early off saves charge. Rearm 1s / minimum charge 20%.");
+      case SMART_LINK ->
+          List.of(
+              "Scan to guide arrows, tridents and TaCZ rounds toward a target.",
+              "Lock: "
+                  + (2 + t)
+                  + "s / "
+                  + (24 + 4 * t)
+                  + " blocks. Requires optics and clear sight.");
+      case BALLISTIC_COPROCESSOR ->
+          List.of(
+              "Arrows and non-explosive TaCZ rounds ricochet once.",
+              "After bounce: " + (60 + 5 * t) + "% speed / +" + (5 * t) + "% damage.",
+              "Aim a gun or draw a bow to preview the bank shot.");
+      case MICROGENERATOR ->
+          List.of(
+              "Weapon hits discharge " + (2 + 2 * t) + " electric damage within 3 blocks.",
+              "Up to 4 enemies / cooldown " + (12 - t) + "s.");
+      case HANDLE_WRAP ->
+          List.of(
+              "Drawing a weapon or deploying blades grants +" + (t * 4) + "% crit chance.",
+              "Throwing a trident also triggers it. Duration 6s / rearm 10s.");
+      case SHOCK_ABSORBER ->
+          List.of(
+              "While aiming: -" + (30 + 10 * t) + "% knockback.",
+              "TaCZ: -" + (8 * t) + "% camera recoil.");
+      case IMMOVABLE_FORCE ->
+          List.of(
+              "Iconic stability: -" + (t * 10) + "% TaCZ recoil / -" + (t * 8) + "% spread.",
+              "Bows, crossbows and tridents gain 1 charge tick every "
+                  + Math.max(2, 6 - t)
+                  + " ticks.",
+              "Arrows: -" + (20 + 8 * t) + "% gravity. Works while moving or airborne.");
+      case EX_DISK -> List.of("+" + t + " RAM / +" + (t * 5) + "% quickhack upload speed.");
+      case MEMORY_BOOST -> List.of("+1 RAM. Kills restore " + number(.35 + .2 * t) + " RAM.");
       case RAM_UPGRADE ->
           List.of(
-              "+" + (1 + t / 3) + " maximum RAM with a cyberdeck.",
-              "+" + String.format(Locale.ROOT, "%.2f", .06 * t) + " RAM recovered per second.");
+              "+"
+                  + (1 + t / 3)
+                  + " RAM / +"
+                  + String.format(Locale.ROOT, "%.2f", .06 * t)
+                  + " RAM/s.");
       case SELF_ICE ->
+          List.of("Blocks one incoming quickhack. +2 RAM.", "Recharge: " + (50 - 6 * t) + "s.");
+      case BIODYNE_BERSERK ->
           List.of(
-              "Automatically blocks one incoming quickhack, including controls.",
-              "+2 maximum RAM with a cyberdeck.",
-              "Recharge: " + (50 - 6 * t) + " seconds. Reinstallation does not reset it.");
+              "I: Berserk for " + (6 + t) + "s / cooldown " + (60 - t * 5) + "s.",
+              "-" + (t * 10) + "% damage taken; HP cannot fall below 25%.",
+              "+"
+                  + (5 + t * 5)
+                  + "% melee speed, +"
+                  + (t * 5 - 5)
+                  + "% crit chance, +"
+                  + ((t - 1) * 25)
+                  + "% crit damage.",
+              "Melee only. On expiry: heal 25% HP per kill.");
+      case CLAIRVOYANT ->
+          List.of(
+              "Scan: " + scanRange(t) + " blocks.",
+              "Scanning highlights visible enemies within " + (t * 4) + " blocks for 60s.");
       case DOOMSAYER ->
           List.of(
-              "Enables optical scanning (" + scanRange(t) + " blocks).",
-              "Scanning marks creepers, primed TNT and fireballs within "
-                  + (8 + t * 4)
-                  + " blocks.",
-              "Danger marks persist for 60 seconds; maximum 64 marks.");
+              "Scan: " + scanRange(t) + " blocks.",
+              "Marks nearby creepers, TNT and fireballs for 60s; radius " + (8 + t * 4) + ".");
       case STALKER ->
           List.of(
-              "Enables optical scanning (" + scanRange(t) + " blocks).",
-              "Scanning reveals enemies through cover in a forward cone, up to "
-                  + (12 + t * 4)
-                  + " blocks.",
-              "Marks fade 3 seconds after losing focus. Hacking still needs line of sight.");
+              "Scan: " + scanRange(t) + " blocks.",
+              "Reveals enemies through cover in a " + (12 + t * 4) + "-block forward cone.",
+              "Marks fade after 3s. Hacking requires clear sight.");
+      case BIONIC_JOINTS ->
+          List.of("+" + (t + 1) + " armor / +" + number(toughness(t)) + " toughness.");
+      case EPIMORPHIC_SKELETON ->
+          List.of(
+              "+"
+                  + (t * 2 - 2)
+                  + " armor / +"
+                  + number(toughness(t))
+                  + " toughness / +"
+                  + ((t - 2) * 5)
+                  + "% max HP.");
+      case SUBDERMAL_ARMOR ->
+          List.of("+" + t + " armor / +" + number(toughness(t)) + " toughness.");
+      case PARA_BELLUM ->
+          List.of("+" + (t * 4) + "% total armor / +" + number(toughness(t)) + " toughness.");
+      case PAIN_EDITOR ->
+          List.of(
+              "+" + t + " armor / +" + number(toughness(t)) + " toughness.",
+              "-" + (t * 2) + "% incoming damage.");
+      case NEOFIBER -> List.of((t * 2) + "% chance to reduce a hit by " + (50 + t * 2) + "%.");
+      case ADRENALINE_CONVERTER ->
+          List.of(
+              "Entering combat: +" + (t * 8) + "% speed for " + (4 + t) + "s.",
+              "Rearm: 20s. Requires 5s out of combat.");
+      case BLOOD_PUMP ->
+          List.of(
+              "H: heal " + (10 + t * 5) + "% HP, then " + number(t * .5) + "% HP/s for 6s.",
+              "2 charges / recharge " + (50 - t * 5) + "s.");
+      case HEAL_ON_KILL -> List.of("Kills heal " + (t + 1) + "% max HP.");
+      case BIOMONITOR ->
+          List.of(
+              "Below 50% HP: uses a Blood Pump charge or healing potion.",
+              "+" + (t * 4) + "% healing received / trigger cooldown 2s.");
+      case SECOND_HEART ->
+          List.of(
+              "A fatal hit restores full HP. Recharge: " + (400 - t * 40) + "s.",
+              "Does not prevent void or /kill deaths.");
+      case SHOCK_N_AWE ->
+          List.of(
+              "+" + number(armor(t)) + " armor / +" + number(toughness(t)) + " toughness.",
+              (t * 2) + "% chance when hurt: " + (2 + 2 * t) + " electric damage within 4 blocks.",
+              "Up to 8 enemies / cooldown 2s.");
+      case OPTICAL_CAMO ->
+          List.of(
+              "C: cloak for " + (3 + t) + "s / cooldown " + (70 - t * 5) + "s.",
+              "Distant mobs cannot acquire you while cloaked.");
+      case REINFORCED_TENDONS ->
+          List.of(
+              "Jump again in midair to double-jump.",
+              "Impulse: " + number(.42 + t * .035) + ". Fall damage still applies.");
+      case FORTIFIED_ANKLES ->
+          List.of(
+              "Hold jump for 1s, then release for a high jump.",
+              "Maximum impulse: " + number(.6 + t * .08) + ". Tap for a normal jump.");
+      case LYNX_PAWS ->
+          List.of(
+              "50% quieter footsteps / +" + (t * 4) + "% crouching speed.",
+              "-" + (t * 4) + "% fall damage. Sculk can still detect you.");
+      case JENKINS_TENDONS ->
+          List.of(
+              "Sprint speed: +" + (t * 12) + "%, fading to +" + (t * 2) + "% over 5s.",
+              "Recovers when not sprinting.");
       case DENSE_MARROW ->
           List.of(
               "+" + (t * 6) + "% melee damage, including Mantis Blades.",
               "Melee hits add "
                   + String.format(Locale.ROOT, "%.3f", t * .004)
                   + " hunger exhaustion.");
-      case PARA_BELLUM ->
-          List.of(
-              "+" + (t * 4) + "% total armor.", "+" + number(toughness(t)) + " armor toughness.");
       case STABBER ->
           List.of(
-              "+" + (t * 4) + "% critical chance with swords, Mantis Blades and thrown tridents.",
-              "Weapon criticals deal 1.5x damage before Berserk bonuses.");
+              "+" + (t * 4) + "% crit chance: swords, blades and thrown tridents.",
+              "Base crit damage: 1.5x.");
       case VISUAL_CORTEX_SUPPORT ->
-          List.of(
-              "Weapon critical chance increases with distance.",
-              "Up to +" + (t * 6) + "% at 32 blocks. Does not affect quickhacks.");
-      case BIOMONITOR ->
-          List.of(
-              "Below 50% HP, automatically uses a Blood Pump charge or a healing potion.",
-              "+" + (t * 4) + "% healing received. Checks health every half-second.",
-              "Consumes real charges/items; at most once every 2 seconds.");
-      case SECOND_HEART ->
-          List.of(
-              "A fatal hit restores 100% maximum HP.",
-              "Recharge: " + (400 - t * 40) + " seconds; survives logout/reinstallation.",
-              "Does not protect against the void or /kill.");
-      case SHOCK_N_AWE ->
-          List.of(
-              "+" + number(armor(t)) + " armor and +" + number(toughness(t)) + " armor toughness.",
-              (t * 2)
-                  + "% chance when hurt to discharge "
-                  + (2 + 2 * t)
-                  + " electrical damage within 4 blocks.",
-              "Maximum 8 enemies; 2-second internal cooldown; no chain reactions.");
-      case PAIN_EDITOR ->
-          List.of(
-              "+" + t + " armor and +" + number(toughness(t)) + " armor toughness.",
-              "Reduces incoming damage by " + (t * 2) + "%, including damaging quickhacks.");
-      case LYNX_PAWS ->
-          List.of(
-              "50% quieter footsteps; +" + (t * 4) + "% crouching speed.",
-              "Reduces fall damage by " + (t * 4) + "%. Does not silence sculk vibrations.");
-      case JENKINS_TENDONS ->
-          List.of(
-              "Sprinting starts at +" + (t * 12) + "% movement speed.",
-              "Tapers to +" + (t * 2) + "% over 5 seconds; recovers while not sprinting.");
+          List.of("Up to +" + (t * 6) + "% weapon crit chance at 32 blocks.");
     };
   }
 }

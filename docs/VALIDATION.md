@@ -1,5 +1,9 @@
 # Validation
 
+## Hands integration and service menus (NeoForge 0.23.0)
+
+**103 JVM tests, 150 standalone GameTests and 13 TaCZ GameTests pass.** Native TaCZ ricochets now continue outside the wall and deal real damage on the reflected path. Gun ADS previews, guided-round visuals, Iconic Immovable Force, Street Cred capacity and compact service menus are covered by dedicated and native client checks. [Implementation and scope](development/HANDS-SERVICES-0.23.0.md) · [Results](review/results/hands-services-0.23.0.json). Forge remains 0.20.0.
+
 ## Bounty contracts (NeoForge 0.22.0)
 
 **103 JVM tests, 147 standalone GameTests and 10 optional TaCZ GameTests.** Native client review covers acceptance, target deployment, scanning, real kill credit, payment/debrief, original delivery and a smaller GUI. [Results](review/results/bounties-0.22.0.json) · [Implementation](development/BOUNTIES-0.22.0.md) · [Player guide](wiki/contracts.md). Forge remains unchanged.

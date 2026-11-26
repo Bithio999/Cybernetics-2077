@@ -8,7 +8,7 @@
 | --- | --- | ---: |
 | Hands | 1–5 | 4 |
 
-Scan a visible enemy with your [optical scanner](scanning.md) to establish a lock. Arrows and thrown tridents fired during that lock gently steer toward the target. A **SMART LOCK** label appears while scanning or drawing a weapon.
+Scan a visible enemy with your [optical scanner](scanning.md) to establish a lock. Arrows and thrown tridents fired during that lock gently steer toward the target. While drawing a weapon or aiming a gun, slim **LINKED** brackets follow the target, with distance and remaining lock time. The scanner keeps its own target display.
 
 Guidance lasts for the projectile's first **2 seconds**. It cannot turn sharply backward or follow targets through solid blocks. Losing the target, line of sight or the projectile's 64-block pursuit range ends guidance. A ricochet also ends guidance. Landed and returning tridents are left to vanilla behavior.
 
@@ -23,5 +23,7 @@ Guidance lasts for the projectile's first **2 seconds**. It cannot turn sharply 
 Lock range is also limited by your equipped optics. Scanning does not require a cyberdeck or quickhack program.
 
 The lock indicator also appears while aiming a TaCZ gun. TaCZ bullets support this scanner lock when the optional gun integration is available. Guidance respects solid terrain and keeps the native bullet speed. [Gun integration](compatibility.md).
+
+![Smart Link target brackets while aiming a TaCZ gun](../images/neo023-smart-lock.png)
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

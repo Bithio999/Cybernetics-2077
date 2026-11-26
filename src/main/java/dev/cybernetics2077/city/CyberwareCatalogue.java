@@ -46,14 +46,16 @@ public final class CyberwareCatalogue {
           for (var entry : Cybernetics2077.QUICKHACKS.get(kind)) add(list, entry.get());
       // Append new families: saved daily stock IDs keep referring to the same original offers.
       for (var kind : Augment.values())
-        if (kind.ordinal() > Augment.FORTIFIED_ANKLES.ordinal() && !kind.iconic())
+        if (kind.ordinal() > Augment.FORTIFIED_ANKLES.ordinal()
+            && kind != Augment.MILITECH_APOGEE
+            && kind != Augment.DAVIDS_SANDEVISTAN)
           for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
       for (var variant : MantisVariant.values())
         if (variant != MantisVariant.PHYSICAL)
           for (var entry : Cybernetics2077.MANTIS_VARIANTS.get(variant)) add(list, entry.get());
       // Iconics append after every existing offer, including elemental arm variants.
       for (var kind : Augment.values())
-        if (kind.iconic())
+        if (kind == Augment.MILITECH_APOGEE || kind == Augment.DAVIDS_SANDEVISTAN)
           for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
       offers = List.copyOf(list);
     }

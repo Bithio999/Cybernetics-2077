@@ -29,15 +29,19 @@ public final class CyberActionButton extends AbstractButton {
     CyberBatch.begin();
     try {
       var c = new CyberCanvas(g, active ? 1 : .4f);
-      int border = isHoveredOrFocused() ? 0xff7dedf4 : 0xffa94756;
-      c.panel(
-          getX(), getY(), width, height, 3, isHoveredOrFocused() ? 0xff233543 : 0xff111a26, border);
-      c.center(
-          getMessage().getString().toUpperCase(java.util.Locale.ROOT),
-          getX() + width / 2f,
-          getY() + 5,
-          11,
-          0xff82dce7);
+      boolean hover = isHoveredOrFocused();
+      c.rect(getX(), getY(), width, height, hover ? 0xff20313a : 0x88111c24);
+      c.line(
+          getX(),
+          getY() + height - 1,
+          getX() + width,
+          getY() + height - 1,
+          .65f,
+          hover ? ServiceStyle.CYAN : ServiceStyle.LINE);
+      if (hover) c.rect(getX(), getY() + 3, 1, height - 6, ServiceStyle.CYAN);
+      String text =
+          c.fit(getMessage().getString().toUpperCase(java.util.Locale.ROOT), width - 8, 9, true);
+      c.center(text, getX() + width / 2f, getY() + (height - 9) / 2f, 9, ServiceStyle.CYAN);
     } finally {
       CyberBatch.flush(g);
     }

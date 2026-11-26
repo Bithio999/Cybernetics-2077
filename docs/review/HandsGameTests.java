@@ -275,8 +275,7 @@ public final class HandsGameTests {
   }
 
   @GameTest(template = "empty", timeoutTicks = 60)
-  public static void immovableForceRequiresGroundedStillnessAndPreservesNoGravity(
-      GameTestHelper h) {
+  public static void iconicImmovableForceWorksWhileMovingAndPreservesNoGravity(GameTestHelper h) {
     var p = AugmentGameTests.player(h);
     CombatGameTests.target(h, p);
     equip(p, IMMOVABLE_FORCE, 5, 0);
@@ -285,7 +284,10 @@ public final class HandsGameTests {
     p.setDeltaMovement(Vec3.ZERO);
     h.startSequence()
         .thenWaitUntil(
-            () -> h.assertTrue(h.getLevel().getGameTime() % 3 == 0, "Await charge period"))
+            () ->
+                h.assertTrue(
+                    h.getLevel().getGameTime() % HandsRules.chargePeriod(5) == 0,
+                    "Await charge period"))
         .thenExecute(
             () -> {
               var charge = new LivingEntityUseItemEvent.Tick(p, bow, 100);
@@ -294,12 +296,12 @@ public final class HandsGameTests {
               p.setOnGround(false);
               var air = new LivingEntityUseItemEvent.Tick(p, bow, 100);
               HandsRuntime.charging(air);
-              h.assertTrue(air.getDuration() == 100, "Airborne charge accelerated");
+              h.assertTrue(air.getDuration() == 99, "Iconic airborne charge did not accelerate");
               p.setOnGround(true);
               p.setDeltaMovement(.4, 0, 0);
               var moving = new LivingEntityUseItemEvent.Tick(p, bow, 100);
               HandsRuntime.charging(moving);
-              h.assertTrue(moving.getDuration() == 100, "Moving charge accelerated");
+              h.assertTrue(moving.getDuration() == 99, "Iconic moving charge did not accelerate");
               var a = arrow(p);
               a.setNoGravity(true);
               a.tickCount = 1;

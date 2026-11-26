@@ -10,7 +10,7 @@ Individual item pages, tier stats, controls, acquisition and village guides.
 
 | Minecraft | Loader | Java | Version / Download |
 | --- | --- | --- | --- |
-| 1.21.1 | NeoForge 21.1.248+ | 21 | 0.22.0 · [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.22.0.jar) |
+| 1.21.1 | NeoForge 21.1.248+ | 21 | 0.23.0 · [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.23.0.jar) |
 | 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | 0.20.0 · [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
 
 Development currently focuses on **1.21.1 NeoForge**. The Forge 1.20.1 build stays at its last release until an update is requested.
@@ -21,7 +21,7 @@ Install the matching build on both server and clients. Replace the previous JAR.
 | --- | --- |
 | First steps and your first implant | [Getting started](docs/wiki/getting-started.md) |
 | Implant effects and tier stats | [Cyberware](docs/wiki/cyberware.md) |
-| Iconic purchases, Apogee and David’s Sandevistan | [Iconics](docs/wiki/iconics.md) |
+| Iconic purchases and implant requirements | [Iconics](docs/wiki/iconics.md) |
 | Decks, RAM and program slots | [Cyberdecks](docs/wiki/cyberdecks.md) |
 | Quickhack costs and damage types | [Quickhacks](docs/wiki/quickhacks.md) |
 | Daily shops, currency and contracts | [Village services](docs/wiki/ripperdocs.md) |

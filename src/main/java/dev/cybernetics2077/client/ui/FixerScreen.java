@@ -23,23 +23,23 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
 
   public FixerScreen(FixerMenu menu, Inventory inventory, Component title) {
     super(menu, inventory, title);
-    imageWidth = 382;
-    imageHeight = 230;
+    imageWidth = 340;
+    imageHeight = 220;
     inventoryLabelY = titleLabelY = -1000;
   }
 
   @Override
   protected void init() {
-    imageWidth = Math.min(382, width - 12);
-    imageHeight = 230;
+    imageWidth = Math.min(340, width - 12);
+    imageHeight = 220;
     super.init();
-    leftWidth = Math.min(126, (imageWidth - 36) / 3);
+    leftWidth = Math.min(108, (imageWidth - 36) / 3);
     String[] names = {"BOUNTIES", "DELIVERY", "DEBRIEF"};
     int tw = (imageWidth - 28) / 3;
     for (int i = 0; i < 3; i++) {
       final int t = i;
       addRenderableWidget(
-          new TabButton(leftPos + 12 + i * (tw + 2), topPos + 42, tw, 18, names[i], t));
+          new TabButton(leftPos + 12 + i * (tw + 2), topPos + 40, tw, 18, names[i], t));
     }
     for (int i = 0; i < 4; i++) {
       cards[i] = addRenderableWidget(new OfferButton(i));
@@ -48,7 +48,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
         addRenderableWidget(
             new CyberActionButton(
                 leftPos + leftWidth + 20,
-                topPos + 202,
+                topPos + 194,
                 imageWidth - leftWidth - 108,
                 18,
                 Component.literal("ACCEPT BOUNTY"),
@@ -57,7 +57,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
         addRenderableWidget(
             new CyberActionButton(
                 leftPos + 12,
-                topPos + 202,
+                topPos + 194,
                 leftWidth,
                 18,
                 Component.literal("ABANDON"),
@@ -70,9 +70,9 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
     addRenderableWidget(
         new CyberActionButton(
             leftPos + imageWidth - 76,
-            topPos + 202,
+            topPos + 194,
             64,
-            18,
+            16,
             Component.literal("LEAVE"),
             this::onClose));
   }
@@ -137,7 +137,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
       var card = cards[i];
       card.visible = tab == 0 && i < rows && initialized;
       card.setX(leftPos + 12);
-      card.setY(topPos + 66 + i * (height + 2));
+      card.setY(topPos + 62 + i * (height + 2));
       card.setWidth(leftWidth);
       card.setHeight(height);
       card.slot = active ? i - 1 : i;
@@ -184,8 +184,8 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
     g.pose().translate(leftPos, topPos, 0);
     try {
       var c = new CyberCanvas(g, 1);
-      c.panel(0, 0, imageWidth, imageHeight, 8, 0xfc091714, 0xff5c9a78);
-      c.glowText("AFTERLIFE // FIXER NETWORK", 12, 10, 13, GREEN);
+      ServiceStyle.frame(c, imageWidth, imageHeight, GREEN);
+      c.text("AFTERLIFE / FIXER NETWORK", 17, 7, 12, GREEN);
       c.body(c.fit(title.getString(), imageWidth - 140, 9, false), 12, 28, 9, MUTED);
       c.right(
           "SC " + menu.streetCred() + " / €$" + String.format(Locale.ROOT, "%,d", menu.eddies()),
@@ -198,7 +198,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
       else report(c);
       String status = status();
       c.body(
-          c.fit(status, imageWidth - 24, 8, false), 12, 190, 8, menu.result() == 0 ? MUTED : GOLD);
+          c.fit(status, imageWidth - 24, 8, false), 12, 184, 8, menu.result() == 0 ? MUTED : GOLD);
     } finally {
       CyberBatch.flush(g);
       g.pose().popPose();
@@ -207,7 +207,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
 
   private void bounty(CyberCanvas c) {
     int x = leftWidth + 20, w = imageWidth - x - 12;
-    c.panel(x, 66, w, 112, 4, 0xff10231d, 0xff345845);
+    ServiceStyle.surface(c, x, 62, w, 112);
     var t = selected();
     if (t.isEmpty()) {
       c.body("Connecting to fixer network...", x + 8, 80, 9, MUTED);
@@ -253,19 +253,19 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
     c.body(
         "DAWN " + String.format(Locale.ROOT, "%02d:%02d", restock / 60, restock % 60),
         12,
-        180,
+        176,
         8,
         MUTED);
     c.right(
         "LOYALTY " + (state.getInt("favor") % 3) + "/3 // THIRD JOB +25%",
         imageWidth - 12,
-        180,
+        176,
         8,
         MUTED);
   }
 
   private void delivery(CyberCanvas c) {
-    c.panel(12, 66, imageWidth - 24, 112, 4, 0xff10231d, 0xff345845);
+    ServiceStyle.surface(c, 12, 62, imageWidth - 24, 112);
     c.text("FIRST IMPRESSIONS", 22, 76, 13, GREEN);
     c.body("Deliver a sealed diagnostic packet to a ripperdoc.", 22, 99, 9, MUTED);
     c.body("Use the contract shard on the doctor to hand it over.", 22, 114, 9, MUTED);
@@ -285,7 +285,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
 
   private void report(CyberCanvas c) {
     var t = state.getCompound("report");
-    c.panel(12, 66, imageWidth - 24, 112, 4, 0xff10231d, 0xff345845);
+    ServiceStyle.surface(c, 12, 62, imageWidth - 24, 112);
     if (t.isEmpty()) {
       c.text("NO COMPLETED BOUNTIES", 22, 79, 12, GREEN);
       c.body("Finish a hunt and collect payment for a debrief.", 22, 103, 9, MUTED);
@@ -315,7 +315,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
     c.body(
         "ELITE CHAIN " + Math.min(3, state.getInt("legends")) + "/3 // ONE-TIME T5 ICONIC CHIP",
         12,
-        180,
+        176,
         8,
         MUTED);
   }
@@ -339,11 +339,11 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
       default ->
           tab == 0
               ? "Accepted jobs survive dawn, logout and death. Optional bonuses do not affect the"
-                    + " base payment."
+                  + " base payment."
               : tab == 1
                   ? "Virtual cargo // no separate delivery item required."
                   : "Optional objectives improve the rating; the base payment is guaranteed for a"
-                        + " confirmed mark.";
+                      + " confirmed mark.";
     };
   }
 
@@ -383,14 +383,14 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
       try {
         var c = new CyberCanvas(g, 1);
         boolean selected = tab == index;
-        c.panel(
+        if (selected || isHoveredOrFocused()) c.rect(getX(), getY(), width, height, 0xff18312a);
+        c.line(
             getX(),
-            getY(),
-            width,
-            height,
-            3,
-            selected ? 0xff214334 : 0xff101e19,
-            selected || isHoveredOrFocused() ? GREEN : 0xff345845);
+            getY() + height - 1,
+            getX() + width,
+            getY() + height - 1,
+            .65f,
+            selected ? GREEN : ServiceStyle.LINE);
         c.center(
             getMessage().getString(),
             getX() + width / 2f,
@@ -429,14 +429,10 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
       try {
         var c = new CyberCanvas(g, 1);
         boolean selected = selection == slot;
-        c.panel(
-            getX(),
-            getY(),
-            width,
-            height,
-            3,
-            selected ? 0xff254234 : 0xff10221c,
-            selected || isHoveredOrFocused() ? GREEN : 0xff345845);
+        if (selected || isHoveredOrFocused()) c.rect(getX(), getY(), width, height, 0xff18312a);
+        c.rect(getX(), getY() + 3, 1, height - 6, selected ? GREEN : ServiceStyle.LINE);
+        c.line(
+            getX() + 4, getY() + height, getX() + width, getY() + height, .5f, ServiceStyle.LINE);
         c.text(
             c.fit(slot < 0 ? "CURRENT JOB" : dossier.getString("alias"), width - 12, 9, true),
             getX() + 6,

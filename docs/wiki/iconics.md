@@ -2,7 +2,7 @@
 
 [Cyberware](cyberware.md) · [Chromed mobs](enhanced-mobs.md) · [Ripperdocs](ripperdocs.md)
 
-Iconics are special implants within the normal **Tier 1–5** system. They require a matching-tier **Iconic Requisition Chip** and cost more than ordinary cyberware. Choose between **[Militech “Apogee” Sandevistan](militech-apogee.md)** and the original **[David’s Sandevistan](davids-sandevistan.md)**. Both are Tier 5; David’s is available on NeoForge 0.21.0.
+Iconics are special implants within the normal **Tier 1–5** system. They require a matching-tier **Iconic Requisition Chip** and cost more than ordinary cyberware. Available models are **[Militech “Apogee” Sandevistan](militech-apogee.md)**, **[David’s Sandevistan](davids-sandevistan.md)** and **[Immovable Force](immovable-force.md)**. The NeoForge 0.23.0 update makes Immovable Force Iconic at Tiers 2–5.
 
 ## Requisition chips
 
@@ -12,7 +12,7 @@ Defeating a chromed mob has a separate chance to drop **one** chip in addition t
 
 Chip tiers use the [same loadout-based tier distribution as salvage](enhanced-mobs.md#damaged-cybernetic-parts), rolled independently. Higher average tiers and more implants favor higher-tier chips. Normal mobs do not drop them; `doMobLoot=false` disables these drops, and Looting does not multiply them.
 
-Keep chips in your main inventory or hotbar. Chips exist at tiers 1–5; **only Tier 5 has an Iconic to buy in this update**. Lower-tier chips can be kept for future additions. Chips cannot be combined into higher tiers.
+Keep chips in your main inventory or hotbar. Chips exist at tiers 1–5; **Tiers 2–5 can purchase Immovable Force**. Chips cannot be combined into higher tiers.
 
 Your first **three [Elite Tier 5 bounty completions](contracts.md#fixer-specialties-and-optional-bonuses)** also award **one Tier 5 chip**, once per player.
 
@@ -28,6 +28,7 @@ Failed purchases consume nothing. A single chip can free its inventory slot for 
 
 | Iconic | Tier | Capacity | Street Cred | Eddies | Chip |
 | --- | ---: | ---: | ---: | ---: | --- |
+| [Immovable Force](immovable-force.md) | 2–5 | 35 | 10–40 | 12,000–75,000 | Matching tier |
 | [Militech “Apogee” Sandevistan](militech-apogee.md) | 5 | 44 | 40 | 75,000 | Tier 5 |
 | [David’s Sandevistan](davids-sandevistan.md) | 5 | 60 | 50 | 150,000 + one Apogee | Tier 5 |
 

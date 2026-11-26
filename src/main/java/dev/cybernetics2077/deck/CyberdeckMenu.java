@@ -85,8 +85,8 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
       deck.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(initial));
     for (int row = 0; row < 3; row++)
       for (int col = 0; col < 9; col++)
-        addSlot(new Slot(inv, col + row * 9 + 9, 58 + col * 18, 134 + row * 18));
-    for (int col = 0; col < 9; col++) addSlot(new Slot(inv, col, 58 + col * 18, 196));
+        addSlot(new Slot(inv, col + row * 9 + 9, 30 + col * 18, 116 + row * 18));
+    for (int col = 0; col < 9; col++) addSlot(new Slot(inv, col, 30 + col * 18, 174));
   }
 
   public CyberwareTier tier() {
@@ -102,11 +102,11 @@ public final class CyberdeckMenu extends AbstractContainerMenu {
   }
 
   public static int slotX(int index) {
-    return 112 + index % 4 * 34;
+    return 12 + index % 4 * 26;
   }
 
   public static int slotY(int index) {
-    return 62 + index / 4 * 34;
+    return 53 + index / 4 * 26;
   }
 
   @Override

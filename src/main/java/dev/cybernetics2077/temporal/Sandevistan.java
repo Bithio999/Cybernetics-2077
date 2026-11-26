@@ -317,6 +317,8 @@ public final class Sandevistan {
   }
 
   public static float renderPartial(Entity e, float partial) {
+    if (e.level().isClientSide && e.getPersistentData().getBoolean("cybernetics2077:guided_visual"))
+      return partial;
     var b = BUDGETS.get().get(e);
     return b == null ? partial : TemporalRules.partial(b.phase, pace(e), partial);
   }

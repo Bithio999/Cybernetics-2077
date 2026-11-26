@@ -201,28 +201,35 @@ public final class TacZCompat {
       tag = new net.minecraft.nbt.CompoundTag();
       entity.getPersistentData().put(DATA, tag);
     }
-    if (tag.getBoolean("pending")) {
-      var point = new Vec3(tag.getDouble("px"), tag.getDouble("py"), tag.getDouble("pz"));
-      entity.setPos(point);
-      entity.setDeltaMovement(tag.getDouble("vx"), tag.getDouble("vy"), tag.getDouble("vz"));
-      tag.remove("pending");
-      sync(entity);
+    completeBounce(entity);
+    LivingEntity target = tag.getBoolean("bounced") ? null : HandsRuntime.locked(player);
+    if (target != null
+        && entity.tickCount <= 40
+        && entity.distanceToSqr(target) <= 64 * 64
+        && player.hasLineOfSight(target)
+        && HandsRuntime.clear(
+            level, entity.position(), target.getBoundingBox().getCenter(), entity)) {
+      var v = entity.getDeltaMovement();
+      var d = target.getBoundingBox().getCenter().subtract(entity.position());
+      var turn =
+          HandsRules.turn(
+              v.x, v.y, v.z, d.x, d.y, d.z, .035 + .012 * AugmentRuntime.tier(player, SMART_LINK));
+      entity.setDeltaMovement(turn.x(), turn.y(), turn.z());
+      tag.putBoolean("controlled", true);
     }
-    if (tag.getBoolean("bounced")) return;
-    LivingEntity target = HandsRuntime.locked(player);
-    if (target == null
-        || entity.tickCount > 40
-        || entity.distanceToSqr(target) > 64 * 64
-        || !player.hasLineOfSight(target)
-        || !HandsRuntime.clear(
-            level, entity.position(), target.getBoundingBox().getCenter(), entity)) return;
-    var v = entity.getDeltaMovement();
-    var d = target.getBoundingBox().getCenter().subtract(entity.position());
-    var turn =
-        HandsRules.turn(
-            v.x, v.y, v.z, d.x, d.y, d.z, .035 + .012 * AugmentRuntime.tier(player, SMART_LINK));
-    entity.setDeltaMovement(turn.x(), turn.y(), turn.z());
-    if (entity.tickCount % 2 == 0) sync(entity);
+    if (tag.getBoolean("controlled")) sync(entity);
+  }
+
+  public static boolean completeBounce(Entity entity) {
+    if (!(entity.level() instanceof ServerLevel)) return false;
+    var tag = entity.getPersistentData().getCompound(DATA);
+    if (!tag.getBoolean("pending")) return false;
+    entity.setPos(tag.getDouble("px"), tag.getDouble("py"), tag.getDouble("pz"));
+    entity.setDeltaMovement(tag.getDouble("vx"), tag.getDouble("vy"), tag.getDouble("vz"));
+    tag.remove("pending");
+    tag.putBoolean("controlled", true);
+    sync(entity);
+    return true;
   }
 
   private static void bounce(Object event) {
@@ -289,7 +296,8 @@ public final class TacZCompat {
             entity.getZ(),
             v.x,
             v.y,
-            v.z));
+            v.z,
+            level.getGameTime()));
   }
 
   public static long interval(LivingEntity shooter, long nativeInterval) {
@@ -308,6 +316,100 @@ public final class TacZCompat {
     }
   }
 
+  public record BallisticProfile(double speed, double gravity, double friction, int lifeTicks) {}
+
+  private record CachedProfile(long tick, ItemStack stack, BallisticProfile profile) {}
+
+  private static final Map<LivingEntity, CachedProfile> PROFILES = new WeakHashMap<>();
+
+  /** Native gun data and attachment properties, cached for the current simulation tick. */
+  public static BallisticProfile ballistics(LivingEntity shooter) {
+    ItemStack stack = shooter.getMainHandItem();
+    if (!gun(stack)) return null;
+    long tick = shooter.level().getGameTime();
+    var old = PROFILES.get(shooter);
+    if (old != null && old.tick == tick && old.stack == stack) return old.profile;
+    BallisticProfile result = null;
+    try {
+      var api = Class.forName("com.tacz.guns.api.TimelessAPI");
+      var index =
+          (Optional<?>)
+              api.getMethod("getCommonGunIndex", net.minecraft.resources.ResourceLocation.class)
+                  .invoke(null, call(stack.getItem(), "getGunId", stack));
+      if (index.isPresent()) {
+        Object data = call(index.get(), "getGunData"), bullet = call(data, "getBulletData");
+        Object explosion = call(bullet, "getExplosionData");
+        if (explosion == null || !Boolean.TRUE.equals(call(explosion, "isExplode"))) {
+          var operatorApi = Class.forName("com.tacz.guns.api.entity.IGunOperator");
+          Object operator =
+              operatorApi.getMethod("fromLivingEntity", LivingEntity.class).invoke(null, shooter);
+          Object cache = call(operator, "getCacheProperty");
+          if (cache == null) {
+            cache =
+                Class.forName("com.tacz.guns.resource.modifier.AttachmentCacheProperty")
+                    .getConstructor()
+                    .newInstance();
+            call(cache, "eval", stack, data);
+          }
+          // Select the String overload explicitly; the GunProperty overload has identical arity.
+          Object speed =
+              cache.getClass().getMethod("getCache", String.class).invoke(cache, "ammo_speed");
+          float velocity =
+              speed instanceof Number n
+                  ? n.floatValue()
+                  : ((Number) call(bullet, "getSpeed")).floatValue();
+          Object holder = operatorApi.getMethod("getDataHolder").invoke(operator);
+          Method modify =
+              gunClass.getMethod(
+                  "modifyProperty",
+                  Class.forName("com.tacz.guns.entity.shooter.ShooterDataHolder"),
+                  ItemStack.class,
+                  LivingEntity.class,
+                  String.class,
+                  Class.class,
+                  Object.class);
+          float gravity =
+              ((Number)
+                      modify.invoke(
+                          stack.getItem(),
+                          holder,
+                          stack,
+                          shooter,
+                          "bullet_gravity",
+                          Float.class,
+                          call(bullet, "getGravity")))
+                  .floatValue();
+          float friction =
+              ((Number)
+                      modify.invoke(
+                          stack.getItem(),
+                          holder,
+                          stack,
+                          shooter,
+                          "bullet_friction",
+                          Float.class,
+                          call(bullet, "getFriction")))
+                  .floatValue();
+          float life = ((Number) call(bullet, "getLifeSecond")).floatValue();
+          if (Float.isFinite(velocity)
+              && velocity > 0
+              && Float.isFinite(gravity)
+              && Float.isFinite(friction))
+            result =
+                new BallisticProfile(
+                    velocity / 20,
+                    Math.max(0, gravity),
+                    Math.clamp(friction, 0, 1),
+                    Math.clamp((int) (life * 20), 1, 200));
+        }
+      }
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException("TaCZ preview properties unavailable", ex);
+    }
+    PROFILES.put(shooter, new CachedProfile(tick, stack, result));
+    return result;
+  }
+
   public static double recoil(LivingEntity player) {
     if (player == null) return 1;
     if (player instanceof ServerPlayer p)
@@ -318,22 +420,20 @@ public final class TacZCompat {
     return clientRecoil.applyAsDouble(player);
   }
 
+  public static double spread(LivingEntity shooter) {
+    int tier =
+        shooter instanceof ServerPlayer p
+            ? AugmentRuntime.tier(p, IMMOVABLE_FORCE)
+            : HandsRuntime.clientImmovable.applyAsInt(shooter);
+    return HandsRules.spreadMultiplier(tier);
+  }
+
   public static double recoil(int shock, int force, boolean stationary) {
-    return Math.max(.15, (1 - .08 * shock) * (stationary ? 1 - .07 * force : 1));
+    return Math.max(.15, (1 - .08 * shock) * (1 - .10 * force));
   }
 
   public static List<String> details(Augment augment, int tier) {
-    if (!loaded) return List.of();
-    return switch (augment) {
-      case SMART_LINK -> List.of("TaCZ: guided bullets follow your scanner lock.");
-      case BALLISTIC_COPROCESSOR -> List.of("TaCZ: one ricochet; explosive rounds excluded.");
-      case MICROGENERATOR -> List.of("TaCZ: landed gunshots trigger the discharge.");
-      case HANDLE_WRAP -> List.of("TaCZ: drawing a gun primes the critical-hit bonus.");
-      case SHOCK_ABSORBER -> List.of("TaCZ: " + (8 * tier) + "% less camera recoil; steadier aim.");
-      case IMMOVABLE_FORCE ->
-          List.of("TaCZ: " + (7 * tier) + "% less recoil while grounded and still.");
-      default -> List.of();
-    };
+    return List.of();
   }
 
   private TacZCompat() {}
