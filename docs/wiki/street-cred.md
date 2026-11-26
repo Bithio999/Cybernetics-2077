@@ -24,6 +24,8 @@ Street Cred determines which tiers enter [daily ripperdoc stock](ripperdocs.md#d
 | 4 | 30 |
 | 5 | 40 |
 
+[David’s Sandevistan](davids-sandevistan.md) has its own **Street Cred 50** purchase requirement.
+
 Higher reputation increases the frequency of higher-tier offers. Tier 1 Kiroshi Optics remain guaranteed from Street Cred **0 through 10**.
 
 The current delivery contract awards **5 Street Cred once**. It is the only implemented contract; higher-tier purchase thresholds are in place for future jobs. Street Cred gates purchases, not installation of equipment you already own.

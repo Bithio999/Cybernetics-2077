@@ -39,4 +39,6 @@ Apogee uses the same animated lens, audio and captured-color pose trails as the 
 
 ![Apogee active in first person](../images/apogee-first-person-0.18.0.png)
 
+An unequipped Apogee is also required to purchase [David’s Sandevistan](davids-sandevistan.md) at Street Cred 50 on NeoForge.
+
 [Obtaining requisition chips](iconics.md#requisition-chips) · [Dynalar comparison](dynalar-sandevistan.md)

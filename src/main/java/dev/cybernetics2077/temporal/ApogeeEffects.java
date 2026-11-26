@@ -19,7 +19,7 @@ public final class ApogeeEffects {
   private static final String HIT = "cybernetics2077:apogee_headshot";
 
   private static boolean active(ServerPlayer p) {
-    return Sandevistan.active(p) && Sandevistan.model(p) == SandevistanModel.APOGEE;
+    return Sandevistan.active(p) && Sandevistan.model(p).iconic();
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -50,7 +50,8 @@ public final class ApogeeEffects {
         && tag.hasUUID("target")
         && tag.getUUID("target").equals(e.getEntity().getUUID())
         && tag.getLong("at") == p.level().getGameTime()
-        && e.getAmount() > 0) e.setAmount(e.getAmount() * 1.2f);
+        && e.getAmount() > 0)
+      e.setAmount(e.getAmount() * Sandevistan.model(p).headshotMultiplier());
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -64,7 +65,15 @@ public final class ApogeeEffects {
         && (!p.server.isPvpAllowed() || !p.canHarmPlayer(other))) return;
     var state = AugmentRuntime.state(p);
     long now = AugmentRuntime.now(p);
-    state.sandyEnd = Math.min(now + 120, state.sandyEnd + 12);
+    var model = Sandevistan.model(p);
+    state.sandyEnd =
+        Math.min(
+            now + model.duration(Sandevistan.tier(p)) * 20L,
+            state.sandyEnd + model.killExtensionTicks());
+    if (model == SandevistanModel.DAVID && now >= state.sandyHealReady) {
+      state.sandyHealReady = now + 20;
+      p.heal(p.getMaxHealth() * .10f);
+    }
     // Minecraft has no stamina bar. Recover 22% of one exhaustion cycle, never food points.
     p.getFoodData().setExhaustion(Math.max(0, p.getFoodData().getExhaustionLevel() - .88f));
     CyberwareRuntime.broadcast(p);

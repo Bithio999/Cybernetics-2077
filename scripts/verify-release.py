@@ -190,6 +190,8 @@ with PortZip(jar) as z:
         'smart_link': 1, 'ballistic_coprocessor': 1, 'microgenerator': 1,
         'handle_wrap': 3, 'shock_absorber': 1, 'immovable_force': 2,
     }
+    if not forge:
+        augment_starts['davids_sandevistan'] = 5
     assert 'data/cybernetics2077/recipe/mantis_claws_tier_1.json' not in names
     assert not any('CrossbowReloadMixin' in n for n in names), 'Obsolete crossbow reload hook shipped'
     for variant, title in [('thermal', 'Thermal'), ('electrical', 'Electrifying'), ('toxic', 'Toxic')]:

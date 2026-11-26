@@ -3,7 +3,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.148'
 }
 group = 'dev.cybernetics2077'
-version = '0.20.1'
+version = '0.21.0'
 base { archivesName = 'Cybernetics2077-NeoForge-1.21.1' }
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 repositories { mavenCentral() }

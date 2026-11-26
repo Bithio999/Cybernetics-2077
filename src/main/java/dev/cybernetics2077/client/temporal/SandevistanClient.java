@@ -31,7 +31,8 @@ public final class SandevistanClient {
         t.getLong("sandyEnd"),
         t.contains("temporalPace") ? Math.clamp(t.getDouble("temporalPace"), .05, 1.25) : 1,
         t.getBoolean("sandyPvp"),
-        t.getBoolean("sandyIconic"));
+        t.getBoolean("sandyIconic") && t.getInt("sandyModel") != SandevistanModel.DAVID.ordinal(),
+        t.getInt("sandyModel") == SandevistanModel.DAVID.ordinal());
   }
 
   public static void frame() {

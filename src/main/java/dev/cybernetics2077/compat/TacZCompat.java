@@ -149,11 +149,12 @@ public final class TacZCompat {
     }
     if (Boolean.TRUE.equals(call(event, "isHeadShot"))
         && Sandevistan.active(player)
-        && Sandevistan.model(player) == SandevistanModel.APOGEE)
+        && Sandevistan.model(player).iconic())
       call(
           event,
           "setHeadshotMultiplier",
-          ((Number) call(event, "getHeadshotMultiplier")).floatValue() * 1.2f);
+          ((Number) call(event, "getHeadshotMultiplier")).floatValue()
+              * Sandevistan.model(player).headshotMultiplier());
     Entity bullet = (Entity) call(event, "getBullet");
     if (bullet != null && bullet.getPersistentData().getCompound(DATA).getBoolean("bounced"))
       base *= 1 + .05f * AugmentRuntime.tier(player, BALLISTIC_COPROCESSOR);

@@ -67,6 +67,8 @@ Replace `<tier>` only with a tier listed in the table.
 | Lynx Paws | `cybernetics2077:lynx_paws_tier_<tier>` | 2–5 |
 | Jenkins’ Tendons | `cybernetics2077:jenkins_tendons_tier_<tier>` | 2–5 |
 
+David’s Sandevistan (NeoForge): `cybernetics2077:davids_sandevistan_tier_5`.
+
 ## Quickhack IDs
 
 | Program | Item ID | Tiers |

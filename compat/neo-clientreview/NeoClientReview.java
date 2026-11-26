@@ -148,6 +148,10 @@ public final class NeoClientReview {
         TacZHudReview.tick(tick - 300, OUT);
         return;
       }
+      if (Boolean.getBoolean("cybernetics2077.davidReview") && tick >= 300) {
+        DavidClientReview.tick(tick - 300, OUT);
+        return;
+      }
       if (tick == 300) {
         Files.createDirectories(OUT);
         Files.writeString(

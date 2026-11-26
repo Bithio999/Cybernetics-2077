@@ -1,5 +1,12 @@
 # Validation
 
+## David’s Sandevistan (NeoForge 0.21.0)
+
+**99 JVM tests, 136 standalone GameTests, 9 TaCZ GameTests, native shop/install/activation review, clean package audit and strict wiki build pass.** [Results](review/results/david-0.21.0.json) · [Implementation](development/DAVID-0.21.0.md) · [Player guide](wiki/davids-sandevistan.md).
+
+The Forge port remains 0.20.0. The new model was not ported or tested on Forge.
+
+
 Active development: Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21. The Forge 1.20.1 release remains 0.20.0 until explicitly requested.
 
 ## TaCZ HUD and basic-optics locks (NeoForge 0.20.1)

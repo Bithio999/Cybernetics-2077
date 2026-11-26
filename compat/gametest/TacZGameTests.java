@@ -111,6 +111,28 @@ public final class TacZGameTests {
     h.assertTrue(
         Math.abs(((Number) call(boosted, "getHeadshotMultiplier")).floatValue() - 2.4f) < .001,
         "Apogee replaced or lost native headshot multiplier");
+    Sandevistan.stop(p, AugmentRuntime.now(p));
+    equip(p, Augment.DAVIDS_SANDEVISTAN, 5, 0);
+    AugmentRuntime.state(p).sandyRearm = 0;
+    AugmentRuntime.state(p).sandyCharge = 1;
+    Sandevistan.toggle(p);
+    var david =
+        event(
+            "common.EntityHurtByGunEvent$Pre",
+            b,
+            target,
+            p,
+            Cybernetics2077.id("test"),
+            Cybernetics2077.id("test"),
+            10f,
+            null,
+            true,
+            2f,
+            LogicalSide.SERVER);
+    post(david);
+    h.assertTrue(
+        Math.abs(((Number) call(david, "getHeadshotMultiplier")).floatValue() - 2.5f) < .001,
+        "David lost native TaCZ headshot multiplier");
     h.succeed();
   }
 

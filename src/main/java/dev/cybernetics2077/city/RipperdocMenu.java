@@ -45,7 +45,8 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     if (day == lastDay && cred == lastCred) return;
     if (!(p.level().getEntity(resident) instanceof CityResident npc)) return;
     var all = CyberwareCatalogue.offers();
-    int[] tiers = all.stream().mapToInt(CyberwareCatalogue.Offer::tier).toArray();
+    int[] tiers =
+        all.stream().mapToInt(o -> cred >= o.requiredStreetCred() ? o.tier() : 0).toArray();
     int optics =
         java.util.stream.IntStream.range(0, all.size())
             .filter(i -> all.get(i).item() == dev.cybernetics2077.Cybernetics2077.OPTICS.get())
@@ -134,6 +135,21 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     return count;
   }
 
+  public int prerequisites(CyberwareCatalogue.Offer offer) {
+    int count = 0;
+    if (offer.prerequisite() == null) return 0;
+    for (int i = 0; i < 36; i++)
+      if (owner.getInventory().getItem(i).is(offer.prerequisite()))
+        count += owner.getInventory().getItem(i).getCount();
+    return count;
+  }
+
+  private int prerequisiteSlot(Player p, CyberwareCatalogue.Offer offer) {
+    if (offer.prerequisite() == null) return -1;
+    for (int i = 0; i < 36; i++) if (p.getInventory().getItem(i).is(offer.prerequisite())) return i;
+    return -1;
+  }
+
   private int requisitionSlot(Player p, int tier) {
     for (int i = 0; i < 36; i++)
       if (p.getInventory().getItem(i).getItem() instanceof IconicRequisition chip
@@ -204,6 +220,12 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
       broadcastChanges();
       return false;
     }
+    int upgradeSlot = prerequisiteSlot(p, offer);
+    if (offer.prerequisite() != null && upgradeSlot < 0) {
+      data.set(6, 8);
+      broadcastChanges();
+      return false;
+    }
     int price = salvage ? DamagedCyberneticPart.price(offer) : offer.price();
     if (wallet.eddies() < price) {
       data.set(6, 1);
@@ -212,7 +234,8 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     }
     // All catalogue entries stack to one; reserve a free slot before charging.
     boolean partFreesSlot =
-        paymentSlot >= 0 && p.getInventory().getItem(paymentSlot).getCount() == 1;
+        paymentSlot >= 0 && p.getInventory().getItem(paymentSlot).getCount() == 1
+            || upgradeSlot >= 0 && p.getInventory().getItem(upgradeSlot).getCount() == 1;
     if (p.getInventory().getFreeSlot() < 0 && !partFreesSlot) {
       data.set(6, 2);
       broadcastChanges();
@@ -222,8 +245,15 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     if (!wallet.spend(price)) return false;
     ItemStack payment =
         paymentSlot >= 0 ? p.getInventory().removeItem(paymentSlot, 1) : ItemStack.EMPTY;
+    ItemStack upgrade =
+        upgradeSlot >= 0 ? p.getInventory().removeItem(upgradeSlot, 1) : ItemStack.EMPTY;
     if (!p.getInventory().add(item)) {
       wallet.credit(price);
+      if (!upgrade.isEmpty()) {
+        var rest = p.getInventory().getItem(upgradeSlot);
+        if (rest.isEmpty()) p.getInventory().setItem(upgradeSlot, upgrade);
+        else rest.grow(1);
+      }
       if (!payment.isEmpty()) {
         var rest = p.getInventory().getItem(paymentSlot);
         if (rest.isEmpty()) p.getInventory().setItem(paymentSlot, payment);

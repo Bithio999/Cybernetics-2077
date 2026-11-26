@@ -22,7 +22,11 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
  */
 @EventBusSubscriber(modid = Cybernetics2077.ID)
 public final class Sandevistan {
-  public record View(int tier, long end, double pace, boolean pvp, boolean apogee) {
+  public record View(int tier, long end, double pace, boolean pvp, boolean apogee, boolean david) {
+    public View(int tier, long end, double pace, boolean pvp, boolean apogee) {
+      this(tier, end, pace, pvp, apogee, false);
+    }
+
     public View(int tier, long end, double pace, boolean pvp) {
       this(tier, end, pace, pvp, false);
     }
@@ -41,7 +45,9 @@ public final class Sandevistan {
 
   public static int tier(Player p) {
     return Math.max(
-        AugmentRuntime.tier(p, Augment.DYNALAR_SANDEVISTAN),
+        Math.max(
+            AugmentRuntime.tier(p, Augment.DYNALAR_SANDEVISTAN),
+            AugmentRuntime.tier(p, Augment.DAVIDS_SANDEVISTAN)),
         AugmentRuntime.tier(p, Augment.MILITECH_APOGEE));
   }
 
@@ -49,7 +55,10 @@ public final class Sandevistan {
     return SandevistanModel.of(
         p instanceof ServerPlayer
             ? AugmentRuntime.tier(p, Augment.MILITECH_APOGEE) > 0
-            : client.apply(p).apogee);
+            : client.apply(p).apogee,
+        p instanceof ServerPlayer
+            ? AugmentRuntime.tier(p, Augment.DAVIDS_SANDEVISTAN) > 0
+            : client.apply(p).david);
   }
 
   public static boolean active(Player p) {
@@ -71,13 +80,14 @@ public final class Sandevistan {
     long now = AugmentRuntime.now(p);
     if (s.sandyEnd > 0)
       return Math.clamp(
-          (s.sandyEnd - now) / (20. * SandevistanModel.of(s.sandyApogee).duration(s.sandyProfile)),
+          (s.sandyEnd - now)
+              / (20. * SandevistanModel.of(s.sandyApogee, s.sandyDavid).duration(s.sandyProfile)),
           0,
           1);
     return Math.clamp(
         s.sandyCharge
             + Math.max(0, now - s.sandyClock)
-                / (20. * SandevistanModel.of(s.sandyApogee).recharge(s.sandyProfile)),
+                / (20. * SandevistanModel.of(s.sandyApogee, s.sandyDavid).recharge(s.sandyProfile)),
         0,
         1);
   }
@@ -88,7 +98,7 @@ public final class Sandevistan {
     s.sandyCharge =
         Math.clamp(
             (s.sandyEnd - when)
-                / (20. * SandevistanModel.of(s.sandyApogee).duration(s.sandyProfile)),
+                / (20. * SandevistanModel.of(s.sandyApogee, s.sandyDavid).duration(s.sandyProfile)),
             0,
             1);
     s.sandyClock = when;
@@ -121,6 +131,7 @@ public final class Sandevistan {
       double available = charge(p);
       s.sandyProfile = t;
       s.sandyApogee = model(p) == SandevistanModel.APOGEE;
+      s.sandyDavid = model(p) == SandevistanModel.DAVID;
       s.sandyCharge = available;
       s.sandyClock = now;
       s.sandyEnd = now + Math.max(1, Math.round(available * model(p).duration(t) * 20));
@@ -224,7 +235,7 @@ public final class Sandevistan {
     long now = AugmentRuntime.now(p);
     if (s.sandyEnd > 0
         && (tier(p) != s.sandyProfile
-            || (model(p) == SandevistanModel.APOGEE) != s.sandyApogee
+            || model(p) != SandevistanModel.of(s.sandyApogee, s.sandyDavid)
             || !p.isAlive()
             || p.isSpectator()
             || now >= s.sandyEnd)) stop(p, Math.min(now, s.sandyEnd));
@@ -242,7 +253,8 @@ public final class Sandevistan {
   public static void snapshot(ServerPlayer p, CompoundTag tag) {
     var s = AugmentRuntime.state(p);
     tag.putInt("sandyTier", tier(p));
-    tag.putBoolean("sandyIconic", model(p) == SandevistanModel.APOGEE);
+    tag.putBoolean("sandyIconic", model(p).iconic());
+    tag.putInt("sandyModel", model(p).ordinal());
     tag.putLong("sandyEnd", active(p) ? s.sandyEnd : 0);
     tag.putDouble("temporalPace", pace(p));
     tag.putBoolean("sandyPvp", p.server.isPvpAllowed());
@@ -251,6 +263,7 @@ public final class Sandevistan {
     tag.putLong("sandyClock", s.sandyClock);
     tag.putInt("sandyProfile", s.sandyProfile);
     tag.putBoolean("sandyApogee", s.sandyApogee);
+    tag.putBoolean("sandyDavid", s.sandyDavid);
     tag.putLong("sandyRearm", s.sandyRearm);
   }
 

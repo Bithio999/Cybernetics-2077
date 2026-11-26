@@ -33,9 +33,11 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.20.1 TaCZ HUD and basic-optics lock research](../research/TACZ-HUD-0.20.1.md).
 
+[0.21.0 David’s Sandevistan implementation and validation](DAVID-0.21.0.md).
+
 ## Edit the wiki
 
-The 67 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
+The 69 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
 
 ```sh
 python3 -m venv .venv-docs

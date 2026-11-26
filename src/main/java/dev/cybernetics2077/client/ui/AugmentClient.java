@@ -150,7 +150,9 @@ public final class AugmentClient {
       }
       if (s.getInt("sandyTier") > 0) {
         int profile = Math.clamp(s.getInt("sandyProfile"), 2, 5);
-        var battery = dev.cybernetics2077.temporal.SandevistanModel.of(s.getBoolean("sandyApogee"));
+        var battery =
+            dev.cybernetics2077.temporal.SandevistanModel.of(
+                s.getBoolean("sandyApogee"), s.getBoolean("sandyDavid"));
         boolean active = s.getLong("sandyEnd") > time;
         double charge =
             active
@@ -165,7 +167,9 @@ public final class AugmentClient {
             dev.cybernetics2077.client.temporal.SandevistanClient.KEY
                 .getTranslatedKeyMessage()
                 .getString(),
-            (s.getBoolean("sandyIconic") ? "APOGEE " : "SANDY ")
+            (s.getInt("sandyModel") == dev.cybernetics2077.temporal.SandevistanModel.DAVID.ordinal()
+                    ? "DAVID "
+                    : s.getBoolean("sandyIconic") ? "APOGEE " : "SANDY ")
                 + (active
                     ? seconds(s.getLong("sandyEnd"), time)
                     : Math.round(Math.clamp(charge, 0, 1) * 100) + "%"),
@@ -188,9 +192,12 @@ public final class AugmentClient {
   private static void badge(
       CyberCanvas c, float x, float y, String key, String text, boolean active) {
     int color = active ? 0xffff6b75 : 0xff71dbe4;
-    c.panel(x, y, 116, 18, 3, 0xcf09131d, color);
+    key = c.fit(key, 48, 10, true);
+    float label = Math.max(23, 11 + c.width(key, 10, true));
+    float width = Math.max(116, label + c.width(text, 8, false) + 6);
+    c.panel(x, y, width, 18, 3, 0xcf09131d, color);
     c.text(key, x + 5, y + 4, 10, color);
-    c.body(text, x + 23, y + 5, 8, color);
+    c.body(text, x + label, y + 5, 8, color);
   }
 
   @EventBusSubscriber(

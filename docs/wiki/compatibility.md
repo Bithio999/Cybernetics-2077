@@ -15,7 +15,7 @@ TaCZ is optional. Tested versions are **1.1.8-hotfix2 on Forge 1.20.1** and **1.
 | Shock Absorber | Reduces camera recoil by 8% per tier. Its knockback resistance also works while aiming a gun. |
 | Immovable Force | Reduces camera recoil by 7% per tier while grounded and still. Stacks multiplicatively with Shock Absorber; combined recoil reduction is capped at 85%. |
 | Weapon critical bonuses | Apply once to a gun hit, including the native headshot multiplier. |
-| Apogee | Its headshot bonus also applies to TaCZ headshots. |
+| Apogee / David’s | Their +20% / +25% headshot bonuses also apply to TaCZ headshots. David’s requires NeoForge 0.21.0. |
 | Sandevistan | Bullets and weapon firing intervals follow relative local time, including burst spacing. Attachments, heat and the native reload system remain owned by TaCZ. |
 
 Basic Kiroshi Optics retain Smart Link locks normally. While aiming a TaCZ gun, Smart Link shows its normal lock indicator. Opening the scanner fades the gun’s ammunition/heat display, interaction hints, crosshair and hit markers with the native HUD; releasing it restores them.

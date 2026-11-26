@@ -40,7 +40,8 @@ public enum Augment {
   HANDLE_WRAP("handle_wrap", CyberwareCategory.HANDS, 3, 8),
   SHOCK_ABSORBER("shock_absorber", CyberwareCategory.HANDS, 1, 12),
   IMMOVABLE_FORCE("immovable_force", CyberwareCategory.HANDS, 2, 35),
-  MILITECH_APOGEE("militech_apogee_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 44);
+  MILITECH_APOGEE("militech_apogee_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 44),
+  DAVIDS_SANDEVISTAN("davids_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 60);
 
   public final String id;
   public final CyberwareCategory category;
@@ -62,11 +63,12 @@ public enum Augment {
         || this == BLOOD_PUMP
         || this == OPTICAL_CAMO
         || this == DYNALAR_SANDEVISTAN
-        || this == MILITECH_APOGEE;
+        || this == MILITECH_APOGEE
+        || this == DAVIDS_SANDEVISTAN;
   }
 
   public boolean iconic() {
-    return this == MILITECH_APOGEE;
+    return this == MILITECH_APOGEE || this == DAVIDS_SANDEVISTAN;
   }
 
   public boolean optics() {
@@ -106,6 +108,15 @@ public enum Augment {
 
   public List<String> details(int t) {
     return switch (this) {
+      case DAVIDS_SANDEVISTAN ->
+          List.of(
+              "O: toggle David's Sandevistan. 95% relative slowing; 32-block bubble.",
+              "Battery: 10 seconds. Full recharge: 40 seconds. Charge is saved.",
+              "+25% weapon critical chance; +30% critical damage; +25% projectile headshot damage.",
+              "Hostile kills: +1 second (max 10); remove 0.88 food exhaustion.",
+              "Second Wind: hostile kills heal 10% maximum health, at most once per second.",
+              "Rearm: 1 second. At least one tick of charge required.",
+              "Purchase: Street Cred 50, Tier 5 Iconic chip, inventory Apogee and eddies.");
       case MILITECH_APOGEE ->
           List.of(
               "O: toggle Apogee. 85% relative slowing; 32-block bubble.",

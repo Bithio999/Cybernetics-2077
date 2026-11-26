@@ -13,8 +13,16 @@ public final class CyberwareCatalogue {
       return item instanceof CyberwareItem implant && implant.iconic();
     }
 
+    public Item prerequisite() {
+      return item instanceof AugmentItem a && a.augment() == Augment.DAVIDS_SANDEVISTAN
+          ? Cybernetics2077.augment(Augment.MILITECH_APOGEE, 5)
+          : null;
+    }
+
     public int requiredStreetCred() {
-      return (tier - 1) * 10;
+      return item instanceof AugmentItem a && a.augment() == Augment.DAVIDS_SANDEVISTAN
+          ? 50
+          : (tier - 1) * 10;
     }
   }
 
@@ -59,7 +67,13 @@ public final class CyberwareCatalogue {
             ? 3000
             : item instanceof QuickhackItem ? 300 : item instanceof MantisBladesItem ? 1600 : 1000;
     list.add(
-        new Offer(item, t, base * t * t, item instanceof CyberwareItem i ? i.category() : null));
+        new Offer(
+            item,
+            t,
+            item instanceof AugmentItem a && a.augment() == Augment.DAVIDS_SANDEVISTAN
+                ? 150000
+                : base * t * t,
+            item instanceof CyberwareItem i ? i.category() : null));
   }
 
   private CyberwareCatalogue() {}

@@ -157,6 +157,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
         int required = offer.requiredStreetCred();
         b.setWidth(offer.iconic() ? 86 : 40);
         b.active &= !offer.iconic() || menu.requisitions(offer.tier()) > 0;
+        b.active &= offer.prerequisite() == null || menu.prerequisites(offer) > 0;
         b.setMessage(Component.literal(offer.iconic() ? "ACQUIRE" : "BUY"));
         b.setTooltip(
             Tooltip.create(
@@ -171,7 +172,12 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
                                 + " Iconic requisition chip ("
                                 + menu.requisitions(offer.tier())
                                 + " owned)."
-                            : ". Keeps your damaged parts."))));
+                            : ". Keeps your damaged parts.")
+                        + (offer.prerequisite() != null
+                            ? " Consumes an inventory Apogee ("
+                                + menu.prerequisites(offer)
+                                + " owned). Unequip it first."
+                            : ""))));
       }
       var trade = trades.get(n);
       trade.visible =
@@ -276,6 +282,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
               case 5 -> "STOCK CHANGED. CHECK TODAY'S SELECTION.";
               case 6 -> "REQUIRES A MATCHING-TIER PART AND AN IMPLANT.";
               case 7 -> "ICONIC: MATCHING REQUISITION CHIP + EDDIES REQUIRED.";
+              case 8 -> "REQUIRES AN APOGEE IN YOUR INVENTORY (UNEQUIP IT FIRST).";
               default ->
                   rows.stream().anyMatch(i -> CyberwareCatalogue.offers().get(i).iconic())
                       ? "ACQUIRE: matching chip + full price. No salvage discount."

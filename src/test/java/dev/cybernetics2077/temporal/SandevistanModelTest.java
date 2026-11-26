@@ -34,4 +34,22 @@ class SandevistanModelTest {
     }
     assertEquals(SandevistanModel.DYNALAR, SandevistanModel.of(false));
   }
+
+  @Test
+  void davidHasNinetyFivePercentRelativeSlowAndDistinctBattery() {
+    var model = SandevistanModel.DAVID;
+    double strength = TemporalRules.acceleration(model.slowing(5));
+    assertEquals(
+        .05, TemporalRules.pace(1, strength) / TemporalRules.pace(strength, strength), 1e-9);
+    assertEquals(.0625, TemporalRules.pace(1, strength), 1e-9);
+    assertEquals(1.25, TemporalRules.pace(strength, strength), 1e-9);
+    assertEquals(10, model.duration(5));
+    assertEquals(40, model.recharge(5));
+    assertEquals(.25f, model.critChance(5));
+    assertEquals(.30f, model.critDamage(5));
+    assertEquals(1.25f, model.headshotMultiplier());
+    assertEquals(20, model.killExtensionTicks());
+    assertEquals(SandevistanModel.DAVID, SandevistanModel.of(false, true));
+    assertEquals(1. / 200, model.minimumCharge(5), 1e-9);
+  }
 }

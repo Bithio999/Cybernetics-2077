@@ -20,7 +20,8 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
   public long sandyEnd, sandyClock, sandyRearm;
   public double sandyCharge = 1, lastSandyPace = 1;
   public int sandyProfile = 2;
-  public boolean sandyApogee;
+  public boolean sandyApogee, sandyDavid;
+  public long sandyHealReady;
   public boolean wasSandy;
   public long microReady, wrapReady, wrapEnd, smartUntil;
   public UUID smartTarget;
@@ -48,6 +49,8 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
     t.putDouble("sandyCharge", sandyCharge);
     t.putInt("sandyProfile", sandyProfile);
     t.putBoolean("sandyApogee", sandyApogee);
+    t.putBoolean("sandyDavid", sandyDavid);
+    t.putLong("sandyHealReady", sandyHealReady);
     t.putLong("berserkEnd", berserkEnd);
     t.putLong("berserkReady", berserkReady);
     t.putLong("camoEnd", camoEnd);
@@ -81,6 +84,8 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
     sandyCharge = t.contains("sandyCharge") ? Math.clamp(t.getDouble("sandyCharge"), 0, 1) : 1;
     sandyProfile = t.contains("sandyProfile") ? Math.clamp(t.getInt("sandyProfile"), 2, 5) : 2;
     sandyApogee = t.getBoolean("sandyApogee");
+    sandyDavid = t.getBoolean("sandyDavid");
+    sandyHealReady = t.getLong("sandyHealReady");
     iceReady = t.getLong("iceReady");
     heartReady = t.getLong("heartReady");
     biomonitorReady = t.getLong("biomonitorReady");

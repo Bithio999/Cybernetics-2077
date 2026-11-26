@@ -36,7 +36,8 @@ Stock rotates at **Overworld dawn**, every 24,000 ticks, including after sleepin
 | Ordinary implant / cyberdeck | 1,000 × tier² |
 | Mantis Blades | 1,600 × tier² |
 | Quickhack chip | 300 × tier² |
-| Iconic implant | 3,000 × tier² + one matching-tier requisition chip |
+| Apogee Iconic | €$75,000 + one Tier 5 requisition chip |
+| David’s Iconic | €$150,000 + one Tier 5 requisition chip + one unequipped Apogee |
 
 A full inventory, insufficient eddies, or an offer rotating out prevents purchase without payment.
 
@@ -48,6 +49,6 @@ Stock and Street Cred requirements still apply. Parts work for ordinary implants
 
 ## Iconic purchases
 
-[Iconics](iconics.md) appear in the same daily assortment once their tier qualifies. Their gold-accented rows use **ACQUIRE**, which requires full payment and **one matching-tier Iconic Requisition Chip**. Hover for the price and your chip count. There is no damaged-part discount. The first is [Militech “Apogee” Sandevistan](militech-apogee.md), at Street Cred 40.
+[Iconics](iconics.md) appear in the same daily assortment once their tier qualifies. Their gold-accented rows use **ACQUIRE**, which requires full payment and **one matching-tier Iconic Requisition Chip**. Hover for the price and your chip count. There is no damaged-part discount. [Militech “Apogee” Sandevistan](militech-apogee.md) unlocks at Street Cred 40. [David’s Sandevistan](davids-sandevistan.md) requires Street Cred **50** and also consumes an **unequipped Apogee** from your inventory.
 
 [Installing cyberware](installation.md) · [Eddies and Street Cred](street-cred.md) · [First delivery](contracts.md)
