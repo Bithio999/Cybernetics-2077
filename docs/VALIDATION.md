@@ -2,6 +2,25 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Iconic requisitions and Apogee (0.18.0)
+
+**94 JVM tests, 129 dedicated-server GameTests, native purchase/install/activation review, clean release audit and strict wiki build pass.** [Results](review/results/iconics-0.18.0.json) · [Reference mechanics and implementation](research/ICONICS-APOGEE-0.18.0.md) · [Iconic player guide](wiki/iconics.md) · [Apogee stats](wiki/militech-apogee.md).
+
+Five added JVM cases cover rare-drop odds, invalid loadouts, model-specific battery/bonuses, equal/unequal-user relative speeds and unchanged Dynalar tiers. Eight new server scenarios exercise mandatory exact-tier chip payment through every purchase path, atomic delivery and inventory-slot reclamation, funds/reputation/stale-stock failures, chip plus salvage loot and duplicate/mob-loot guards, different/equal models and PvP, saved/legacy battery state, native enemy deaths and passive-animal exclusion, projectile impact-height/damage matching, and installed capacity/socket/client state.
+
+The native integrated-client fixture uses the real shop button and inventory synchronization: disabled acquisition without a chip, enabled acquisition after receipt, €$75,000 payment and chip consumption, actual clinic installation, Iconic equipment details, O activation, 0.1875× ordinary environmental pace, first-person full-body echoes and early-off recharge. Screenshots are direct client output, without generated frames or substituted UI artwork. The existing Dynalar client playthrough also runs before these scenarios.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PiconicReview
+./gradlew clean test build
+python3 scripts/verify-release.py
+python3 scripts/check-wiki.py
+mkdocs build --strict
+```
+
+The native environment uses 1280×720 software OpenGL in a disposable world, without working audio or session services. This is not a hardware benchmark or authenticated two-computer multiplayer test. Headshot tests feed native impact events at chosen heights into actual damage calls; they do not cover every target shape or external projectile implementation. Review fixtures are excluded from the clean release.
+
 ## Local time bubble and first-person body trails (0.17.0)
 
 **89 JVM tests, 121 dedicated-server GameTests, the native bubble review, the established trail review, clean release audit and strict wiki build pass.** [Results](review/results/bubble-0.17.0.json) · [Clock/scheduler design and compatibility](research/SANDEVISTAN-BUBBLE-0.17.0.md) · [Player guide](wiki/dynalar-sandevistan.md).

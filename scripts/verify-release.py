@@ -8,11 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.17.0.jar'
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.18.0.jar'
 with ZipFile(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.17.0'
+    assert metadata['mods'][0]['version']=='0.18.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -26,6 +26,10 @@ with ZipFile(jar) as z:
     for required in ('dev/cybernetics2077/Cybernetics2077.class',
                      'dev/cybernetics2077/mob/EnhancedMobs.class',
                      'dev/cybernetics2077/mob/SalvageOdds.class',
+                     'dev/cybernetics2077/mob/IconicOdds.class',
+                     'dev/cybernetics2077/mob/IconicRequisition.class',
+                     'dev/cybernetics2077/temporal/SandevistanModel.class',
+                     'dev/cybernetics2077/temporal/ApogeeEffects.class',
                      'dev/cybernetics2077/mob/DamagedCyberneticPart.class',
                      'dev/cybernetics2077/client/EnhancedMobLayer.class',
                      'dev/cybernetics2077/city/DeliveryContracts.class',
@@ -136,11 +140,18 @@ with ZipFile(jar) as z:
             assert f'assets/cybernetics2077/models/item/{item}.json' in names
         for tier in range(1,first):
             assert f'assets/cybernetics2077/models/item/{kind}_tier_{tier}.json' not in names
+    for tier in range(1, 6):
+        chip=f'iconic_requisition_tier_{tier}'
+        assert 'item.cybernetics2077.'+chip in lang
+        assert f'assets/cybernetics2077/models/item/{chip}.json' in names
+        png=z.read(f'assets/cybernetics2077/textures/item/{chip}.png')
+        assert struct.unpack('>II',png[16:24])==(32,32)
+    assert 'cybernetics2077.implant.iconic' in lang
     augment_starts = {
         'ex_disk': 3, 'memory_boost': 2, 'biodyne_berserk': 2, 'kiroshi_clairvoyant_optics': 3,
         'bionic_joints': 1, 'epimorphic_skeleton': 4, 'neofiber': 3, 'adrenaline_converter': 1,
         'blood_pump': 2, 'heal_on_kill': 1, 'subdermal_armor': 1, 'optical_camo': 2,
-        'reinforced_tendons': 2, 'fortified_ankles': 2, 'dynalar_sandevistan': 2,
+        'reinforced_tendons': 2, 'fortified_ankles': 2, 'dynalar_sandevistan': 2, 'militech_apogee_sandevistan': 5,
         'ram_upgrade': 1,
         'self_ice': 3,
         'kiroshi_doomsayer_optics': 1,

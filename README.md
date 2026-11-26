@@ -8,7 +8,7 @@ A standalone **Minecraft 1.21.1 / NeoForge** mod inspired by Cyberpunk 2077. Ins
 
 Individual item pages, tier stats, controls, acquisition and village guides.
 
-**[Download version 0.17.0](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.17.0.jar)**
+**[Download version 0.18.0](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.18.0.jar)**
 
 Requires Minecraft **1.21.1**, NeoForge **21.1.248+ for 1.21.1**, and Java **21**. Install the same version on server and clients. Replace an older JAR instead of keeping both.
 
@@ -16,6 +16,7 @@ Requires Minecraft **1.21.1**, NeoForge **21.1.248+ for 1.21.1**, and Java **21*
 | --- | --- |
 | First steps and your first implant | [Getting started](docs/wiki/getting-started.md) |
 | Implant effects and tier stats | [Cyberware](docs/wiki/cyberware.md) |
+| Iconic purchases and the Apogee Sandevistan | [Iconics](docs/wiki/iconics.md) |
 | Decks, RAM and program slots | [Cyberdecks](docs/wiki/cyberdecks.md) |
 | Quickhack costs and damage types | [Quickhacks](docs/wiki/quickhacks.md) |
 | Daily shops, currency and contracts | [Village services](docs/wiki/ripperdocs.md) |

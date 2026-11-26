@@ -328,7 +328,7 @@
   "item.cybernetics2077.dynalar_sandevistan_tier_4": "Dynalar Sandevistan",
   "item.cybernetics2077.dynalar_sandevistan_tier_5": "Dynalar Sandevistan",
   "key.cybernetics2077.sandevistan": "Toggle Sandevistan",
-  "cybernetics2077.sandy.recharging": "Sandevistan recharging — requires 20% charge.",
+  "cybernetics2077.sandy.recharging": "Sandevistan recharging — insufficient charge or rearming.",
   "subtitles.cybernetics2077.sandy_on": "Sandevistan engages",
   "subtitles.cybernetics2077.sandy_off": "Sandevistan disengages",
   "subtitles.cybernetics2077.sandy_hum": "Temporal processor humming",
@@ -386,5 +386,16 @@
   "death.attack.mantis_bleed": "%1$s was overcome by cyberware",
   "death.attack.mantis_bleed.player": "%1$s was overcome by %2$s’s cyberware",
   "death.attack.hand_discharge": "%1$s was overcome by cyberware",
-  "death.attack.hand_discharge.player": "%1$s was overcome by %2$s’s cyberware"
+  "death.attack.hand_discharge.player": "%1$s was overcome by %2$s’s cyberware",
+  "cybernetics2077.augment.militech_apogee_sandevistan": "Militech “Apogee” Sandevistan",
+  "item.cybernetics2077.militech_apogee_sandevistan_tier_5": "Militech “Apogee” Sandevistan",
+  "cybernetics2077.implant.iconic": "Iconic",
+  "cybernetics2077.iconic.requisition": "Authorizes one Tier %s Iconic cyberware purchase.",
+  "cybernetics2077.iconic.requirements": "Requires current ripperdoc stock, Street Cred and full Iconic price.",
+  "cybernetics2077.iconic.consumed": "Consumed on purchase. Does not grant a discount or an implant directly.",
+  "item.cybernetics2077.iconic_requisition_tier_1": "Iconic Requisition Chip",
+  "item.cybernetics2077.iconic_requisition_tier_2": "Iconic Requisition Chip",
+  "item.cybernetics2077.iconic_requisition_tier_3": "Iconic Requisition Chip",
+  "item.cybernetics2077.iconic_requisition_tier_4": "Iconic Requisition Chip",
+  "item.cybernetics2077.iconic_requisition_tier_5": "Iconic Requisition Chip"
 }

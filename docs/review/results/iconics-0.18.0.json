@@ -1,0 +1,48 @@
+{
+  "version": "0.18.0",
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "status": "passed",
+  "jvmTests": {
+    "tests": 94,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "addedJvmTests": 5,
+  "serverGameTests": {
+    "tests": 129,
+    "added": 8,
+    "failures": 0,
+    "status": "All 129 required tests passed"
+  },
+  "nativeStatus": "PASS: real stock screen and disabled chip gate; chip synchronization; native purchase, payment and installation; Iconic detail page; O activation with 85% relative time bubble; first-person body echoes; early off and recharge HUD.",
+  "nativeMeasurements": {
+    "tier": 5,
+    "environmentPace": 0.1875,
+    "visibleOwnEchoes": 9,
+    "price": 75000
+  },
+  "releaseVerifier": "passed",
+  "wiki": {
+    "pages": 67,
+    "itemProgramEntries": 49,
+    "strictBuild": "passed"
+  },
+  "jarSha256": "49c2f8f5dbb16cc9a177a0d24c954026793977ead5d492d3b573c8e876b31eb6",
+  "screenshots": {
+    "apogee-details-0.18.0.png": "3edee592f84f6fe87f60b7c227fe1f4994a2d01a08c20d47da1f693864405bc2",
+    "apogee-ripperdoc-stock-0.18.0.png": "a720a06dd0af422a3be2a644f3696b9aa6c8ea5755d1ec340d6bbcfc6e0625a4",
+    "apogee-first-person-0.18.0.png": "bdd3552b51c16a8b1184418c608536d847d92e34c670248fe8f4a9b4b04b807f"
+  },
+  "references": [
+    "https://gamestegy.com/cyberpunk-2077/wiki/3049/militech-apogee-sandevistan",
+    "https://gamestegy.com/cyberpunk-2077/wiki/cyberware"
+  ],
+  "limitations": [
+    "Native review used an integrated disposable world at 1280x720 with software OpenGL, not a hardware performance benchmark or authenticated two-computer multiplayer.",
+    "No working audio device or session-service connection in the native environment.",
+    "Headshot fixtures supply native impact events at chosen heights into actual damage calls, not full trajectory coverage for every target or external projectile implementation.",
+    "Minecraft stamina adaptation removes food exhaustion; it does not create food or saturation. Tier 1-4 requisition chips are reserved for future Iconics; only Tier 5 Apogee is sold in this version."
+  ]
+}

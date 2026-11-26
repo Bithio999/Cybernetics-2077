@@ -2,9 +2,9 @@
 
 A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod inspired by Cyberpunk 2077.
 
-**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.17.0**
+**Minecraft 1.21.1 · NeoForge 21.1.248+ · Current version: 0.18.0**
 
-[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.17.0.jar)
+[Download the mod](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.18.0.jar)
 [Start playing](getting-started.md)
 
 ## Find what you need
@@ -21,7 +21,7 @@ A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod 
 
     Every implant, organized by body system, with effects and tier stats.
 
-    [Browse cyberware](cyberware.md) · [Compare cyberdecks](cyberdecks.md)
+    [Browse cyberware](cyberware.md) · [Iconics](iconics.md) · [Compare cyberdecks](cyberdecks.md)
 
 - **Quickhacks**
 
@@ -37,7 +37,7 @@ A player guide for **Cybernetics 2077**, the standalone Minecraft cyberware mod 
 
 - **Chromed hostiles**
 
-    Rare enhanced mobs, tiered salvage and matching-tier implant discounts.
+    Rare enhanced mobs, tiered salvage, implant discounts and Iconic requisition chips.
 
     [Mobs and salvage](enhanced-mobs.md)
 

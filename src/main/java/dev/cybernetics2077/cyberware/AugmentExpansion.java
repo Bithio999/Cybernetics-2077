@@ -135,8 +135,8 @@ public final class AugmentExpansion {
         AugmentRuntime.berserk(p) ? (AugmentRuntime.tier(p, BIODYNE_BERSERK) - 1) * .05f : 0;
     float sandy =
         dev.cybernetics2077.temporal.Sandevistan.active(p)
-            ? dev.cybernetics2077.temporal.TemporalRules.critChance(
-                dev.cybernetics2077.temporal.Sandevistan.tier(p))
+            ? dev.cybernetics2077.temporal.Sandevistan.model(p)
+                .critChance(dev.cybernetics2077.temporal.Sandevistan.tier(p))
             : 0;
     return Math.min(
         .5f,
@@ -152,8 +152,8 @@ public final class AugmentExpansion {
     return 1.5f
         * (dev.cybernetics2077.temporal.Sandevistan.active(p)
             ? 1
-                + dev.cybernetics2077.temporal.TemporalRules.critDamage(
-                    dev.cybernetics2077.temporal.Sandevistan.tier(p))
+                + dev.cybernetics2077.temporal.Sandevistan.model(p)
+                    .critDamage(dev.cybernetics2077.temporal.Sandevistan.tier(p))
             : 1)
         * (AugmentRuntime.berserk(p)
             ? 1 + (AugmentRuntime.tier(p, BIODYNE_BERSERK) - 1) * .25f

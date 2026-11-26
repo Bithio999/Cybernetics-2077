@@ -3,6 +3,7 @@ package dev.cybernetics2077.city;
 import dev.cybernetics2077.bench.CyberneticsBenchMenu;
 import dev.cybernetics2077.cyberware.CyberwareItem;
 import dev.cybernetics2077.mob.DamagedCyberneticPart;
+import dev.cybernetics2077.mob.IconicRequisition;
 import java.util.*;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -123,6 +124,23 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     return -1;
   }
 
+  public int requisitions(int tier) {
+    int count = 0;
+    for (int i = 0; i < 36; i++) {
+      var stack = owner.getInventory().getItem(i);
+      if (stack.getItem() instanceof IconicRequisition chip && chip.tier().level == tier)
+        count += stack.getCount();
+    }
+    return count;
+  }
+
+  private int requisitionSlot(Player p, int tier) {
+    for (int i = 0; i < 36; i++)
+      if (p.getInventory().getItem(i).getItem() instanceof IconicRequisition chip
+          && chip.tier().level == tier) return i;
+    return -1;
+  }
+
   @Override
   protected boolean installationActive() {
     return tab() == 1;
@@ -171,8 +189,17 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
       broadcastChanges();
       return false;
     }
-    int partSlot = salvage ? partSlot(p, offer.tier()) : -1;
-    if (salvage && (!(offer.item() instanceof CyberwareItem) || partSlot < 0)) {
+    // Neither full-price nor salvage packets can bypass an Iconic's authorization.
+    int paymentSlot =
+        offer.iconic()
+            ? requisitionSlot(p, offer.tier())
+            : salvage ? partSlot(p, offer.tier()) : -1;
+    if (offer.iconic() && (salvage || paymentSlot < 0)) {
+      data.set(6, 7);
+      broadcastChanges();
+      return false;
+    }
+    if (salvage && (!(offer.item() instanceof CyberwareItem) || paymentSlot < 0)) {
       data.set(6, 6);
       broadcastChanges();
       return false;
@@ -184,7 +211,8 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
       return false;
     }
     // All catalogue entries stack to one; reserve a free slot before charging.
-    boolean partFreesSlot = salvage && p.getInventory().getItem(partSlot).getCount() == 1;
+    boolean partFreesSlot =
+        paymentSlot >= 0 && p.getInventory().getItem(paymentSlot).getCount() == 1;
     if (p.getInventory().getFreeSlot() < 0 && !partFreesSlot) {
       data.set(6, 2);
       broadcastChanges();
@@ -192,12 +220,13 @@ public final class RipperdocMenu extends CyberneticsBenchMenu {
     }
     var item = new ItemStack(offer.item());
     if (!wallet.spend(price)) return false;
-    ItemStack payment = salvage ? p.getInventory().removeItem(partSlot, 1) : ItemStack.EMPTY;
+    ItemStack payment =
+        paymentSlot >= 0 ? p.getInventory().removeItem(paymentSlot, 1) : ItemStack.EMPTY;
     if (!p.getInventory().add(item)) {
       wallet.credit(price);
       if (!payment.isEmpty()) {
-        var rest = p.getInventory().getItem(partSlot);
-        if (rest.isEmpty()) p.getInventory().setItem(partSlot, payment);
+        var rest = p.getInventory().getItem(paymentSlot);
+        if (rest.isEmpty()) p.getInventory().setItem(paymentSlot, payment);
         else rest.grow(1);
       }
       data.set(6, 2);

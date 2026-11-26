@@ -155,14 +155,14 @@ public final class AugmentClient {
       }
       if (s.getInt("sandyTier") > 0) {
         int profile = Math.clamp(s.getInt("sandyProfile"), 2, 5);
+        var battery = dev.cybernetics2077.temporal.SandevistanModel.of(s.getBoolean("sandyApogee"));
         boolean active = s.getLong("sandyEnd") > time;
         double charge =
             active
-                ? (s.getLong("sandyEnd") - time)
-                    / (20. * dev.cybernetics2077.temporal.TemporalRules.duration(profile))
+                ? (s.getLong("sandyEnd") - time) / (20. * battery.duration(profile))
                 : s.getDouble("sandyCharge")
                     + Math.max(0, time - s.getLong("sandyClock"))
-                        / (20. * dev.cybernetics2077.temporal.TemporalRules.recharge(profile));
+                        / (20. * battery.recharge(profile));
         badge(
             c,
             5,
@@ -170,7 +170,7 @@ public final class AugmentClient {
             dev.cybernetics2077.client.temporal.SandevistanClient.KEY
                 .getTranslatedKeyMessage()
                 .getString(),
-            "SANDY "
+            (s.getBoolean("sandyIconic") ? "APOGEE " : "SANDY ")
                 + (active
                     ? seconds(s.getLong("sandyEnd"), time)
                     : Math.round(Math.clamp(charge, 0, 1) * 100) + "%"),

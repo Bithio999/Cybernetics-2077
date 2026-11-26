@@ -288,6 +288,17 @@ public final class EnhancedMobs {
                 mob.getY() + .3,
                 mob.getZ(),
                 new ItemStack(Cybernetics2077.DAMAGED_PARTS.get(tier - 1).get())));
+    if (mob.getRandom().nextDouble() < IconicOdds.chance(l.averageTier, l.count)) {
+      int iconicTier = SalvageOdds.roll(l.averageTier, l.count, mob.getRandom().nextDouble());
+      e.getDrops()
+          .add(
+              new ItemEntity(
+                  mob.level(),
+                  mob.getX(),
+                  mob.getY() + .3,
+                  mob.getZ(),
+                  new ItemStack(Cybernetics2077.ICONIC_REQUISITIONS.get(iconicTier - 1).get())));
+    }
     state(mob).putBoolean("salvaged", true);
   }
 

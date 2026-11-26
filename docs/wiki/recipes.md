@@ -6,6 +6,8 @@ Buy implants, cyberdecks and quickhack chips from [ripperdocs](ripperdocs.md). T
 
 [Damaged cybernetic parts](enhanced-mobs.md#using-a-part) give a matching-tier implant discount.
 
+[Iconics](iconics.md) require a matching-tier requisition chip from chromed mobs plus their higher purchase price. Damaged parts cannot discount them.
+
 ## Cybernetics Bench
 
 | | | |

@@ -42,9 +42,13 @@ Examples, rounded:
 
 At a ripperdoc's **Purchase** tab, choose **−30%** beside an implant. You pay **70% of its normal price plus one matching-tier damaged part**. Hover the button to see the discounted price and how many matching parts you have. **BUY** pays full price and keeps your parts.
 
-The implant must be in today's stock, and you still need its normal Street Cred. Parts work for implants and cyberdecks, **not quickhack chips**. Discounts do not stack. The part is consumed only when the purchase succeeds. Keep parts in your main inventory or hotbar.
+The implant must be in today's stock, and you still need its normal Street Cred. Parts work for ordinary implants and cyberdecks, **not quickhack chips or Iconics**. Discounts do not stack. The part is consumed only when the purchase succeeds. Keep parts in your main inventory or hotbar.
 
 ![Ripperdoc salvage purchases](../images/ripperdoc-salvage-discount.png)
+
+## Iconic requisition chips
+
+Chromed mobs can also drop a rare, tiered [Iconic Requisition Chip](iconics.md). It authorizes one matching-tier Iconic purchase from the doctor's current stock, with full eddie and Street Cred requirements. It is a separate bonus drop and does not replace the damaged part.
 
 Server owners can adjust `enhancedMobSpawnChance` in the mod's server configuration. The default is `0.02`; `0` disables new variants without removing existing ones.
 

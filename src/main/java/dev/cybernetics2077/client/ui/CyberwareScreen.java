@@ -355,11 +355,13 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
       c.right(item.capacityCost() + " CAPACITY", 900, 505, 17, 0xffe3b76f);
       if (stack.getItem() instanceof AugmentItem implant) {
         c.glowText(
-            implant.augment().active() ? "ACTIVE CYBERWARE" : "IMPLANT EFFECTS",
+            implant.iconic()
+                ? "ICONIC // ACTIVE CYBERWARE"
+                : implant.augment().active() ? "ACTIVE CYBERWARE" : "IMPLANT EFFECTS",
             434,
             546,
             23,
-            CYAN);
+            implant.iconic() ? item.tier().color : CYAN);
         var lines = implant.augment().details(implant.tier().level);
         for (int i = 0; i < lines.size(); i++)
           c.body(c.fit(lines.get(i), 465, 16, false), 434, 580 + i * 16, 16, WHITE);

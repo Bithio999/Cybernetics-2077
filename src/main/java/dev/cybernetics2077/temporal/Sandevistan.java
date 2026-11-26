@@ -22,7 +22,11 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
  */
 @EventBusSubscriber(modid = Cybernetics2077.ID)
 public final class Sandevistan {
-  public record View(int tier, long end, double pace, boolean pvp) {}
+  public record View(int tier, long end, double pace, boolean pvp, boolean apogee) {
+    public View(int tier, long end, double pace, boolean pvp) {
+      this(tier, end, pace, pvp, false);
+    }
+  }
 
   public static java.util.function.Function<Player, View> client = p -> new View(0, 0, 1, false);
 
@@ -36,7 +40,16 @@ public final class Sandevistan {
       ThreadLocal.withInitial(WeakHashMap::new);
 
   public static int tier(Player p) {
-    return AugmentRuntime.tier(p, Augment.DYNALAR_SANDEVISTAN);
+    return Math.max(
+        AugmentRuntime.tier(p, Augment.DYNALAR_SANDEVISTAN),
+        AugmentRuntime.tier(p, Augment.MILITECH_APOGEE));
+  }
+
+  public static SandevistanModel model(Player p) {
+    return SandevistanModel.of(
+        p instanceof ServerPlayer
+            ? AugmentRuntime.tier(p, Augment.MILITECH_APOGEE) > 0
+            : client.apply(p).apogee);
   }
 
   public static boolean active(Player p) {
@@ -50,17 +63,21 @@ public final class Sandevistan {
   public static double strength(Player p) {
     if (!active(p)) return 1;
     int t = p instanceof ServerPlayer ? tier(p) : client.apply(p).tier;
-    return TemporalRules.acceleration(TemporalRules.slowing(t));
+    return TemporalRules.acceleration(model(p).slowing(t));
   }
 
   public static double charge(ServerPlayer p) {
     var s = AugmentRuntime.state(p);
     long now = AugmentRuntime.now(p);
     if (s.sandyEnd > 0)
-      return Math.clamp((s.sandyEnd - now) / (20. * TemporalRules.duration(s.sandyProfile)), 0, 1);
+      return Math.clamp(
+          (s.sandyEnd - now) / (20. * SandevistanModel.of(s.sandyApogee).duration(s.sandyProfile)),
+          0,
+          1);
     return Math.clamp(
         s.sandyCharge
-            + Math.max(0, now - s.sandyClock) / (20. * TemporalRules.recharge(s.sandyProfile)),
+            + Math.max(0, now - s.sandyClock)
+                / (20. * SandevistanModel.of(s.sandyApogee).recharge(s.sandyProfile)),
         0,
         1);
   }
@@ -69,7 +86,11 @@ public final class Sandevistan {
     var s = AugmentRuntime.state(p);
     if (s.sandyEnd == 0) return;
     s.sandyCharge =
-        Math.clamp((s.sandyEnd - when) / (20. * TemporalRules.duration(s.sandyProfile)), 0, 1);
+        Math.clamp(
+            (s.sandyEnd - when)
+                / (20. * SandevistanModel.of(s.sandyApogee).duration(s.sandyProfile)),
+            0,
+            1);
     s.sandyClock = when;
     s.sandyEnd = 0;
     s.sandyRearm = when + 20;
@@ -93,15 +114,16 @@ public final class Sandevistan {
               .6f,
               1.5f);
     } else {
-      if (now < s.sandyRearm || charge(p) < .2) {
+      if (now < s.sandyRearm || charge(p) + 1e-9 < model(p).minimumCharge(t)) {
         p.displayClientMessage(Component.translatable("cybernetics2077.sandy.recharging"), true);
         return false;
       }
       double available = charge(p);
       s.sandyProfile = t;
+      s.sandyApogee = model(p) == SandevistanModel.APOGEE;
       s.sandyCharge = available;
       s.sandyClock = now;
-      s.sandyEnd = now + Math.max(1, Math.round(available * TemporalRules.duration(t) * 20));
+      s.sandyEnd = now + Math.max(1, Math.round(available * model(p).duration(t) * 20));
       invalidate(p.level());
       p.level()
           .playSound(
@@ -201,8 +223,11 @@ public final class Sandevistan {
     var s = AugmentRuntime.state(p);
     long now = AugmentRuntime.now(p);
     if (s.sandyEnd > 0
-        && (tier(p) != s.sandyProfile || !p.isAlive() || p.isSpectator() || now >= s.sandyEnd))
-      stop(p, Math.min(now, s.sandyEnd));
+        && (tier(p) != s.sandyProfile
+            || (model(p) == SandevistanModel.APOGEE) != s.sandyApogee
+            || !p.isAlive()
+            || p.isSpectator()
+            || now >= s.sandyEnd)) stop(p, Math.min(now, s.sandyEnd));
     double pace = pace(p);
     modifier(p, Attributes.MOVEMENT_SPEED, pace);
     modifier(p, Attributes.ATTACK_SPEED, pace);
@@ -217,6 +242,7 @@ public final class Sandevistan {
   public static void snapshot(ServerPlayer p, CompoundTag tag) {
     var s = AugmentRuntime.state(p);
     tag.putInt("sandyTier", tier(p));
+    tag.putBoolean("sandyIconic", model(p) == SandevistanModel.APOGEE);
     tag.putLong("sandyEnd", active(p) ? s.sandyEnd : 0);
     tag.putDouble("temporalPace", pace(p));
     tag.putBoolean("sandyPvp", p.server.isPvpAllowed());
@@ -224,6 +250,7 @@ public final class Sandevistan {
     tag.putDouble("sandyCharge", s.sandyEnd > 0 ? 0 : s.sandyCharge);
     tag.putLong("sandyClock", s.sandyClock);
     tag.putInt("sandyProfile", s.sandyProfile);
+    tag.putBoolean("sandyApogee", s.sandyApogee);
     tag.putLong("sandyRearm", s.sandyRearm);
   }
 

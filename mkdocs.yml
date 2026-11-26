@@ -46,6 +46,7 @@ nav:
       - Common questions: faq.md
   - Cyberware:
       - All cyberware: cyberware.md
+      - Iconic cyberware: iconics.md
       - Frontal Cortex:
           - Ex-Disk: ex-disk.md
           - Memory Boost: memory-boost.md
@@ -57,6 +58,7 @@ nav:
           - Raven Microcyber: raven-microcyber.md
           - BioDyne Berserk: biodyne-berserk.md
           - Dynalar Sandevistan: dynalar-sandevistan.md
+          - Militech “Apogee” Sandevistan: militech-apogee.md
       - Arms:
           - Physical Mantis Blades: mantis-blades.md
           - Thermal Mantis Blades: thermal-mantis-blades.md

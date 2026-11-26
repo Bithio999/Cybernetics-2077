@@ -213,7 +213,7 @@ public final class AugmentRuntime {
     return CyberwareRuntime.canAttack(p, target) && enemyKind(p, target);
   }
 
-  private static boolean enemyKind(ServerPlayer p, LivingEntity target) {
+  public static boolean enemyKind(ServerPlayer p, LivingEntity target) {
     return target instanceof Enemy
         || target instanceof Mob mob && mob.getTarget() == p
         || target == p.getLastHurtByMob()
@@ -490,8 +490,8 @@ public final class AugmentRuntime {
       if (dev.cybernetics2077.temporal.Sandevistan.active(p))
         multiplier *=
             1
-                + dev.cybernetics2077.temporal.TemporalRules.critDamage(
-                    dev.cybernetics2077.temporal.Sandevistan.tier(p));
+                + dev.cybernetics2077.temporal.Sandevistan.model(p)
+                    .critDamage(dev.cybernetics2077.temporal.Sandevistan.tier(p));
       if (berserk(p)) multiplier *= 1 + (tier(p, BIODYNE_BERSERK) - 1) * .25f;
       e.setDamageMultiplier(multiplier);
     }

@@ -16,6 +16,8 @@ Useful for server setup and Creative testing. Commands require cheats or operato
 
 Damaged salvage: `cybernetics2077:damaged_cybernetic_part_tier_<tier>` (tiers **1–5**). See [enhanced mobs](enhanced-mobs.md) for drops and discounts.
 
+Iconic purchase authorization: `cybernetics2077:iconic_requisition_tier_<tier>` (tiers **1–5**). [Apogee](militech-apogee.md): `cybernetics2077:militech_apogee_sandevistan_tier_5`.
+
 Replace `<tier>` only with a tier listed in the table.
 
 | Implant | Item ID | Tiers |

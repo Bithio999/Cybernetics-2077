@@ -36,6 +36,7 @@ Stock rotates at **Overworld dawn**, every 24,000 ticks, including after sleepin
 | Ordinary implant / cyberdeck | 1,000 × tier² |
 | Mantis Blades | 1,600 × tier² |
 | Quickhack chip | 300 × tier² |
+| Iconic implant | 3,000 × tier² + one matching-tier requisition chip |
 
 A full inventory, insufficient eddies, or an offer rotating out prevents purchase without payment.
 
@@ -43,6 +44,10 @@ A full inventory, insufficient eddies, or an offer rotating out prevents purchas
 
 Rare [cybernetically enhanced mobs](enhanced-mobs.md) drop **Tier 1–5 damaged cybernetic parts**. Choose **−30%** beside an available implant to trade **one matching-tier part plus 70% of the normal price**. Hover to see the discounted price and your part count. **BUY** keeps your parts and pays full price.
 
-Stock and Street Cred requirements still apply. Parts work for implants and cyberdecks, not quickhack chips. Failed purchases consume neither eddies nor parts. A single part can free its inventory slot for the new implant.
+Stock and Street Cred requirements still apply. Parts work for ordinary implants and cyberdecks, not quickhack chips or Iconics. Failed purchases consume neither eddies nor parts. A single part can free its inventory slot for the new implant.
+
+## Iconic purchases
+
+[Iconics](iconics.md) appear in the same daily assortment once their tier qualifies. Their gold-accented rows use **ACQUIRE**, which requires full payment and **one matching-tier Iconic Requisition Chip**. Hover for the price and your chip count. There is no damaged-part discount. The first is [Militech “Apogee” Sandevistan](militech-apogee.md), at Street Cred 40.
 
 [Installing cyberware](installation.md) · [Eddies and Street Cred](street-cred.md) · [First delivery](contracts.md)

@@ -35,7 +35,8 @@ public final class SandevistanClient {
         t.getInt("sandyTier"),
         t.getLong("sandyEnd"),
         t.contains("temporalPace") ? Math.clamp(t.getDouble("temporalPace"), .05, 1.25) : 1,
-        t.getBoolean("sandyPvp"));
+        t.getBoolean("sandyPvp"),
+        t.getBoolean("sandyIconic"));
   }
 
   public static void frame() {

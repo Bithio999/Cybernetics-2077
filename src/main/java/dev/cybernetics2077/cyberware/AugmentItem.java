@@ -20,6 +20,11 @@ public final class AugmentItem extends CyberwareItem {
   }
 
   @Override
+  public boolean iconic() {
+    return augment.iconic();
+  }
+
+  @Override
   public void appendHoverText(
       ItemStack stack, TooltipContext context, List<Component> lines, TooltipFlag flag) {
     super.appendHoverText(stack, context, lines, flag);

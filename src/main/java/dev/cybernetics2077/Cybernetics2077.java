@@ -139,6 +139,16 @@ public final class Cybernetics2077 {
                           () -> new dev.cybernetics2077.mob.DamagedCyberneticPart(t)))
               .toList();
 
+  public static final java.util.List<Supplier<dev.cybernetics2077.mob.IconicRequisition>>
+      ICONIC_REQUISITIONS =
+          java.util.Arrays.stream(CyberwareTier.values())
+              .<Supplier<dev.cybernetics2077.mob.IconicRequisition>>map(
+                  t ->
+                      ITEMS.register(
+                          "iconic_requisition_tier_" + t.level,
+                          () -> new dev.cybernetics2077.mob.IconicRequisition(t)))
+              .toList();
+
   private static java.util.Map<Augment, java.util.List<Supplier<AugmentItem>>> registerAugments() {
     var result =
         new java.util.EnumMap<Augment, java.util.List<Supplier<AugmentItem>>>(Augment.class);
@@ -234,6 +244,7 @@ public final class Cybernetics2077 {
           for (var item : MANTIS_VARIANTS.get(variant)) e.accept(item.get());
       for (var family : AUGMENTS.values()) for (var item : family) e.accept(item.get());
       for (var part : DAMAGED_PARTS) e.accept(part.get());
+      for (var chip : ICONIC_REQUISITIONS) e.accept(chip.get());
       for (var kind : QuickhackKind.values())
         if (kind != QuickhackKind.SHORT_CIRCUIT)
           for (var item : QUICKHACKS.get(kind)) e.accept(item.get());

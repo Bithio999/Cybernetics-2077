@@ -23,9 +23,11 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.17.0 local time scheduler, rain clocks and first-person trails](../research/SANDEVISTAN-BUBBLE-0.17.0.md).
 
+[0.18.0 Iconic requisitions, Apogee research and model-specific timing](../research/ICONICS-APOGEE-0.18.0.md) · Original sprites: `python3 art/iconics/generate.py`.
+
 ## Edit the wiki
 
-The 65 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
+The 67 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.
 
 ```sh
 python3 -m venv .venv-docs

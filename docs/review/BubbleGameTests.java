@@ -190,7 +190,12 @@ public final class BubbleGameTests {
                     TemporalScheduled.get(h.getLevel())
                         .save(new net.minecraft.nbt.CompoundTag(), h.getLevel().registryAccess());
                 h.assertTrue(
-                    saved.getList("timers", 10).isEmpty(), "Clear left stale time metadata");
+                    saved.getList("timers", 10).stream()
+                        .noneMatch(
+                            raw ->
+                                ((net.minecraft.nbt.CompoundTag) raw).getLong("pos")
+                                    == pos.asLong()),
+                    "Clear left stale time metadata at the cleared position");
               } finally {
                 SandevistanGameTests.cleanup(p);
               }

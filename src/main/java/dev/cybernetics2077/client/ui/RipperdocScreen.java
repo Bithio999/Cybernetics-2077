@@ -155,7 +155,9 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
       if (b.visible) {
         var offer = CyberwareCatalogue.offers().get(offers.get(i));
         int required = offer.requiredStreetCred();
-        b.setMessage(Component.literal(menu.streetCred() < required ? "SC " + required : "BUY"));
+        b.setWidth(offer.iconic() ? 86 : 40);
+        b.active &= !offer.iconic() || menu.requisitions(offer.tier()) > 0;
+        b.setMessage(Component.literal(offer.iconic() ? "ACQUIRE" : "BUY"));
         b.setTooltip(
             Tooltip.create(
                 Component.literal(
@@ -163,12 +165,19 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
                         + offer.price()
                         + ". Requires Street Cred "
                         + required
-                        + ". Keeps your damaged parts.")));
+                        + (offer.iconic()
+                            ? ". Consumes 1 Tier "
+                                + offer.tier()
+                                + " Iconic requisition chip ("
+                                + menu.requisitions(offer.tier())
+                                + " owned)."
+                            : ". Keeps your damaged parts."))));
       }
       var trade = trades.get(n);
       trade.visible =
           b.visible
-              && CyberwareCatalogue.offers().get(offers.get(i)).item() instanceof CyberwareItem;
+              && CyberwareCatalogue.offers().get(offers.get(i)).item() instanceof CyberwareItem
+              && !CyberwareCatalogue.offers().get(offers.get(i)).iconic();
       trade.active = false;
       if (trade.visible) {
         var offer = CyberwareCatalogue.offers().get(offers.get(i));
@@ -219,7 +228,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
         for (int n = 0; n < 5 && first + n < rows.size(); n++) {
           var o = CyberwareCatalogue.offers().get(rows.get(first + n));
           float y = 74 + n * 25;
-          c.panel(11, y, 297, 23, 3, 0xff11232b, 0xff31515d);
+          c.panel(11, y, 297, 23, 3, 0xff11232b, o.iconic() ? 0xffbb8b44 : 0xff31515d);
           c.rect(12, y + 1, 2, 21, CyberwareTier.of(o.tier()).color);
           c.text(
               c.fit(o.item().getDescription().getString(), 179, 10, false),
@@ -228,7 +237,7 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
               10,
               0xffd6e2df);
           c.text(
-              "T"
+              (o.iconic() ? "ICONIC / T" : "T")
                   + o.tier()
                   + "  /  SC "
                   + o.requiredStreetCred()
@@ -266,7 +275,11 @@ public final class RipperdocScreen extends AbstractContainerScreen<RipperdocMenu
               case 4 -> "HIGHER STREET CRED REQUIRED";
               case 5 -> "STOCK CHANGED. CHECK TODAY'S SELECTION.";
               case 6 -> "REQUIRES A MATCHING-TIER PART AND AN IMPLANT.";
-              default -> "BUY: full price. -30%: trade a matching damaged part.";
+              case 7 -> "ICONIC: MATCHING REQUISITION CHIP + EDDIES REQUIRED.";
+              default ->
+                  rows.stream().anyMatch(i -> CyberwareCatalogue.offers().get(i).iconic())
+                      ? "ACQUIRE: matching chip + full price. No salvage discount."
+                      : "BUY: full price. -30%: trade a matching damaged part.";
             };
         c.center(result, 159, 225, 8, menu.result() == 3 ? 0xff80e8bd : 0xffb6b2a7);
         CyberBatch.flush(g);

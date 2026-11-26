@@ -55,6 +55,7 @@ families = {
     'optical_scanner':'kiroshi-optics', 'cyberdeck_tier_1':'militech-paraline',
     'raven_microcyber':'raven-microcyber', 'mantis_claws_tier_1':'mantis-blades',
     'dynalar_sandevistan':'dynalar-sandevistan',
+    'militech_apogee_sandevistan':'militech-apogee',
     'thermal_mantis_blades':'thermal-mantis-blades',
     'electrical_mantis_blades':'electrifying-mantis-blades',
     'toxic_mantis_blades':'toxic-mantis-blades',

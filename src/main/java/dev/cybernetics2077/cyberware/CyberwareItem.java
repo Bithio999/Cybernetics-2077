@@ -30,6 +30,10 @@ public class CyberwareItem extends Item {
     return tier;
   }
 
+  public boolean iconic() {
+    return false;
+  }
+
   @Override
   public net.minecraft.network.chat.Component getName(net.minecraft.world.item.ItemStack stack) {
     return super.getName(stack).copy().withColor(tier.color & 0xffffff);
@@ -41,6 +45,10 @@ public class CyberwareItem extends Item {
       TooltipContext context,
       java.util.List<net.minecraft.network.chat.Component> lines,
       net.minecraft.world.item.TooltipFlag flag) {
+    if (iconic())
+      lines.add(
+          net.minecraft.network.chat.Component.translatable("cybernetics2077.implant.iconic")
+              .withStyle(net.minecraft.ChatFormatting.GOLD));
     lines.add(
         net.minecraft.network.chat.Component.translatable(
                 "cybernetics2077.implant.tier", tier.level)

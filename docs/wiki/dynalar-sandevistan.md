@@ -33,7 +33,7 @@ The encounter radius is **32 blocks**. Nearby non-allied mobs and projectiles sl
 
 With one Dynalar active, the user runs at **125%** normal movement/weapon recovery while affected ordinary opponents run at **62.5%**. Opponents therefore run at half the user's pace. This changes nearby combat updates, not the server's 20 TPS. Players' regeneration and battery timers use normal game time.
 
-Two active Dynalar users have equal temporal pace, regardless of tier. Overlapping fields apply their strongest strength once; they do not multiply. The relative-speed system supports other slowing strengths for future models, but **tier upgrades never increase Dynalar’s slowing**.
+Two active Dynalar users have equal temporal pace, regardless of tier. Overlapping fields apply their strongest strength once; they do not multiply. The [Iconic Apogee](militech-apogee.md) has a stronger model profile; an active Dynalar user in its field runs at 37.5% of normal, versus the Apogee user's 125%. **Tier upgrades never increase Dynalar’s slowing**.
 
 Server PvP settings and team protections prevent slowing protected players or their projectiles. Creative players and spectators are protected. Mounted entities retain normal vehicle physics. Normal defensive effects still work; Sandevistan does not grant invulnerability or ignore armor.
 

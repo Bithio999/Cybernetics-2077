@@ -39,7 +39,8 @@ public enum Augment {
   MICROGENERATOR("microgenerator", CyberwareCategory.HANDS, 1, 9),
   HANDLE_WRAP("handle_wrap", CyberwareCategory.HANDS, 3, 8),
   SHOCK_ABSORBER("shock_absorber", CyberwareCategory.HANDS, 1, 12),
-  IMMOVABLE_FORCE("immovable_force", CyberwareCategory.HANDS, 2, 35);
+  IMMOVABLE_FORCE("immovable_force", CyberwareCategory.HANDS, 2, 35),
+  MILITECH_APOGEE("militech_apogee_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 44);
 
   public final String id;
   public final CyberwareCategory category;
@@ -60,7 +61,12 @@ public enum Augment {
     return this == BIODYNE_BERSERK
         || this == BLOOD_PUMP
         || this == OPTICAL_CAMO
-        || this == DYNALAR_SANDEVISTAN;
+        || this == DYNALAR_SANDEVISTAN
+        || this == MILITECH_APOGEE;
+  }
+
+  public boolean iconic() {
+    return this == MILITECH_APOGEE;
   }
 
   public boolean optics() {
@@ -100,6 +106,15 @@ public enum Augment {
 
   public List<String> details(int t) {
     return switch (this) {
+      case MILITECH_APOGEE ->
+          List.of(
+              "O: toggle Apogee. 85% relative slowing; 32-block bubble.",
+              "Battery: 6 seconds. Full recharge: 25 seconds. Charge is saved.",
+              "+20% weapon critical chance and critical damage.",
+              "+20% arrow / thrown trident headshot damage.",
+              "Enemy kills: +0.6 seconds (max 6); remove 0.88 food exhaustion.",
+              "Rearm: 1 second. Any charge of at least one tick can activate.",
+              "Iconic purchase: Street Cred 40, one Tier 5 chip and eddies.");
       case SMART_LINK ->
           List.of(
               "Scanning an enemy locks arrows / thrown tridents onto it.",
