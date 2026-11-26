@@ -48,11 +48,19 @@ While active, a **32-block spherical field** slows nearby environmental simulati
 | Crop growth, fire and other random block updates | Updates occur less frequently |
 | Dropped items, XP, falling blocks and primed TNT | Movement and entity timers slow |
 | Empty boats and minecarts | Physics slows; occupied vehicles keep normal handling |
+| Animated vanilla block textures | Water, lava, fire, Nether portals and other animated block surfaces advance in local time |
+| Moving pistons | Smaller movement steps every tick, with normal collision handling and smooth rendering |
 | Rain | Falling streaks and splash particles look slower, blending back to normal near the edge |
 
 Pending updates keep their unfinished delay when the field moves away; they do not replay missed ticks in a burst. Local delays are saved with the world, and unloaded chunks are not forced to stay loaded.
 
-The sun, shared weather cycle, server tick rate and player resource/battery clocks keep normal time. Rain slowing is visual. Shared animated textures and machines driven by their own global timers keep those clocks; the machine effect covers Minecraft's standard block-entity tickers.
+The sun, shared weather cycle, server tick rate and player resource/battery clocks keep normal time. Rain and texture slowing are visual. The machine effect covers Minecraft's standard block-entity tickers; machines driven by their own global timers keep those clocks.
+
+Animated surfaces blend between local clocks near the field edge. When the field ends, their remaining phase is preserved briefly and then fades back to the normal animation over two seconds. Blocks elsewhere, inventory icons and held items retain native animation. Frames are cached with mipmaps; this does not rebuild chunks for every animation frame. This covers vanilla animated atlas textures, rather than procedural renderer effects such as the End portal's layered shader. Shader packs and replacement chunk renderers may need separate integration.
+
+Pistons keep running their native pushing code every tick, reducing their movement distance instead of skipping updates. This prevents the repeated interpolation jumps of the earlier bubble. Straight pushed lines use the base piston's pace across the field boundary; slime launch velocity also follows local pace.
+
+![Vanilla animated block surfaces inside Apogee's time bubble](../images/animated-blocks-apogee-0.19.0.png)
 
 ## Effects
 

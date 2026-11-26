@@ -48,12 +48,27 @@ public final class TemporalEnvironment {
       clocks.gates.values().removeIf(g -> now - g.last > 40);
       clocks.swept = now;
     }
-    var gate = clocks.gates.computeIfAbsent(pos.asLong(), k -> new Gate());
+    var gate =
+        clocks.gates.computeIfAbsent(
+            pos.asLong(),
+            k -> {
+              var created = new Gate();
+              created.budget.phase = 1 - pace;
+              return created;
+            });
     if (gate.last != now) {
       gate.step = gate.budget.advance(pace) > 0;
       gate.last = now;
     }
     return gate.step;
+  }
+
+  public static float renderPartial(Level level, BlockPos pos, float partial) {
+    var clocks = CLOCKS.get().get(level);
+    var gate = clocks == null ? null : clocks.gates.get(pos.asLong());
+    return gate == null
+        ? partial
+        : TemporalRules.partial(gate.budget.phase, pace(level, pos), partial);
   }
 
   public static boolean randomStep(

@@ -21,7 +21,11 @@
     "TemporalRainMixin",
     "TemporalParticleAccess",
     "TemporalParticlesMixin",
-    "TemporalBlockAnimationMixin"
+    "TemporalBlockAnimationMixin",
+    "TemporalBlockRenderMixin",
+    "TemporalAtlasMixin",
+    "TemporalWorldAnimationMixin",
+    "TemporalBlockShadersMixin"
   ],
   "injectors": {
     "defaultRequire": 1

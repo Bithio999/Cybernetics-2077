@@ -304,6 +304,11 @@ public final class BubbleGameTests {
     var pos = p.blockPosition();
     var dest = pos.offset(1, 0, 0);
     LevelTicks<Block> ticks = scheduler(h, pos, false);
+    // Template placement can put the clone across a chunk edge. This isolated scheduler
+    // must own both containers just as a loaded native world does.
+    if (!new net.minecraft.world.level.ChunkPos(pos)
+        .equals(new net.minecraft.world.level.ChunkPos(dest)))
+      ticks.addContainer(new net.minecraft.world.level.ChunkPos(dest), new LevelChunkTicks<>());
     var sourceAt = new AtomicInteger(-1);
     var destAt = new AtomicInteger(-1);
     ticks.schedule(

@@ -14,7 +14,7 @@ Buy it with **ACQUIRE** when it appears in a ripperdoc's daily stock, then insta
 
 ## Activation
 
-Press **O** to toggle. Apogee slows affected opponents to **15% of your temporal pace** within 32 blocks. Your movement and weapon recovery run at **125% of normal**; ordinary affected entities and environmental updates run at **18.75%**. The [time bubble](dynalar-sandevistan.md#time-bubble) includes standard machine tickers, scheduled blocks/fluids, loose objects and visual rain slowing. The sun and shared weather clock keep normal time.
+Press **O** to toggle. Apogee slows affected opponents to **15% of your temporal pace** within 32 blocks. Your movement and weapon recovery run at **125% of normal**; ordinary affected entities and environmental updates run at **18.75%**. The [time bubble](dynalar-sandevistan.md#time-bubble) includes standard machine tickers, scheduled blocks/fluids, smooth piston movement, loose objects, animated vanilla block textures and visual rain slowing. The sun and shared weather clock keep normal time.
 
 | Effect | Value |
 | --- | ---: |

@@ -12,7 +12,8 @@
     "LivingDamageMemory",
     "TemporalLevelTicksMixin",
     "TemporalBlocksMixin",
-    "TemporalBlockEntityMixin"
+    "TemporalBlockEntityMixin",
+    "TemporalPistonMixin"
   ],
   "injectors": {
     "defaultRequire": 1

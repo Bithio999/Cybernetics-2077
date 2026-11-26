@@ -113,6 +113,7 @@ public final class SandevistanClient {
       frameTime = 0;
       wasActive = false;
       SandevistanTrails.clear();
+      BlockAnimations.release();
       if (hum != null) m.getSoundManager().stop(hum);
       hum = null;
       SandevistanLens.release();
@@ -158,6 +159,7 @@ public final class SandevistanClient {
 
     @SubscribeEvent
     public static void shaders(RegisterShadersEvent e) throws java.io.IOException {
+      AnimationShaders.register(e);
       TemporalMaterial.register(e);
       SandevistanLens.register(e);
     }

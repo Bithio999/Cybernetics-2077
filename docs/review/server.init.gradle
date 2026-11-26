@@ -1,6 +1,6 @@
 gradle.projectsEvaluated {
  rootProject.sourceSets.main.java.srcDir(rootProject.file('docs/review'))
- rootProject.sourceSets.main.java.exclude('**/IconicClientReview.java', '**/BubbleClientReview.java', '**/TrailCameraReview.java', '**/HandsClientReview.java', '**/TrailClientReview.java', '**/SandevistanClientReview.java', '**/ExpansionClientReview.java', '**/EnhancedClientReview.java', '**/EnhancedAssetReviewScreen.java')
+ rootProject.sourceSets.main.java.exclude('**/AnimationClientReview.java', '**/AnimationPixelProbe.java', '**/IconicClientReview.java', '**/BubbleClientReview.java', '**/TrailCameraReview.java', '**/HandsClientReview.java', '**/TrailClientReview.java', '**/SandevistanClientReview.java', '**/ExpansionClientReview.java', '**/EnhancedClientReview.java', '**/EnhancedAssetReviewScreen.java')
  rootProject.sourceSets.main.java.exclude('**/HacksClientReview.java', '**/StockClientReview.java', '**/ContractClientReview.java', '**/CityAssetReviewScreen.java', '**/CityClientReview.java', '**/CyberwareClientReview.java', '**/ContentClientReview.java', '**/AugmentClientReview.java', '**/NativeHandReferenceReview.java', '**/ArmSkinBoundsReview.java', '**/RecordingFrames.java')
  rootProject.sourceSets.main.resources.setSrcDirs([rootProject.file('docs/review/resources'),rootProject.file('src/main/resources')])
  rootProject.tasks.named('processResources').configure { duplicatesStrategy=DuplicatesStrategy.EXCLUDE }

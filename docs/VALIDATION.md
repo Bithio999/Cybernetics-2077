@@ -2,6 +2,25 @@
 
 Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
 
+## Animated blocks and smooth pistons (0.19.0)
+
+**98 JVM tests, 133 dedicated-server GameTests, native shader pixel/piston review, clean package audit and strict wiki build pass.** [Results](review/results/animation-0.19.0.json) · [Rendering design and native references](research/LOCAL-ANIMATION-0.19.0.md) · [Player guide](wiki/dynalar-sandevistan.md#time-bubble).
+
+Four added JVM cases verify local visual rates/phase, restoration/expiry, the clock-state bound and Java/GLSL hash agreement near both world limits. Four added server scenarios verify continuous native piston progress/interpolation for both models in both directions, actual bound-ticker progress, straight-line assembly timing across a bubble edge and normal resumption, and native slime push/velocity. The 129 prior scenarios also pass, including actual furnace, fluid, repeater, scheduler, shop and combat behavior.
+
+The integrated client compares actual shader framebuffer output against independently selected source animation frames for water, lava, fire, Nether portal and magma. It separately compares the same shader outside the field with vanilla pixels. It samples client piston endpoints on consecutive native ticks, checks frame/storage bounds and confirms visual clocks expire after their restoration fade. The prior native Dynalar input/installation/trail review runs before the new fixture. Native screenshots are direct client output.
+
+```sh
+./gradlew test runGameTestServer -I docs/review/server.init.gradle
+./gradlew runClient -I docs/review/client.init.gradle -PanimationReview
+./gradlew clean test build
+python3 scripts/verify-release.py
+python3 scripts/check-wiki.py
+mkdocs build --strict
+```
+
+Native graphics checks use 1280×720 software OpenGL in a disposable integrated world, without working audio or session services. This is not a hardware benchmark or authenticated two-computer multiplayer test. The default atlas has 49 supported animated block sprites; cache budgets and renderer/resource-pack limits are documented in the rendering notes. Procedural End portal rendering and replacement shader/terrain pipelines are outside the tested path. Review classes and reference downloads are excluded from the clean release.
+
 ## Iconic requisitions and Apogee (0.18.0)
 
 **94 JVM tests, 129 dedicated-server GameTests, native purchase/install/activation review, clean release audit and strict wiki build pass.** [Results](review/results/iconics-0.18.0.json) · [Reference mechanics and implementation](research/ICONICS-APOGEE-0.18.0.md) · [Iconic player guide](wiki/iconics.md) · [Apogee stats](wiki/militech-apogee.md).

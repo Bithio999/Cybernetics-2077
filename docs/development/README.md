@@ -25,6 +25,8 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 
 [0.18.0 Iconic requisitions, Apogee research and model-specific timing](../research/ICONICS-APOGEE-0.18.0.md) · Original sprites: `python3 art/iconics/generate.py`.
 
+[0.19.0 local animated textures and continuous piston movement](../research/LOCAL-ANIMATION-0.19.0.md).
+
 ## Edit the wiki
 
 The 67 player pages live in `docs/wiki/`, with navigation in `mkdocs.yml`. Update an item's own page when changing its behaviour. Keep engineering history and test results in the developer documentation.

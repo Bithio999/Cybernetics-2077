@@ -13,7 +13,8 @@ public abstract class TemporalBlockEntityMixin {
   @WrapMethod(method = "tick")
   private void cybernetics$localTime(Operation<Void> original) {
     var level = blockEntity.getLevel();
-    if (level == null || TemporalEnvironment.step(level, blockEntity.getBlockPos()))
-      original.call();
+    if (level == null
+        || blockEntity instanceof net.minecraft.world.level.block.piston.PistonMovingBlockEntity
+        || TemporalEnvironment.step(level, blockEntity.getBlockPos())) original.call();
   }
 }
