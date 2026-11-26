@@ -1,0 +1,59 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.148'
+}
+group = 'dev.cybernetics2077'
+version = '0.20.0'
+base { archivesName = 'Cybernetics2077-Forge-1.20.1' }
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+repositories { mavenCentral() }
+legacyForge {
+    enable { forgeVersion = '1.20.1-47.4.29'; disableRecompilation = true }
+    runs {
+        client { client() }
+        server { server(); programArgument '--nogui' }
+        gameTestServer { type = 'gameTestServer'; systemProperty 'forge.enabledGameTestNamespaces', 'cybernetics2077' }
+    }
+    mods { cybernetics2077 { sourceSet sourceSets.main } }
+}
+def generatePort = tasks.register('generatePort', Exec) {
+    workingDir projectDir
+    commandLine(['python3', 'generate.py'] + (project.hasProperty('compatGameTests') ? ['--tests'] : []))
+    inputs.property('compatGameTests',project.hasProperty('compatGameTests'))
+    inputs.dir('../compat/gametest')
+    inputs.dir('../src/main/java')
+    inputs.dir('../src/main/resources')
+    inputs.dir('src/main/java')
+    inputs.file('generate.py')
+    outputs.dir(layout.buildDirectory.dir('generated/port'))
+}
+sourceSets.main.java.srcDirs('build/generated/port/java')
+sourceSets.test.java.srcDirs('../src/test/java')
+sourceSets.main.resources.srcDirs('build/generated/port/resources')
+tasks.named('compileJava') { dependsOn generatePort }
+tasks.named('processResources') { dependsOn generatePort; duplicatesStrategy = DuplicatesStrategy.EXCLUDE }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+    options.compilerArgs.addAll(['-Xmaxerrs', '500'])
+}
+dependencies {
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation 'io.github.llamalad7:mixinextras-common:0.5.0'
+    annotationProcessor 'io.github.llamalad7:mixinextras-common:0.5.0'
+    implementation 'io.github.llamalad7:mixinextras-forge:0.5.0'
+    jarJar 'io.github.llamalad7:mixinextras-forge:0.5.0'
+    testImplementation 'org.joml:joml:1.10.5'
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+mixin {
+    add sourceSets.main, 'cybernetics2077.refmap.json'
+    config 'cybernetics2077.mixins.json'
+    config 'cybernetics2077.common.mixins.json'
+}
+tasks.named('jar') {
+    manifest.attributes('MixinConfigs': 'cybernetics2077.mixins.json,cybernetics2077.common.mixins.json')
+}
+test { useJUnitPlatform(); workingDir rootDir.parentFile }

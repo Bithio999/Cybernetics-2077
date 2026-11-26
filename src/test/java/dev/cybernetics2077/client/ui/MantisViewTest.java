@@ -69,7 +69,7 @@ final class MantisViewTest {
         // Testing isolated projected corners misses triangles crossing the near plane.
         for (int plane = 0; plane < 6 && !polygon.isEmpty(); plane++) {
           var clipped = new java.util.ArrayList<Vector4f>();
-          var previous = polygon.getLast();
+          var previous = polygon.get(polygon.size()-1);
           float da = distance(previous, plane);
           for (var current : polygon) {
             float db = distance(current, plane);

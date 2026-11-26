@@ -27,6 +27,11 @@ public final class TemporalEnvironment {
       ThreadLocal.withInitial(WeakHashMap::new);
 
   public static double pace(Level level, BlockPos pos) {
+    String namespace =
+        net.minecraft.core.registries.BuiltInRegistries.BLOCK
+            .getKey(level.getBlockState(pos).getBlock())
+            .getNamespace();
+    if (Cybernetics2077.TIME_BUBBLE_EXCLUDED_BLOCK_NAMESPACES.get().contains(namespace)) return 1;
     return Sandevistan.environmentPace(
         level, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, false);
   }

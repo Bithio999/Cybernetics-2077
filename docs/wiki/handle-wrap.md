@@ -18,4 +18,6 @@ Drawing a sword, axe or trident, deploying Mantis Blades, or throwing a trident 
 
 **Rearm:** 10 seconds from activation. Switching hotbar slots repeatedly cannot refresh the window during rearm. The timer is saved across logout and reinstalling. All cyberware critical-chance bonuses share a **50% cap**.
 
+With TaCZ, drawing a gun also primes this critical-hit bonus. [Gun integration](compatibility.md).
+
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

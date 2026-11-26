@@ -24,4 +24,6 @@ The preview estimates block collisions; enemy movement, spread and Smart Link gu
 
 ![Bow trajectory preview in Minecraft](../images/hands-bow-preview-0.16.png)
 
+With TaCZ, non-explosive bullets can ricochet once with the same retained-speed and damage bonuses. Explosive rounds retain their native impact behavior. [Gun integration](compatibility.md).
+
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

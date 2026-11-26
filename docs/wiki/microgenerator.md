@@ -24,4 +24,6 @@ A successful melee, Mantis Blade, arrow or thrown-trident hit releases an electr
 
 Recharge is saved across logout and reinstalling the implant. This is a weapon-hit adaptation for Minecraft; it does not require firearm reloads.
 
+With TaCZ, confirmed gunshot damage also triggers this discharge. Hits that deal no damage do not trigger it. [Gun integration](compatibility.md).
+
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

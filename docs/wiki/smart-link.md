@@ -22,4 +22,6 @@ Guidance lasts for the projectile's first **2 seconds**. It cannot turn sharply 
 
 Lock range is also limited by your equipped optics. Scanning does not require a cyberdeck or quickhack program.
 
+TaCZ bullets also support this scanner lock when the optional gun integration is available. Guidance respects solid terrain and keeps the native bullet speed. [Gun integration](compatibility.md).
+
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

@@ -18,4 +18,6 @@ Reduces incoming knockback while charging a **bow, crossbow or trident**. It doe
 | 4 | 70% |
 | 5 | 80% |
 
+With TaCZ, camera recoil is reduced by 8% per tier. The knockback benefit also applies while aiming a gun. [Gun integration](compatibility.md).
+
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

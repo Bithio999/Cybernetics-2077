@@ -13,7 +13,9 @@
     "TemporalLevelTicksMixin",
     "TemporalBlocksMixin",
     "TemporalBlockEntityMixin",
-    "TemporalPistonMixin"
+    "TemporalPistonMixin",
+    "TacZGunDataMixin",
+    "TacZBurstMixin"
   ],
   "injectors": {
     "defaultRequire": 1

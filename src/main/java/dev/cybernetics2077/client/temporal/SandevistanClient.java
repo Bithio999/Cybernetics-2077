@@ -17,12 +17,7 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = Cybernetics2077.ID, value = Dist.CLIENT)
 public final class SandevistanClient {
   public static final KeyMapping KEY =
-      new KeyMapping(
-          "key.cybernetics2077.sandevistan",
-          net.neoforged.neoforge.client.settings.KeyConflictContext.IN_GAME,
-          com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,
-          GLFW.GLFW_KEY_O,
-          "key.categories.cybernetics2077");
+      dev.cybernetics2077.client.ui.CyberKeys.create("sandevistan", GLFW.GLFW_KEY_O);
   public static volatile float intensity;
   private static long frameTime, activation;
   private static boolean wasActive;

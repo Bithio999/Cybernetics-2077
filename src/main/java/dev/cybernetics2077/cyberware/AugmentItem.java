@@ -30,5 +30,7 @@ public final class AugmentItem extends CyberwareItem {
     super.appendHoverText(stack, context, lines, flag);
     for (var line : augment.details(tier().level))
       lines.add(Component.literal(line).withStyle(ChatFormatting.AQUA));
+    for (var line : dev.cybernetics2077.compat.TacZCompat.details(augment, tier().level))
+      lines.add(Component.literal(line).withStyle(ChatFormatting.GRAY));
   }
 }

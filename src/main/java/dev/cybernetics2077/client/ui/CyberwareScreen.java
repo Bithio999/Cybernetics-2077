@@ -46,6 +46,9 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
 
   @Override
   protected void init() {
+    // Report the actual full-screen footprint to JEI/other container overlays.
+    imageWidth = width;
+    imageHeight = height;
     super.init();
     layout = CyberLayout.fit(width, height);
     sockets.clear();

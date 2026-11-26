@@ -18,6 +18,21 @@ import net.neoforged.neoforge.client.event.*;
 public final class HandsClient {
   @SubscribeEvent
   public static void tick(ClientTickEvent.Post e) {
+    dev.cybernetics2077.compat.TacZCompat.clientBlocked =
+        entity ->
+            entity == Minecraft.getInstance().player
+                && (CyberwareClient.own().getBoolean("deployed")
+                    || CyberwareClient.own().getBoolean("berserk")
+                    || ScannerClient.active());
+    dev.cybernetics2077.compat.TacZCompat.clientRecoil =
+        entity -> {
+          if (entity != Minecraft.getInstance().player) return 1;
+          var own = CyberwareClient.own();
+          return dev.cybernetics2077.compat.TacZCompat.recoil(
+              own.getInt("shockTier"),
+              own.getInt("immovableTier"),
+              entity.onGround() && entity.getDeltaMovement().horizontalDistanceSqr() < .005);
+        };
     HandsRuntime.clientImmovable =
         entity ->
             entity == Minecraft.getInstance().player
@@ -109,6 +124,29 @@ public final class HandsClient {
     out.addVertex(pose.last(), (float) b.x, (float) b.y, (float) b.z)
         .setColor(color)
         .setNormal(pose.last(), (float) n.x, (float) n.y, (float) n.z);
+  }
+
+  @EventBusSubscriber(
+      modid = Cybernetics2077.ID,
+      value = net.neoforged.api.distmarker.Dist.CLIENT,
+      bus = EventBusSubscriber.Bus.MOD)
+  public static final class Setup {
+    @SubscribeEvent
+    public static void setup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+      event.enqueueWork(
+          () ->
+              CyberwareNetwork.trajectory =
+                  packet -> {
+                    var m = Minecraft.getInstance();
+                    if (m.level == null) return;
+                    var entity = m.level.getEntity(packet.entity());
+                    if (entity == null
+                        || !entity.getUUID().equals(packet.uuid())
+                        || !dev.cybernetics2077.compat.TacZCompat.bullet(entity)) return;
+                    entity.setPos(packet.x(), packet.y(), packet.z());
+                    entity.setDeltaMovement(packet.vx(), packet.vy(), packet.vz());
+                  });
+    }
   }
 
   private HandsClient() {}

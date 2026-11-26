@@ -1,6 +1,6 @@
 # Cybernetics 2077
 
-A standalone **Minecraft 1.21.1 / NeoForge** mod inspired by Cyberpunk 2077. Install cyberware, load quickhacks and find ripperdocs and fixers in villages.
+A standalone **Minecraft 1.21.1 NeoForge / 1.20.1 Forge** mod inspired by Cyberpunk 2077. Install cyberware, load quickhacks and find ripperdocs and fixers in villages.
 
 ## Start here
 
@@ -8,9 +8,12 @@ A standalone **Minecraft 1.21.1 / NeoForge** mod inspired by Cyberpunk 2077. Ins
 
 Individual item pages, tier stats, controls, acquisition and village guides.
 
-**[Download version 0.19.0](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.19.0.jar)**
+| Minecraft | Loader | Java | Download 0.20.0 |
+| --- | --- | --- | --- |
+| 1.21.1 | NeoForge 21.1.248+ | 21 | [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.20.0.jar) |
+| 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
 
-Requires Minecraft **1.21.1**, NeoForge **21.1.248+ for 1.21.1**, and Java **21**. Install the same version on server and clients. Replace an older JAR instead of keeping both.
+Install the matching build on both server and clients. Replace the previous JAR. [TaCZ integration and modpack compatibility](docs/wiki/compatibility.md).
 
 | Looking for… | Open |
 | --- | --- |
@@ -32,7 +35,7 @@ Existing worlds are supported; new village buildings require new chunks.
 <details>
 <summary>Source code, building and documentation maintenance</summary>
 
-Requires Java 21. Run `./gradlew test build`, then `python3 scripts/verify-release.py`.
+NeoForge: Java 21, `./gradlew test build`. Forge: Java 17, `./gradlew -p forge-1.20.1 test build`. Run `python3 scripts/verify-release.py` after both builds. [Port and compatibility testing](compat/README.md).
 
 [Developer notes](docs/development/README.md) · [Validation](docs/VALIDATION.md) · [Research](docs/research/CYBERWARE-CATALOGUE.md) · [Preview archive](docs/PREVIEWS.md)
 

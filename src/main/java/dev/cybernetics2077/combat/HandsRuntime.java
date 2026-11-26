@@ -34,7 +34,8 @@ public final class HandsRuntime {
       ResourceKey.create(Registries.DAMAGE_TYPE, Cybernetics2077.id("hand_discharge"));
 
   public static boolean ranged(ItemStack stack) {
-    return stack.getItem() instanceof BowItem
+    return dev.cybernetics2077.compat.TacZCompat.gun(stack)
+        || stack.getItem() instanceof BowItem
         || stack.getItem() instanceof CrossbowItem
         || stack.getItem() instanceof TridentItem;
   }
@@ -93,6 +94,7 @@ public final class HandsRuntime {
     var s = AugmentRuntime.state(p);
     t.putInt("smartTier", AugmentRuntime.tier(p, SMART_LINK));
     t.putInt("ballisticTier", AugmentRuntime.tier(p, BALLISTIC_COPROCESSOR));
+    t.putInt("shockTier", AugmentRuntime.tier(p, SHOCK_ABSORBER));
     t.putInt("immovableTier", AugmentRuntime.tier(p, IMMOVABLE_FORCE));
     t.putInt("microTier", AugmentRuntime.tier(p, MICROGENERATOR));
     t.putLong("microReady", s.microReady);
@@ -278,7 +280,9 @@ public final class HandsRuntime {
 
   @SubscribeEvent
   public static void knockback(LivingKnockBackEvent e) {
-    if (e.getEntity() instanceof ServerPlayer p && p.isUsingItem() && ranged(p.getUseItem())) {
+    if (e.getEntity() instanceof ServerPlayer p
+        && (p.isUsingItem() && ranged(p.getUseItem())
+            || dev.cybernetics2077.compat.TacZCompat.aiming(p))) {
       int t = AugmentRuntime.tier(p, SHOCK_ABSORBER);
       if (t > 0) e.setStrength(e.getStrength() * (1 - (.3f + .1f * t)));
     }
@@ -303,11 +307,17 @@ public final class HandsRuntime {
         e.getSource().getDirectEntity() instanceof AbstractArrow a
             ? a.getPersistentData().getCompound(DATA).getInt("micro")
             : AugmentRuntime.tier(p, MICROGENERATOR);
+    discharge(p, e.getEntity(), tier);
+  }
+
+  public static void discharge(ServerPlayer p, LivingEntity main, int tier) {
+    if (!p.isAlive() || p.isSpectator() || main == p || p.isAlliedTo(main)) return;
+    if (main instanceof net.minecraft.world.entity.player.Player other
+        && (!p.server.isPvpAllowed() || !p.canHarmPlayer(other))) return;
     var s = AugmentRuntime.state(p);
     long now = AugmentRuntime.now(p);
     if (tier == 0 || now < s.microReady) return;
     s.microReady = now + (12 - tier) * 20L;
-    var main = e.getEntity();
     var point = main.getBoundingBox().getCenter();
     var targets =
         p.serverLevel()

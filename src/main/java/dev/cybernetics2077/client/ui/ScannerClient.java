@@ -20,12 +20,7 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = Cybernetics2077.ID, value = Dist.CLIENT)
 public final class ScannerClient {
   public static final KeyMapping KEY =
-      new KeyMapping(
-          "key.cybernetics2077.scan",
-          net.neoforged.neoforge.client.settings.KeyConflictContext.IN_GAME,
-          com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,
-          GLFW.GLFW_KEY_V,
-          "key.categories.cybernetics2077");
+      dev.cybernetics2077.client.ui.CyberKeys.create("scan", GLFW.GLFW_KEY_V);
   private static final int RED = 0xffff3742, CYAN = 0xff65e5f5, MUTED = 0xff7badae;
   private static boolean installed, down, prepared;
   private static int scanRange = 32;

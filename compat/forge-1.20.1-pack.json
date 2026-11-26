@@ -1,0 +1,801 @@
+{
+  "minecraft": "1.20.1",
+  "loader": "Forge",
+  "mods": [
+    {
+      "filename": "[1.16.5-1.20.1] Belroft Motors Mk 14.jar",
+      "projectId": 1618243,
+      "fileId": 9124891
+    },
+    {
+      "filename": "[1.20.1] SecurityCraft v1.10.2.1.jar",
+      "projectId": 64760,
+      "fileId": 8336490
+    },
+    {
+      "filename": "ad_astra_more_structures-1.20.1-forge.jar",
+      "projectId": 1311898,
+      "fileId": 8324466
+    },
+    {
+      "filename": "ad_astra-forge-1.20.1-1.15.21.jar",
+      "projectId": 635042,
+      "fileId": 8833730
+    },
+    {
+      "filename": "adastraextra-forge-1.20.1-1.2.3.jar",
+      "projectId": 957097,
+      "fileId": 5037401
+    },
+    {
+      "filename": "aether-1.20.1-1.5.2-neoforge.jar",
+      "projectId": 255308,
+      "fileId": 6134920
+    },
+    {
+      "filename": "aetherite-1.20.1-1.1.1.jar",
+      "projectId": 1524680,
+      "fileId": 8001444
+    },
+    {
+      "filename": "alchemistry-1.20.1-2.3.4.jar",
+      "projectId": 293425,
+      "fileId": 4770614
+    },
+    {
+      "filename": "alchemylib-1.20.1-1.0.30.jar",
+      "projectId": 293426,
+      "fileId": 5037781
+    },
+    {
+      "filename": "amendments-1.20-2.2.6.jar",
+      "projectId": 896746,
+      "fileId": 8657397
+    },
+    {
+      "filename": "amwplushies-forge-1.20.1-4.4.0.jar",
+      "projectId": 441249,
+      "fileId": 6675277
+    },
+    {
+      "filename": "appleskin-forge-mc1.20.1-2.5.1.jar",
+      "projectId": 248787,
+      "fileId": 4770828
+    },
+    {
+      "filename": "architectury-9.2.14-forge.jar",
+      "projectId": 419699,
+      "fileId": 5137938
+    },
+    {
+      "filename": "athena-forge-1.20.1-3.1.2.jar",
+      "projectId": 841890,
+      "fileId": 5176879
+    },
+    {
+      "filename": "atmosphericwatergenerator-1.0.12-forge-1.20.1.jar",
+      "projectId": 1260695,
+      "fileId": 7228219
+    },
+    {
+      "filename": "balm-forge-1.20.1-7.3.44.jar",
+      "projectId": 531761,
+      "fileId": 8969708
+    },
+    {
+      "filename": "better_weaponry-1.1.3-forge-1.20.1.jar",
+      "projectId": 990523,
+      "fileId": 6046452
+    },
+    {
+      "filename": "betterfpsdist-1.20.1-6.0.jar",
+      "projectId": 551520,
+      "fileId": 5723247
+    },
+    {
+      "filename": "bettersoils-1.0.1.jar",
+      "projectId": 1426047,
+      "fileId": 7728325
+    },
+    {
+      "filename": "Bookshelf-Forge-1.20.1-20.2.15.jar",
+      "projectId": 228525,
+      "fileId": 7612389
+    },
+    {
+      "filename": "Botania-1.20.1-456-FORGE.jar",
+      "projectId": 225643,
+      "fileId": 8901969
+    },
+    {
+      "filename": "BotanyPots-Forge-1.20.1-13.0.43.jar",
+      "projectId": 353928,
+      "fileId": 7612402
+    },
+    {
+      "filename": "BotanyPotsOrePlanting-Forge-15.40.0+1.18.2-1.20.4.jar",
+      "projectId": 872868,
+      "fileId": 7755193
+    },
+    {
+      "filename": "BotanyPotsTiers-Forge-1.20.1-6.0.2.jar",
+      "projectId": 526754,
+      "fileId": 5953202
+    },
+    {
+      "filename": "BotanyTrees-Forge-1.20.1-9.0.20.jar",
+      "projectId": 411357,
+      "fileId": 7612410
+    },
+    {
+      "filename": "botarium-forge-1.20.1-2.3.4.jar",
+      "projectId": 704113,
+      "fileId": 5486070
+    },
+    {
+      "filename": "Butchersdelight beta 1.20.1 2.1.0.jar",
+      "projectId": 551909,
+      "fileId": 5228909
+    },
+    {
+      "filename": "Butchersdelight Foods beta 1.20.1 1.0.3.jar",
+      "projectId": 919301,
+      "fileId": 5230731
+    },
+    {
+      "filename": "byts-full-system-release-3.0.jar",
+      "projectId": 1394848,
+      "fileId": 8507158
+    },
+    {
+      "filename": "carryon-forge-1.20.1-2.1.2.7.jar",
+      "projectId": 274259,
+      "fileId": 4882500
+    },
+    {
+      "filename": "cfm+nfm-forge-2026.10.11b-1.20.1.jar",
+      "projectId": 593876,
+      "fileId": 9139363
+    },
+    {
+      "filename": "chemlib-1.20.1-2.0.19.jar",
+      "projectId": 340666,
+      "fileId": 5128632
+    },
+    {
+      "filename": "chipped-forge-1.20.1-3.0.7.jar",
+      "projectId": 456956,
+      "fileId": 5813138
+    },
+    {
+      "filename": "chunkloaders-1.2.9-forge-mc1.20.1.jar",
+      "projectId": 402924,
+      "fileId": 6832591
+    },
+    {
+      "filename": "cloth-config-11.1.136-forge.jar",
+      "projectId": 348521,
+      "fileId": 5729105
+    },
+    {
+      "filename": "Clumps-forge-1.20.1-12.0.0.4.jar",
+      "projectId": 256717,
+      "fileId": 5278538
+    },
+    {
+      "filename": "ColossalChests-1.20.1-1.8.7.jar",
+      "projectId": 237875,
+      "fileId": 7098765
+    },
+    {
+      "filename": "comforts-forge-6.4.0+1.20.1.jar",
+      "projectId": 276951,
+      "fileId": 5503516
+    },
+    {
+      "filename": "compactextremereactor-1.0.0-Forge-1.20.1.jar",
+      "projectId": 1690681,
+      "fileId": 8855321
+    },
+    {
+      "filename": "connectedglass-1.1.14-forge-mc1.20.1.jar",
+      "projectId": 383129,
+      "fileId": 6811804
+    },
+    {
+      "filename": "connectivity-1.20.1-7.7.jar",
+      "projectId": 470193,
+      "fileId": 8957366
+    },
+    {
+      "filename": "constructionwand-1.20.1-2.11.jar",
+      "projectId": 399558,
+      "fileId": 4684054
+    },
+    {
+      "filename": "cookingforblockheads-forge-1.20.1-16.0.15.jar",
+      "projectId": 231484,
+      "fileId": 7454483
+    },
+    {
+      "filename": "Cosmic_Horizons_0.0.7.3-forge-1.20.1.jar",
+      "projectId": 1063119,
+      "fileId": 6055514
+    },
+    {
+      "filename": "craftingtweaks-forge-1.20.1-18.2.9.jar",
+      "projectId": 233071,
+      "fileId": 8019501
+    },
+    {
+      "filename": "create_ad_astra_compat-forge-1.20.1-1.0.0.jar",
+      "projectId": 1001456,
+      "fileId": 5252441
+    },
+    {
+      "filename": "create-1.20.1-6.0.8.jar",
+      "projectId": 328085,
+      "fileId": 7178761
+    },
+    {
+      "filename": "Cucumber-1.20.1-7.0.16.jar",
+      "projectId": 272335,
+      "fileId": 7180783
+    },
+    {
+      "filename": "cupboard-1.20.1-4.2.jar",
+      "projectId": 326652,
+      "fileId": 8889041
+    },
+    {
+      "filename": "curios-forge-5.14.1+1.20.1.jar",
+      "projectId": 309927,
+      "fileId": 6418456
+    },
+    {
+      "filename": "CustomNPCs-1.20.1-GBPort-Unofficial-1.20.1.20260711.jar",
+      "projectId": 1052708,
+      "fileId": 8414335
+    },
+    {
+      "filename": "cybernetic_system-1.1.5-forge-1.20.1.jar",
+      "projectId": 1183847,
+      "fileId": 6220161
+    },
+    {
+      "filename": "Cyclic-1.20.1-1.13.7.jar",
+      "projectId": 239286,
+      "fileId": 8089280
+    },
+    {
+      "filename": "CyclopsCore-1.20.1-1.22.3.jar",
+      "projectId": 232758,
+      "fileId": 8813356
+    },
+    {
+      "filename": "easy_mob_farm-forge-1.20.1-11.0.0.jar",
+      "projectId": 563464,
+      "fileId": 9060387
+    },
+    {
+      "filename": "easy-piglins-forge-1.20.1-1.0.13.jar",
+      "projectId": 419372,
+      "fileId": 5688758
+    },
+    {
+      "filename": "easy-villagers-forge-1.20.1-1.1.23.jar",
+      "projectId": 400514,
+      "fileId": 5724570
+    },
+    {
+      "filename": "echoes_core-1.0.2-forge-1.20.1.jar",
+      "projectId": 1673092,
+      "fileId": 9082574
+    },
+    {
+      "filename": "elevatorid-1.20.1-1.9.1-forge.jar",
+      "projectId": 250832,
+      "fileId": 6602224
+    },
+    {
+      "filename": "eoh-1.0.2-forge-1.20.1.jar",
+      "projectId": 1548017,
+      "fileId": 9082570
+    },
+    {
+      "filename": "Essential_1-5-0-1_forge_1-20-1.jar",
+      "projectId": 546670,
+      "fileId": 8905499
+    },
+    {
+      "filename": "etched-3.0.4.jar",
+      "projectId": 491890,
+      "fileId": 5999495
+    },
+    {
+      "filename": "excompressum-forge-1.20.1-20.1.9.jar",
+      "projectId": 241967,
+      "fileId": 6512136
+    },
+    {
+      "filename": "exdeorum-1.53.jar",
+      "projectId": 901420,
+      "fileId": 8384482
+    },
+    {
+      "filename": "exposure-1.20.1-1.7.16-forge.jar",
+      "projectId": 871755,
+      "fileId": 6655718
+    },
+    {
+      "filename": "ExtremeReactors2-1.20.1-2.0.97.jar",
+      "projectId": 250277,
+      "fileId": 7344727
+    },
+    {
+      "filename": "fabric-api-0.92.6+1.11.15+1.20.1.jar",
+      "projectId": 889079,
+      "fileId": 8641553
+    },
+    {
+      "filename": "FarmersDelight-1.20.1-1.3.4.jar",
+      "projectId": 398521,
+      "fileId": 8765179
+    },
+    {
+      "filename": "FastLeafDecay-32.jar",
+      "projectId": 230976,
+      "fileId": 5375681
+    },
+    {
+      "filename": "ferritecore-6.0.1-forge.jar",
+      "projectId": 429235,
+      "fileId": 4810975
+    },
+    {
+      "filename": "flib-1.20.1-0.0.16.jar",
+      "projectId": 661261,
+      "fileId": 8070669
+    },
+    {
+      "filename": "framework-forge-1.20.1-0.8.0.jar",
+      "projectId": 549225,
+      "fileId": 7573740
+    },
+    {
+      "filename": "ftb-library-forge-2001.2.13.jar",
+      "projectId": 404465,
+      "fileId": 8226927
+    },
+    {
+      "filename": "ftb-ultimine-forge-2001.1.8.jar",
+      "projectId": 386134,
+      "fileId": 7880472
+    },
+    {
+      "filename": "fusion-1.3.16-forge-mc1.20.1.jar",
+      "projectId": 854949,
+      "fileId": 9070201
+    },
+    {
+      "filename": "gas_station_snacks-1.0.1.jar",
+      "projectId": 1445722,
+      "fileId": 7662986
+    },
+    {
+      "filename": "geckolib-forge-1.20.1-4.8.4.jar",
+      "projectId": 388172,
+      "fileId": 8285794
+    },
+    {
+      "filename": "HammerLib-1.20.1-20.1.50.jar",
+      "projectId": 247401,
+      "fileId": 6337292
+    },
+    {
+      "filename": "IAV-1.1.11-1.20.1.jar",
+      "projectId": 422073,
+      "fileId": 7088377
+    },
+    {
+      "filename": "Immersive Vehicles-1.20.1-24.0.0.jar",
+      "projectId": 286703,
+      "fileId": 7926604
+    },
+    {
+      "filename": "immersive_paintings-0.6.13+1.20.1-forge.jar",
+      "projectId": 639584,
+      "fileId": 8140573
+    },
+    {
+      "filename": "ImmersiveEngineering-1.20.1-10.2.0-183.jar",
+      "projectId": 231951,
+      "fileId": 6206989
+    },
+    {
+      "filename": "immersivepaintings-exposure-1.0.0.jar",
+      "projectId": 1430255,
+      "fileId": 7462555
+    },
+    {
+      "filename": "infiniters-1.20.1-forge-0.1.0.jar",
+      "projectId": 1725370,
+      "fileId": 9053371
+    },
+    {
+      "filename": "invtweaks-1.20.1-1.2.2.jar",
+      "projectId": 976858,
+      "fileId": 6816947
+    },
+    {
+      "filename": "inzhefopcore-1.0.0-forge-1.20.1.jar",
+      "projectId": 434516,
+      "fileId": 8713241
+    },
+    {
+      "filename": "Iron-Backpacks-1.20.1-1.0.2.jar",
+      "projectId": 1598479,
+      "fileId": 8372668
+    },
+    {
+      "filename": "ironfurnaces-1.20.1-4.1.8.jar",
+      "projectId": 237664,
+      "fileId": 7888952
+    },
+    {
+      "filename": "irongenerators-1.1.0-forge-1.20.1.jar",
+      "projectId": 446489,
+      "fileId": 8713386
+    },
+    {
+      "filename": "Jade-1.20.1-Forge-11.13.3.jar",
+      "projectId": 324717,
+      "fileId": 8479276
+    },
+    {
+      "filename": "jamlib-forge-1.3.6+1.20.1-patch.1.jar",
+      "projectId": 623764,
+      "fileId": 8155852
+    },
+    {
+      "filename": "JEI Ores-1.20.1-1.0.3.jar",
+      "projectId": 1425991,
+      "fileId": 8581528
+    },
+    {
+      "filename": "jei-1.20.1-forge-15.57.0.208.jar",
+      "projectId": 238222,
+      "fileId": 8812887
+    },
+    {
+      "filename": "JRFTL-1.20.1-1.6.0.jar",
+      "projectId": 247136,
+      "fileId": 4594475
+    },
+    {
+      "filename": "kotlinforforge-4.12.0-all.jar",
+      "projectId": 351264,
+      "fileId": 7291067
+    },
+    {
+      "filename": "laglessmod-1.0.2.jar",
+      "projectId": 1438799,
+      "fileId": 8254144
+    },
+    {
+      "filename": "leather_to_rabbit_hide-1-forge-1.20.1.jar",
+      "projectId": 1129736,
+      "fileId": 5857831
+    },
+    {
+      "filename": "lostcities-1.20-7.5.7.jar",
+      "projectId": 269024,
+      "fileId": 9055133
+    },
+    {
+      "filename": "Mantle-1.20.1-1.11.104.jar",
+      "projectId": 74924,
+      "fileId": 7563777
+    },
+    {
+      "filename": "mcef-forge-2.1.6-1.20.1.jar",
+      "projectId": 636236,
+      "fileId": 5828187
+    },
+    {
+      "filename": "Mekanism-1.20.1-10.4.16.80.jar",
+      "projectId": 268560,
+      "fileId": 6552911
+    },
+    {
+      "filename": "MekanismGenerators-1.20.1-10.4.16.80.jar",
+      "projectId": 268566,
+      "fileId": 6552914
+    },
+    {
+      "filename": "midnightthoughts-1.5.5+forge.1.20.1.jar",
+      "projectId": 1401318,
+      "fileId": 8660348
+    },
+    {
+      "filename": "MineBikes mod 1.20.1 Forge 1.4.jar",
+      "projectId": 1017542,
+      "fileId": 5463784
+    },
+    {
+      "filename": "minecraft-comes-alive-7.6.26+1.20.1-universal.jar",
+      "projectId": 535291,
+      "fileId": 8315977
+    },
+    {
+      "filename": "mining-dimension-forge-1.20.1-1.1.0.jar",
+      "projectId": 332640,
+      "fileId": 4973562
+    },
+    {
+      "filename": "moonlight-1.20-2.16.36-forge.jar",
+      "projectId": 499980,
+      "fileId": 9073068
+    },
+    {
+      "filename": "MouseTweaks-forge-mc1.20.1-2.25.1.jar",
+      "projectId": 60089,
+      "fileId": 5338457
+    },
+    {
+      "filename": "MTS Official Pack-1.20.1-V29.jar",
+      "projectId": 292217,
+      "fileId": 7933733
+    },
+    {
+      "filename": "MysticalAgradditions-1.20.1-7.0.12.jar",
+      "projectId": 256247,
+      "fileId": 7180729
+    },
+    {
+      "filename": "MysticalAgriculture-1.20.1-7.0.24.jar",
+      "projectId": 246640,
+      "fileId": 8034376
+    },
+    {
+      "filename": "NaturesCompass-1.20.1-1.12.0-forge.jar",
+      "projectId": 252848,
+      "fileId": 7892948
+    },
+    {
+      "filename": "notenoughcrashes-4.4.9+1.20.1-forge.jar",
+      "projectId": 442354,
+      "fileId": 6598273
+    },
+    {
+      "filename": "paladin-furniture-mod-1.5.0-forge-mc1.20.1.jar",
+      "projectId": 663141,
+      "fileId": 8614409
+    },
+    {
+      "filename": "pamhc2crops-1.20-1.0.3.jar",
+      "projectId": 361385,
+      "fileId": 4687624
+    },
+    {
+      "filename": "pamhc2foodcore-1.20.4-1.0.5.jar",
+      "projectId": 372534,
+      "fileId": 5097798
+    },
+    {
+      "filename": "pamhc2trees-1.20-1.0.2.jar",
+      "projectId": 365460,
+      "fileId": 4625518
+    },
+    {
+      "filename": "Patchouli-1.20.1-85-FORGE.jar",
+      "projectId": 306770,
+      "fileId": 7731017
+    },
+    {
+      "filename": "pipez-forge-1.20.1-1.2.26.jar",
+      "projectId": 443900,
+      "fileId": 6945379
+    },
+    {
+      "filename": "player-animation-lib-forge-1.0.2-rc1+1.20.jar",
+      "projectId": 658587,
+      "fileId": 4587214
+    },
+    {
+      "filename": "polymorph-forge-0.49.11+1.20.1.jar",
+      "projectId": 388800,
+      "fileId": 8854504
+    },
+    {
+      "filename": "posture-1.5.0-1.20.1.jar",
+      "projectId": 1341498,
+      "fileId": 8071118
+    },
+    {
+      "filename": "quarry-1.20.1-2.0.0r.jar",
+      "projectId": 676373,
+      "fileId": 6654997
+    },
+    {
+      "filename": "rechiseled-1.2.6-forge-mc1.20.1.jar",
+      "projectId": 558998,
+      "fileId": 8875661
+    },
+    {
+      "filename": "refinedstorage-1.12.4.jar",
+      "projectId": 243076,
+      "fileId": 4844585
+    },
+    {
+      "filename": "resourcefulconfig-forge-1.20.1-2.1.3.jar",
+      "projectId": 714059,
+      "fileId": 6231176
+    },
+    {
+      "filename": "resourcefullib-forge-1.20.1-2.1.29.jar",
+      "projectId": 570073,
+      "fileId": 5659871
+    },
+    {
+      "filename": "respawnrecap-forge-1.2.0-1.20.1.jar",
+      "projectId": 1651841,
+      "fileId": 8935651
+    },
+    {
+      "filename": "rightclickharvest-forge-4.6.1+1.20.1.jar",
+      "projectId": 452834,
+      "fileId": 7508764
+    },
+    {
+      "filename": "simpleplanes-1.20.1-5.3.3.jar",
+      "projectId": 388908,
+      "fileId": 5537137
+    },
+    {
+      "filename": "SimpleQuarry-1.20.1-20.1.6.jar",
+      "projectId": 247393,
+      "fileId": 5502011
+    },
+    {
+      "filename": "smallships-2.0.1-forge-1.20.1.jar",
+      "projectId": 450659,
+      "fileId": 9118591
+    },
+    {
+      "filename": "solcarrot-1.20.1-1.15.1.jar",
+      "projectId": 277616,
+      "fileId": 4888575
+    },
+    {
+      "filename": "sophisticatedbackpacks-1.20.1-3.26.12.2206.jar",
+      "projectId": 422301,
+      "fileId": 9154766
+    },
+    {
+      "filename": "sophisticatedcore-1.20.1-1.5.11.2407.jar",
+      "projectId": 618298,
+      "fileId": 9201413
+    },
+    {
+      "filename": "squatgrow-forge-5.3.0+mc1.20.1.jar",
+      "projectId": 515698,
+      "fileId": 5150173
+    },
+    {
+      "filename": "supermartijn642configlib-1.1.8-forge-mc1.20.jar",
+      "projectId": 438332,
+      "fileId": 4715408
+    },
+    {
+      "filename": "supermartijn642corelib-1.1.25a-forge-mc1.20.1.jar",
+      "projectId": 454372,
+      "fileId": 9167765
+    },
+    {
+      "filename": "supplementaries-1.20-3.1.44-forge.jar",
+      "projectId": 412082,
+      "fileId": 9140345
+    },
+    {
+      "filename": "Sync-0.1.2.jar",
+      "projectId": 1493314,
+      "fileId": 7871435
+    },
+    {
+      "filename": "tacz_c-1.0.2-forge-1.20.1.jar",
+      "projectId": 1109760,
+      "fileId": 7327274
+    },
+    {
+      "filename": "tacz-1.20.1-1.1.8-hotfix2.jar",
+      "projectId": 1028108,
+      "fileId": 9037989
+    },
+    {
+      "filename": "TATOS 1.0.1_stable.jar",
+      "projectId": 440647,
+      "fileId": 5129404
+    },
+    {
+      "filename": "TConstruct-1.20.1-3.11.2.166.jar",
+      "projectId": 74072,
+      "fileId": 7449219
+    },
+    {
+      "filename": "ThirstWasTaken-1.20.1-1.4.0.jar",
+      "projectId": 679270,
+      "fileId": 6660408
+    },
+    {
+      "filename": "time-in-a-bottle-4.1.1-mc1.20.1.jar",
+      "projectId": 895919,
+      "fileId": 8988876
+    },
+    {
+      "filename": "tleveling-1.2.1-1.20.1.jar",
+      "projectId": 1088354,
+      "fileId": 8888185
+    },
+    {
+      "filename": "torchmaster-20.1.9.jar",
+      "projectId": 254268,
+      "fileId": 5849456
+    },
+    {
+      "filename": "trashcans-1.1.1a-forge-mc1.20.4.jar",
+      "projectId": 394535,
+      "fileId": 9009341
+    },
+    {
+      "filename": "TruckPack_0.5-1.20.1.jar",
+      "projectId": 1659146,
+      "fileId": 8682641
+    },
+    {
+      "filename": "universalportals-forge-1.20.1-v2.1.0.jar",
+      "projectId": 1505709,
+      "fileId": 9121525
+    },
+    {
+      "filename": "valkyrienskies-120-2.4.11.jar",
+      "projectId": 258371,
+      "fileId": 7906689
+    },
+    {
+      "filename": "vehicle-mod-26w37b-1.20.1.jar",
+      "projectId": 1341459,
+      "fileId": 8863240
+    },
+    {
+      "filename": "waystones-forge-1.20.1-14.1.21.jar",
+      "projectId": 245755,
+      "fileId": 8849482
+    },
+    {
+      "filename": "webdisplays-2.0.2-1.20.1.jar",
+      "projectId": 654478,
+      "fileId": 5823561
+    },
+    {
+      "filename": "xaerominimap-forge-1.20.1-26.6.0.jar",
+      "projectId": 263420,
+      "fileId": 9067172
+    },
+    {
+      "filename": "xaeroworldmap-forge-1.20.1-1.47.0.jar",
+      "projectId": 317780,
+      "fileId": 9067273
+    },
+    {
+      "filename": "ZDVehicles_V1.6-1.20.1.jar",
+      "projectId": 729125,
+      "fileId": 7182721
+    },
+    {
+      "filename": "ZeroCore2-1.20.1-2.1.48.jar",
+      "projectId": 247921,
+      "fileId": 7344725
+    }
+  ]
+}

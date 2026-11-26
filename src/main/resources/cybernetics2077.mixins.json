@@ -25,7 +25,9 @@
     "TemporalBlockRenderMixin",
     "TemporalAtlasMixin",
     "TemporalWorldAnimationMixin",
-    "TemporalBlockShadersMixin"
+    "TemporalBlockShadersMixin",
+    "TacZRecoilMixin",
+    "TacZClientBurstMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,0 +1,35 @@
+# Compatibility and TaCZ
+
+Both platform builds contain the same cyberware, quickhacks, village services and progression. Install **only** the build matching your Minecraft version and loader. No extra dependency is needed; the Forge build embeds its MixinExtras dependency.
+
+## TaCZ gun integration
+
+TaCZ is optional. Tested versions are **1.1.8-hotfix2 on Forge 1.20.1** and **1.2.0-hotfix on NeoForge 1.21.1**. The bridge works with TaCZ's gun API, including gunpack weapons that use that API.
+
+| Cyberware | Effect with TaCZ |
+| --- | --- |
+| Smart Link | Bullets gently steer toward your scanner lock for their first two seconds. Requires optics, a valid enemy and clear sight; bullets cannot turn through walls. |
+| Ballistic Coprocessor | Non-explosive bullets can ricochet once, retaining 60% + 5% per tier of their speed. A bounced hit gains 5% damage per tier. |
+| Microgenerator | Confirmed gun hits trigger the normal electric discharge, with its existing cooldown and target limit. Blocked hits do not trigger it. |
+| Handle Wrap | Drawing a gun primes the implant's temporary critical-hit bonus. |
+| Shock Absorber | Reduces camera recoil by 8% per tier. Its knockback resistance also works while aiming a gun. |
+| Immovable Force | Reduces camera recoil by 7% per tier while grounded and still. Stacks multiplicatively with Shock Absorber; combined recoil reduction is capped at 85%. |
+| Weapon critical bonuses | Apply once to a gun hit, including the native headshot multiplier. |
+| Apogee | Its headshot bonus also applies to TaCZ headshots. |
+| Sandevistan | Bullets and weapon firing intervals follow relative local time, including burst spacing. Attachments, heat and the native reload system remain owned by TaCZ. |
+
+Deployed Mantis Blades and Berserk prevent firing and reloading guns. Scanner controls retain priority while scanning. TaCZ defaults use **Alt** for conflicting cyberware keys; see [controls](controls.md). Existing saved bindings are not reset.
+
+The full-screen cyberware viewer reports its complete footprint so JEI does not cover the hologram or sockets. Normal inventory, bench and shop overlays remain available.
+
+## Large modpacks and the time bubble
+
+The time bubble leaves complex machine and physics blocks at normal tick speed by default. This includes Create, Valkyrien Skies, Mekanism, Extreme Reactors, Immersive Engineering, Immersive Vehicles, Ad Astra, Refined Storage, Pipez, Cyclic, Botania and WebDisplays. This avoids skipping essential network, energy and physics updates. Ordinary supported blocks still use local time.
+
+Server owners can adjust `timeBubbleExcludedBlockNamespaces` in the Cybernetics 2077 server config. Custom vehicle and contraption entities retain their native simulation.
+
+## Checked pack
+
+The supplied Forge pack list contains **159 pinned mod files**, including TaCZ, TaCZ: Creatified and Cybernetic System. Its sanitized manifest and detailed validation notes are in [the compatibility directory](https://github.com/Bithio999/Cybernetics-2077/tree/main/compat). Third-party mods and assets are not bundled with Cybernetics 2077.
+
+Pack-specific configs, scripts and extra gunpacks were not supplied, so those settings require a check in your actual instance. Cybernetic System remains a separate mod with its own equipment and progression.

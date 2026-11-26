@@ -23,12 +23,7 @@ public final class AugmentClient {
   private static Object level;
 
   private static KeyMapping key(String id, int code) {
-    return new KeyMapping(
-        "key.cybernetics2077." + id,
-        net.neoforged.neoforge.client.settings.KeyConflictContext.IN_GAME,
-        com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,
-        code,
-        "key.categories.cybernetics2077");
+    return CyberKeys.create(id, code);
   }
 
   public static void action(int id) {

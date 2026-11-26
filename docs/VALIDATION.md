@@ -1,6 +1,18 @@
 # Validation
 
-Minecraft 1.21.1, NeoForge 21.1.248, Java 21. Tests use NeoForge alone, without Tensura or other gameplay mods.
+Current targets: Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21 and Minecraft 1.20.1 / Forge 47.4.29 / Java 17.
+
+## Forge port and TaCZ integration (0.20.0)
+
+Both builds pass 98 shared JVM tests and eight TaCZ integration GameTests. All 133 existing NeoForge GameTests pass without TaCZ. Native clients load a real integrated world, open the cyberware menu over the network and render the hologram, scanner, Mantis Blades and Sandevistan with TaCZ installed. The Forge shaders explicitly declare their vertex attributes and blend state; these were verified in actual framebuffer captures.
+
+A production client with all 159 supplied files completes multiplayer login and opens the cyberware screen. A follow-up native JEI check verifies the full-screen viewer prevents ingredient-list overlap.
+
+A production Forge server reaches `Done` with 157 server-compatible files from the supplied 159-file pack, both before and after adding the reobfuscated mod. Essential and Respawn Recap are client-only. Original pack configs/scripts/gunpacks were not supplied. Startup checks do not establish every third-party gameplay interaction.
+
+[Reproducible setup and limitations](../compat/README.md) · [Results](review/results/compat-0.20.0.json) · [Forge client capture](images/compat-forge-0.20.0.png) · [NeoForge client capture](images/compat-neoforge-0.20.0.png)
+
+The sections below describe earlier NeoForge-only releases.
 
 ## Animated blocks and smooth pistons (0.19.0)
 

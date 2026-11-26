@@ -1,9 +1,12 @@
-# Download
+# Downloads
 
-**[Latest: Cybernetics2077-0.19.0.jar](Cybernetics2077-0.19.0.jar)**
+| Minecraft | Loader | Java | Download 0.20.0 |
+| --- | --- | --- | --- |
+| 1.21.1 | NeoForge 21.1.248+ | 21 | [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.20.0.jar) |
+| 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
 
-Minecraft **1.21.1** · NeoForge **21.1.248+ for 1.21.1** · Java **21**. Install on both server and clients; replace any previous Cybernetics 2077 JAR.
+Install the matching build on both server and clients; replace the older Cybernetics 2077 JAR.
 
-[Installation guide](../docs/wiki/getting-started.md) · [Checksums](SHA256SUMS)
+[Installation](../docs/wiki/getting-started.md) · [Compatibility](../docs/wiki/compatibility.md) · [Checksums](SHA256SUMS)
 
-The other JARs in this folder are older releases retained for existing links and rollback.
+Older releases remain here for existing links and rollback.

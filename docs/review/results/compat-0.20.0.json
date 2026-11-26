@@ -1,0 +1,48 @@
+{
+  "version": "0.20.0",
+  "date": "2026-11-26",
+  "platforms": [
+    {
+      "minecraft": "1.21.1",
+      "loader": "NeoForge 21.1.248",
+      "java": 21,
+      "tacz": "1.2.0-hotfix",
+      "jvmTests": 98,
+      "taczGameTests": 8,
+      "nativeClient": "passed"
+    },
+    {
+      "minecraft": "1.20.1",
+      "loader": "Forge 47.4.29",
+      "java": 17,
+      "tacz": "1.1.8-hotfix2",
+      "jvmTests": 98,
+      "taczGameTests": 8,
+      "nativeClient": "passed"
+    }
+  ],
+  "neoforgeWithoutTacz": {
+    "gameTests": 133,
+    "failures": 0
+  },
+  "pack": {
+    "pinnedFiles": 159,
+    "productionServerFiles": 157,
+    "excludedClientComponents": [
+      "Essential",
+      "Respawn Recap"
+    ],
+    "baselineStartup": "Done",
+    "withCyberneticsStartup": "Done",
+    "usesOriginalPackConfigs": false,
+    "productionClientFiles": 159,
+    "productionMultiplayerLogin": "passed",
+    "cyberwareMenuNetworking": "passed"
+  },
+  "scope": "Native gun API fixtures, integrated clients, and production pack startup. No complete modpack playthrough or supplied custom configs/gunpacks.",
+  "jei": {
+    "forgeVersion": "15.57.0.208",
+    "fullScreenCyberwareOverlayHidden": true,
+    "nativeClientStatus": "passed"
+  }
+}

@@ -8,18 +8,36 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'build/libs/Cybernetics2077-0.19.0.jar'
-with ZipFile(jar) as z:
+if len(sys.argv) == 1:
+    import subprocess
+    for build in ('build/libs/Cybernetics2077-NeoForge-1.21.1-0.20.0.jar',
+                  'forge-1.20.1/build/libs/Cybernetics2077-Forge-1.20.1-0.20.0.jar'):
+        subprocess.run([sys.executable, __file__, str(root / build)], check=True)
+    sys.exit(0)
+jar = Path(sys.argv[1])
+forge = '-Forge-1.20.1-' in jar.name
+resource_root = root / ('forge-1.20.1/build/generated/port/resources' if forge else 'src/main/resources')
+def versioned(entry):
+    if not forge: return entry
+    parts = entry.split('/')
+    for i, part in enumerate(parts):
+        if part in ('recipe', 'loot_table', 'structure', 'advancement', 'item_modifier', 'predicate'):
+            parts[i] = part + 's'
+    return '/'.join(parts)
+class PortZip(ZipFile):
+    def read(self, name, *args, **kwargs):
+        return super().read(versioned(name), *args, **kwargs)
+with PortZip(jar) as z:
     names = set(z.namelist())
-    metadata = tomllib.loads(z.read('META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.19.0'
+    metadata = tomllib.loads(z.read('META-INF/mods.toml' if forge else 'META-INF/neoforge.mods.toml').decode())
+    assert metadata['mods'][0]['version']=='0.20.0'
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
-    assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'neoforge'}
-    forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
+    assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'forge' if forge else 'neoforge'}
+    forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'structures/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
     assert not [n for n in names if any(s in n.lower() for s in forbidden)], 'Foreign content or review fixtures in release'
-    for path in (root / 'src/main/resources').rglob('*'):
+    for path in resource_root.rglob('*'):
         if path.is_file():
-            entry = path.relative_to(root / 'src/main/resources').as_posix()
+            entry = path.relative_to(resource_root).as_posix()
             assert entry in names and z.read(entry) == path.read_bytes(), f'Missing/stale resource: {entry}'
             if path.suffix == '.json':
                 json.loads(z.read(entry))
@@ -98,19 +116,19 @@ with ZipFile(jar) as z:
                      'data/cybernetics2077/damage_type/short_circuit.json',
                      'cybernetics2077.mixins.json',
                      'assets/cybernetics2077/font/rajdhani-license.txt'):
-        assert required in names, required
+        assert versioned(required) in names, required
     assert not any(n.endswith(('.blend','.py','.cyh')) or 'DiagnosticModel' in n for n in names), 'Replaced hologram pipeline leaked into release'
     assert 'assets/cybernetics2077/textures/entity/diagnostic.png' not in names, 'Diagnostic placeholder skin still shipped'
     for icon in ('optical_scanner','cyberdeck_tier_1','mantis_claws_tier_1','short_circuit_tier_1'):
         png=z.read('assets/cybernetics2077/textures/item/'+icon+'.png')
         assert struct.unpack('>II',png[16:24]) == (32,32), 'Equipment sprite is not 32px pixel art: '+icon
     assert struct.unpack('>II', z.read('assets/cybernetics2077/textures/entity/mantis_elemental.png')[16:24]) == (64, 32)
-    recipes = {n for n in names if n.startswith('data/cybernetics2077/recipe/') and n.endswith('.json')}
-    unlocks = {n for n in names if n.startswith('data/cybernetics2077/advancement/recipes/') and n.endswith('.json')}
-    assert recipes == {'data/cybernetics2077/recipe/cybernetics_bench.json'}, 'Cyberware crafting/upgrade recipes shipped'
-    assert unlocks == {'data/cybernetics2077/advancement/recipes/cybernetics_bench.json'}, 'Removed recipe unlocks shipped'
+    recipes = {n for n in names if n.startswith(versioned('data/cybernetics2077/recipe/')) and n.endswith('.json')}
+    unlocks = {n for n in names if n.startswith(versioned('data/cybernetics2077/advancement/recipes/')) and n.endswith('.json')}
+    assert recipes == {versioned('data/cybernetics2077/recipe/cybernetics_bench.json')}, 'Cyberware crafting/upgrade recipes shipped'
+    assert unlocks == {versioned('data/cybernetics2077/advancement/recipes/cybernetics_bench.json')}, 'Removed recipe unlocks shipped'
     bench = json.loads(z.read(next(iter(recipes))))
-    assert bench['type'] == 'minecraft:crafting_shaped' and bench['result']['id'] == 'cybernetics2077:cybernetics_bench'
+    assert bench['type'] == 'minecraft:crafting_shaped' and bench['result']['item' if forge else 'id'] == 'cybernetics2077:cybernetics_bench'
     advancement = json.loads(z.read(next(iter(unlocks))))
     assert advancement['rewards']['recipes'] == ['cybernetics2077:cybernetics_bench']
     lang = json.loads(z.read('assets/cybernetics2077/lang/en_us.json'))
@@ -230,7 +248,7 @@ with ZipFile(jar) as z:
         states=json.loads(z.read(f'assets/cybernetics2077/blockstates/{block}.json'))
         assert set(states['variants'])=={'facing='+d for d in ('north','east','south','west')}
         assert f'assets/cybernetics2077/models/item/{block}.json' in names
-        assert f'data/cybernetics2077/loot_table/blocks/{block}.json' in names
+        assert versioned(f'data/cybernetics2077/loot_table/blocks/{block}.json') in names
         for texture in model['textures'].values():
             assert 'assets/'+texture.replace(':','/textures/')+'.png' in names, texture
         for part in model['elements']:
@@ -255,5 +273,20 @@ with ZipFile(jar) as z:
                 assert entry['Name'].split(':')[1] in city_blocks
         pool=json.loads(z.read(f'data/cybernetics2077/worldgen/template_pool/village/{building}.json'))
         assert pool['elements'][0]['element']['element_type']=='cybernetics2077:supported_building'
-        assert f'data/cybernetics2077/loot_table/chests/{building}.json' in names
+        assert versioned(f'data/cybernetics2077/loot_table/chests/{building}.json') in names
+    for entry in names:
+        if entry.endswith('.class'):
+            major = struct.unpack('>H', z.read(entry)[6:8])[0]
+            assert major <= (61 if forge else 65), f'Wrong Java target: {entry}'
+            if forge: assert b'net/neoforged/' not in z.read(entry), entry
+    for cls in ('compat/TacZCompat', 'mixin/TacZGunDataMixin', 'mixin/TacZBurstMixin',
+                'mixin/client/TacZRecoilMixin', 'mixin/client/TacZClientBurstMixin'):
+        assert f'dev/cybernetics2077/{cls}.class' in names
+    if forge:
+        assert 'META-INF/neoforge.mods.toml' not in names
+        assert 'cybernetics2077.refmap.json' in names
+        assert any(n.startswith('META-INF/jarjar/') and 'mixinextras-forge' in n for n in names)
+        for shader in ('hologram', 'temporal_ghost', 'skin_composite', 'ui_texture'):
+            data = json.loads(z.read(f'assets/cybernetics2077/shaders/core/{shader}.json'))
+            assert data.get('attributes') and data.get('blend'), shader
 print(f'PASS: standalone metadata, classes, resource parity, JSON, font license, no review fixtures: {jar.name}')

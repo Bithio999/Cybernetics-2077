@@ -4,12 +4,15 @@
 
 ## Build the mod
 
-Use Java 21:
+NeoForge uses Java 21. Forge 1.20.1 uses Java 17:
 
 ```sh
 ./gradlew test build
+./gradlew -p forge-1.20.1 test build
 python3 scripts/verify-release.py
 ```
+
+[Forge port and TaCZ validation](../../compat/README.md).
 
 Run `./gradlew runClient` for development. [Native/server review instructions](../VALIDATION.md) include disposable test-save setup. Research lives in [research](../research/CYBERWARE-CATALOGUE.md); model work in [art](../../art/mantis/README.md); older captures in the [preview archive](../PREVIEWS.md).
 

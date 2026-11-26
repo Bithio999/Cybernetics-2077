@@ -172,6 +172,7 @@ public final class AugmentExpansion {
         }
       } else if (e.getSource().getDirectEntity() instanceof Projectile projectile
           && e.getSource().is(DamageTypeTags.IS_PROJECTILE)
+          && !dev.cybernetics2077.compat.TacZCompat.bullet(projectile)
           && attacker.getRandom().nextFloat()
               < weaponCritChance(attacker, e.getEntity(), projectile instanceof ThrownTrident)) {
         e.setAmount(e.getAmount() * critMultiplier(attacker));

@@ -4,11 +4,16 @@
 
 ## Install the mod
 
-1. Install **Minecraft 1.21.1** with **NeoForge 21.1.248 or newer for 1.21.1** and **Java 21**.
-2. Download [Cybernetics2077-0.19.0.jar](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-0.19.0.jar) and place it in your instance's `mods` folder.
-3. Replace older Cybernetics 2077 JARs. For multiplayer, install the same version on **both server and clients**.
+| Minecraft | Loader | Java | Download 0.20.0 |
+| --- | --- | --- | --- |
+| 1.21.1 | NeoForge 21.1.248+ | 21 | [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.20.0.jar) |
+| 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
 
-This is a standalone mod. Existing saves remain compatible.
+1. Install the loader and Java version matching your Minecraft instance.
+2. Download that platform's JAR and place it in `mods`.
+3. Replace older Cybernetics 2077 JARs. For multiplayer, use the same mod version on both server and clients.
+
+Existing worlds on the **same Minecraft version** are supported. The Forge port is for 1.20.1 worlds; it does not convert a 1.21.1 save to 1.20.1. Village buildings require new chunks. See [compatibility](compatibility.md) for TaCZ and modpack notes.
 
 ## Get your first implant
 
@@ -16,7 +21,7 @@ This is a standalone mod. Existing saves remain compatible.
 2. Visit the **[Afterlife](afterlife.md)** and accept **[First Impressions](contracts.md#first-impressions)** from a fixer. If no route is available, visit a clinic and return.
 3. Deliver the contract shard to a ripperdoc for **€$1,000 and 5 Street Cred**.
 4. Buy **tier 1 [Basic Kiroshi Optics](kiroshi-optics.md)** for €$1,000. They are guaranteed in stock at Street Cred 0–10.
-5. Use the ripperdoc's **Install** tab to equip them in **Face**. Hold **V** to scan.
+5. Use the ripperdoc's **Install** tab to equip them in **Face**. Hold **V** to scan (**Alt+V** by default when TaCZ is installed).
 
 Supply barrels also contain [Eurodollar Credit Chips](street-cred.md#eddies), worth 100 eddies each.
 

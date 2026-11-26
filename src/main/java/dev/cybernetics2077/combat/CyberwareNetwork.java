@@ -11,6 +11,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 public final class CyberwareNetwork {
   public static Consumer<CompoundTag> receiver = t -> {};
+  public static java.util.function.Consumer<Ballistics> trajectory = p -> {};
   public static java.util.function.IntConsumer impact = i -> {};
 
   public record Action(int kind) implements CustomPacketPayload {
@@ -66,8 +67,49 @@ public final class CyberwareNetwork {
     }
   }
 
+  public record Ballistics(
+      int entity,
+      java.util.UUID uuid,
+      double x,
+      double y,
+      double z,
+      double vx,
+      double vy,
+      double vz)
+      implements CustomPacketPayload {
+    public static final Type<Ballistics> TYPE = new Type<>(Cybernetics2077.id("ballistics"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, Ballistics> CODEC =
+        StreamCodec.of(
+            (b, p) -> {
+              b.writeVarInt(p.entity);
+              b.writeUUID(p.uuid);
+              b.writeDouble(p.x);
+              b.writeDouble(p.y);
+              b.writeDouble(p.z);
+              b.writeDouble(p.vx);
+              b.writeDouble(p.vy);
+              b.writeDouble(p.vz);
+            },
+            b ->
+                new Ballistics(
+                    b.readVarInt(),
+                    b.readUUID(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble()));
+
+    public Type<Ballistics> type() {
+      return TYPE;
+    }
+  }
+
   public static void register(RegisterPayloadHandlersEvent e) {
-    var r = e.registrar("10");
+    var r = e.registrar("11");
+    r.playToClient(
+        Ballistics.TYPE, Ballistics.CODEC, (p, c) -> c.enqueueWork(() -> trajectory.accept(p)));
     r.playToServer(
         Action.TYPE,
         Action.CODEC,

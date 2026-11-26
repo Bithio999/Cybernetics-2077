@@ -24,4 +24,6 @@ Default bindings can be changed under **Options → Controls → Cybernetics 207
 | Fortified Ankles charged jump | Hold jump on ground, then release |
 | Install/remove implants or chips | Shift-click in the appropriate menu |
 
-[Cyberware](cyberware.md) · [Quickhacks](quickhacks.md)
+With **TaCZ installed**, new default bindings use **Alt+V** for the scanner, **Alt+G** for blades, **Alt+H** for Blood Pump, **Alt+C** for camo, **Alt+O** for Sandevistan and **Alt+I** for Berserk. This avoids conflicting with the gun controls. Previously saved keybindings are kept; resolve existing conflicts in Options → Controls.
+
+[TaCZ compatibility](compatibility.md) · [Cyberware](cyberware.md) · [Quickhacks](quickhacks.md)

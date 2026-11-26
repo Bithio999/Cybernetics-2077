@@ -19,4 +19,6 @@ While standing still on the ground, bows, crossbows and tridents charge faster. 
 
 No-gravity projectiles retain their existing flight. The flatter-flight effect applies to arrows, not tridents.
 
+With TaCZ, camera recoil is reduced by 7% per tier while grounded and still. This stacks multiplicatively with Shock Absorber, with an 85% combined reduction limit. [Gun integration](compatibility.md).
+
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)

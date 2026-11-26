@@ -18,12 +18,7 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = Cybernetics2077.ID, value = Dist.CLIENT)
 public final class CyberwareClient {
   public static final KeyMapping DRAW =
-      new KeyMapping(
-          "key.cybernetics2077.mantis",
-          net.neoforged.neoforge.client.settings.KeyConflictContext.IN_GAME,
-          com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM,
-          GLFW.GLFW_KEY_G,
-          "key.categories.cybernetics2077");
+      dev.cybernetics2077.client.ui.CyberKeys.create("mantis", GLFW.GLFW_KEY_G);
   private static final Map<Integer, CompoundTag> STATES = new HashMap<>();
   private static final Map<Integer, MantisDeployment> DEPLOYMENT = new HashMap<>();
   public static final Map<Integer, Long> IMPACTS = new HashMap<>();

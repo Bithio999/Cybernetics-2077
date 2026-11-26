@@ -216,6 +216,39 @@ public final class Cybernetics2077 {
               "Chance per eligible natural hostile spawn to receive cyberware. 0 disables new"
                   + " variants.")
           .defineInRange("enhancedMobSpawnChance", .02, 0, 1);
+  public static final ModConfigSpec.ConfigValue<java.util.List<? extends String>>
+      TIME_BUBBLE_EXCLUDED_BLOCK_NAMESPACES =
+          CONFIG
+              .comment(
+                  "Block namespaces whose machinery keeps normal simulation time inside a"
+                      + " Sandevistan bubble. Add networked machines or physics mods here.")
+              .defineListAllowEmpty(
+                  "timeBubbleExcludedBlockNamespaces",
+                  java.util.List.of(
+                      "create",
+                      "valkyrienskies",
+                      "vs_clockwork",
+                      "vs_eureka",
+                      "mekanism",
+                      "mekanismgenerators",
+                      "extremereactors",
+                      "compactextremereactor",
+                      "zerocore",
+                      "immersiveengineering",
+                      "immersivevehicles",
+                      "ad_astra",
+                      "create_ad_astra_compat",
+                      "botarium",
+                      "refinedstorage",
+                      "pipez",
+                      "tconstruct",
+                      "quarry",
+                      "simplequarry",
+                      "cyclic",
+                      "botania",
+                      "mcef",
+                      "webdisplays"),
+                  value -> value instanceof String name && name.matches("[a-z0-9_.-]+"));
   private static final ModConfigSpec SPEC = CONFIG.build();
 
   public Cybernetics2077(IEventBus bus, ModContainer container) {
@@ -229,6 +262,7 @@ public final class Cybernetics2077 {
     bus.addListener(ScannerNetwork::register);
     bus.addListener(CyberwareNetwork::register);
     bus.addListener(this::creative);
+    dev.cybernetics2077.compat.TacZCompat.init();
   }
 
   private void creative(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent e) {

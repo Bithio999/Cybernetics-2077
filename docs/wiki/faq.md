@@ -8,7 +8,7 @@ Yes. Existing equipment and player data remain compatible. New village buildings
 
 ## Why does the scanner not open?
 
-Install optics in **Face** at a ripperdoc or bench. Carrying the item is not enough. Hold **V**, rather than tapping it. An active contract grants navigation only.
+Install optics in **Face** at a ripperdoc or bench. Carrying the item is not enough. Hold **V**, rather than tapping it (**Alt+V** by default with TaCZ). An active contract grants navigation only.
 
 ## Why are there no quickhacks in the scanner?
 

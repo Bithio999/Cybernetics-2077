@@ -1,0 +1,30 @@
+// Optional test fixtures and local TaCZ JARs; never applied by release builds.
+gradle.projectsEvaluated {
+    def p = rootProject
+    def forge = p.plugins.hasPlugin('net.neoforged.moddev.legacyforge')
+    def ext = forge ? p.legacyForge : p.neoForge
+    def prefix = forge ? '../' : ''
+    if (p.hasProperty('compatClientReview')) {
+        p.sourceSets.main.java.srcDir(p.file(prefix + 'compat/' + (forge ? 'forge' : 'neo') + '-clientreview'))
+        ext.runs.client.systemProperty('cybernetics2077.compatOutput', p.findProperty('compatOutput') ?: p.file('build/compat-client-review').absolutePath)
+    }
+    if (p.hasProperty('compatGameTests') && !forge) {
+        p.sourceSets.main.java.srcDir(p.file('compat/gametest'))
+        p.sourceSets.main.resources.srcDir(p.file('docs/review/resources'))
+    }
+    def jars = ['taczJar', 'jeiJar'].findAll { p.findProperty(it) }.collect { p.file(p.findProperty(it)) }
+    if (forge && !jars.isEmpty()) {
+        p.repositories.exclusiveContent {
+            forRepository { p.repositories.flatDir { dirs jars.collect { it.parentFile }.unique() } }
+            filter { includeGroup 'compat.local' }
+        }
+    }
+    jars.each { jar ->
+        if (forge) p.dependencies.add('modRuntimeOnly', [group: 'compat.local', name: jar.name.replaceFirst(/\.jar$/, ''), version: 'pinned'])
+        else p.dependencies.add('runtimeOnly', p.files(jar))
+    }
+    if (p.findProperty('compatRunDir')) {
+        ext.runs.server.gameDirectory = p.file(p.findProperty('compatRunDir'))
+        ext.runs.client.gameDirectory = p.file(p.findProperty('compatRunDir'))
+    }
+}
