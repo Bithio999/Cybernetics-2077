@@ -1,0 +1,67 @@
+{
+  "version": "0.24.0",
+  "platform": "Minecraft 1.21.1 / NeoForge 21.1.248",
+  "jvm": {
+    "tests": 106,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "standaloneGameTests": {
+    "tests": 150,
+    "failures": 0
+  },
+  "taczGameTests": {
+    "tests": 17,
+    "failures": 0,
+    "version": "1.2.0-hotfix",
+    "newScenarios": [
+      "Every world tick moves a David-slowed kinetic round; local lifetime and boundary restoration",
+      "Actual native round ricochets and damages target during fractional flight"
+    ]
+  },
+  "nativeClient": {
+    "status": "passed",
+    "triggeredGuns": [
+      "AKM",
+      "Desert Eagle"
+    ],
+    "fractionalFlightPacketCounts": [
+      22,
+      32
+    ],
+    "renderedFrameInterpolation": true,
+    "injectedNativeClipSecondsPerRealSecondWithDavid": {
+      "shoot": 0.0625,
+      "bolt": 0.0625,
+      "reload_tactical": 1.0,
+      "reload_empty": 1.0,
+      "draw": 1.0,
+      "static_idle": 1.0
+    },
+    "shootAndBoltAfterDeactivation": 1.0,
+    "normalSpeedRicochetRegression": "Six native triggers; ammo consumption, reflected target damage, post-removal path and framebuffer visibility checks passed",
+    "flightAndAnimationTrace": [
+      "Native clip shoot: 0.0625 seconds / 1 real second",
+      "Native clip bolt: 0.0625 seconds / 1 real second",
+      "Native clip reload_tactical: 1.0 seconds / 1 real second",
+      "Native clip reload_empty: 1.0 seconds / 1 real second",
+      "Native clip draw: 1.0 seconds / 1 real second",
+      "Native clip static_idle: 1.0 seconds / 1 real second",
+      "Native trigger: SUCCESS",
+      "Native trigger: SUCCESS",
+      "Round 34: 32 consecutive fractional flight packets; rendered interpolation confirmed",
+      "Round 32: 22 consecutive fractional flight packets; rendered interpolation confirmed",
+      "Native clip shoot: 1.0 seconds / 1 real second",
+      "Native clip bolt: 1.0 seconds / 1 real second"
+    ]
+  },
+  "releaseAudit": "passed; no review fixtures or optional dependencies bundled",
+  "wiki": "69 pages / 50 item and program entries; coverage and strict build passed",
+  "forge": {
+    "updated": false,
+    "version": "0.20.0",
+    "sha256": "95aa30a182e2c4046d9390da2a0c0d824f328c59204d45249541775eba580b4a"
+  },
+  "sha256": "dd88743285ec6366f3d0d65f54a8edf4526d6947021db5d00208a63cd0991244"
+}

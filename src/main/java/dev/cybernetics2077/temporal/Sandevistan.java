@@ -296,6 +296,11 @@ public final class Sandevistan {
 
   /** Native projectile collision and mob AI run at the same fractional rate as their physics. */
   public static void tickEntity(Entity entity, Runnable vanilla) {
+    if (BulletTime.eligible(entity)) {
+      BUDGETS.get().remove(entity);
+      vanilla.run();
+      return;
+    }
     if (!controlled(entity)) {
       BUDGETS.get().remove(entity);
       vanilla.run();

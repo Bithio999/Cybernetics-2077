@@ -12,7 +12,7 @@ Buy it with **ACQUIRE** when it appears in a ripperdoc's daily stock, then insta
 
 ![Apogee equipment details](../images/apogee-details-0.18.0.png)
 
-With [TaCZ](compatibility.md#tacz-gun-integration), your gunfire and bullets slow with the world; **reload speed stays normal**. Guns do not receive your personal speed increase.
+With [TaCZ](compatibility.md#tacz-gun-integration), your gunfire, firing/cycling animations and bullets slow with the world; **reload speed stays normal**. Guns do not receive your personal speed increase.
 
 ## Activation
 

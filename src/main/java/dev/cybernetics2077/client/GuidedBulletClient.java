@@ -34,7 +34,13 @@ public final class GuidedBulletClient {
     return e.level().isClientSide && e.getPersistentData().getBoolean(MANAGED);
   }
 
+  public static void release(Entity e) {
+    TRACKS.remove(e);
+    PENDING.remove(e.getUUID());
+  }
+
   public static void receive(CyberwareNetwork.Ballistics p) {
+    if (SmoothBulletClient.owns(p.uuid())) return;
     var mc = Minecraft.getInstance();
     if (mc.level == null) return;
     if (level != mc.level) {
@@ -53,6 +59,7 @@ public final class GuidedBulletClient {
   }
 
   private static void apply(Entity e, CyberwareNetwork.Ballistics p) {
+    if (SmoothBulletClient.owns(p.uuid())) return;
     var mc = Minecraft.getInstance();
     var track = TRACKS.computeIfAbsent(e, k -> new Track());
     long tick = p.tick() < 0 ? mc.level.getGameTime() : p.tick();

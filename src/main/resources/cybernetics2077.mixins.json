@@ -30,7 +30,8 @@
     "TacZClientBurstMixin",
     "TacZCrosshairMixin",
     "TacZBulletVisualMixin",
-    "TacZTracerMixin"
+    "TacZTracerMixin",
+    "TacZAnimationTimeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

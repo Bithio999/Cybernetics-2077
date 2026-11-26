@@ -1,5 +1,9 @@
 # Validation
 
+## Continuous bullet flight and gun mechanisms (NeoForge 0.24.0)
+
+**106 JVM tests, 150 standalone GameTests and 17 optional TaCZ GameTests pass.** Native AKM and Desert Eagle trigger checks verify continuous fractional flight and rendered interpolation. Injected firing/bolt clocks slow with David while reload/handling clocks remain normal. Normal-speed ricochet framebuffer checks also pass. [Implementation and scope](development/BULLET-TIME-0.24.0.md) · [Results](review/results/bullet-time-0.24.0.json). Forge remains unchanged.
+
 ## Full-speed ricochet display (NeoForge 0.23.1)
 
 **103 JVM tests, 150 standalone GameTests and 15 optional TaCZ GameTests pass.** The native client fires the AKM and Desert Eagle through normal trigger requests, verifies reflected damage and ammunition consumption, and checks the visible reflected path after native entity removal. [Reproduction and correction](development/RICOCHET-0.23.1.md) · [Results](review/results/ricochet-0.23.1.json). Forge remains unchanged.

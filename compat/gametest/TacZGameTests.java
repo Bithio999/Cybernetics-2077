@@ -242,69 +242,99 @@ public final class TacZGameTests {
 
   @GameTest(template = "empty", batch = "realBankDamage", timeoutTicks = 80)
   public static void ricochetedNativeGunRoundDamagesAnEnemy(GameTestHelper h) throws Exception {
+    realRoundDamage(h, false);
+  }
+
+  @GameTest(template = "empty", batch = "slowBankDamage", timeoutTicks = 80)
+  public static void fractionalNativeRoundRicochetsAndDamagesAnEnemy(GameTestHelper h)
+      throws Exception {
+    realRoundDamage(h, true);
+  }
+
+  private static void realRoundDamage(GameTestHelper h, boolean slow) throws Exception {
     var p = player(h);
-    equip(p, Augment.BALLISTIC_COPROCESSOR, 5, 0);
-    var builder =
-        Class.forName("com.tacz.guns.api.item.builder.GunItemBuilder")
-            .getMethod("create")
-            .invoke(null);
-    call(builder, "setId", net.minecraft.resources.ResourceLocation.parse("tacz:ak47"));
-    var stack = (ItemStack) call(builder, "build", p.registryAccess());
-    p.getInventory().setItem(0, stack);
-    p.getInventory().selected = 0;
-    var index =
-        (Optional<?>)
-            Class.forName("com.tacz.guns.api.TimelessAPI")
-                .getMethod("getCommonGunIndex", net.minecraft.resources.ResourceLocation.class)
-                .invoke(null, net.minecraft.resources.ResourceLocation.parse("tacz:ak47"));
-    var data = call(index.orElseThrow(), "getGunData");
-    var bulletData = call(data, "getBulletData");
-    var cache =
-        Class.forName("com.tacz.guns.resource.modifier.AttachmentCacheProperty")
-            .getConstructor()
-            .newInstance();
-    call(cache, "eval", stack, data);
-    var operatorApi = Class.forName("com.tacz.guns.api.entity.IGunOperator");
-    var operator = operatorApi.getMethod("fromLivingEntity", LivingEntity.class).invoke(null, p);
-    call(operator, "updateCacheProperty", cache);
-    var profile = TacZCompat.ballistics(p);
-    h.assertTrue(
-        profile != null && profile.speed() > 1 && profile.gravity() >= 0,
-        "Native gun preview properties unavailable");
-    var type = Class.forName("com.tacz.guns.entity.EntityKineticBullet");
-    var ctor =
-        Arrays.stream(type.getConstructors())
-            .filter(c -> c.getParameterCount() == 8)
-            .findFirst()
-            .orElseThrow();
-    var b =
-        (Projectile)
-            ctor.newInstance(
-                p.level(),
-                p,
-                stack,
-                net.minecraft.resources.ResourceLocation.parse("tacz:762x39"),
-                net.minecraft.resources.ResourceLocation.parse("tacz:ak47"),
-                true,
-                data,
-                bulletData);
-    var wall = p.blockPosition().offset(0, 1, 4);
-    for (int x = -2; x <= 2; x++)
-      for (int y = -2; y <= 2; y++)
-        h.getLevel().setBlock(wall.offset(x, y, 0), Blocks.STONE.defaultBlockState(), 3);
-    var target = EntityType.HUSK.create(h.getLevel());
-    target.moveTo(wall.getX() + .5, wall.getY() - 1, wall.getZ() - 2, 0, 0);
-    target.setNoAi(true);
-    target.setNoGravity(true);
-    h.getLevel().addFreshEntity(target);
-    b.setPos(wall.getX() + .5, wall.getY() + .5, wall.getZ() - .4);
-    b.setDeltaMovement(0, 0, 2);
-    b.tick();
-    h.assertTrue(b.isAlive() && b.getDeltaMovement().z < 0, "Native shot failed to bounce");
-    for (int i = 0; i < 4 && b.isAlive(); i++) b.tick();
-    h.assertTrue(
-        target.getHealth() < target.getMaxHealth(),
-        "Ricochet produced movement without a real native damage hit");
+    if (slow) {
+      equip(p, Augment.DAVIDS_SANDEVISTAN, 5, 0);
+      h.getLevel().addNewPlayer(p);
+      Sandevistan.toggle(p);
+      Sandevistan.invalidate(h.getLevel());
+    }
+    try {
+      equip(p, Augment.BALLISTIC_COPROCESSOR, 5, 0);
+      var builder =
+          Class.forName("com.tacz.guns.api.item.builder.GunItemBuilder")
+              .getMethod("create")
+              .invoke(null);
+      call(builder, "setId", net.minecraft.resources.ResourceLocation.parse("tacz:ak47"));
+      var stack = (ItemStack) call(builder, "build", p.registryAccess());
+      p.getInventory().setItem(0, stack);
+      p.getInventory().selected = 0;
+      var index =
+          (Optional<?>)
+              Class.forName("com.tacz.guns.api.TimelessAPI")
+                  .getMethod("getCommonGunIndex", net.minecraft.resources.ResourceLocation.class)
+                  .invoke(null, net.minecraft.resources.ResourceLocation.parse("tacz:ak47"));
+      var data = call(index.orElseThrow(), "getGunData");
+      var bulletData = call(data, "getBulletData");
+      var cache =
+          Class.forName("com.tacz.guns.resource.modifier.AttachmentCacheProperty")
+              .getConstructor()
+              .newInstance();
+      call(cache, "eval", stack, data);
+      var operatorApi = Class.forName("com.tacz.guns.api.entity.IGunOperator");
+      var operator = operatorApi.getMethod("fromLivingEntity", LivingEntity.class).invoke(null, p);
+      call(operator, "updateCacheProperty", cache);
+      var profile = TacZCompat.ballistics(p);
+      h.assertTrue(
+          profile != null && profile.speed() > 1 && profile.gravity() >= 0,
+          "Native gun preview properties unavailable");
+      var type = Class.forName("com.tacz.guns.entity.EntityKineticBullet");
+      var ctor =
+          Arrays.stream(type.getConstructors())
+              .filter(c -> c.getParameterCount() == 8)
+              .findFirst()
+              .orElseThrow();
+      var b =
+          (Projectile)
+              ctor.newInstance(
+                  p.level(),
+                  p,
+                  stack,
+                  net.minecraft.resources.ResourceLocation.parse("tacz:762x39"),
+                  net.minecraft.resources.ResourceLocation.parse("tacz:ak47"),
+                  true,
+                  data,
+                  bulletData);
+      var wall = p.blockPosition().offset(0, 1, 4);
+      for (int x = -2; x <= 2; x++)
+        for (int y = -2; y <= 2; y++)
+          h.getLevel().setBlock(wall.offset(x, y, 0), Blocks.STONE.defaultBlockState(), 3);
+      var target = EntityType.HUSK.create(h.getLevel());
+      target.moveTo(wall.getX() + .5, wall.getY() - 1, wall.getZ() - 2, 0, 0);
+      target.setNoAi(true);
+      target.setNoGravity(true);
+      h.getLevel().addFreshEntity(target);
+      b.setPos(wall.getX() + .5, wall.getY() + .5, wall.getZ() - .4);
+      b.setDeltaMovement(0, 0, 2);
+      for (int i = 0; i < (slow ? 8 : 1) && b.getDeltaMovement().z > 0; i++) {
+        b.tickCount++;
+        Sandevistan.tickEntity(b, b::tick);
+      }
+      h.assertTrue(b.isAlive() && b.getDeltaMovement().z < 0, "Native shot failed to bounce");
+      for (int i = 0; i < (slow ? 40 : 4) && b.isAlive(); i++) {
+        b.tickCount++;
+        Sandevistan.tickEntity(b, b::tick);
+      }
+      h.assertTrue(
+          target.getHealth() < target.getMaxHealth(),
+          "Ricochet produced movement without a real native damage hit");
+    } finally {
+      if (slow) {
+        Sandevistan.stop(p, AugmentRuntime.now(p));
+        h.getLevel().removePlayerImmediately(p, Entity.RemovalReason.DISCARDED);
+        Sandevistan.invalidate(h.getLevel());
+      }
+    }
     h.succeed();
   }
 
@@ -405,6 +435,45 @@ public final class TacZGameTests {
     h.assertTrue(
         b.getPersistentData().getCompound(TacZCompat.DATA).getInt("traceSteps") == 1,
         "Completed flight was lost with the owner");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", batch = "continuousFlight", timeoutTicks = 80)
+  public static void davidBulletsMoveEveryWorldTickAndRetainLocalLifetime(GameTestHelper h)
+      throws Exception {
+    var p = player(h);
+    equip(p, Augment.DAVIDS_SANDEVISTAN, 5, 0);
+    h.getLevel().addNewPlayer(p);
+    try {
+      Sandevistan.toggle(p);
+      Sandevistan.invalidate(h.getLevel());
+      var b = bullet(h, p);
+      b.setPos(p.position().add(0, 8, 0));
+      b.setDeltaMovement(0, 0, .25);
+      double start = b.getZ();
+      for (int i = 0; i < 16; i++) {
+        double old = b.getZ();
+        b.tickCount++;
+        Sandevistan.tickEntity(b, b::tick);
+        h.assertTrue(b.getZ() > old, "A slow round froze on a world tick");
+      }
+      h.assertTrue(
+          Math.abs(b.getZ() - start - .25) < .00001,
+          "Fractional displacement changed native travel");
+      h.assertTrue(
+          Math.abs(dev.cybernetics2077.temporal.BulletTime.age(b) - 1) < .00001,
+          "Bullet lifetime advanced in world time");
+      h.assertTrue(b.isAlive(), "Slowed round expired before local lifetime");
+      b.setPos(p.position().add(40, 8, 0));
+      double old = b.getZ();
+      b.tickCount++;
+      Sandevistan.tickEntity(b, b::tick);
+      h.assertTrue(b.getZ() - old > .2, "Leaving bubble did not restore native flight");
+    } finally {
+      Sandevistan.stop(p, AugmentRuntime.now(p));
+      h.getLevel().removePlayerImmediately(p, Entity.RemovalReason.DISCARDED);
+      Sandevistan.invalidate(h.getLevel());
+    }
     h.succeed();
   }
 
@@ -551,7 +620,8 @@ public final class TacZGameTests {
           Math.abs(Sandevistan.pace(arrow) - 1.25) < .00001, "Gun change also altered arrows");
       int[] steps = {0};
       for (int i = 0; i < 160; i++) Sandevistan.tickEntity(b, () -> steps[0]++);
-      h.assertTrue(steps[0] == 10, "Gun bullet physics did not follow fractional world clock");
+      h.assertTrue(
+          steps[0] == 160, "Kinetic bullets did not receive a fractional step every world tick");
       b.setPos(p.position().add(40, 0, 0));
       h.assertTrue(Sandevistan.pace(b) == 1, "Gun bullet remained slowed outside the bubble");
     } finally {

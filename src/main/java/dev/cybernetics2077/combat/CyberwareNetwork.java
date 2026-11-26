@@ -12,6 +12,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public final class CyberwareNetwork {
   public static Consumer<CompoundTag> receiver = t -> {};
   public static java.util.function.Consumer<Ballistics> trajectory = p -> {};
+  public static Consumer<Flight> flight = p -> {};
   public static Consumer<Rebound> rebound = p -> {};
   public static java.util.function.IntConsumer impact = i -> {};
 
@@ -152,8 +153,72 @@ public final class CyberwareNetwork {
     }
   }
 
+  public record Flight(
+      int entity,
+      java.util.UUID uuid,
+      long tick,
+      double px,
+      double py,
+      double pz,
+      double x,
+      double y,
+      double z,
+      double vx,
+      double vy,
+      double vz,
+      float pace,
+      float age,
+      boolean ended,
+      boolean bounced)
+      implements CustomPacketPayload {
+    public static final Type<Flight> TYPE = new Type<>(Cybernetics2077.id("bullet_flight"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, Flight> CODEC =
+        StreamCodec.of(
+            (b, p) -> {
+              b.writeVarInt(p.entity);
+              b.writeUUID(p.uuid);
+              b.writeLong(p.tick);
+              b.writeDouble(p.px);
+              b.writeDouble(p.py);
+              b.writeDouble(p.pz);
+              b.writeDouble(p.x);
+              b.writeDouble(p.y);
+              b.writeDouble(p.z);
+              b.writeDouble(p.vx);
+              b.writeDouble(p.vy);
+              b.writeDouble(p.vz);
+              b.writeFloat(p.pace);
+              b.writeFloat(p.age);
+              b.writeBoolean(p.ended);
+              b.writeBoolean(p.bounced);
+            },
+            b ->
+                new Flight(
+                    b.readVarInt(),
+                    b.readUUID(),
+                    b.readLong(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readDouble(),
+                    b.readFloat(),
+                    b.readFloat(),
+                    b.readBoolean(),
+                    b.readBoolean()));
+
+    public Type<Flight> type() {
+      return TYPE;
+    }
+  }
+
   public static void register(RegisterPayloadHandlersEvent e) {
-    var r = e.registrar("13");
+    var r = e.registrar("14");
+    r.playToClient(Flight.TYPE, Flight.CODEC, (p, c) -> c.enqueueWork(() -> flight.accept(p)));
     r.playToClient(Rebound.TYPE, Rebound.CODEC, (p, c) -> c.enqueueWork(() -> rebound.accept(p)));
     r.playToClient(
         Ballistics.TYPE, Ballistics.CODEC, (p, c) -> c.enqueueWork(() -> trajectory.accept(p)));

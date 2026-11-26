@@ -16,9 +16,11 @@ TaCZ is optional. Tested versions are **1.1.8-hotfix2 on Forge 1.20.1** and **1.
 | Immovable Force | Iconic: reduces camera recoil by 10% and bullet spread by 8% per tier, including while moving. Recoil stacks multiplicatively with Shock Absorber, capped at 85% combined reduction. |
 | Weapon critical bonuses | Apply once to a gun hit, including the native headshot multiplier. |
 | Apogee / David’s | Their +20% / +25% headshot bonuses also apply to TaCZ headshots. David’s requires NeoForge 0.21.0. |
-| Sandevistan | Gun firing intervals, burst spacing and TaCZ bullets follow the slowed world clock, including your own guns and bullets. Reload speed stays normal. Attachments, heat and native ammunition handling remain owned by TaCZ. |
+| Sandevistan | Gun firing intervals, burst spacing and firing/cycling animations follow the slowed world clock, including your own guns. Reload speed stays normal. Attachments, heat and native ammunition handling remain owned by TaCZ. |
 
 With one Sandevistan active, TaCZ firing rate and bullet simulation run at **62.5% of normal with Dynalar, 18.75% with Apogee, and 6.25% with David’s**. Your personal movement and melee speed still accelerate; guns do not inherit that acceleration. Reloading takes its normal real time. Bullets return to normal speed after leaving the bubble. These rules use the strongest applicable field once and retain PvP/team protections. Arrows and thrown tridents keep their existing owner-relative timing.
+
+**NeoForge 0.24.0:** non-explosive kinetic bullets advance smoothly every world tick, with fractional gravity, drag and lifetime. Their tracers shorten with local speed. Firing and cycling animations visibly slow, including their timed effects; reload and handling animations keep normal speed. Explosive rounds keep their existing native behavior.
 
 Basic Kiroshi Optics retain Smart Link locks normally. While aiming a TaCZ gun, Smart Link shows its normal lock indicator. Opening the scanner fades the gun’s ammunition/heat display, interaction hints, crosshair and hit markers with the native HUD; releasing it restores them.
 

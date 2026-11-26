@@ -225,7 +225,7 @@ public final class TacZCompat {
     completeBounce(entity);
     LivingEntity target = tag.getBoolean("bounced") ? null : HandsRuntime.locked(player);
     if (target != null
-        && entity.tickCount <= 40
+        && BulletTime.age(entity) <= 40
         && entity.distanceToSqr(target) <= 64 * 64
         && player.hasLineOfSight(target)
         && HandsRuntime.clear(
@@ -234,7 +234,14 @@ public final class TacZCompat {
       var d = target.getBoundingBox().getCenter().subtract(entity.position());
       var turn =
           HandsRules.turn(
-              v.x, v.y, v.z, d.x, d.y, d.z, .035 + .012 * AugmentRuntime.tier(player, SMART_LINK));
+              v.x,
+              v.y,
+              v.z,
+              d.x,
+              d.y,
+              d.z,
+              (.035 + .012 * AugmentRuntime.tier(player, SMART_LINK))
+                  * (BulletTime.eligible(entity) ? Math.min(1, Sandevistan.pace(entity)) : 1));
       entity.setDeltaMovement(turn.x(), turn.y(), turn.z());
       tag.putBoolean("controlled", true);
     }
@@ -253,21 +260,17 @@ public final class TacZCompat {
 
   public static void flightHit(Entity entity, Vec3 point) {
     if (!(entity.level() instanceof ServerLevel)) return;
+    BulletTime.hit(entity, point);
     var step = FLIGHT.get(entity);
     if (step != null) step.hit = point;
   }
 
-  /**
-   * Runs before removal reaches clients; endpoints come from real collision results.
-   */
+  /** Runs before removal reaches clients; endpoints come from real collision results. */
   public static void finishFlight(Entity entity) {
     if (!(entity.level() instanceof ServerLevel)) return;
     var step = FLIGHT.remove(entity);
     if (step == null) return;
-    Vec3 end =
-        entity.isRemoved() && step.hit != null
-            ? step.hit
-            : entity.position().add(entity.getDeltaMovement());
+    Vec3 end = entity.isRemoved() && step.hit != null ? step.hit : BulletTime.end(entity);
     var tag = entity.getPersistentData().getCompound(DATA);
     tag.putInt("traceSteps", tag.getInt("traceSteps") + 1);
     rebound(entity, step.start, end);
@@ -315,6 +318,7 @@ public final class TacZCompat {
     entity.setPos(tag.getDouble("px"), tag.getDouble("py"), tag.getDouble("pz"));
     entity.setDeltaMovement(tag.getDouble("vx"), tag.getDouble("vy"), tag.getDouble("vz"));
     tag.remove("pending");
+    BulletTime.bounce(entity);
     tag.putBoolean("controlled", true);
     sync(entity);
     rebound(entity, entity.position(), entity.position());
@@ -514,6 +518,18 @@ public final class TacZCompat {
     }
     PROFILES.put(shooter, new CachedProfile(tick, stack, result));
     return result;
+  }
+
+  public static boolean reloading(LivingEntity player) {
+    if (!gun(player.getMainHandItem())) return false;
+    try {
+      var api = Class.forName("com.tacz.guns.api.entity.IGunOperator");
+      var op = api.getMethod("fromLivingEntity", LivingEntity.class).invoke(null, player);
+      return Boolean.TRUE.equals(
+          call(call(call(op, "getSynReloadState"), "getStateType"), "isReloading"));
+    } catch (ReflectiveOperationException ex) {
+      throw new IllegalStateException(ex);
+    }
   }
 
   public static double recoil(LivingEntity player) {

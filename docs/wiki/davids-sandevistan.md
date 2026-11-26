@@ -12,7 +12,7 @@ An original **Tier 5 Iconic Operating System** for extended bursts of overwhelmi
 | Street Cred | 50 |
 | Purchase | €$150,000 + one Tier 5 Iconic Requisition Chip + one Militech “Apogee” Sandevistan |
 
-With [TaCZ](compatibility.md#tacz-gun-integration), your gunfire and bullets slow with the world; **reload speed stays normal**. Guns do not receive your personal speed increase.
+With [TaCZ](compatibility.md#tacz-gun-integration), your gunfire, firing/cycling animations and bullets slow with the world; **reload speed stays normal**. Guns do not receive your personal speed increase.
 
 ## Obtaining and installing
 

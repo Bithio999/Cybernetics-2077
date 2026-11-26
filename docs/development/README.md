@@ -71,3 +71,5 @@ Ripperdoc and Fixer spawn eggs are available in Creative. [Building design and a
 - [Hands integration and service menus — NeoForge 0.23.0](HANDS-SERVICES-0.23.0.md)
 
 - [Full-speed ricochet display — NeoForge 0.23.1](RICOCHET-0.23.1.md)
+
+- [Continuous bullet flight and mechanical animation — NeoForge 0.24.0](BULLET-TIME-0.24.0.md)

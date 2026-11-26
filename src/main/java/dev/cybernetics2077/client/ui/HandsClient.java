@@ -242,6 +242,7 @@ public final class HandsClient {
       event.enqueueWork(
           () -> {
             CyberwareNetwork.trajectory = dev.cybernetics2077.client.GuidedBulletClient::receive;
+            CyberwareNetwork.flight = dev.cybernetics2077.client.SmoothBulletClient::receive;
             CyberwareNetwork.rebound = dev.cybernetics2077.client.ReboundTrailClient::receive;
           });
     }
