@@ -4,13 +4,14 @@
 
 ## Build the mod
 
-NeoForge uses Java 21. Forge 1.20.1 uses Java 17:
+Work on **NeoForge 1.21.1 with Java 21**. Only update the Forge 1.20.1 port when explicitly requested:
 
 ```sh
 ./gradlew test build
-./gradlew -p forge-1.20.1 test build
 python3 scripts/verify-release.py
 ```
+
+For an explicit port update, use Java 17 and `./gradlew -p forge-1.20.1 test build`, then pass its JAR path to the release verifier. Otherwise leave its sources, version and artifact unchanged.
 
 [Forge port and TaCZ validation](../../compat/README.md).
 
@@ -29,6 +30,8 @@ Run `./gradlew runClient` for development. [Native/server review instructions](.
 [0.18.0 Iconic requisitions, Apogee research and model-specific timing](../research/ICONICS-APOGEE-0.18.0.md) · Original sprites: `python3 art/iconics/generate.py`.
 
 [0.19.0 local animated textures and continuous piston movement](../research/LOCAL-ANIMATION-0.19.0.md).
+
+[0.20.1 TaCZ HUD and basic-optics lock research](../research/TACZ-HUD-0.20.1.md).
 
 ## Edit the wiki
 

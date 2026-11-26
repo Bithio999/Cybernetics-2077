@@ -144,6 +144,10 @@ public final class NeoClientReview {
                     dev.cybernetics2077.temporal.Sandevistan.toggle(p);
                 });
       }
+      if (Boolean.getBoolean("cybernetics2077.gunReview") && tick >= 300) {
+        TacZHudReview.tick(tick - 300, OUT);
+        return;
+      }
       if (tick == 300) {
         Files.createDirectories(OUT);
         Files.writeString(

@@ -1,6 +1,17 @@
 # Validation
 
-Current targets: Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21 and Minecraft 1.20.1 / Forge 47.4.29 / Java 17.
+Active development: Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21. The Forge 1.20.1 release remains 0.20.0 until explicitly requested.
+
+## TaCZ HUD and basic-optics locks (NeoForge 0.20.1)
+
+Basic Kiroshi Optics no longer lose Smart Link locks during the ordinary equipment tick. The regression acquires a real target, runs equipment ticks, confirms the lock survives, then removes the optics and confirms the lock is cleared. All nine NeoForge TaCZ GameTests pass.
+
+The native client review holds a real TaCZ AK47, aims with the native aiming key, checks the Smart Link target state, opens/releases the scanner and verifies the gun HUD returns. It attempts a native trigger pull while scanning and verifies cancellation with ammunition preserved. A lowest-priority event observer checks that TaCZ's cancelled-crosshair contract remains intact while the scanner hides it. The generic TaCZ ammo, heat, interaction and kill layers use the same staged fade as the native HUD.
+
+[Results](review/results/tacz-0.20.1.json) · [Native ADS lock](images/tacz-0201-gun-smart-lock.png) · [Scanner open](images/tacz-0201-gun-scanner-open.png) · [Restored gun HUD](images/tacz-0201-gun-scanner-restored.png)
+
+The default release verifier targets only the current NeoForge version. Forge code and its published artifact are unchanged.
+
 
 ## Forge port and TaCZ integration (0.20.0)
 

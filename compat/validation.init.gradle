@@ -4,6 +4,7 @@ gradle.projectsEvaluated {
     def forge = p.plugins.hasPlugin('net.neoforged.moddev.legacyforge')
     def ext = forge ? p.legacyForge : p.neoForge
     def prefix = forge ? '../' : ''
+    if (p.hasProperty('compatGunReview')) ext.runs.client.systemProperty('cybernetics2077.gunReview','true')
     if (p.hasProperty('compatClientReview')) {
         p.sourceSets.main.java.srcDir(p.file(prefix + 'compat/' + (forge ? 'forge' : 'neo') + '-clientreview'))
         ext.runs.client.systemProperty('cybernetics2077.compatOutput', p.findProperty('compatOutput') ?: p.file('build/compat-client-review').absolutePath)

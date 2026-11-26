@@ -27,7 +27,8 @@
     "TemporalWorldAnimationMixin",
     "TemporalBlockShadersMixin",
     "TacZRecoilMixin",
-    "TacZClientBurstMixin"
+    "TacZClientBurstMixin",
+    "TacZCrosshairMixin"
   ],
   "injectors": {
     "defaultRequire": 1

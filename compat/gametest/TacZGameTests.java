@@ -268,7 +268,8 @@ public final class TacZGameTests {
           slowed > nativeInterval, "Native TaCZ interval ignored nearby Sandevistan field");
       long own = ((Number) call(data, "getShootInterval", p, mode, gun)).longValue();
       h.assertTrue(
-          own == TacZCompat.interval(p,nativeInterval), "Native gun interval did not use the owner's relative pace");
+          own == TacZCompat.interval(p, nativeInterval),
+          "Native gun interval did not use the owner's relative pace");
     } finally {
       h.getLevel().removePlayerImmediately(p, Entity.RemovalReason.DISCARDED);
       Sandevistan.invalidate(h.getLevel());
@@ -331,12 +332,58 @@ public final class TacZGameTests {
             LogicalSide.SERVER);
     post(untouched);
     h.assertTrue(AugmentRuntime.state(p).microReady == 0, "A blocked hit triggered Microgenerator");
-    post(event("common.EntityHurtByGunEvent$Pre",b,target,p,Cybernetics2077.id("test"),Cybernetics2077.id("test"),10f,null,false,1f,LogicalSide.SERVER));
+    post(
+        event(
+            "common.EntityHurtByGunEvent$Pre",
+            b,
+            target,
+            p,
+            Cybernetics2077.id("test"),
+            Cybernetics2077.id("test"),
+            10f,
+            null,
+            false,
+            1f,
+            LogicalSide.SERVER));
     target.setHealth(target.getHealth() - 2);
-    post(event("common.EntityHurtByGunEvent$Post",b,target,p,Cybernetics2077.id("test"),Cybernetics2077.id("test"),10f,null,false,1f,LogicalSide.SERVER));
+    post(
+        event(
+            "common.EntityHurtByGunEvent$Post",
+            b,
+            target,
+            p,
+            Cybernetics2077.id("test"),
+            Cybernetics2077.id("test"),
+            10f,
+            null,
+            false,
+            1f,
+            LogicalSide.SERVER));
     h.assertTrue(
         AugmentRuntime.state(p).microReady > AugmentRuntime.now(p),
         "Confirmed gun damage did not start discharge cooldown");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void basicOpticsKeepSmartLockAcrossEquipmentTicks(GameTestHelper h) {
+    var p = player(h);
+    p.getData(Cybernetics2077.CYBERWARE)
+        .setStackInSlot(
+            CyberwareCategory.FACE.firstSlot(), new ItemStack(Cybernetics2077.OPTICS.get()));
+    equip(p, Augment.SMART_LINK, 5, 0);
+    var target = h.spawn(EntityType.HUSK, new BlockPos(2, 90, 7));
+    HandsRuntime.lock(p, target);
+    h.assertTrue(HandsRuntime.locked(p) == target, "Basic optics could not acquire a lock");
+    for (int i = 0; i < 5; i++) AugmentRuntime.tick(p);
+    h.assertTrue(
+        HandsRuntime.locked(p) == target, "Equipment tick cleared a valid basic-optics lock");
+    p.getData(Cybernetics2077.CYBERWARE)
+        .setStackInSlot(CyberwareCategory.FACE.firstSlot(), ItemStack.EMPTY);
+    AugmentRuntime.tick(p);
+    h.assertTrue(
+        HandsRuntime.locked(p) == null && AugmentRuntime.state(p).smartTarget == null,
+        "Removing optics left a live lock");
     h.succeed();
   }
 }

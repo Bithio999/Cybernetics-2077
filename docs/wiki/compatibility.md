@@ -1,6 +1,6 @@
 # Compatibility and TaCZ
 
-Both platform builds contain the same cyberware, quickhacks, village services and progression. Install **only** the build matching your Minecraft version and loader. No extra dependency is needed; the Forge build embeds its MixinExtras dependency.
+Development currently targets **NeoForge 1.21.1**. The **Forge 1.20.1** version keeps its last release until a port update is requested. Install **only** the build matching your Minecraft version and loader. No extra dependency is needed; the Forge build embeds its MixinExtras dependency.
 
 ## TaCZ gun integration
 
@@ -18,9 +18,19 @@ TaCZ is optional. Tested versions are **1.1.8-hotfix2 on Forge 1.20.1** and **1.
 | Apogee | Its headshot bonus also applies to TaCZ headshots. |
 | Sandevistan | Bullets and weapon firing intervals follow relative local time, including burst spacing. Attachments, heat and the native reload system remain owned by TaCZ. |
 
+Basic Kiroshi Optics retain Smart Link locks normally. While aiming a TaCZ gun, Smart Link shows its normal lock indicator. Opening the scanner fades the gun’s ammunition/heat display, interaction hints, crosshair and hit markers with the native HUD; releasing it restores them.
+
 Deployed Mantis Blades and Berserk prevent firing and reloading guns. Scanner controls retain priority while scanning. TaCZ defaults use **Alt** for conflicting cyberware keys; see [controls](controls.md). Existing saved bindings are not reset.
 
 The full-screen cyberware viewer reports its complete footprint so JEI does not cover the hologram or sockets. Normal inventory, bench and shop overlays remain available.
+
+### Scanning with a gun
+
+Aim after scanning an enemy to see your Smart Link lock. The scanner replaces the native gun HUD while held; it returns when you release the scanner.
+
+![Smart Link while aiming](../images/tacz-0201-gun-smart-lock.png)
+
+![Scanner with a TaCZ rifle](../images/tacz-0201-gun-scanner-open.png)
 
 ## Large modpacks and the time bubble
 

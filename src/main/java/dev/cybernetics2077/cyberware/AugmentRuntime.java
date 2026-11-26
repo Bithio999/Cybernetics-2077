@@ -356,8 +356,11 @@ public final class AugmentRuntime {
     }
     if (optic == null) {
       s.highlights.clear();
-      s.smartUntil = 0;
-      s.smartTarget = null;
+      // Basic Kiroshi Optics provide scanning without an advanced highlight profile.
+      if (!dev.cybernetics2077.scanner.ScannerNetwork.installed(p)) {
+        s.smartUntil = 0;
+        s.smartTarget = null;
+      }
       return;
     }
     if (s.scanUntil <= time || !CyberwareRuntime.usable(p) || time % 4 != 0) return;

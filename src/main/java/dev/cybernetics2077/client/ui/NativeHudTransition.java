@@ -31,6 +31,14 @@ public final class NativeHudTransition {
   }
 
   public static Group vanilla(ResourceLocation name) {
+    if (name.getNamespace().equals("tacz")) {
+      return switch (name.getPath()) {
+        case "tac_gun_hud_overlay", "tac_heat_bar" -> Group.HOTBAR;
+        case "tac_kill_amount_overlay" -> Group.SKILLS;
+        case "tac_interact_key_overlay" -> Group.CROSSHAIR;
+        default -> null;
+      };
+    }
     if (!name.getNamespace().equals("minecraft")) return null;
     return switch (name.getPath()) {
       case "hotbar", "experience_bar", "experience_level", "jump_meter" -> Group.HOTBAR;

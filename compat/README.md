@@ -1,6 +1,8 @@
 # Port and gun compatibility
 
-Cybernetics 2077 0.20.0 targets two independent platforms:
+Active development targets **1.21.1 NeoForge (0.20.1)**. The **1.20.1 Forge release remains 0.20.0** and is updated only when explicitly requested. The root-source generator is not an automatic promise of port compatibility.
+
+The previous 0.20.0 port validation below covers two independent platforms:
 
 | Build | Runtime | Tested optional gun mod |
 | --- | --- | --- |
@@ -16,6 +18,10 @@ The optional bridge registers TaCZ's published events only when TaCZ is installe
 Smart guidance and one-shot ricochets operate on real `EntityKineticBullet` projectiles. Explosive rounds do not bounce. Full-precision trajectory packets retain TaCZ's projectile velocities beyond the vanilla motion-packet clamp. The receiver validates entity ID, UUID and bullet type. Guidance checks ownership, optics/lock, allies/PvP, distance and solid terrain. The gun damage bridge applies weapon critical bonuses once and preserves TaCZ's headshot factor. Electric discharge requires confirmed HP/absorption loss.
 
 Default key modifiers avoid the gun controls without resetting existing user settings. Complex machine/physics namespaces are exempt from block-ticker skipping in a Sandevistan bubble; configure `timeBubbleExcludedBlockNamespaces` for additional machinery.
+
+## NeoForge 0.20.1 follow-up
+
+Basic optics now preserve locks through equipment ticks. A ninth TaCZ GameTest covers lock persistence and cleanup after removing the optics. The native AK47 review verifies a positive ADS lock, smooth scanner/HUD handover, preservation of TaCZ's crosshair cancellation and a blocked trigger pull without ammunition loss. The Forge port and its release stay unchanged.
 
 ## Pack manifest and scope
 
@@ -37,13 +43,14 @@ The original modpack configs, scripts, resource packs and extra TaCZ gunpacks we
 
 ## Reproduce
 
-Build without test fixtures:
+Normal development builds and verifies **NeoForge only**:
 
 ```sh
 ./gradlew test build
-./gradlew -p forge-1.20.1 test build
 python3 scripts/verify-release.py
 ```
+
+Only for an explicit port update, build with `./gradlew -p forge-1.20.1 test build` and pass the Forge JAR path to `scripts/verify-release.py`. The default verifier checks the current NeoForge build.
 
 Download the appropriate TaCZ version separately. The init script adds a locally held gun JAR and optional test fixtures; it does not download or bundle it:
 
@@ -58,6 +65,8 @@ Download the appropriate TaCZ version separately. The init script adds a locally
 ```
 
 Add `-PjeiJar=/absolute/path/to/jei.jar` to include JEI in the native client overlay check.
+
+Add `-PcompatGunReview` with the NeoForge client review to exercise a real AK47, native ADS, Smart Link indication, scanner/HUD transitions and a blocked trigger pull without ammunition loss.
 
 For a native client smoke test, use a **disposable** save named `Cybernetics Forge Review` or `Cybernetics Neo Review` under the selected client's `saves` directory. Apply the same init script with `-PcompatClientReview`, `-PcompatRunDir=/absolute/path/to/test-instance`, `-PcompatOutput=/absolute/path/to/captures` and `runClient`. The fixture changes equipment and terrain in that save and closes the client on completion. It never ships in release builds. Do not run separate builds against the same project's generated files simultaneously.
 

@@ -8,10 +8,12 @@ A standalone **Minecraft 1.21.1 NeoForge / 1.20.1 Forge** mod inspired by Cyberp
 
 Individual item pages, tier stats, controls, acquisition and village guides.
 
-| Minecraft | Loader | Java | Download 0.20.0 |
+| Minecraft | Loader | Java | Version / Download |
 | --- | --- | --- | --- |
-| 1.21.1 | NeoForge 21.1.248+ | 21 | [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.20.0.jar) |
-| 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
+| 1.21.1 | NeoForge 21.1.248+ | 21 | 0.20.1 · [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.20.1.jar) |
+| 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | 0.20.0 · [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
+
+Development currently focuses on **1.21.1 NeoForge**. The Forge 1.20.1 build stays at its last release until an update is requested.
 
 Install the matching build on both server and clients. Replace the previous JAR. [TaCZ integration and modpack compatibility](docs/wiki/compatibility.md).
 
@@ -35,7 +37,7 @@ Existing worlds are supported; new village buildings require new chunks.
 <details>
 <summary>Source code, building and documentation maintenance</summary>
 
-NeoForge: Java 21, `./gradlew test build`. Forge: Java 17, `./gradlew -p forge-1.20.1 test build`. Run `python3 scripts/verify-release.py` after both builds. [Port and compatibility testing](compat/README.md).
+Active NeoForge development: Java 21, `./gradlew test build`, then `python3 scripts/verify-release.py`. Build and validate Forge separately only for an explicitly requested port update. [Port and compatibility testing](compat/README.md).
 
 [Developer notes](docs/development/README.md) · [Validation](docs/VALIDATION.md) · [Research](docs/research/CYBERWARE-CATALOGUE.md) · [Preview archive](docs/PREVIEWS.md)
 

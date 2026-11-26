@@ -8,13 +8,11 @@ import tomllib
 from zipfile import ZipFile
 
 root = Path(__file__).resolve().parents[1]
-if len(sys.argv) == 1:
-    import subprocess
-    for build in ('build/libs/Cybernetics2077-NeoForge-1.21.1-0.20.0.jar',
-                  'forge-1.20.1/build/libs/Cybernetics2077-Forge-1.20.1-0.20.0.jar'):
-        subprocess.run([sys.executable, __file__, str(root / build)], check=True)
-    sys.exit(0)
-jar = Path(sys.argv[1])
+def build_version(project):
+    import re
+    return re.search(r"^version = '([^']+)'", (root / project / 'build.gradle').read_text(), re.M)[1]
+neo_version = build_version(Path('.'))
+jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / f'build/libs/Cybernetics2077-NeoForge-1.21.1-{neo_version}.jar'
 forge = '-Forge-1.20.1-' in jar.name
 resource_root = root / ('forge-1.20.1/build/generated/port/resources' if forge else 'src/main/resources')
 def versioned(entry):
@@ -30,7 +28,7 @@ class PortZip(ZipFile):
 with PortZip(jar) as z:
     names = set(z.namelist())
     metadata = tomllib.loads(z.read('META-INF/mods.toml' if forge else 'META-INF/neoforge.mods.toml').decode())
-    assert metadata['mods'][0]['version']=='0.20.0'
+    assert metadata['mods'][0]['version'] == build_version(Path('forge-1.20.1') if forge else Path('.'))
     assert [m['modId'] for m in metadata['mods']] == ['cybernetics2077']
     assert {d['modId'] for d in metadata['dependencies']['cybernetics2077']} == {'minecraft', 'forge' if forge else 'neoforge'}
     forbidden = ('review/', 'armskinboundsreview', 'review_cortex', 'structure/empty.nbt', 'structures/empty.nbt', 'dev/heavenlyrestriction/', 'dev/wildhunt/', 'tensura', 'marcos')
@@ -282,6 +280,8 @@ with PortZip(jar) as z:
     for cls in ('compat/TacZCompat', 'mixin/TacZGunDataMixin', 'mixin/TacZBurstMixin',
                 'mixin/client/TacZRecoilMixin', 'mixin/client/TacZClientBurstMixin'):
         assert f'dev/cybernetics2077/{cls}.class' in names
+    if not forge:
+        assert 'dev/cybernetics2077/mixin/client/TacZCrosshairMixin.class' in names
     if forge:
         assert 'META-INF/neoforge.mods.toml' not in names
         assert 'cybernetics2077.refmap.json' in names

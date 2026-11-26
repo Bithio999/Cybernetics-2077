@@ -45,7 +45,10 @@ public final class HandsClient {
     var m = Minecraft.getInstance();
     if (m.player == null || m.level == null || m.screen != null || m.options.hideGui) return;
     var t = CyberwareClient.own();
-    if (t.getInt("smartTier") == 0 || !m.player.isUsingItem() && !ScannerClient.active()) return;
+    if (t.getInt("smartTier") == 0
+        || !m.player.isUsingItem()
+            && !ScannerClient.active()
+            && !dev.cybernetics2077.compat.TacZCompat.aiming(m.player)) return;
     var g = e.getGuiGraphics();
     float x = g.guiWidth() / 2f, y = g.guiHeight() / 2f + 26;
     CyberBatch.begin();
