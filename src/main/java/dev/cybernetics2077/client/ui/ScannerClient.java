@@ -284,7 +284,7 @@ public final class ScannerClient {
     var equipment = dev.cybernetics2077.client.mantis.CyberwareClient.own();
     boolean deck = equipment.getBoolean("deck"),
         chip = !equipment.getList("programs", 10).isEmpty();
-    // A delivery shard provides navigation, never the optical/deck functions.
+    // Contract shards provide navigation, never optical/deck functions.
     deck &= installed;
     chip &= installed;
     resource(root.fade(f.resource()), f, equipment, deck);
@@ -595,7 +595,18 @@ public final class ScannerClient {
     double relative = net.minecraft.util.Mth.wrapDegrees(angle - (mc.player.getYRot() + 180));
     String turn = Math.abs(relative) < 20 ? "AHEAD" : relative > 0 ? "RIGHT" : "LEFT";
     c.panel(1390, 868, 418, 116, 8, 0xee0b171e, 0xff467f88);
-    c.tracked("GIG // FIRST IMPRESSIONS", 1410, 881, 14, CYAN, .5f);
+    c.tracked(
+        c.fit(
+            "GIG // "
+                + (contract.contains("title") ? contract.getString("title") : "FIRST IMPRESSIONS"),
+            378,
+            14,
+            false),
+        1410,
+        881,
+        14,
+        CYAN,
+        .5f);
     c.text(
         same
             ? String.format(Locale.ROOT, "%s  /  %.0f m  /  %s", bearing, Math.hypot(dx, dz), turn)
@@ -617,7 +628,13 @@ public final class ScannerClient {
         0xffc8eff5);
     c.body(
         same
-            ? "RIPPERDOC  /  " + (dy > 2 ? "ABOVE" : dy < -2 ? "BELOW" : "SAME LEVEL")
+            ? c.fit(
+                (contract.contains("objective") ? contract.getString("objective") : "RIPPERDOC")
+                    + " / "
+                    + (dy > 2 ? "ABOVE" : dy < -2 ? "BELOW" : "SAME LEVEL"),
+                378,
+                13,
+                false)
             : c.fit(contract.getString("dimension"), 378, 13, false),
         1410,
         963,

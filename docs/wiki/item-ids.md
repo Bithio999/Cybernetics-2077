@@ -85,6 +85,7 @@ David’s Sandevistan (NeoForge): `cybernetics2077:davids_sandevistan_tier_5`.
 | Item | ID |
 | --- | --- |
 | Cybernetics Bench | `cybernetics2077:cybernetics_bench` |
+| Bounty Dossier | `cybernetics2077:bounty_contract` |
 | Eurodollar Credit Chip | `cybernetics2077:eurodollar_chip` |
 | Ripperdoc Spawn Egg | `cybernetics2077:ripperdoc_spawn_egg` |
 | Fixer Spawn Egg | `cybernetics2077:fixer_spawn_egg` |

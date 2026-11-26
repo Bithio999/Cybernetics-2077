@@ -9,6 +9,7 @@ Eddies (**€$**) pay for cyberware and chips. Your wallet is saved and retained
 - Use a **Eurodollar Credit Chip** to deposit **100 eddies**.
 - Find chips in clinic and Afterlife supply barrels.
 - Complete **[First Impressions](contracts.md#first-impressions)** for **€$1,000**.
+- Hunt [bounty targets](contracts.md#bounties) for **€$1,800–24,000 base payment**, plus optional and loyalty bonuses.
 
 Supply barrels generate loot once; they do not refill daily. [Purchase prices](ripperdocs.md#prices).
 
@@ -28,6 +29,6 @@ Street Cred determines which tiers enter [daily ripperdoc stock](ripperdocs.md#d
 
 Higher reputation increases the frequency of higher-tier offers. Tier 1 Kiroshi Optics remain guaranteed from Street Cred **0 through 10**.
 
-The current delivery contract awards **5 Street Cred once**. It is the only implemented contract; higher-tier purchase thresholds are in place for future jobs. Street Cred gates purchases, not installation of equipment you already own.
+The introductory delivery awards **5 Street Cred once**. Bounties award **2–7 base Street Cred**, plus one for meeting the fixer’s specialty. Higher Street Cred unlocks higher-tier bounty targets. Street Cred gates purchases, not installation of equipment you already own.
 
 [Contracts](contracts.md) · [Ripperdocs](ripperdocs.md)

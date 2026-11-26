@@ -6,7 +6,7 @@
 
 | Minecraft | Loader | Java | Version / Download |
 | --- | --- | --- | --- |
-| 1.21.1 | NeoForge 21.1.248+ | 21 | 0.21.1 · [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.21.1.jar) |
+| 1.21.1 | NeoForge 21.1.248+ | 21 | 0.22.0 · [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.22.0.jar) |
 | 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | 0.20.0 · [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
 
 1. Install the loader and Java version matching your Minecraft instance.
@@ -18,7 +18,7 @@ Existing worlds on the **same Minecraft version** are supported. The Forge port 
 ## Get your first implant
 
 1. Find a **[ripperdoc clinic](ripperdocs.md)** in a village. Explore new chunks to find the mod's buildings.
-2. Visit the **[Afterlife](afterlife.md)** and accept **[First Impressions](contracts.md#first-impressions)** from a fixer. If no route is available, visit a clinic and return.
+2. Visit the **[Afterlife](afterlife.md)** and accept **[First Impressions](contracts.md#first-impressions)** from a fixer’s **Delivery** tab. If no route is available, visit a clinic and return.
 3. Deliver the contract shard to a ripperdoc for **€$1,000 and 5 Street Cred**.
 4. Buy **tier 1 [Basic Kiroshi Optics](kiroshi-optics.md)** for €$1,000. They are guaranteed in stock at Street Cred 0–10.
 5. Use the ripperdoc's **Install** tab to equip them in **Face**. Hold **V** to scan (**Alt+V** by default when TaCZ is installed).

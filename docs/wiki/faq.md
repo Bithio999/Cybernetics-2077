@@ -24,7 +24,7 @@ Stock rotates daily and is filtered by Street Cred. Another doctor may carry it,
 
 ## How do I get more Street Cred?
 
-The current **First Impressions** contract grants **5 once**. More jobs have not been added yet. See [Street Cred](street-cred.md#street-cred) for current progression and thresholds.
+**First Impressions** grants **5 once**. On NeoForge 0.22.0, repeatable [bounties](contracts.md#bounties) grant **2–7 base Street Cred**, plus one for the fixer specialty. See [Street Cred](street-cred.md#street-cred) for unlocks.
 
 ## My fixer has no clinic route
 

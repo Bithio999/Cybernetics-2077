@@ -192,6 +192,11 @@ with PortZip(jar) as z:
     }
     if not forge:
         assert 'dev/cybernetics2077/mob/MobCyberwarePool.class' in names
+        for cls in ('BountyRules', 'BountyLedger', 'BountyContracts', 'BountyNetwork', 'BountyContract'):
+            assert f'dev/cybernetics2077/city/{cls}.class' in names
+        png = z.read('assets/cybernetics2077/textures/item/bounty_contract.png')
+        assert struct.unpack('>II', png[16:24]) == (32, 32)
+        assert lang['item.cybernetics2077.bounty_contract'] == 'Bounty Dossier'
         augment_starts['davids_sandevistan'] = 5
     assert 'data/cybernetics2077/recipe/mantis_claws_tier_1.json' not in names
     assert not any('CrossbowReloadMixin' in n for n in names), 'Obsolete crossbow reload hook shipped'

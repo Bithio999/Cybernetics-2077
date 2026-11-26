@@ -109,6 +109,8 @@ public final class CityContent {
 
   public static final Supplier<Item> CONTRACT =
       ITEMS.register("delivery_contract", DeliveryContract::new);
+  public static final Supplier<Item> BOUNTY_CONTRACT =
+      ITEMS.register("bounty_contract", BountyContract::new);
   public static final Supplier<Item> EDDIES =
       ITEMS.register("eurodollar_chip", EurodollarChip::new);
   public static final Supplier<EntityType<CityResident>> RIPPERDOC = resident("ripperdoc");
@@ -154,6 +156,7 @@ public final class CityContent {
   }
 
   public static void register(IEventBus bus) {
+    bus.addListener(BountyNetwork::register);
     BLOCKS.register(bus);
     ITEMS.register(bus);
     ENTITIES.register(bus);

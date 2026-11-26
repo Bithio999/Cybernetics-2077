@@ -14,6 +14,8 @@ Chip tiers use the [same loadout-based tier distribution as salvage](enhanced-mo
 
 Keep chips in your main inventory or hotbar. Chips exist at tiers 1–5; **only Tier 5 has an Iconic to buy in this update**. Lower-tier chips can be kept for future additions. Chips cannot be combined into higher tiers.
 
+Your first **three [Elite Tier 5 bounty completions](contracts.md#fixer-specialties-and-optional-bonuses)** also award **one Tier 5 chip**, once per player.
+
 ## Purchasing
 
 1. Find a ripperdoc stocking the Iconic you want. Owning a chip does not add it to stock.

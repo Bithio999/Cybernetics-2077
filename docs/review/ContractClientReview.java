@@ -44,6 +44,7 @@ final class ContractClientReview {
       check(((FixerMenu) mc.player.containerMenu).hasRoute(), "No native clinic route");
       shot("contract-offer");
     }
+    if (t == 27) CityClientReview.clickButton("DELIVERY");
     if (t == 30) CityClientReview.clickButton("ACCEPT CONTRACT");
     if (t == 45) {
       check(((FixerMenu) mc.player.containerMenu).stage() == 1, "Accept packet not synchronized");

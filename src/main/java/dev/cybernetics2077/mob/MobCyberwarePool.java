@@ -41,6 +41,14 @@ public final class MobCyberwarePool {
   }
 
   public static List<CyberwareItem> roll(int tier, int count, RandomSource random) {
+    return roll(tier, count, random, false);
+  }
+
+  public static List<CyberwareItem> rollExactTier(int tier, int count, RandomSource random) {
+    return roll(tier, count, random, true);
+  }
+
+  private static List<CyberwareItem> roll(int tier, int count, RandomSource random, boolean exact) {
     if (tier < 1 || tier > 5 || count < 1 || count > 6)
       throw new IllegalArgumentException("Invalid mob cyberware roll");
     pool();
@@ -60,7 +68,7 @@ public final class MobCyberwarePool {
       var eligible = family.stream().filter(i -> i.tier().level <= tier).toList();
       if (eligible.isEmpty()) continue;
       int first = eligible.stream().mapToInt(i -> i.tier().level).min().orElseThrow();
-      int target = Math.max(first, tier - random.nextInt(2));
+      int target = exact ? tier : Math.max(first, tier - random.nextInt(2));
       var item = eligible.stream().filter(i -> i.tier().level == target).findFirst().orElseThrow();
       for (int slot = item.category().firstSlot();
           slot < item.category().firstSlot() + item.category().sockets;

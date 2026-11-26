@@ -1,5 +1,10 @@
 # Port and gun compatibility
 
+## Bounty review (NeoForge 0.22.0)
+
+Add `-PcompatBountyReview` with `-PcompatClientReview` to exercise daily fixer offers, the native bounty accept/claim flow, real target deployment and scanning, the payment debrief, original delivery and a 640×480 GUI. It changes only the disposable review save and closes the client on completion. [Validation scope](../docs/development/BOUNTIES-0.22.0.md).
+
+
 ## NeoForge 0.21.1
 
 Gun cadence and burst spacing now follow the slowed world clock rather than inheriting the owner's Sandevistan acceleration. TaCZ bullets do the same; native reload duration remains normal. Chromed mobs draw from current non-Iconic implant families; this does not enable player-only controls on mob AI. [Validation and implementation](../docs/development/GUN-CLOCK-0.21.1.md).

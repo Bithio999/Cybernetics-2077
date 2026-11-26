@@ -1,5 +1,10 @@
 # Validation
 
+## Bounty contracts (NeoForge 0.22.0)
+
+**103 JVM tests, 147 standalone GameTests and 10 optional TaCZ GameTests.** Native client review covers acceptance, target deployment, scanning, real kill credit, payment/debrief, original delivery and a smaller GUI. [Results](review/results/bounties-0.22.0.json) · [Implementation](development/BOUNTIES-0.22.0.md) · [Player guide](wiki/contracts.md). Forge remains unchanged.
+
+
 ## Firearm timing and chromed equipment (NeoForge 0.21.1)
 
 **99 JVM tests, 138 standalone GameTests and 10 optional TaCZ GameTests.** Native client review checks the synchronized David firing interval and unchanged reload data. [Results](review/results/gun-clock-0.21.1.json) · [Implementation and test scope](development/GUN-CLOCK-0.21.1.md). Forge remains unchanged.

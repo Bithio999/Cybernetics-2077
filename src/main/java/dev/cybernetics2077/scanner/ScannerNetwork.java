@@ -106,7 +106,7 @@ public final class ScannerNetwork {
     var t = new CompoundTag();
     t.putBoolean("installed", value);
     t.putInt("range", range(p));
-    t.put("contract", dev.cybernetics2077.city.DeliveryContracts.navigation(p));
+    t.put("contract", dev.cybernetics2077.city.BountyContracts.navigation(p));
     PacketDistributor.sendToPlayer(p, new State(t));
   }
 
@@ -129,7 +129,7 @@ public final class ScannerNetwork {
     var t = new CompoundTag();
     t.putBoolean("installed", installed(player));
     t.putInt("range", range(player));
-    t.put("contract", dev.cybernetics2077.city.DeliveryContracts.navigation(player));
+    t.put("contract", dev.cybernetics2077.city.BountyContracts.navigation(player));
     if (!installed(player) || !player.isAlive() || player.containerMenu != player.inventoryMenu)
       return t;
     var entity = player.serverLevel().getEntity(id);
@@ -181,8 +181,10 @@ public final class ScannerNetwork {
     if (now - LAST.getOrDefault(p, Long.MIN_VALUE / 2) < 4) return;
     LAST.put(p, now);
     var data = inspect(p, id);
-    if (data.contains("id") && p.serverLevel().getEntity(id) instanceof LivingEntity target)
+    if (data.contains("id") && p.serverLevel().getEntity(id) instanceof LivingEntity target) {
       dev.cybernetics2077.combat.HandsRuntime.lock(p, target);
+      dev.cybernetics2077.city.BountyContracts.scanned(p, target);
+    }
     PacketDistributor.sendToPlayer(p, new State(data));
   }
 
