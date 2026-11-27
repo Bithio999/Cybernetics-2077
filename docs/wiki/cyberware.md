@@ -17,7 +17,7 @@ Choose a body system below. Each link opens an implant's effects, tiers and stat
 | Integumentary System | [Subdermal Armor](subdermal-armor.md), [Optical Camo](optical-camo.md), [Shock-n-Awe](shock-n-awe.md), [Pain Editor](pain-editor.md), [Carapace](carapace.md), [Cellular Adapter](cellular-adapter.md), [Chitin](chitin.md), [Cogito Lattice](cogito-lattice.md), [Countershell](countershell.md), [Defenzikov](defenzikov.md), [Nano-plating](nano-plating.md), [Painducer](painducer.md), [Peripheral Inverse](peripheral-inverse.md), [ProxiShield](proxishield.md), [RangeGuard](rangeguard.md) |
 | Legs | [Reinforced Tendons](reinforced-tendons.md), [Fortified Ankles](fortified-ankles.md), [Lynx Paws](lynx-paws.md), [Jenkins’ Tendons](jenkins-tendons.md), [Leeroy Ligament System](leeroy-ligament-system.md) |
 
-![Expanded cyberware icons rendered in Minecraft](../images/expansion-icons-028.png)
+![Cyberware and quickhack icons rendered in Minecraft](../images/icon-identity-0.28.2/icons-current-catalogue.png)
 
 ## Tiers and buying
 

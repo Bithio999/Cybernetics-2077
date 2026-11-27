@@ -1,5 +1,9 @@
 # Validation
 
+## Icon identity (NeoForge 0.28.2)
+
+84 actual item models pass the native comparison review at 16 and 32 GUI pixels. All 116 implant/program families render in the catalogue, and the native creative tab correctly exposes 457 canonical items with working search. Export checks cover transparency, padding, palette, unique sprites, unchanged retained textures and wiki parity; package checks enforce the audited texture hashes. [Comparisons and scope](development/ICON-IDENTITY-0.28.2.md) · [Results](review/results/icon-identity-0.28.2.json). No production gameplay or rendering code changes; Forge remains unchanged.
+
 ## Drawn-gun Smart Link indicator (NeoForge 0.28.1)
 
 Native client review with TaCZ 1.2.0-hotfix and TaCZ Tweaks 3.0.0-alpha.12 confirms the lock brackets render while holding a gun without ADS. The same fixture verifies ADS, scanner handover, ammunition preservation, David's world-clock gun interval and unchanged reload timing. [Native hip-fire capture](images/smart-link-drawn-0.28.1.png) · [Results](review/results/smart-link-drawn-0.28.1.json). Projectile guidance and server lock acquisition are unchanged. Forge remains 0.20.0.

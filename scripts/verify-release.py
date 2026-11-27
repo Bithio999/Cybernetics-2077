@@ -42,6 +42,15 @@ with PortZip(jar) as z:
                 json.loads(z.read(entry))
     if not forge:
         import re
+        import hashlib
+        identity=json.loads((root/'art/icon-identity/manifest.json').read_text())
+        expected={e['id'] for sheet in identity['sheets'] for e in sheet['icons']}
+        checked=json.loads((root/'art/icon-identity/export-report.json').read_text())
+        assert len(expected)==len(checked)==84 and expected=={e['id'] for e in checked}
+        for e in checked:
+            data=z.read('assets/cybernetics2077/textures/item/'+e['id']+'.png')
+            assert hashlib.sha256(data).hexdigest()==e['sha256'], 'Icon differs from audited export: '+e['id']
+            assert e['opaqueColors']<=9 and min(e['bounds'][0],e['bounds'][1],32-e['bounds'][2],32-e['bounds'][3])>=3
         coverage=json.loads((root/'docs/research/expansion-028/coverage.json').read_text())
         assert len(coverage)==103 and len({x['family'] for x in coverage})==103
         for extra in ('cyberware/ExpansionRuntime','cyberware/BerserkSpecs','mob/MobImplants','combat/NeuralActors','combat/NeuralInterference','cyberware/CarryReserveMenu','client/ui/CarryReserveScreen','client/ui/CyberpsychoModel','client/mantis/MobMantisLayer','mixin/MobGoalAccess','mixin/MobMeleeTimingMixin','mixin/MobBowTimingMixin'):

@@ -1,0 +1,729 @@
+{
+  "logicalSpriteSize": 32,
+  "contentBudget": 26,
+  "columns": 4,
+  "rows": 4,
+  "usedRows": 3,
+  "palette": [
+    "#172129",
+    "#3c4b53",
+    "#78858a",
+    "#c9c6b5",
+    "#ede5d0",
+    "#925d42",
+    "#cb8c4c",
+    "#a44440",
+    "#5b8992",
+    "#729657",
+    "#8b7394"
+  ],
+  "sheets": [
+    {
+      "name": "cortex",
+      "icons": [
+        {
+          "id": "memory_boost",
+          "brief": "two short exposed memory banks joined in a stepped Z, charcoal boards and copper contacts; a broad two-pronged stepped outline",
+          "cell": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "ram_upgrade",
+          "brief": "one long bare green RAM stick with a comb of broad gold edge contacts; narrow horizontal outline, no casing",
+          "cell": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "self_ice",
+          "brief": "a single ivory kite shield with three pale blue icicle teeth hanging from the bottom and a small charcoal keyhole; shield itself is the object, no chip frame",
+          "cell": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "axolotl",
+          "brief": "an exposed pink neural relay with a narrow central stalk and three pairs of branching feather-like side contacts; the wide organic antler outline recalls axolotl gills without an animal face",
+          "cell": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "bioconductor",
+          "brief": "an open U-shaped red neural conduit with two thick ivory terminal plugs; copper cable loops form the outline, large empty central hole",
+          "cell": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "camillo_ram_manager",
+          "brief": "a compact forked memory cradle: one vertical charcoal memory strip at left, a broad open ivory three-finger fan at right, joined by a copper ribbon",
+          "cell": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "cox_2_cybersomatic_optimizer",
+          "brief": "two exposed asymmetrical brain hemispheres, one deep red and one warm ivory, linked by one thick copper bridge; lobed organic outline, only two large fold lines",
+          "cell": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "kerenzikov_boost_system",
+          "brief": "a small swept horseshoe-shaped booster fork with two forward ivory prongs and one amber diagonal impulse bar; open middle",
+          "cell": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "mechatronic_core",
+          "brief": "an exposed three-jaw charcoal rotor around a copper triangular core; three wide lobes and big gaps, not a round lens or boxed chip",
+          "cell": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "newton_module",
+          "brief": "a miniature physical pendulum: ivory L-shaped support, one copper suspension rod and a large brass bob hanging in the open gap; asymmetric silhouette",
+          "cell": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "quantum_tuner",
+          "brief": "two interwoven pale ivory and muted violet conductive ribbons forming an open infinity/Moebius loop, with one dark joint; two clearly visible holes",
+          "cell": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "ram_reallocator",
+          "brief": "two bare charcoal half-boards pointing in opposite directions, joined by a wide red S-shaped flexible ribbon; alternating left-right fins",
+          "cell": [
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "systems",
+      "icons": [
+        {
+          "id": "cyberdeck_tier_1",
+          "brief": "Militech Paraline: a flat wide exposed charcoal circuit board with three broad red parallel tracks and a comb connector on the bottom; a stepped slab, no cream box",
+          "cell": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "raven_microcyber",
+          "brief": "Raven deck: a tall dark forked board with two swept copper antenna wings spreading from its top, a small red central contact; birdlike outline but no animal face",
+          "cell": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "arasaka",
+          "brief": "Arasaka deck: two thin black diamond-shaped circuit plates offset diagonally, linked by a visible red U cable at their exposed corner; angular split silhouette",
+          "cell": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "biotech_sigma",
+          "brief": "Biotech deck: one long ivory crescent circuit carrier with three thick green vascular tracks on its open side, forming a leaflike asymmetrical outline",
+          "cell": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "netwatch_netdriver",
+          "brief": "NetWatch deck: two broad folded ivory circuit wings hinged to a small cobalt blue rectangular bridge; wide W outline and big dark gaps",
+          "cell": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "tetratronic_rippler",
+          "brief": "Tetratronic deck: exposed T-shaped charcoal board with three broad copper contact fingers across the top and one ivory terminal at its foot; very clear T silhouette",
+          "cell": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "dynalar_sandevistan",
+          "brief": "Dynalar spinal implant: two parallel short silver spinal rails joined by three broad amber crossbars; elongated ladder outline with open gaps",
+          "cell": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "zetatech_sandevistan",
+          "brief": "Zetatech spinal implant: a long asymmetric ivory spinal stem with a single broad side fork at its upper end, three red nodes along the stem; off-center F silhouette",
+          "cell": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "qiant_warp_dancer",
+          "brief": "QianT Warp Dancer: a graceful S-shaped dark spinal strip edged by three broad gold swept fins; one flowing curved outline, no circular casing",
+          "cell": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "militech_falcon_sandevistan",
+          "brief": "Falcon spinal implant: a tapered silver spinal rail with five broad backward-swept red fins on one side, a raptor wing outline; horizontal diagonal",
+          "cell": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "biodyne_berserk",
+          "brief": "Biodyne Berserk: two exposed muscular dark red gland lobes connected by an ivory arched tube; organic double-lobed body, no rectangular housing",
+          "cell": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "moore_tech_berserk",
+          "brief": "Moore Tech Berserk: one heavy charcoal U-shaped hydraulic yoke with a copper central piston and a red foot pad; broad square horseshoe with an open center",
+          "cell": [
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "senses",
+      "icons": [
+        {
+          "id": "zetatech_berserk",
+          "brief": "Zetatech Berserk: two angular bronze hinged plates splayed into a wide V around one red actuator, offset ivory tip; open aggressive V silhouette",
+          "cell": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "militech_berserk",
+          "brief": "Militech Berserk: a broad black X-shaped armored actuator, four thick squared arms and a small dark red hub; powerful X silhouette with empty quadrants",
+          "cell": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "chrome_compressor",
+          "brief": "a physical silver C-clamp with a broad black screw pressing inward onto a red contact plate; large open C and visible thick threaded rod",
+          "cell": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "kiroshi_clairvoyant_optics",
+          "brief": "Clairvoyant optic: a narrow ivory optical rail holding three small gold aperture holes in a straight line; very wide thin silhouette",
+          "cell": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "kiroshi_doomsayer_optics",
+          "brief": "Doomsayer optic: exposed triangular amber lens in a dark three-corner mount, with a short red cable tail; unmistakable triangular outer edge",
+          "cell": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "kiroshi_stalker_optics",
+          "brief": "Stalker optic: one long telescopic lens barrel, three stepped silver rings tapering toward a small green front aperture, one side mounting lug; narrow side-on tube",
+          "cell": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "kiroshi_cockatrice_optics",
+          "brief": "Cockatrice optic: a large slitted ruby iris held between two swept charcoal fins; flat horizontal eye silhouette, red center, no bulbous cream camera case",
+          "cell": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "kiroshi_sentry_optics",
+          "brief": "Sentry optic: two small cyan lenses side by side in a simple navy binocular bridge; clear twin circular outline and one ivory bracket below",
+          "cell": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "kiroshi_oracle_optics",
+          "brief": "Oracle optic: three exposed cyan lenses of unequal sizes offset into a triangular cluster on an open ivory Y-shaped bracket; three separate lobes, no triangular casing",
+          "cell": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "behavioral_imprint_synced_faceplate",
+          "brief": "an asymmetrical half-face implant mask in ivory and charcoal, cutout for one eye, one angular cheek and a short red cable at the jaw; clean face profile outline",
+          "cell": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "weapon_glitch",
+          "brief": "a front-facing black quickhack program chip with four chunky gold connector teeth on its left and right, large simple ivory pistol pictogram bisected by one red diagonal slash; broad readable glyph, no tiny components",
+          "cell": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "cyberware_malfunction",
+          "brief": "a front-facing black quickhack program chip with four chunky gold connector teeth on its left and right, large simple ivory mechanical forearm/hinge pictogram broken by one red zigzag; different clear glyph from pistol",
+          "cell": [
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "structure",
+      "icons": [
+        {
+          "id": "feen_x",
+          "brief": "two wide exposed red and ivory conductive ribbons crossing in an asymmetric X, four chunky green terminal pads; an open X with no central box",
+          "cell": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "kinetic_frame",
+          "brief": "a single ivory exoskeleton hip brace: two long side rails and a wide curved upper bridge around a large open center, black piston at one side; tall inverted U outline",
+          "cell": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "rara_avis",
+          "brief": "two layered silver structural wings sweeping outward and upward from one copper hinge, each wing has three broad feather plates; wide shallow W outline, no actual bird body",
+          "cell": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "ram_recoup",
+          "brief": "an ivory spinal dowel curled around by one thick green conductive nerve tube; hook/L outline with exposed gold terminal at one end",
+          "cell": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "scar_coalescer",
+          "brief": "a single cracked ivory bone graft bridged by a broad red suture plate and two dark staples; bent chunky bone outline, visible repaired notch",
+          "cell": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "scarab",
+          "brief": "two charcoal and bronze back plates opening like beetle wing cases around a short ivory hinge; solid oval halves separated by one large dark cleft",
+          "cell": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "spring_joints",
+          "brief": "one large exposed bronze helical spring around a black piston, ivory mounting eye at each end; a diagonal coil-over shock absorber with clear wide zigzags",
+          "cell": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "titanium_bones",
+          "brief": "one sturdy ivory-silver femur with a dark metal cross-brace along its shaft; a single chunky bone with a broad two-knuckle end, no paired cylinders",
+          "cell": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "universal_booster",
+          "brief": "a compact copper four-way medical junction with three broad ivory tube outlets and one red reservoir; plus-shaped physical plumbing hub",
+          "cell": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "ballistic_coprocessor",
+          "brief": "an exposed L-shaped ivory flexible circuit with copper contacts on its bottom and a bold red ricochet path making two right-angle turns across its wide bend; no square chip housing",
+          "cell": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "shock_absorber",
+          "brief": "a short vertical black hydraulic damper with one thick copper spring and wide ivory mounting lugs; squat piston, not a leg or boot",
+          "cell": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "immovable_force",
+          "brief": "a broad charcoal armored palm actuator with four squared ivory knuckle blocks, heavy copper wrist brace and a small red joint; unmistakable large mechanical hand",
+          "cell": [
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "neural",
+      "icons": [
+        {
+          "id": "adrenaline_converter",
+          "brief": "a forked Y-shaped amber adrenal gland implant with two red arterial hoses curling from its top; three-lobed organic outline, no battery box",
+          "cell": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "adreno_trigger",
+          "brief": "a large ivory hooked trigger fork wrapped around a short red actuator cylinder; an asymmetric hooked lever outline",
+          "cell": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "atomic_sensors",
+          "brief": "one open dark radar dish tilted diagonally, a thick gold central antenna and two cyan sensor prongs behind it; dish profile and projecting rod",
+          "cell": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "deep_field_visual_interface",
+          "brief": "two nested long ivory optical chevrons connected at one end by a thick cyan prism, open gaps between the V guides; long angular optical comb",
+          "cell": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "kerenzikov",
+          "brief": "one thick copper and dark red braided neural cable curving into a tall S, with chunky ivory plugs at both ends; no box or lens",
+          "cell": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "reflex_tuner",
+          "brief": "a short right-angle elbow of red nerve cable, ivory terminal at each end, with one thick copper tuning collar at the corner; bold L silhouette",
+          "cell": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "revulsor",
+          "brief": "an inverted U-shaped dark repulsor arc with three wide outward-facing silver fins and a red inner conductor; open arch with spiky outer contour",
+          "cell": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "synaptic_accelerator",
+          "brief": "one long vertical blue neural stem branching into three thick ivory contact forks at its top and a red jack at its bottom; tall Y silhouette",
+          "cell": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "tyrosine_injector",
+          "brief": "a slender diagonal medical injector with a large amber glass reservoir, ivory plunger bar and one dark long needle; clear syringe shape, no tiny graduations",
+          "cell": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "heal_on_kill",
+          "brief": "a thick ivory C-shaped transfusion tube with a simple red medical cross on its broad upper elbow and one large blood drop hanging at its lower end; open C outline",
+          "cell": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "adrenaline_booster",
+          "brief": "a coiled red artery wrapping a small exposed amber reservoir, two flared ivory tube tips spread at the top; curved organic loop silhouette",
+          "cell": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "black_mamba",
+          "brief": "an S-shaped dark venom tube with one large green fluid bulb and two short ivory fang-like injector tips at its lower end; not a literal snake face",
+          "cell": [
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vital",
+      "icons": [
+        {
+          "id": "clutch_padding",
+          "brief": "three thick charcoal cushioning leaves staggered like a comb under one ivory finger brace, muted red padded undersides; broad scalloped silhouette",
+          "cell": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "electromag_recycler",
+          "brief": "two offset copper electromagnetic coils joined by a broad cyan conductor bar, one ivory connector foot; tall double-loop electrical outline",
+          "cell": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "feedback_circuit",
+          "brief": "a single thick red arterial feedback loop with an ivory Y-shaped connector interrupting one side and a copper return branch; large open loop, not a lens",
+          "cell": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "isometric_stabilizer",
+          "brief": "a miniature physical balance bar with two broad ivory counterweights on a dark horizontal rod and one copper joint below center; wide dumbbell/T silhouette",
+          "cell": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "microrotors",
+          "brief": "an exposed three-bladed silver micro-propeller with one red central hub; three broad curved blades and very clear gaps, no surrounding circular casing",
+          "cell": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "threatevac",
+          "brief": "an ivory evacuation tube curving sharply around one large amber pull-tab/release lever, short red valve at its foot; swept hooked outline",
+          "cell": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "shock_n_awe",
+          "brief": "three broad ivory discharge electrodes pointing upward from a short black bridge, one chunky cyan zigzag arc between outer prongs; electric trident outline",
+          "cell": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "pain_editor",
+          "brief": "a thick red nerve cable passing diagonally through a flat charcoal filter plate and emerging as a pale ivory cable; an asymmetric diagonal graft, no monitor box",
+          "cell": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "carapace",
+          "brief": "five broad overlapping ivory armor plates bending into a protective arc, copper dark joints; an elongated layered shell with a pointed end",
+          "cell": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "cellular_adapter",
+          "brief": "an ivory four-point tissue connector with one broad green rectangular graft tab at each end, charcoal central hole; open-ended cellular cross silhouette",
+          "cell": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "chitin",
+          "brief": "one long jagged charcoal chest plate split by a wide ivory central seam and two red braces; pointed armored torso outline, no hexagon disc",
+          "cell": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "cogito_lattice",
+          "brief": "three thick ivory woven ribbons forming an open diamond lattice with four large dark holes and one red terminal; clear loose woven mesh, no outer frame",
+          "cell": [
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "defense-mobility",
+      "icons": [
+        {
+          "id": "countershell",
+          "brief": "two opposing ivory shell halves flaring sideways around one red rebound spring; broad horizontal scalloped U outline with an open central gap",
+          "cell": [
+            0,
+            0
+          ]
+        },
+        {
+          "id": "defenzikov",
+          "brief": "three thick gold neural ribbons fanning backward from a single black anchor, each ending in a broad ivory contact; asymmetric swept fan silhouette",
+          "cell": [
+            1,
+            0
+          ]
+        },
+        {
+          "id": "nano_plating",
+          "brief": "three thin silver armor tiles staggered diagonally with two large separated red mounting tabs; floating offset plates, no encompassing case",
+          "cell": [
+            2,
+            0
+          ]
+        },
+        {
+          "id": "painducer",
+          "brief": "an exposed tapered red vascular graft pouch with one ivory inlet at its broad top and a long narrow copper drain tube; organic teardrop outline, not a heart",
+          "cell": [
+            3,
+            0
+          ]
+        },
+        {
+          "id": "peripheral_inverse",
+          "brief": "an ivory horseshoe crescent bent inward, three broad charcoal ribs along its convex edge and two short red inward-facing terminal tips; open crescent contour",
+          "cell": [
+            0,
+            1
+          ]
+        },
+        {
+          "id": "proxishield",
+          "brief": "one domed ivory physical shield plate with a flat upper shoulder, angular pointed nose and a broad dark red bracing foot; solid upright shield outline, no emblem frame",
+          "cell": [
+            1,
+            1
+          ]
+        },
+        {
+          "id": "rangeguard",
+          "brief": "two long swept ivory lateral panels separated by a large open gap, a short cyan antenna bridge at their base; wide open wing-shaped range antenna",
+          "cell": [
+            2,
+            1
+          ]
+        },
+        {
+          "id": "reinforced_tendons",
+          "brief": "two exposed thick gold tendon cables arching from one broad ivory upper mount to a small charcoal heel hook; long open two-strand tendon assembly",
+          "cell": [
+            3,
+            1
+          ]
+        },
+        {
+          "id": "fortified_ankles",
+          "brief": "one broad ivory ankle clamp with a heavy black heel plate and a single copper horizontal pivot; squat low boot-joint silhouette, not two leg shafts",
+          "cell": [
+            0,
+            2
+          ]
+        },
+        {
+          "id": "lynx_paws",
+          "brief": "a low charcoal three-toed cybernetic foot pad in side/three-quarter view, three broad ivory gripping toes and one muted green flexible sole; clearly a soft low foot, no leg shaft",
+          "cell": [
+            1,
+            2
+          ]
+        },
+        {
+          "id": "jenkins_tendons",
+          "brief": "a single long thin running calf brace leaning forward, red outer rail and ivory cable, ending in a tiny hooked toe; fast narrow angular running-leg silhouette",
+          "cell": [
+            2,
+            2
+          ]
+        },
+        {
+          "id": "leeroy_ligament_system",
+          "brief": "one chunky black heel and broad ivory forward foot plate linked by a visible large amber X-shaped ligament brace; low wide foot with a large open gap",
+          "cell": [
+            3,
+            2
+          ]
+        }
+      ]
+    }
+  ]
+}

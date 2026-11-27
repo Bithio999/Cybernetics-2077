@@ -76,7 +76,16 @@ public final class CreativeClientReview {
     }
     if (t == 50) {
       var screen = (CreativeModeInventoryScreen) mc.screen;
-      if (screen.getMenu().items.size() != 6
+      if (screen.getMenu().items.size()
+              != CreativeContent.items().stream()
+                  .filter(
+                      item ->
+                          new net.minecraft.world.item.ItemStack(item)
+                              .getHoverName()
+                              .getString()
+                              .toLowerCase(java.util.Locale.ROOT)
+                              .contains("sandevistan"))
+                  .count()
           || screen.getMenu().items.stream()
               .anyMatch(
                   s ->
@@ -84,7 +93,8 @@ public final class CreativeClientReview {
                           .getString()
                           .toLowerCase(java.util.Locale.ROOT)
                           .contains("sandevistan")))
-        throw new IllegalStateException("Native per-tab search did not filter six Sandevistans");
+        throw new IllegalStateException(
+            "Native per-tab search did not filter the current Sandevistan catalogue");
       Screenshot.grab(out.toFile(), "creative-search.png", mc.getMainRenderTarget(), m -> {});
     }
     if (t == 60) {
@@ -99,8 +109,8 @@ public final class CreativeClientReview {
           out.resolve("passed.txt"),
           "PASS: native Cybernetics 2077 creative tab; "
               + CreativeContent.items().size()
-              + " canonical items; native search returns six Sandevistans and clearing restores all"
-              + " contents.\n");
+              + " canonical items; native search returns the current Sandevistan catalogue and"
+              + " clearing restores all contents.\n");
       mc.stop();
     }
   }

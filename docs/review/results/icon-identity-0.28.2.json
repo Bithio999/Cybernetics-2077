@@ -1,0 +1,55 @@
+{
+  "version": "0.28.2",
+  "platform": "Minecraft 1.21.1 / NeoForge 21.1.248",
+  "assets": {
+    "redesignedFamilies": 84,
+    "unchangedOtherItemTextures": 45,
+    "textureSize": [
+      32,
+      32
+    ],
+    "maximumContentSize": [
+      26,
+      26
+    ],
+    "minimumTransparentBorder": 3,
+    "maximumOpaqueColors": 7,
+    "binaryAlpha": true,
+    "uniqueSprites": 84,
+    "wikiTextureParity": true
+  },
+  "nativeClient": {
+    "status": "passed",
+    "checked": [
+      "84 actual registered item models with baseline texture comparison",
+      "native 16 GUI pixel view and 32 pixel detail",
+      "all 116 current implant/program families",
+      "457 canonical creative items",
+      "native creative tab search and clearing search restores every item",
+      "comparison panels remain inside viewport"
+    ],
+    "dependencies": {
+      "tacz": "1.2.0-hotfix",
+      "taczTweaks": "3.0.0-alpha.12+1.21.1-neoforge"
+    }
+  },
+  "gameplayChanged": false,
+  "productionJavaChanged": false,
+  "forgeUpdated": false,
+  "source": "art/icon-identity/manifest.json",
+  "comparisonDirectory": "docs/images/icon-identity-0.28.2",
+  "jvm": {
+    "tests": 110,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "release": {
+    "jar": "Cybernetics2077-NeoForge-1.21.1-0.28.2.jar",
+    "sha256": "91b69448dc58a52dbf16940b4d9f5f2469a66abbcfe76e23ace7e50809ef1459",
+    "packageAudit": "passed",
+    "cleanBuild": true,
+    "strictWiki": "passed",
+    "unchangedProductionClasses": 307
+  }
+}
