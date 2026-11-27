@@ -28,6 +28,12 @@ Deployed Mantis Blades and Berserk prevent firing and reloading guns. Scanner co
 
 The full-screen cyberware viewer reports its complete footprint so JEI does not cover the hologram or sockets. Normal inventory, bench and shop overlays remain available.
 
+### TaCZ Tweaks
+
+NeoForge **0.24.1+** supports ricochets with **TaCZ Tweaks 3.0.0-alpha.12** and **TaCZ 1.2.0-hotfix**. Update Cybernetics 2077 on both the server and clients. No Tweaks configuration change is needed for the fix.
+
+Custom bullet-piercing rules can change where a round stops; the aiming line remains an estimate.
+
 ### Scanning with a gun
 
 Aim after scanning an enemy to see your Smart Link lock. The scanner replaces the native gun HUD while held; it returns when you release the scanner.

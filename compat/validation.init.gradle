@@ -18,7 +18,7 @@ gradle.projectsEvaluated {
         p.sourceSets.main.java.srcDir(p.file('compat/gametest'))
         p.sourceSets.main.resources.srcDir(p.file('docs/review/resources'))
     }
-    def jars = ['taczJar', 'jeiJar'].findAll { p.findProperty(it) }.collect { p.file(p.findProperty(it)) }
+    def jars = ['taczJar', 'jeiJar', 'taczTweaksJar', 'kotlinJar', 'yaclJar'].findAll { p.findProperty(it) }.collect { p.file(p.findProperty(it)) }
     if (forge && !jars.isEmpty()) {
         p.repositories.exclusiveContent {
             forRepository { p.repositories.flatDir { dirs jars.collect { it.parentFile }.unique() } }

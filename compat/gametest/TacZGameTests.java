@@ -212,6 +212,163 @@ public final class TacZGameTests {
     h.succeed();
   }
 
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void duplicateImpactCannotDeletePendingRicochet(GameTestHelper h) throws Exception {
+    var p = player(h);
+    equip(p, Augment.BALLISTIC_COPROCESSOR, 5, 0);
+    var b = bullet(h, p);
+    var hit =
+        new BlockHitResult(
+            b.position().add(0, 0, .5), Direction.NORTH, b.blockPosition().south(), false);
+    for (int i = 0; i < 2; i++) {
+      var e =
+          event("server.AmmoHitBlockEvent", h.getLevel(), hit, Blocks.STONE.defaultBlockState(), b);
+      post(e);
+      h.assertTrue(
+          ((net.neoforged.bus.api.ICancellableEvent) e).isCanceled(),
+          "Repeated impact removed pending ricochet");
+    }
+    h.assertTrue(TacZCompat.completeBounce(b), "Pending reflection was lost");
+    h.assertTrue(
+        b.getDeltaMovement().z < 0 && b.isAlive(),
+        "Pending reflection did not produce a live outgoing round");
+    var second =
+        event("server.AmmoHitBlockEvent", h.getLevel(), hit, Blocks.STONE.defaultBlockState(), b);
+    post(second);
+    h.assertTrue(
+        !((net.neoforged.bus.api.ICancellableEvent) second).isCanceled(),
+        "A completed bounce became infinite ricochets");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", batch = "readOnlyBulletQuery", timeoutTicks = 80)
+  public static void bulletGeometryQueriesCannotApplyLiveImpacts(GameTestHelper h)
+      throws Exception {
+    var p = player(h);
+    equip(p, Augment.BALLISTIC_COPROCESSOR, 5, 0);
+    var b = bullet(h, p);
+    var from = b.position();
+    var velocity = b.getDeltaMovement();
+    var wall = b.blockPosition().offset(0, 0, 2);
+    h.getLevel().setBlock(wall, Blocks.STONE.defaultBlockState(), 3);
+    for (int i = 0; i < 2; i++) {
+      var hit = TacZCompat.clip(h.getLevel(), from, from.add(0, 0, 4), b);
+      h.assertTrue(
+          hit.getType() == HitResult.Type.BLOCK && hit.getBlockPos().equals(wall),
+          "Read-only query missed the actual wall");
+      h.assertTrue(
+          b.isAlive() && b.position().equals(from) && b.getDeltaMovement().equals(velocity),
+          "Geometry query changed a live bullet");
+      h.assertTrue(
+          !b.getPersistentData().getCompound(TacZCompat.DATA).getBoolean("bounced"),
+          "Geometry query triggered a real ricochet");
+    }
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", batch = "tweaksTraceIsolation", timeoutTicks = 80)
+  public static void tweaksIntegratedThreadsCannotOverwriteActiveTrace(GameTestHelper h)
+      throws Exception {
+    if (!net.neoforged.fml.ModList.get().isLoaded("tacztweaks")) {
+      h.succeed();
+      return;
+    }
+    var p = player(h);
+    var bullet = bullet(h, p);
+    var context =
+        new net.minecraft.world.level.ClipContext(
+            bullet.position(),
+            bullet.position().add(0, 0, 2),
+            net.minecraft.world.level.ClipContext.Block.COLLIDER,
+            net.minecraft.world.level.ClipContext.Fluid.NONE,
+            bullet);
+    var geometry =
+        new net.minecraft.world.level.ClipContext(
+            p.position(),
+            p.position().add(0, 0, 2),
+            net.minecraft.world.level.ClipContext.Block.COLLIDER,
+            net.minecraft.world.level.ClipContext.Fluid.NONE,
+            p);
+    var tracer = Class.forName("me.muksc.tacztweaks.feature.raytracer.BulletRayTracer");
+    var args = Class.forName(tracer.getName() + "$RayTraceBlocksArgs");
+    var ctor =
+        args.getConstructor(
+            net.minecraft.world.level.Level.class, net.minecraft.world.level.ClipContext.class);
+    var function = Class.forName("kotlin.jvm.functions.Function1");
+    var method = tracer.getMethod("rayTraceBlocks", args, function);
+    var state = tracer.getDeclaredField("level");
+    state.setAccessible(true);
+    var entered = new java.util.concurrent.CountDownLatch(1);
+    var release = new java.util.concurrent.CountDownLatch(1);
+    var attempted = new java.util.concurrent.CountDownLatch(1);
+    var finished = new java.util.concurrent.CountDownLatch(1);
+    var failure = new java.util.concurrent.atomic.AtomicReference<Throwable>();
+    var preserved = new java.util.concurrent.atomic.AtomicBoolean();
+    var miss =
+        BlockHitResult.miss(context.getTo(), Direction.SOUTH, BlockPos.containing(context.getTo()));
+    Object firstCallback =
+        Proxy.newProxyInstance(
+            function.getClassLoader(),
+            new Class[] {function},
+            (proxy, m, a) -> {
+              entered.countDown();
+              if (!release.await(3, java.util.concurrent.TimeUnit.SECONDS))
+                throw new IllegalStateException("Trace probe timed out");
+              preserved.set(state.get(null) == h.getLevel());
+              return miss;
+            });
+    Object secondCallback =
+        Proxy.newProxyInstance(
+            function.getClassLoader(), new Class[] {function}, (proxy, m, a) -> miss);
+    var first =
+        new Thread(
+            () -> {
+              try {
+                method.invoke(null, ctor.newInstance(h.getLevel(), context), firstCallback);
+              } catch (Throwable t) {
+                failure.compareAndSet(null, t);
+              }
+            },
+            "cybernetics-trace-probe-first");
+    var second =
+        new Thread(
+            () -> {
+              try {
+                attempted.countDown();
+                method.invoke(null, ctor.newInstance(h.getLevel(), geometry), secondCallback);
+              } catch (Throwable t) {
+                failure.compareAndSet(null, t);
+              } finally {
+                finished.countDown();
+              }
+            },
+            "cybernetics-trace-probe-second");
+    first.setDaemon(true);
+    second.setDaemon(true);
+    boolean overlapped;
+    try {
+      first.start();
+      h.assertTrue(
+          entered.await(2, java.util.concurrent.TimeUnit.SECONDS), "First trace did not enter");
+      second.start();
+      h.assertTrue(
+          attempted.await(2, java.util.concurrent.TimeUnit.SECONDS),
+          "Second trace did not attempt entry");
+      overlapped = finished.await(250, java.util.concurrent.TimeUnit.MILLISECONDS);
+    } finally {
+      release.countDown();
+      first.join(3000);
+      second.join(3000);
+    }
+    h.assertTrue(
+        !first.isAlive() && !second.isAlive() && failure.get() == null,
+        "Trace isolation probe failed: " + failure.get());
+    h.assertTrue(
+        !overlapped && preserved.get(), "Concurrent trace replaced the live bullet context");
+    h.assertTrue(state.get(null) == null, "Trace context leaked after completion");
+    h.succeed();
+  }
+
   @GameTest(template = "empty", batch = "realBank", timeoutTicks = 80)
   public static void nativeBulletActuallyRicochetsAndLeavesTheWall(GameTestHelper h)
       throws Exception {

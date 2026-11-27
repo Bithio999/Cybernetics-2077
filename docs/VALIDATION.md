@@ -1,5 +1,9 @@
 # Validation
 
+## TaCZ Tweaks ricochet compatibility (NeoForge 0.24.1)
+
+**106 JVM tests, 150 standalone GameTests, 20 TaCZ tests with Tweaks and 20 without Tweaks pass.** The reported Tweaks alpha.12 artifact reproduced four failures before the fix. Duplicate callbacks, read-only geometry queries and shared trace-state isolation are now covered. Native client tests fire six actual AKM/Desert Eagle rounds, confirm 12 cancelled impact callbacks, reflected target damage and visible outgoing paths. [Investigation and scope](development/TACZ-TWEAKS-0.24.1.md) · [Results](review/results/tacz-tweaks-0.24.1.json). Forge remains unchanged.
+
 ## Continuous bullet flight and gun mechanisms (NeoForge 0.24.0)
 
 **106 JVM tests, 150 standalone GameTests and 17 optional TaCZ GameTests pass.** Native AKM and Desert Eagle trigger checks verify continuous fractional flight and rendered interpolation. Injected firing/bolt clocks slow with David while reload/handling clocks remain normal. Normal-speed ricochet framebuffer checks also pass. [Implementation and scope](development/BULLET-TIME-0.24.0.md) · [Results](review/results/bullet-time-0.24.0.json). Forge remains unchanged.

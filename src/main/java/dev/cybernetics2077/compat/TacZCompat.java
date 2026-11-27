@@ -298,7 +298,11 @@ public final class TacZCompat {
             to,
             net.minecraft.world.level.ClipContext.Block.COLLIDER,
             net.minecraft.world.level.ClipContext.Fluid.NONE,
-            context);
+            // Tweaks treats a bullet collision context as a live shot and applies damage here.
+            // Geometry/preview queries must never identify themselves as a live bullet sweep.
+            bullet(context) || context == null
+                ? net.minecraft.world.phys.shapes.CollisionContext.empty()
+                : net.minecraft.world.phys.shapes.CollisionContext.of(context));
     if (!loaded) return level.clip(query);
     try {
       return (BlockHitResult) blockClip.invoke(null, level, query);
@@ -332,6 +336,12 @@ public final class TacZCompat {
     BlockHitResult hit = (BlockHitResult) call(event, "getHitResult");
     int tier = AugmentRuntime.tier(player, BALLISTIC_COPROCESSOR);
     var tag = bullet.getPersistentData().getCompound(DATA);
+    // Some collision pipelines dispatch the same impact again before onBulletTick returns.
+    // Keep suppressing that impact until completeBounce has moved the round out of the wall.
+    if (tag.getBoolean("pending")) {
+      cancel(event);
+      return;
+    }
     if (tier == 0
         || tag.getBoolean("bounced")
         || explosive(bullet)

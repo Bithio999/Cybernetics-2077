@@ -128,6 +128,7 @@ with PortZip(jar) as z:
             'dev/cybernetics2077/client/ReboundTrailClient.class',
             'dev/cybernetics2077/client/ui/ServiceStyle.class',
             'dev/cybernetics2077/mixin/TacZBulletMixin.class',
+            'dev/cybernetics2077/mixin/TacZTweaksTraceMixin.class',
             'dev/cybernetics2077/mixin/client/TacZBulletVisualMixin.class',
             'dev/cybernetics2077/mixin/client/TacZTracerMixin.class',
         ):

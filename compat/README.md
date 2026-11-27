@@ -74,6 +74,8 @@ Download the appropriate TaCZ version separately. The init script adds a locally
   -PtaczJar=/absolute/path/tacz-1.20.1-1.1.8-hotfix2.jar runGameTestServer
 ```
 
+For TaCZ Tweaks on NeoForge, add `-PtaczTweaksJar=/absolute/path/to/tacz-tweaks.jar -PkotlinJar=/absolute/path/to/kotlinforforge.jar -PyaclJar=/absolute/path/to/yacl.jar`. The 0.24.1 regression uses Tweaks **3.0.0-alpha.12+1.21.1-neoforge**, Kotlin for Forge **5.13.0** and YACL **3.8.2+1.21.1-neoforge**, with TaCZ **1.2.0-hotfix**. These libraries remain optional validation dependencies and are never bundled.
+
 Add `-PjeiJar=/absolute/path/to/jei.jar` to include JEI in the native client overlay check.
 
 Add `-PcompatGunReview` with the NeoForge client review to exercise a real AK47, native ADS, Smart Link indication, scanner/HUD transitions and a blocked trigger pull without ammunition loss.

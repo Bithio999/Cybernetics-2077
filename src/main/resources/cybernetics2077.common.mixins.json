@@ -16,7 +16,8 @@
     "TemporalPistonMixin",
     "TacZGunDataMixin",
     "TacZBurstMixin",
-    "TacZBulletMixin"
+    "TacZBulletMixin",
+    "TacZTweaksTraceMixin"
   ],
   "injectors": {
     "defaultRequire": 1

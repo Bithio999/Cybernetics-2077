@@ -1,0 +1,71 @@
+{
+  "version": "0.24.1",
+  "platform": "Minecraft 1.21.1 / NeoForge 21.1.248",
+  "tacz": "1.2.0-hotfix",
+  "taczTweaks": {
+    "version": "3.0.0-alpha.12+1.21.1-neoforge",
+    "sha256": "fac5d0c11ab927026dacf4825fdcfcab8cc4be7539ed51288680c0be9f36a31c",
+    "publishedSha512Verified": true,
+    "kotlinForForge": "5.13.0",
+    "yacl": "3.8.2+1.21.1-neoforge"
+  },
+  "baseline": {
+    "tests": 17,
+    "failures": 4,
+    "failedScenarios": [
+      "native rebound outside wall",
+      "native reflected target damage",
+      "fractional reflected target damage",
+      "fast rebound and second wall"
+    ]
+  },
+  "jvm": {
+    "tests": 106,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "standaloneGameTests": {
+    "tests": 150,
+    "failures": 0
+  },
+  "taczTweaksGameTests": {
+    "tests": 20,
+    "failures": 0,
+    "newScenarios": [
+      "duplicate callbacks cancel until one reflection completes",
+      "geometry query cannot trigger live bullet impact",
+      "overlapping threads cannot overwrite active Tweaks trace context"
+    ]
+  },
+  "plainTaczGameTests": {
+    "tests": 20,
+    "failures": 0,
+    "tweaksOnlyTraceProbe": "not applicable without Tweaks"
+  },
+  "nativeClient": {
+    "status": "passed",
+    "guns": [
+      "AKM",
+      "Desert Eagle"
+    ],
+    "realTriggerRequests": 6,
+    "cancelledImpactCallbacks": 12,
+    "reflectedServerSegments": 6,
+    "nativeAmmunitionConsumption": true,
+    "reflectedTargetDamage": true,
+    "framebufferChecks": [
+      "CLIENT reflected pixels ak47 at 304,242 visible=true",
+      "CLIENT reflected pixels deagle at 311,255 visible=true"
+    ],
+    "renderedAfterNativeRemoval": true
+  },
+  "releaseAudit": "passed; no fixtures or third-party mods bundled",
+  "wiki": "69 pages / 50 item/program entries; coverage and strict build passed",
+  "forge": {
+    "updated": false,
+    "version": "0.20.0",
+    "sha256": "95aa30a182e2c4046d9390da2a0c0d824f328c59204d45249541775eba580b4a"
+  },
+  "sha256": "86ef21dc498feaf6737cb349060ba97c1bf06d4cd2f546e2c0f0271eef6bbafc"
+}
