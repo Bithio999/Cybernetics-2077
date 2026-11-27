@@ -1,0 +1,838 @@
+{
+  "version": "0.28.2",
+  "entries": [
+    {
+      "icon": "axolotl",
+      "category": "frontal_cortex",
+      "name": "Axolotl",
+      "number": 1
+    },
+    {
+      "icon": "bioconductor",
+      "category": "frontal_cortex",
+      "name": "Bioconductor",
+      "number": 2
+    },
+    {
+      "icon": "camillo_ram_manager",
+      "category": "frontal_cortex",
+      "name": "Camillo RAM Manager",
+      "number": 3
+    },
+    {
+      "icon": "cox_2_cybersomatic_optimizer",
+      "category": "frontal_cortex",
+      "name": "COX-2 Cybersomatic Optimizer",
+      "number": 4
+    },
+    {
+      "icon": "ex_disk",
+      "category": "frontal_cortex",
+      "name": "Ex-Disk",
+      "number": 5
+    },
+    {
+      "icon": "kerenzikov_boost_system",
+      "category": "frontal_cortex",
+      "name": "Kerenzikov Boost System",
+      "number": 6
+    },
+    {
+      "icon": "mechatronic_core",
+      "category": "frontal_cortex",
+      "name": "Mechatronic Core",
+      "number": 7
+    },
+    {
+      "icon": "memory_boost",
+      "category": "frontal_cortex",
+      "name": "Memory Boost",
+      "number": 8
+    },
+    {
+      "icon": "newton_module",
+      "category": "frontal_cortex",
+      "name": "Newton Module",
+      "number": 9
+    },
+    {
+      "icon": "quantum_tuner",
+      "category": "frontal_cortex",
+      "name": "Quantum Tuner",
+      "number": 10
+    },
+    {
+      "icon": "ram_reallocator",
+      "category": "frontal_cortex",
+      "name": "RAM Reallocator",
+      "number": 11
+    },
+    {
+      "icon": "ram_upgrade",
+      "category": "frontal_cortex",
+      "name": "RAM Upgrade",
+      "number": 12
+    },
+    {
+      "icon": "self_ice",
+      "category": "frontal_cortex",
+      "name": "Self-ICE",
+      "number": 13
+    },
+    {
+      "icon": "arasaka",
+      "category": "operating_system",
+      "name": "Arasaka",
+      "number": 14
+    },
+    {
+      "icon": "biodyne_berserk",
+      "category": "operating_system",
+      "name": "BioDyne Berserk",
+      "number": 15
+    },
+    {
+      "icon": "biotech_sigma",
+      "category": "operating_system",
+      "name": "Biotech Σ",
+      "number": 16
+    },
+    {
+      "icon": "chrome_compressor",
+      "category": "operating_system",
+      "name": "Chrome Compressor",
+      "number": 17
+    },
+    {
+      "icon": "davids_sandevistan",
+      "category": "operating_system",
+      "name": "David's Sandevistan",
+      "number": 18
+    },
+    {
+      "icon": "dynalar_sandevistan",
+      "category": "operating_system",
+      "name": "Dynalar Sandevistan",
+      "number": 19
+    },
+    {
+      "icon": "militech_berserk",
+      "category": "operating_system",
+      "name": "Militech Berserk",
+      "number": 20
+    },
+    {
+      "icon": "cyberdeck_tier_1",
+      "category": "operating_system",
+      "name": "Militech Paraline",
+      "number": 21
+    },
+    {
+      "icon": "militech_apogee_sandevistan",
+      "category": "operating_system",
+      "name": "Militech “Apogee” Sandevistan",
+      "number": 22
+    },
+    {
+      "icon": "militech_falcon_sandevistan",
+      "category": "operating_system",
+      "name": "Militech “Falcon” Sandevistan",
+      "number": 23
+    },
+    {
+      "icon": "moore_tech_berserk",
+      "category": "operating_system",
+      "name": "Moore Tech Berserk",
+      "number": 24
+    },
+    {
+      "icon": "netwatch_netdriver",
+      "category": "operating_system",
+      "name": "NetWatch Netdriver Mk.1",
+      "number": 25
+    },
+    {
+      "icon": "qiant_warp_dancer",
+      "category": "operating_system",
+      "name": "QianT “Warp Dancer” Sandevistan",
+      "number": 26
+    },
+    {
+      "icon": "raven_microcyber",
+      "category": "operating_system",
+      "name": "Raven Microcyber",
+      "number": 27
+    },
+    {
+      "icon": "tetratronic_rippler",
+      "category": "operating_system",
+      "name": "Tetratronic Rippler",
+      "number": 28
+    },
+    {
+      "icon": "zetatech_berserk",
+      "category": "operating_system",
+      "name": "Zetatech Berserk",
+      "number": 29
+    },
+    {
+      "icon": "zetatech_sandevistan",
+      "category": "operating_system",
+      "name": "Zetatech Sandevistan",
+      "number": 30
+    },
+    {
+      "icon": "electrical_mantis_blades",
+      "category": "arms",
+      "name": "Electrifying Mantis Blades",
+      "number": 31
+    },
+    {
+      "icon": "mantis_claws_tier_1",
+      "category": "arms",
+      "name": "Physical Mantis Blades",
+      "number": 32
+    },
+    {
+      "icon": "thermal_mantis_blades",
+      "category": "arms",
+      "name": "Thermal Mantis Blades",
+      "number": 33
+    },
+    {
+      "icon": "toxic_mantis_blades",
+      "category": "arms",
+      "name": "Toxic Mantis Blades",
+      "number": 34
+    },
+    {
+      "icon": "optical_scanner",
+      "category": "face",
+      "name": "Basic Kiroshi Optics",
+      "number": 35
+    },
+    {
+      "icon": "behavioral_imprint_synced_faceplate",
+      "category": "face",
+      "name": "Behavioral Imprint-synced Faceplate",
+      "number": 36
+    },
+    {
+      "icon": "kiroshi_clairvoyant_optics",
+      "category": "face",
+      "name": "Kiroshi \"Clairvoyant\" Optics",
+      "number": 37
+    },
+    {
+      "icon": "kiroshi_cockatrice_optics",
+      "category": "face",
+      "name": "Kiroshi “Cockatrice” Optics",
+      "number": 38
+    },
+    {
+      "icon": "kiroshi_doomsayer_optics",
+      "category": "face",
+      "name": "Kiroshi “Doomsayer” Optics",
+      "number": 39
+    },
+    {
+      "icon": "kiroshi_sentry_optics",
+      "category": "face",
+      "name": "Kiroshi “Sentry” Optics",
+      "number": 40
+    },
+    {
+      "icon": "kiroshi_stalker_optics",
+      "category": "face",
+      "name": "Kiroshi “Stalker” Optics",
+      "number": 41
+    },
+    {
+      "icon": "kiroshi_oracle_optics",
+      "category": "face",
+      "name": "Kiroshi “The Oracle” Optics",
+      "number": 42
+    },
+    {
+      "icon": "bionic_joints",
+      "category": "skeleton",
+      "name": "Bionic Joints",
+      "number": 43
+    },
+    {
+      "icon": "dense_marrow",
+      "category": "skeleton",
+      "name": "Dense Marrow",
+      "number": 44
+    },
+    {
+      "icon": "epimorphic_skeleton",
+      "category": "skeleton",
+      "name": "Epimorphic Skeleton",
+      "number": 45
+    },
+    {
+      "icon": "feen_x",
+      "category": "skeleton",
+      "name": "Feen-X",
+      "number": 46
+    },
+    {
+      "icon": "kinetic_frame",
+      "category": "skeleton",
+      "name": "Kinetic Frame",
+      "number": 47
+    },
+    {
+      "icon": "para_bellum",
+      "category": "skeleton",
+      "name": "Para Bellum",
+      "number": 48
+    },
+    {
+      "icon": "ram_recoup",
+      "category": "skeleton",
+      "name": "RAM Recoup",
+      "number": 49
+    },
+    {
+      "icon": "rara_avis",
+      "category": "skeleton",
+      "name": "Rara Avis",
+      "number": 50
+    },
+    {
+      "icon": "scar_coalescer",
+      "category": "skeleton",
+      "name": "Scar Coalescer",
+      "number": 51
+    },
+    {
+      "icon": "scarab",
+      "category": "skeleton",
+      "name": "Scarab",
+      "number": 52
+    },
+    {
+      "icon": "spring_joints",
+      "category": "skeleton",
+      "name": "Spring Joints",
+      "number": 53
+    },
+    {
+      "icon": "titanium_bones",
+      "category": "skeleton",
+      "name": "Titanium Bones",
+      "number": 54
+    },
+    {
+      "icon": "universal_booster",
+      "category": "skeleton",
+      "name": "Universal Booster",
+      "number": 55
+    },
+    {
+      "icon": "ballistic_coprocessor",
+      "category": "hands",
+      "name": "Ballistic Coprocessor",
+      "number": 56
+    },
+    {
+      "icon": "handle_wrap",
+      "category": "hands",
+      "name": "Handle Wrap",
+      "number": 57
+    },
+    {
+      "icon": "immovable_force",
+      "category": "hands",
+      "name": "Immovable Force",
+      "number": 58
+    },
+    {
+      "icon": "microgenerator",
+      "category": "hands",
+      "name": "Microgenerator",
+      "number": 59
+    },
+    {
+      "icon": "shock_absorber",
+      "category": "hands",
+      "name": "Shock Absorber",
+      "number": 60
+    },
+    {
+      "icon": "smart_link",
+      "category": "hands",
+      "name": "Smart Link",
+      "number": 61
+    },
+    {
+      "icon": "johnnys_special",
+      "category": "hands",
+      "name": "Tattoo: Johnny’s Special",
+      "number": 62
+    },
+    {
+      "icon": "together_forever",
+      "category": "hands",
+      "name": "Tattoo: Together Forever",
+      "number": 63
+    },
+    {
+      "icon": "tyger_claws_dermal_imprint",
+      "category": "hands",
+      "name": "Tattoo: Tyger Claws Dermal Imprint",
+      "number": 64
+    },
+    {
+      "icon": "adrenaline_converter",
+      "category": "nervous_system",
+      "name": "Adrenaline Converter",
+      "number": 65
+    },
+    {
+      "icon": "adreno_trigger",
+      "category": "nervous_system",
+      "name": "Adreno-trigger",
+      "number": 66
+    },
+    {
+      "icon": "atomic_sensors",
+      "category": "nervous_system",
+      "name": "Atomic Sensors",
+      "number": 67
+    },
+    {
+      "icon": "deep_field_visual_interface",
+      "category": "nervous_system",
+      "name": "Deep-field Visual Interface",
+      "number": 68
+    },
+    {
+      "icon": "kerenzikov",
+      "category": "nervous_system",
+      "name": "Kerenzikov",
+      "number": 69
+    },
+    {
+      "icon": "neofiber",
+      "category": "nervous_system",
+      "name": "NeoFiber",
+      "number": 70
+    },
+    {
+      "icon": "reflex_tuner",
+      "category": "nervous_system",
+      "name": "Reflex Tuner",
+      "number": 71
+    },
+    {
+      "icon": "revulsor",
+      "category": "nervous_system",
+      "name": "Revulsor",
+      "number": 72
+    },
+    {
+      "icon": "stabber",
+      "category": "nervous_system",
+      "name": "Stabber",
+      "number": 73
+    },
+    {
+      "icon": "synaptic_accelerator",
+      "category": "nervous_system",
+      "name": "Synaptic Accelerator",
+      "number": 74
+    },
+    {
+      "icon": "tyrosine_injector",
+      "category": "nervous_system",
+      "name": "Tyrosine Injector",
+      "number": 75
+    },
+    {
+      "icon": "visual_cortex_support",
+      "category": "nervous_system",
+      "name": "Visual Cortex Support",
+      "number": 76
+    },
+    {
+      "icon": "adrenaline_booster",
+      "category": "circulatory_system",
+      "name": "Adrenaline Booster",
+      "number": 77
+    },
+    {
+      "icon": "biomonitor",
+      "category": "circulatory_system",
+      "name": "Biomonitor",
+      "number": 78
+    },
+    {
+      "icon": "black_mamba",
+      "category": "circulatory_system",
+      "name": "Black Mamba",
+      "number": 79
+    },
+    {
+      "icon": "blood_pump",
+      "category": "circulatory_system",
+      "name": "Blood Pump",
+      "number": 80
+    },
+    {
+      "icon": "clutch_padding",
+      "category": "circulatory_system",
+      "name": "Clutch Padding",
+      "number": 81
+    },
+    {
+      "icon": "electromag_recycler",
+      "category": "circulatory_system",
+      "name": "Electromag Recycler",
+      "number": 82
+    },
+    {
+      "icon": "feedback_circuit",
+      "category": "circulatory_system",
+      "name": "Feedback Circuit",
+      "number": 83
+    },
+    {
+      "icon": "heal_on_kill",
+      "category": "circulatory_system",
+      "name": "Heal-On-Kill",
+      "number": 84
+    },
+    {
+      "icon": "isometric_stabilizer",
+      "category": "circulatory_system",
+      "name": "Isometric Stabilizer",
+      "number": 85
+    },
+    {
+      "icon": "microrotors",
+      "category": "circulatory_system",
+      "name": "Microrotors",
+      "number": 86
+    },
+    {
+      "icon": "second_heart",
+      "category": "circulatory_system",
+      "name": "Second Heart",
+      "number": 87
+    },
+    {
+      "icon": "threatevac",
+      "category": "circulatory_system",
+      "name": "ThreatEvac",
+      "number": 88
+    },
+    {
+      "icon": "carapace",
+      "category": "integumentary_system",
+      "name": "Carapace",
+      "number": 89
+    },
+    {
+      "icon": "cellular_adapter",
+      "category": "integumentary_system",
+      "name": "Cellular Adapter",
+      "number": 90
+    },
+    {
+      "icon": "chitin",
+      "category": "integumentary_system",
+      "name": "Chitin",
+      "number": 91
+    },
+    {
+      "icon": "cogito_lattice",
+      "category": "integumentary_system",
+      "name": "Cogito Lattice",
+      "number": 92
+    },
+    {
+      "icon": "countershell",
+      "category": "integumentary_system",
+      "name": "Countershell",
+      "number": 93
+    },
+    {
+      "icon": "defenzikov",
+      "category": "integumentary_system",
+      "name": "Defenzikov",
+      "number": 94
+    },
+    {
+      "icon": "nano_plating",
+      "category": "integumentary_system",
+      "name": "Nano-plating",
+      "number": 95
+    },
+    {
+      "icon": "optical_camo",
+      "category": "integumentary_system",
+      "name": "Optical Camo",
+      "number": 96
+    },
+    {
+      "icon": "pain_editor",
+      "category": "integumentary_system",
+      "name": "Pain Editor",
+      "number": 97
+    },
+    {
+      "icon": "painducer",
+      "category": "integumentary_system",
+      "name": "Painducer",
+      "number": 98
+    },
+    {
+      "icon": "peripheral_inverse",
+      "category": "integumentary_system",
+      "name": "Peripheral Inverse",
+      "number": 99
+    },
+    {
+      "icon": "proxishield",
+      "category": "integumentary_system",
+      "name": "ProxiShield",
+      "number": 100
+    },
+    {
+      "icon": "rangeguard",
+      "category": "integumentary_system",
+      "name": "RangeGuard",
+      "number": 101
+    },
+    {
+      "icon": "shock_n_awe",
+      "category": "integumentary_system",
+      "name": "Shock-n-Awe",
+      "number": 102
+    },
+    {
+      "icon": "subdermal_armor",
+      "category": "integumentary_system",
+      "name": "Subdermal Armor",
+      "number": 103
+    },
+    {
+      "icon": "fortified_ankles",
+      "category": "legs",
+      "name": "Fortified Ankles",
+      "number": 104
+    },
+    {
+      "icon": "jenkins_tendons",
+      "category": "legs",
+      "name": "Jenkins’ Tendons",
+      "number": 105
+    },
+    {
+      "icon": "leeroy_ligament_system",
+      "category": "legs",
+      "name": "Leeroy Ligament System",
+      "number": 106
+    },
+    {
+      "icon": "lynx_paws",
+      "category": "legs",
+      "name": "Lynx Paws",
+      "number": 107
+    },
+    {
+      "icon": "reinforced_tendons",
+      "category": "legs",
+      "name": "Reinforced Tendons",
+      "number": 108
+    },
+    {
+      "icon": "contagion",
+      "category": "quickhacks",
+      "name": "Contagion",
+      "number": 109
+    },
+    {
+      "icon": "cripple_movement",
+      "category": "quickhacks",
+      "name": "Cripple Movement",
+      "number": 110
+    },
+    {
+      "icon": "cyberware_malfunction",
+      "category": "quickhacks",
+      "name": "Cyberware Malfunction",
+      "number": 111
+    },
+    {
+      "icon": "overheat",
+      "category": "quickhacks",
+      "name": "Overheat",
+      "number": 112
+    },
+    {
+      "icon": "reboot_optics",
+      "category": "quickhacks",
+      "name": "Reboot Optics",
+      "number": 113
+    },
+    {
+      "icon": "short_circuit_tier_1",
+      "category": "quickhacks",
+      "name": "Short Circuit",
+      "number": 114
+    },
+    {
+      "icon": "synapse_burnout",
+      "category": "quickhacks",
+      "name": "Synapse Burnout",
+      "number": 115
+    },
+    {
+      "icon": "weapon_glitch",
+      "category": "quickhacks",
+      "name": "Weapon Glitch",
+      "number": 116
+    },
+    {
+      "icon": "bounty_contract",
+      "category": "utility",
+      "name": "Bounty Dossier",
+      "number": 117
+    },
+    {
+      "icon": "damaged_cybernetic_part_tier_1",
+      "category": "utility",
+      "name": "Damaged Cybernetic Part — Tier 1",
+      "number": 118
+    },
+    {
+      "icon": "damaged_cybernetic_part_tier_2",
+      "category": "utility",
+      "name": "Damaged Cybernetic Part — Tier 2",
+      "number": 119
+    },
+    {
+      "icon": "damaged_cybernetic_part_tier_3",
+      "category": "utility",
+      "name": "Damaged Cybernetic Part — Tier 3",
+      "number": 120
+    },
+    {
+      "icon": "damaged_cybernetic_part_tier_4",
+      "category": "utility",
+      "name": "Damaged Cybernetic Part — Tier 4",
+      "number": 121
+    },
+    {
+      "icon": "damaged_cybernetic_part_tier_5",
+      "category": "utility",
+      "name": "Damaged Cybernetic Part — Tier 5",
+      "number": 122
+    },
+    {
+      "icon": "delivery_contract",
+      "category": "utility",
+      "name": "Delivery Contract Shard",
+      "number": 123
+    },
+    {
+      "icon": "eurodollar_chip",
+      "category": "utility",
+      "name": "Eurodollar Credit Chip",
+      "number": 124
+    },
+    {
+      "icon": "iconic_requisition_tier_1",
+      "category": "utility",
+      "name": "Iconic Requisition Chip — Tier 1",
+      "number": 125
+    },
+    {
+      "icon": "iconic_requisition_tier_2",
+      "category": "utility",
+      "name": "Iconic Requisition Chip — Tier 2",
+      "number": 126
+    },
+    {
+      "icon": "iconic_requisition_tier_3",
+      "category": "utility",
+      "name": "Iconic Requisition Chip — Tier 3",
+      "number": 127
+    },
+    {
+      "icon": "iconic_requisition_tier_4",
+      "category": "utility",
+      "name": "Iconic Requisition Chip — Tier 4",
+      "number": 128
+    },
+    {
+      "icon": "iconic_requisition_tier_5",
+      "category": "utility",
+      "name": "Iconic Requisition Chip — Tier 5",
+      "number": 129
+    }
+  ],
+  "sheets": [
+    {
+      "sheet": 1,
+      "file": "sheet-01.png",
+      "first": 1,
+      "last": 30,
+      "count": 30,
+      "categories": [
+        "frontal_cortex",
+        "operating_system"
+      ]
+    },
+    {
+      "sheet": 2,
+      "file": "sheet-02.png",
+      "first": 31,
+      "last": 55,
+      "count": 25,
+      "categories": [
+        "arms",
+        "face",
+        "skeleton"
+      ]
+    },
+    {
+      "sheet": 3,
+      "file": "sheet-03.png",
+      "first": 56,
+      "last": 76,
+      "count": 21,
+      "categories": [
+        "hands",
+        "nervous_system"
+      ]
+    },
+    {
+      "sheet": 4,
+      "file": "sheet-04.png",
+      "first": 77,
+      "last": 103,
+      "count": 27,
+      "categories": [
+        "circulatory_system",
+        "integumentary_system"
+      ]
+    },
+    {
+      "sheet": 5,
+      "file": "sheet-05.png",
+      "first": 104,
+      "last": 129,
+      "count": 26,
+      "categories": [
+        "legs",
+        "quickhacks",
+        "utility"
+      ]
+    }
+  ]
+}

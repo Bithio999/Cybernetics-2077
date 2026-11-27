@@ -1,0 +1,130 @@
+Number,Name,Category,Texture
+1,Axolotl,Frontal Cortex,axolotl
+2,Bioconductor,Frontal Cortex,bioconductor
+3,Camillo RAM Manager,Frontal Cortex,camillo_ram_manager
+4,COX-2 Cybersomatic Optimizer,Frontal Cortex,cox_2_cybersomatic_optimizer
+5,Ex-Disk,Frontal Cortex,ex_disk
+6,Kerenzikov Boost System,Frontal Cortex,kerenzikov_boost_system
+7,Mechatronic Core,Frontal Cortex,mechatronic_core
+8,Memory Boost,Frontal Cortex,memory_boost
+9,Newton Module,Frontal Cortex,newton_module
+10,Quantum Tuner,Frontal Cortex,quantum_tuner
+11,RAM Reallocator,Frontal Cortex,ram_reallocator
+12,RAM Upgrade,Frontal Cortex,ram_upgrade
+13,Self-ICE,Frontal Cortex,self_ice
+14,Arasaka,Operating System,arasaka
+15,BioDyne Berserk,Operating System,biodyne_berserk
+16,Biotech Σ,Operating System,biotech_sigma
+17,Chrome Compressor,Operating System,chrome_compressor
+18,David's Sandevistan,Operating System,davids_sandevistan
+19,Dynalar Sandevistan,Operating System,dynalar_sandevistan
+20,Militech Berserk,Operating System,militech_berserk
+21,Militech Paraline,Operating System,cyberdeck_tier_1
+22,Militech “Apogee” Sandevistan,Operating System,militech_apogee_sandevistan
+23,Militech “Falcon” Sandevistan,Operating System,militech_falcon_sandevistan
+24,Moore Tech Berserk,Operating System,moore_tech_berserk
+25,NetWatch Netdriver Mk.1,Operating System,netwatch_netdriver
+26,QianT “Warp Dancer” Sandevistan,Operating System,qiant_warp_dancer
+27,Raven Microcyber,Operating System,raven_microcyber
+28,Tetratronic Rippler,Operating System,tetratronic_rippler
+29,Zetatech Berserk,Operating System,zetatech_berserk
+30,Zetatech Sandevistan,Operating System,zetatech_sandevistan
+31,Electrifying Mantis Blades,Arms,electrical_mantis_blades
+32,Physical Mantis Blades,Arms,mantis_claws_tier_1
+33,Thermal Mantis Blades,Arms,thermal_mantis_blades
+34,Toxic Mantis Blades,Arms,toxic_mantis_blades
+35,Basic Kiroshi Optics,Face,optical_scanner
+36,Behavioral Imprint-synced Faceplate,Face,behavioral_imprint_synced_faceplate
+37,"Kiroshi ""Clairvoyant"" Optics",Face,kiroshi_clairvoyant_optics
+38,Kiroshi “Cockatrice” Optics,Face,kiroshi_cockatrice_optics
+39,Kiroshi “Doomsayer” Optics,Face,kiroshi_doomsayer_optics
+40,Kiroshi “Sentry” Optics,Face,kiroshi_sentry_optics
+41,Kiroshi “Stalker” Optics,Face,kiroshi_stalker_optics
+42,Kiroshi “The Oracle” Optics,Face,kiroshi_oracle_optics
+43,Bionic Joints,Skeleton,bionic_joints
+44,Dense Marrow,Skeleton,dense_marrow
+45,Epimorphic Skeleton,Skeleton,epimorphic_skeleton
+46,Feen-X,Skeleton,feen_x
+47,Kinetic Frame,Skeleton,kinetic_frame
+48,Para Bellum,Skeleton,para_bellum
+49,RAM Recoup,Skeleton,ram_recoup
+50,Rara Avis,Skeleton,rara_avis
+51,Scar Coalescer,Skeleton,scar_coalescer
+52,Scarab,Skeleton,scarab
+53,Spring Joints,Skeleton,spring_joints
+54,Titanium Bones,Skeleton,titanium_bones
+55,Universal Booster,Skeleton,universal_booster
+56,Ballistic Coprocessor,Hands,ballistic_coprocessor
+57,Handle Wrap,Hands,handle_wrap
+58,Immovable Force,Hands,immovable_force
+59,Microgenerator,Hands,microgenerator
+60,Shock Absorber,Hands,shock_absorber
+61,Smart Link,Hands,smart_link
+62,Tattoo: Johnny’s Special,Hands,johnnys_special
+63,Tattoo: Together Forever,Hands,together_forever
+64,Tattoo: Tyger Claws Dermal Imprint,Hands,tyger_claws_dermal_imprint
+65,Adrenaline Converter,Nervous System,adrenaline_converter
+66,Adreno-trigger,Nervous System,adreno_trigger
+67,Atomic Sensors,Nervous System,atomic_sensors
+68,Deep-field Visual Interface,Nervous System,deep_field_visual_interface
+69,Kerenzikov,Nervous System,kerenzikov
+70,NeoFiber,Nervous System,neofiber
+71,Reflex Tuner,Nervous System,reflex_tuner
+72,Revulsor,Nervous System,revulsor
+73,Stabber,Nervous System,stabber
+74,Synaptic Accelerator,Nervous System,synaptic_accelerator
+75,Tyrosine Injector,Nervous System,tyrosine_injector
+76,Visual Cortex Support,Nervous System,visual_cortex_support
+77,Adrenaline Booster,Circulatory System,adrenaline_booster
+78,Biomonitor,Circulatory System,biomonitor
+79,Black Mamba,Circulatory System,black_mamba
+80,Blood Pump,Circulatory System,blood_pump
+81,Clutch Padding,Circulatory System,clutch_padding
+82,Electromag Recycler,Circulatory System,electromag_recycler
+83,Feedback Circuit,Circulatory System,feedback_circuit
+84,Heal-On-Kill,Circulatory System,heal_on_kill
+85,Isometric Stabilizer,Circulatory System,isometric_stabilizer
+86,Microrotors,Circulatory System,microrotors
+87,Second Heart,Circulatory System,second_heart
+88,ThreatEvac,Circulatory System,threatevac
+89,Carapace,Integumentary System,carapace
+90,Cellular Adapter,Integumentary System,cellular_adapter
+91,Chitin,Integumentary System,chitin
+92,Cogito Lattice,Integumentary System,cogito_lattice
+93,Countershell,Integumentary System,countershell
+94,Defenzikov,Integumentary System,defenzikov
+95,Nano-plating,Integumentary System,nano_plating
+96,Optical Camo,Integumentary System,optical_camo
+97,Pain Editor,Integumentary System,pain_editor
+98,Painducer,Integumentary System,painducer
+99,Peripheral Inverse,Integumentary System,peripheral_inverse
+100,ProxiShield,Integumentary System,proxishield
+101,RangeGuard,Integumentary System,rangeguard
+102,Shock-n-Awe,Integumentary System,shock_n_awe
+103,Subdermal Armor,Integumentary System,subdermal_armor
+104,Fortified Ankles,Legs,fortified_ankles
+105,Jenkins’ Tendons,Legs,jenkins_tendons
+106,Leeroy Ligament System,Legs,leeroy_ligament_system
+107,Lynx Paws,Legs,lynx_paws
+108,Reinforced Tendons,Legs,reinforced_tendons
+109,Contagion,Quickhacks,contagion
+110,Cripple Movement,Quickhacks,cripple_movement
+111,Cyberware Malfunction,Quickhacks,cyberware_malfunction
+112,Overheat,Quickhacks,overheat
+113,Reboot Optics,Quickhacks,reboot_optics
+114,Short Circuit,Quickhacks,short_circuit_tier_1
+115,Synapse Burnout,Quickhacks,synapse_burnout
+116,Weapon Glitch,Quickhacks,weapon_glitch
+117,Bounty Dossier,Utility items,bounty_contract
+118,Damaged Cybernetic Part — Tier 1,Utility items,damaged_cybernetic_part_tier_1
+119,Damaged Cybernetic Part — Tier 2,Utility items,damaged_cybernetic_part_tier_2
+120,Damaged Cybernetic Part — Tier 3,Utility items,damaged_cybernetic_part_tier_3
+121,Damaged Cybernetic Part — Tier 4,Utility items,damaged_cybernetic_part_tier_4
+122,Damaged Cybernetic Part — Tier 5,Utility items,damaged_cybernetic_part_tier_5
+123,Delivery Contract Shard,Utility items,delivery_contract
+124,Eurodollar Credit Chip,Utility items,eurodollar_chip
+125,Iconic Requisition Chip — Tier 1,Utility items,iconic_requisition_tier_1
+126,Iconic Requisition Chip — Tier 2,Utility items,iconic_requisition_tier_2
+127,Iconic Requisition Chip — Tier 3,Utility items,iconic_requisition_tier_3
+128,Iconic Requisition Chip — Tier 4,Utility items,iconic_requisition_tier_4
+129,Iconic Requisition Chip — Tier 5,Utility items,iconic_requisition_tier_5

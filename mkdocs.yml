@@ -47,6 +47,7 @@ nav:
       - Common questions: faq.md
   - Cyberware:
       - All cyberware: cyberware.md
+      - Numbered icon reference: icon-reference.md
       - Iconic cyberware: iconics.md
       - Frontal Cortex:
           - "Axolotl": axolotl.md

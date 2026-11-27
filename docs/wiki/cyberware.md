@@ -2,6 +2,8 @@
 
 [Wiki home](index.md) · [Cyberware](cyberware.md) · [Quickhacks](quickhacks.md) · [Village services](ripperdocs.md)
 
+[View all icons with names and numbers](icon-reference.md).
+
 Choose a body system below. Each link opens an implant's effects, tiers and stats. [Learn installation](installation.md).
 
 | System | Implants |
