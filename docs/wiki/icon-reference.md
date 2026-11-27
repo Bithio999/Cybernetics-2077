@@ -23,4 +23,3 @@ Each icon has a name and a stable number, so you can refer to it as **#042**, fo
 **#104–#129: Legs / Quickhacks / Utility**
 
 ![Named and numbered icons 104–129](../images/icon-index/sheet-05.png)
-

@@ -98,7 +98,7 @@ for page,groups in enumerate(pages,1):
     records.append({'sheet':page,'file':filename,'first':min(e['number'] for e in subset),'last':max(e['number'] for e in subset),'count':len(subset),'categories':groups})
 pdf.save()
 with (DOWNLOAD/'icon-reference.csv').open('w',newline='') as f:
-    writer=csv.writer(f);writer.writerow(['Number','Name','Category','Texture'])
+    writer=csv.writer(f,lineterminator="\n");writer.writerow(['Number','Name','Category','Texture'])
     for e in entries:writer.writerow([e['number'],e['name'],category_names[e['category']],e['icon']])
 cards=[]
 for e in entries:
