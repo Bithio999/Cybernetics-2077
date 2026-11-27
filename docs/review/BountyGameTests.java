@@ -46,13 +46,19 @@ public final class BountyGameTests {
 
   private static Mob mark(GameTestHelper h, ServerPlayer p) {
     var job = BountyContracts.job(p);
-    var m = EntityType.HUSK.create(h.getLevel());
+    Mob m =
+        BountyContracts.kind(job) == BountyRules.Kind.CYBERPSYCHO
+            ? CityContent.CYBERPSYCHO.get().create(h.getLevel())
+            : EntityType.HUSK.create(h.getLevel());
     m.setPos(p.position().add(4, 0, 0));
     m.setNoGravity(true);
     m.setNoAi(true);
-    EnhancedMobs.install(
-        m,
-        MobCyberwarePool.rollExactTier(job.getInt("tier"), job.getInt("implants"), m.getRandom()));
+    if (m instanceof Cyberpsycho psycho) psycho.configure(job.getInt("rank"));
+    else
+      EnhancedMobs.install(
+          m,
+          MobCyberwarePool.rollExactTier(
+              job.getInt("tier"), job.getInt("implants"), m.getRandom()));
     var t = new CompoundTag();
     t.putUUID("owner", p.getUUID());
     t.putUUID("token", job.getUUID("token"));

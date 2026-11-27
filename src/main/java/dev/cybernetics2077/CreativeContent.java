@@ -54,6 +54,7 @@ public final class CreativeContent {
     items.add(CityContent.BOUNTY_CONTRACT.get());
     items.add(CityContent.DOC_EGG.get());
     items.add(CityContent.FIXER_EGG.get());
+    items.add(CityContent.PSYCHO_EGG.get());
     return List.copyOf(items);
   }
 

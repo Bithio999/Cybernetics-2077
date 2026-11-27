@@ -30,15 +30,7 @@ public final class BountyContract extends Item {
     }
     lines.add(Component.literal(t.getString("title")).withStyle(ChatFormatting.AQUA));
     lines.add(Component.literal(BountyContracts.objective(t)).withStyle(ChatFormatting.YELLOW));
-    lines.add(
-        Component.literal(
-                BountyRules.rankName(Math.clamp(t.getInt("rank"), 1, 6))
-                    + " / "
-                    + t.getInt("implants")
-                    + " implants / "
-                    + t.getInt("guards")
-                    + " guards")
-            .withStyle(ChatFormatting.GRAY));
+    lines.add(Component.literal(BountyContracts.threatSummary(t)).withStyle(ChatFormatting.GRAY));
     lines.add(
         Component.literal("Lead: " + t.getInt("x") + ", " + t.getInt("y") + ", " + t.getInt("z"))
             .withStyle(ChatFormatting.YELLOW));

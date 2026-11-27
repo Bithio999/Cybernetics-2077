@@ -35,9 +35,24 @@ The mark wears **real non-Iconic combat implants at the listed tier**, including
 
 Fight the named cyberpsycho down to **10% maximum health**. Your hit—or your tamed pet's—automatically contains them, even if that hit would otherwise be fatal. A contained target stops fighting and is protected from normal follow-up damage. Return to the issuing fixer network to collect payment.
 
-Cyberpsychos have **one additional implant**, up to six, **50% more health** and **20% more damage** than an equivalent named mark. Their base payment is **25% higher** than the table. A target killed by another player or the environment before containment fails the job.
+Cyberpsychos are **dedicated human mobs**, not chromed vanilla monsters. Their base cyberware capacity is **150**. Their installed implants exceed that limit; every additional **25 capacity** raises the contract tier, up to Tier 6. This is separate from the tiers of their individual implants.
 
-![Cyberpsycho sighting dossier](../images/contracts-025-cyberpsycho.png)
+| Contract tier | Overcapacity band | Installed capacity | Implant tier | Implants |
+| ---: | --- | ---: | ---: | ---: |
+| 1 | +1–25 | 162 / 150 | 3 | 14 |
+| 2 | +26–50 | 187 / 150 | 3 | 15 |
+| 3 | +51–75 | 215 / 150 | 4 | 15 |
+| 4 | +76–100 | 250 / 150 | 4 | 16 |
+| 5 | +101–125 | 270 / 150 | 5 | 16 |
+| 6 | +126 or more | 278 / 150 | 5 | 17 |
+
+Their combat implants work automatically: **Biodyne Berserk**, **Biomonitor/Blood Pump**, **Adrenaline Converter**, **Reinforced Tendons**, **Microgenerator** and **Shock-N-Awe**, plus melee, armor, toughness and mitigation bonuses. Self-ICE blocks an incoming quickhack before recharging. Higher contract tiers add Para Bellum, Epimorphic Skeleton, Pain Editor, Second Heart and Handle Wrap. Berserk's temporary 25% health floor must expire before containment is possible. No Iconic implants are equipped.
+
+The contract menu, shard and scanner show their capacity. Their base payment remains **25% higher** than standard Wanted jobs. A target killed by another player or the environment before containment fails the job.
+
+![Cyberpsycho sighting dossier](../images/psycho-027-offer.png)
+
+![Cyberpsycho and capacity scan](../images/psycho-027-scanner.png)
 
 ### Cyberware Recovery
 

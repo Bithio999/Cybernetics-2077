@@ -108,7 +108,7 @@ public final class BountyRules {
           profile == 0
               ? (random.nextBoolean() ? "minecraft:skeleton" : "minecraft:pillager")
               : (rank >= 3 && random.nextBoolean() ? "minecraft:vindicator" : "minecraft:husk");
-      if (kind == Kind.CYBERPSYCHO) mob = rank >= 3 ? "minecraft:vindicator" : "minecraft:husk";
+      if (kind == Kind.CYBERPSYCHO) mob = "cybernetics2077:cyberpsycho";
       String[] names = profile == 0 ? MARA : REN;
       result.add(
           new Offer(

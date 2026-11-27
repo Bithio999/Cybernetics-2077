@@ -1,5 +1,9 @@
 # Validation
 
+## Dedicated cyberpsychos and overcapacity (NeoForge 0.27.0)
+
+**109 JVM tests and 163 standalone GameTests pass.** Runtime checks cover all six real equipment/capacity bands, native Berserk activation, medical charges/recharge, Self-ICE interception, Second Heart fatal-hit handling, native melee/discharges, double jumping and save/load without healing or modifier stacking. The native client checks dedicated entity deployment, capacity in the contract menu/scanner, nonlethal containment and payment through the fixer UI. [Implementation](development/CYBERPSYCHOS-0.27.0.md) · [Results](review/results/cyberpsychos-0.27.0.json). Forge remains unchanged.
+
 ## Pixel icons and creative inventory (NeoForge 0.26.0)
 
 **107 JVM tests and 156 standalone GameTests pass.** Native client review selects the real mod tab using the creative inventory's page buttons, checks all 240 canonical items, searches for the six Sandevistans and restores the full list. All 63 item sprites are 32×32 with binary alpha and a limited palette. The release audit checks their dimensions, the bundled mod badge and absence of review fixtures. [Implementation](development/ICONS-CREATIVE-0.26.0.md) · [Results](review/results/icons-creative-0.26.0.json) · [Inventory](images/creative-026-all.png) · [Search](images/creative-026-search.png). Forge remains unchanged.

@@ -1,0 +1,78 @@
+{
+  "version": "0.27.0",
+  "platform": "Minecraft 1.21.1 / NeoForge 21.1.248",
+  "jvm": {
+    "tests": 109,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "standaloneGameTests": {
+    "tests": 163,
+    "failures": 0,
+    "newScenarios": [
+      "real cost and valid unique sockets for all six ranks",
+      "autonomous Berserk, Adrenaline and Biomonitor/Pump",
+      "two medical charges and recharge",
+      "actual quickhack interception and Self-ICE cooldown",
+      "Second Heart fatal native damage, rearm and subsequent death",
+      "equipment, medical timers, missing HP and attribute idempotence across save/load",
+      "native sword damage and Microgenerator rearm",
+      "second airborne impulse with Reinforced Tendons"
+    ]
+  },
+  "nativeClient": {
+    "status": "passed",
+    "checked": [
+      "native fixer board and accept packets",
+      "dedicated humanoid deployment at contract tier 3",
+      "real installed capacity 215 / 150",
+      "aimed scanner inspection returns installed capacity",
+      "nonlethal owner containment and payment",
+      "existing Wanted and Recovery objective/payment checks",
+      "small GUI widget bounds"
+    ],
+    "screenshots": [
+      "psycho-027-offer.png",
+      "psycho-027-model.png",
+      "psycho-027-scanner.png"
+    ]
+  },
+  "capacity": {
+    "baseline": 150,
+    "perDifficultyBand": 25,
+    "installedByRank": [
+      162,
+      187,
+      215,
+      250,
+      270,
+      278
+    ],
+    "implantsByRank": [
+      14,
+      15,
+      15,
+      16,
+      16,
+      17
+    ],
+    "implantTiersByRank": [
+      3,
+      3,
+      4,
+      4,
+      5,
+      5
+    ],
+    "iconicImplants": false
+  },
+  "releaseAudit": "passed; resource parity and no review fixtures",
+  "wiki": "69 pages / 50 item/program entries; strict build and coverage passed",
+  "forge": {
+    "updated": false,
+    "version": "0.20.0",
+    "sha256": "95aa30a182e2c4046d9390da2a0c0d824f328c59204d45249541775eba580b4a"
+  },
+  "sha256": "7202e61fea08f681d459e2d4ba7d3ec07443a569830608bc65a9259a8a857bf8"
+}

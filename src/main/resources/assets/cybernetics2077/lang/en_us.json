@@ -402,5 +402,7 @@
   "item.cybernetics2077.davids_sandevistan_tier_5": "David's Sandevistan",
   "item.cybernetics2077.bounty_contract": "Bounty Dossier",
   "cybernetics2077.implant.meta": "Tier %s · %s capacity",
-  "itemGroup.cybernetics2077": "Cybernetics 2077"
+  "itemGroup.cybernetics2077": "Cybernetics 2077",
+  "entity.cybernetics2077.cyberpsycho": "Cyberpsycho",
+  "item.cybernetics2077.cyberpsycho_spawn_egg": "Cyberpsycho Spawn Egg"
 }

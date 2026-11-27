@@ -173,6 +173,13 @@ public final class ScannerNetwork {
       t.putInt("implants", loadout.count());
       t.putDouble("averageTier", loadout.averageTier());
     }
+    if (target instanceof dev.cybernetics2077.mob.Cyberpsycho psycho) {
+      var plan = dev.cybernetics2077.mob.CyberpsychoLoadouts.forRank(psycho.rank());
+      t.putInt("implants", plan.implants().size());
+      t.putDouble("averageTier", plan.tier());
+      t.putInt("capacity", psycho.capacity());
+      t.putInt("baseCapacity", 150);
+    }
     return t;
   }
 

@@ -78,6 +78,7 @@ public final class ClientHooks {
 
     @SubscribeEvent
     public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
+      e.registerEntityRenderer(dev.cybernetics2077.city.CityContent.CYBERPSYCHO.get(), CyberpsychoRenderer::new);
       e.registerEntityRenderer(
           dev.cybernetics2077.city.CityContent.RIPPERDOC.get(), CityResidentRenderer::new);
       e.registerEntityRenderer(

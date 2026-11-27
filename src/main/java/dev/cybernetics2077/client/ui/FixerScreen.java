@@ -214,17 +214,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
       return;
     }
     c.text(c.fit(t.getString("title"), w - 16, 11, true), x + 8, 73, 11, GREEN);
-    c.body(
-        BountyRules.rankName(t.getInt("rank"))
-            + " / "
-            + t.getInt("implants")
-            + " implants / "
-            + t.getInt("guards")
-            + " guards",
-        x + 8,
-        91,
-        8,
-        MUTED);
+    c.body(BountyContracts.threatSummary(t), x + 8, 91, 8, MUTED);
     c.text(
         "€$"
             + String.format(Locale.ROOT, "%,d", t.getInt("eddies"))
@@ -451,7 +441,9 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
                 ? "TAKEN TODAY"
                 : slot < 0
                     ? (dossier.getInt("stage") == 2 ? "READY FOR PAYMENT" : "TRACK DOSSIER")
-                    : BountyRules.rankName(dossier.getInt("rank"))
+                    : (dossier.getInt("baseCapacity") > 0
+                            ? "TIER " + dossier.getInt("rank")
+                            : BountyRules.rankName(dossier.getInt("rank")))
                         + " / €$"
                         + dossier.getInt("eddies"),
             getX() + 6,

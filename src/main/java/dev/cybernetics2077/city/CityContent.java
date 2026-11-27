@@ -115,6 +115,21 @@ public final class CityContent {
       ITEMS.register("eurodollar_chip", EurodollarChip::new);
   public static final Supplier<EntityType<CityResident>> RIPPERDOC = resident("ripperdoc");
   public static final Supplier<EntityType<CityResident>> FIXER = resident("fixer");
+  public static final Supplier<EntityType<dev.cybernetics2077.mob.Cyberpsycho>> CYBERPSYCHO =
+      ENTITIES.register(
+          "cyberpsycho",
+          () ->
+              EntityType.Builder.of(dev.cybernetics2077.mob.Cyberpsycho::new, MobCategory.MONSTER)
+                  .sized(.6f, 1.8f)
+                  .eyeHeight(1.62f)
+                  .clientTrackingRange(8)
+                  .build(Cybernetics2077.ID + ":cyberpsycho"));
+  public static final Supplier<Item> PSYCHO_EGG =
+      ITEMS.register(
+          "cyberpsycho_spawn_egg",
+          () ->
+              new net.neoforged.neoforge.common.DeferredSpawnEggItem(
+                  CYBERPSYCHO, 0x19282c, 0xeb584f, new Item.Properties()));
   public static final Supplier<Item> DOC_EGG =
       ITEMS.register(
           "ripperdoc_spawn_egg",
@@ -167,6 +182,7 @@ public final class CityContent {
         (net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent e) -> {
           e.put(RIPPERDOC.get(), CityResident.attributes().build());
           e.put(FIXER.get(), CityResident.attributes().build());
+          e.put(CYBERPSYCHO.get(), dev.cybernetics2077.mob.Cyberpsycho.attributes().build());
         });
   }
 

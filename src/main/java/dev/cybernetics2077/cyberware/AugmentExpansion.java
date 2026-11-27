@@ -45,6 +45,11 @@ public final class AugmentExpansion {
   }
 
   public static boolean blockHack(ServerPlayer attacker, LivingEntity target) {
+    if (target instanceof dev.cybernetics2077.mob.Cyberpsycho psycho) {
+      if (!psycho.blockHack()) return false;
+      attacker.displayClientMessage(Component.translatable("cybernetics2077.self_ice.rejected"), true);
+      return true;
+    }
     if (!(target instanceof ServerPlayer defender) || attacker == defender) return false;
     int t = AugmentRuntime.tier(defender, SELF_ICE);
     var state = AugmentRuntime.state(defender);

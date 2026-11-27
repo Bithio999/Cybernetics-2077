@@ -225,12 +225,49 @@ public final class BountyClientReview {
       shot(out, "bounty-small-window");
       org.lwjgl.glfw.GLFW.glfwSetWindowSize(mc.getWindow().getWindow(), 854, 480);
     }
-    if (tick == 260 || tick == 350) button("BOUNTIES");
+    if (tick == 260 || tick == 390) button("BOUNTIES");
     if (tick == 265) card("CYBERPSYCHO SIGHTING:");
     if (tick == 270) shot(out, "cyberpsycho-offer");
     if (tick == 275) button("ACCEPT BOUNTY");
     if (tick == 290) deploy(mc);
-    if (tick == 310) {
+    if (tick == 295) {
+      server(
+          p -> {
+            var target = p.serverLevel().getEntity(targetId);
+            check(
+                target instanceof dev.cybernetics2077.mob.Cyberpsycho,
+                "Sighting did not deploy dedicated entity");
+            var psycho = (dev.cybernetics2077.mob.Cyberpsycho) target;
+            check(psycho.capacity() == 215 && psycho.rank() == 3, "Incorrect real capacity/rank");
+            psycho.moveTo(12, 90, 6, 180, 0);
+            psycho.setYBodyRot(180);
+            psycho.setYHeadRot(180);
+            psycho.setTarget(null);
+            p.teleportTo(12, 90, 0);
+          });
+    }
+    if (tick >= 300 && tick <= 337) {
+      var target = mc.level.getEntity(targetId);
+      check(target != null, "Cyberpsycho not synchronized");
+      var d = target.getEyePosition().subtract(mc.player.getEyePosition());
+      mc.player.setYRot((float) (Math.toDegrees(Math.atan2(d.z, d.x)) - 90));
+      mc.player.setXRot((float) -Math.toDegrees(Math.atan2(d.y, Math.hypot(d.x, d.z))));
+    }
+    if (tick == 332)
+      server(
+          p -> {
+            var scan = dev.cybernetics2077.scanner.ScannerNetwork.inspect(p, targetId);
+            check(
+                scan.getInt("id") == targetId
+                    && scan.getInt("capacity") == 215
+                    && scan.getInt("baseCapacity") == 150,
+                "Native aimed scanner did not report installed capacity");
+          });
+    if (tick == 303) shot(out, "cyberpsycho-model");
+    if (tick == 305) ScannerClient.KEY.setDown(true);
+    if (tick == 335) shot(out, "cyberpsycho-scanner");
+    if (tick == 339) ScannerClient.KEY.setDown(false);
+    if (tick == 350) {
       server(
           p -> {
             var target = (Mob) p.serverLevel().getEntity(targetId);
@@ -243,13 +280,13 @@ public final class BountyClientReview {
             open(p);
           });
     }
-    if (tick == 330) shot(out, "cyberpsycho-ready");
-    if (tick == 335) button("CLAIM PAYMENT");
-    if (tick == 355) card("CYBERWARE RECOVERY:");
-    if (tick == 360) shot(out, "recovery-offer");
-    if (tick == 365) button("ACCEPT BOUNTY");
-    if (tick == 380) deploy(mc);
-    if (tick == 400)
+    if (tick == 370) shot(out, "cyberpsycho-ready");
+    if (tick == 375) button("CLAIM PAYMENT");
+    if (tick == 395) card("CYBERWARE RECOVERY:");
+    if (tick == 400) shot(out, "recovery-offer");
+    if (tick == 405) button("ACCEPT BOUNTY");
+    if (tick == 420) deploy(mc);
+    if (tick == 440)
       server(
           p -> {
             var target = (Mob) p.serverLevel().getEntity(targetId);
@@ -258,7 +295,7 @@ public final class BountyClientReview {
             check(job.getInt("stage") == 4, "Courier kill bypassed recovery");
             p.teleportTo(job.getInt("x") + 2, job.getInt("y"), job.getInt("z"));
           });
-    if (tick == 420) {
+    if (tick == 460) {
       var cache =
           java.util.stream.StreamSupport.stream(
                   mc.level.entitiesForRendering().spliterator(), false)
@@ -271,14 +308,14 @@ public final class BountyClientReview {
       mc.player.setXRot((float) -Math.toDegrees(Math.atan2(d.y, Math.hypot(d.x, d.z))));
       mc.gui.getChat().clearMessages(false);
     }
-    if (tick == 423) shot(out, "recovery-cache");
-    if (tick == 425) {
+    if (tick == 463) shot(out, "recovery-cache");
+    if (tick == 465) {
       for (int i = 0; i < 9; i++)
         if (mc.player.getInventory().getItem(i).is(CityContent.BOUNTY_CONTRACT.get()))
           mc.player.getInventory().selected = i;
       mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
     }
-    if (tick == 445)
+    if (tick == 485)
       server(
           p -> {
             check(
@@ -288,15 +325,15 @@ public final class BountyClientReview {
             p.teleportTo(0, 90, 0);
             open(p);
           });
-    if (tick == 465) shot(out, "recovery-ready");
-    if (tick == 470) button("CLAIM PAYMENT");
-    if (tick == 490) {
+    if (tick == 505) shot(out, "recovery-ready");
+    if (tick == 510) button("CLAIM PAYMENT");
+    if (tick == 530) {
       check(
           ((FixerMenu) mc.player.containerMenu).board().getCompound("job").isEmpty(),
           "Recovery claim failed");
       shot(out, "recovery-debrief");
     }
-    if (tick == 495) {
+    if (tick == 535) {
       Files.writeString(
           out.resolve("passed.txt"),
           "PASS: daily bounty board, native accept/dossier, real target/guards deployment,"

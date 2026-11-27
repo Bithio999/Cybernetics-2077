@@ -537,6 +537,8 @@ public final class ScannerClient {
               "CHROMED // %d IMPLANTS // AVG T%.1f",
               target.getInt("implants"),
               target.getDouble("averageTier"));
+    if (has && target.getInt("baseCapacity") > 0)
+      kind = "CYBERPSYCHO // " + target.getInt("capacity") + "/150 CAPACITY";
     c.tracked(has ? kind : "AIM AT A LIVING TARGET", 1410, 414, 14, 0xffb4e1eb, .8f);
     c.body(
         has ? c.fit(target.getString("type"), 378, 16, false) : "Line of sight required",

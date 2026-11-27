@@ -80,7 +80,39 @@ public final class BountyContracts {
     t.putInt("guards", BountyRules.guards(offer.rank()));
     t.putInt("eddies", BountyRules.pay(offer.rank(), offer.kind()));
     t.putInt("cred", BountyRules.cred(offer.rank()));
+    if (offer.kind() == BountyRules.Kind.CYBERPSYCHO) psychoPlan(t);
     return t;
+  }
+
+  public static String threatSummary(CompoundTag t) {
+    if (t.getInt("baseCapacity") > 0)
+      return "Tier "
+          + t.getInt("rank")
+          + " / "
+          + t.getInt("capacity")
+          + "/150 (+"
+          + t.getInt("overcapacity")
+          + ") / "
+          + t.getInt("guards")
+          + " guards";
+    return BountyRules.rankName(Math.clamp(t.getInt("rank"), 1, 6))
+        + " / "
+        + t.getInt("implants")
+        + " implants / "
+        + t.getInt("guards")
+        + " guards";
+  }
+
+  private static void psychoPlan(CompoundTag t) {
+    var plan = CyberpsychoLoadouts.forRank(Math.clamp(t.getInt("rank"), 1, 6));
+    t.putInt("rank", plan.rank());
+    t.putString("mob", "cybernetics2077:cyberpsycho");
+    t.putInt("tier", plan.tier());
+    t.putInt("implants", plan.implants().size());
+    t.putInt("baseCapacity", CyberpsychoRules.BASE_CAPACITY);
+    t.putInt("capacity", plan.capacity());
+    t.putInt("overcapacity", plan.overcapacity());
+    t.putInt("psychoVersion", 1);
   }
 
   private static boolean valid(ServerPlayer p, CityResident fixer) {
@@ -378,6 +410,7 @@ public final class BountyContracts {
         || player.level().getDifficulty() == Difficulty.PEACEFUL
         || player.isSpectator()
         || !player.isAlive()) return false;
+    if (kind(job) == BountyRules.Kind.CYBERPSYCHO) psychoPlan(job);
     var level = player.serverLevel();
     double dx = job.getInt("x") + .5 - player.getX(), dz = job.getInt("z") + .5 - player.getZ();
     if (dx * dx + dz * dz > 96 * 96) return false;
@@ -406,13 +439,15 @@ public final class BountyContracts {
       var pos = places.get(i);
       mob.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, 0, 0);
       int tier = i == 0 ? job.getInt("tier") : Math.max(1, job.getInt("tier") - 1);
-      EnhancedMobs.install(
-          mob,
-          i == 0
-              ? BountyCombat.loadout(tier, job.getInt("implants"))
-              : MobCyberwarePool.rollExactTier(
-                  tier, Math.min(3, job.getInt("implants")), mob.getRandom()));
-      if (i == 0)
+      if (i == 0 && mob instanceof Cyberpsycho psycho) psycho.configure(job.getInt("rank"));
+      else
+        EnhancedMobs.install(
+            mob,
+            i == 0
+                ? BountyCombat.loadout(tier, job.getInt("implants"))
+                : MobCyberwarePool.rollExactTier(
+                    tier, Math.min(3, job.getInt("implants")), mob.getRandom()));
+      if (i == 0 && !(mob instanceof Cyberpsycho))
         BountyCombat.apply(
             mob, job.getInt("rank"), kind(job) == BountyRules.Kind.CYBERPSYCHO, true);
       var marker = new CompoundTag();
@@ -425,19 +460,23 @@ public final class BountyContracts {
       mob.setPersistenceRequired();
       mob.setCanPickUpLoot(false);
       Item weapon =
-          mob.getType() == EntityType.SKELETON
-              ? Items.BOW
-              : mob.getType() == EntityType.PILLAGER
-                  ? Items.CROSSBOW
-                  : mob.getType() == EntityType.VINDICATOR
-                      ? Items.IRON_AXE
-                      : tier >= 3 ? Items.IRON_SWORD : Items.STONE_SWORD;
+          mob instanceof Cyberpsycho && job.getInt("rank") >= 5
+              ? Items.NETHERITE_SWORD
+              : mob.getType() == EntityType.SKELETON
+                  ? Items.BOW
+                  : mob.getType() == EntityType.PILLAGER
+                      ? Items.CROSSBOW
+                      : mob.getType() == EntityType.VINDICATOR
+                          ? Items.IRON_AXE
+                          : tier >= 3 ? Items.IRON_SWORD : Items.STONE_SWORD;
       mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(weapon));
       mob.setDropChance(EquipmentSlot.MAINHAND, 0);
-      var helmet = new ItemStack(Items.IRON_HELMET);
-      helmet.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
-      mob.setItemSlot(EquipmentSlot.HEAD, helmet);
-      mob.setDropChance(EquipmentSlot.HEAD, 0);
+      if (!(mob instanceof Cyberpsycho)) {
+        var helmet = new ItemStack(Items.IRON_HELMET);
+        helmet.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
+        mob.setItemSlot(EquipmentSlot.HEAD, helmet);
+        mob.setDropChance(EquipmentSlot.HEAD, 0);
+      }
       if (mob instanceof net.minecraft.world.entity.monster.Zombie zombie) zombie.setBaby(false);
       mob.setTarget(player);
       entities.add(mob);
@@ -506,13 +545,18 @@ public final class BountyContracts {
       marker.putInt("rank", job.getInt("rank"));
       marker.putString("kind", kind(job).id);
     }
-    if (marker.getInt("role") == 0)
+    if (marker.getInt("role") == 0 && !(mob instanceof Cyberpsycho))
       BountyCombat.apply(
           mob,
           Math.clamp(job.getInt("rank"), 1, 6),
           kind(job) == BountyRules.Kind.CYBERPSYCHO,
           false);
-    if (marker.getInt("role") == 0)
+    if (marker.getInt("role") == 0 && mob instanceof Cyberpsycho psycho) {
+      mob.setCustomName(
+          Component.literal(
+                  job.getString("alias") + " // CYBERPSYCHO " + psycho.capacity() + "/150")
+              .withStyle(ChatFormatting.RED));
+    } else if (marker.getInt("role") == 0)
       mob.setCustomName(
           Component.translatable(
                   "cybernetics2077.enhanced.name",
@@ -538,6 +582,16 @@ public final class BountyContracts {
         continue;
       }
       if (job.getInt("stage") != 1) continue;
+      if (kind(job) == BountyRules.Kind.CYBERPSYCHO && job.getInt("psychoVersion") < 1) {
+        // Upgrade uncompleted sightings without changing their accepted rewards or token.
+        cleanup(server, job);
+        psychoPlan(job);
+        job.putBoolean("spawned", false);
+        job.remove("target");
+        job.remove("guardIds");
+        save(player, job);
+        changed(player);
+      }
       if (!job.getBoolean("spawned")) {
         deploy(player);
         continue;
