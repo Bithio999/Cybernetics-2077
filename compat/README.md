@@ -7,7 +7,7 @@ Add `-PcompatBountyReview` with `-PcompatClientReview` to exercise daily fixer o
 
 ## NeoForge 0.21.1
 
-Gun cadence and burst spacing now follow the slowed world clock rather than inheriting the owner's Sandevistan acceleration. TaCZ bullets do the same; native reload duration remains normal. Chromed mobs draw from current non-Iconic implant families; this does not enable player-only controls on mob AI. [Validation and implementation](../docs/development/GUN-CLOCK-0.21.1.md).
+Gun cadence and burst spacing now follow the slowed world clock rather than inheriting the owner's Sandevistan acceleration. TaCZ bullets do the same; native reload duration remains normal. Chromed mobs draw from current non-Iconic implant families; installed combat cyberware is operated by the shared NPC runtime in NeoForge 0.28.0. [Validation and implementation](../docs/development/GUN-CLOCK-0.21.1.md).
 
 
 Active development targets **1.21.1 NeoForge (0.20.1)**. The **1.20.1 Forge release remains 0.20.0** and is updated only when explicitly requested. The root-source generator is not an automatic promise of port compatibility.
@@ -92,3 +92,9 @@ After using fixtures, run `clean test build` without the init script before pack
 - [Legacy Forge build plugin](https://github.com/neoforged/ModDevGradle)
 
 No TaCZ code or assets are copied into Cybernetics 2077.
+
+## NeoForge 0.28.0
+
+The full current non-arm catalogue (except Canto) uses the existing optional native gun bridge. Predictive Smart Link, conditional critical/damage bonuses, aimed-hit recovery, weapon jams and firing-mechanism recovery preserve ammunition, attachments, native headshots and explosive exclusions. Shared NPC systems handle actual installed programs/RAM, autonomous actives and relative-time fields. [Research and adaptations](../docs/research/expansion-028/README.md) · [Implementation](../docs/development/EXPANSION-0.28.0.md).
+
+`-PcompatFullExpansionReview` adds native role-mesh/icon/reserve/upload/time-field checks. Its disposable terrain and review-only classes never ship in release builds.

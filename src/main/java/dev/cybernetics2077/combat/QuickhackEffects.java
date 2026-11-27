@@ -1,13 +1,11 @@
 package dev.cybernetics2077.combat;
 
 import dev.cybernetics2077.Cybernetics2077;
-import dev.cybernetics2077.cyberware.AugmentRuntime;
 import dev.cybernetics2077.deck.*;
 import java.util.*;
 import net.minecraft.core.particles.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.*;
@@ -31,7 +29,7 @@ public final class QuickhackEffects {
       new WeakHashMap<>();
 
   private static final class Effect {
-    final java.lang.ref.WeakReference<ServerPlayer> owner;
+    final java.lang.ref.WeakReference<LivingEntity> owner;
     final QuickhackKind kind;
     final int tier, interval;
     final float damage;
@@ -39,7 +37,7 @@ public final class QuickhackEffects {
     long next;
     int pulses = 4;
 
-    Effect(ServerPlayer p, QuickhackItem program, float damage, int duration, long now) {
+    Effect(LivingEntity p, QuickhackItem program, float damage, int duration, long now) {
       owner = new java.lang.ref.WeakReference<>(p);
       kind = program.kind();
       tier = program.tier().level;
@@ -56,7 +54,7 @@ public final class QuickhackEffects {
     return effect != null && effect.end >= target.level().getGameTime();
   }
 
-  private static DamageSource source(ServerPlayer p, QuickhackKind kind) {
+  private static DamageSource source(LivingEntity p, QuickhackKind kind) {
     return new DamageSource(
         p.registryAccess()
             .registryOrThrow(Registries.DAMAGE_TYPE)
@@ -67,14 +65,16 @@ public final class QuickhackEffects {
   }
 
   public static void land(
-      ServerPlayer p,
+      LivingEntity p,
       LivingEntity target,
       QuickhackItem program,
       float damage,
       ItemStack sourceDeck) {
-    if (!CyberwareRuntime.canAttack(p, target)) return;
+    if (!NeuralActors.canAttack(p, target)) return;
     Vec3 origin = target.position().add(0, target.getBbHeight() * .6, 0);
-    if (!apply(p, target, program, damage, 1)) return;
+    float duration =
+        sourceDeck.getItem() instanceof CyberdeckItem d ? d.durationMultiplier(program) : 1;
+    if (!apply(p, target, program, damage, duration)) return;
     var deck = sourceDeck.getItem() instanceof CyberdeckItem item ? item : null;
     boolean infection = program.kind() == QuickhackKind.CONTAGION;
     int count =
@@ -86,16 +86,15 @@ public final class QuickhackEffects {
             : deck == null ? 0 : deck.relayRange();
     if (count == 0) return;
     var candidates =
-        p.serverLevel()
+        ((net.minecraft.server.level.ServerLevel) p.level())
             .getEntitiesOfClass(
                 LivingEntity.class,
                 target.getBoundingBox().inflate(radius),
                 e ->
                     e != target
-                        && AugmentRuntime.hostile(p, e)
+                        && NeuralActors.hostile(p, e)
                         && target.distanceToSqr(e) <= radius * radius
-                        && p.distanceToSqr(e)
-                            <= Math.pow(dev.cybernetics2077.scanner.ScannerNetwork.range(p) + 16, 2)
+                        && p.distanceToSqr(e) <= Math.pow(NeuralActors.range(p) + 16, 2)
                         && target.hasLineOfSight(e));
     candidates.sort(
         Comparator.<LivingEntity>comparingDouble(target::distanceToSqr)
@@ -111,8 +110,8 @@ public final class QuickhackEffects {
   }
 
   private static boolean apply(
-      ServerPlayer p, LivingEntity t, QuickhackItem q, float damage, float durationScale) {
-    if (!CyberwareRuntime.canAttack(p, t)) return false;
+      LivingEntity p, LivingEntity t, QuickhackItem q, float damage, float durationScale) {
+    if (!NeuralActors.canAttack(p, t)) return false;
     if (dev.cybernetics2077.cyberware.AugmentExpansion.blockHack(p, t)) return false;
     long now = t.level().getGameTime();
     switch (q.kind()) {
@@ -129,26 +128,41 @@ public final class QuickhackEffects {
             && infection.end >= now) {
           effects.remove(QuickhackKind.CONTAGION);
           t.hurt(source(p, QuickhackKind.OVERHEAT), 8 + 2 * infection.tier);
-          p.serverLevel()
+          ((net.minecraft.server.level.ServerLevel) p.level())
               .sendParticles(
                   ParticleTypes.EXPLOSION, t.getX(), t.getY() + 1, t.getZ(), 1, 0, 0, 0, 0);
           for (var other :
-              p
-                  .serverLevel()
-                  .getEntitiesOfClass(
-                      LivingEntity.class,
-                      t.getBoundingBox().inflate(3),
-                      e ->
-                          e != t
-                              && AugmentRuntime.hostile(p, e)
-                              && t.distanceToSqr(e) <= 9
-                              && t.hasLineOfSight(e))
-                  .stream()
-                  .limit(3)
-                  .toList())
+              ((net.minecraft.server.level.ServerLevel) p.level())
+                      .getEntitiesOfClass(
+                          LivingEntity.class,
+                          t.getBoundingBox().inflate(3),
+                          e ->
+                              e != t
+                                  && NeuralActors.hostile(p, e)
+                                  && t.distanceToSqr(e) <= 9
+                                  && t.hasLineOfSight(e))
+                      .stream()
+                      .limit(3)
+                      .toList())
             other.hurt(source(p, QuickhackKind.OVERHEAT), (8 + 2 * infection.tier) * .5f);
         }
-        effects.put(q.kind(), new Effect(p, q, damage, q.duration(), now));
+        effects.put(
+            q.kind(), new Effect(p, q, damage, Math.round(q.duration() * durationScale), now));
+      }
+      case WEAPON_GLITCH, CYBERWARE_MALFUNCTION -> {
+        ACTIVE
+            .computeIfAbsent(t, k -> new EnumMap<>(QuickhackKind.class))
+            .put(q.kind(), new Effect(p, q, 0, Math.round(q.duration() * durationScale), now));
+        if (q.kind() == QuickhackKind.CYBERWARE_MALFUNCTION) {
+          dev.cybernetics2077.cyberware.AugmentRuntime.state(t)
+              .extra
+              .putLong("disabledUntil", now + Math.round(q.duration() * durationScale));
+          if (q.tier().level >= 3) t.hurt(source(p, q.kind()), damage);
+        } else {
+          dev.cybernetics2077.cyberware.ExpansionRuntime.extra(t)
+              .putLong("jammedUntil", now + Math.round(q.duration() * durationScale));
+          if (t.isUsingItem()) t.stopUsingItem();
+        }
       }
       case REBOOT_OPTICS, CRIPPLE_MOVEMENT -> {
         int duration = Math.max(1, Math.round(q.duration() * durationScale));
@@ -190,7 +204,7 @@ public final class QuickhackEffects {
           || !player.isAlive()
           || player.isRemoved()
           || player.level() != target.level()
-          || !CyberwareRuntime.canAttack(player, target)) {
+          || !NeuralActors.canAttack(player, target)) {
         it.remove();
         continue;
       }
@@ -201,7 +215,7 @@ public final class QuickhackEffects {
         }
         if (target instanceof Mob mob) {
           if (effect.kind == QuickhackKind.REBOOT_OPTICS) clearTarget(mob);
-          else mob.getNavigation().stop();
+          else if (effect.kind == QuickhackKind.CRIPPLE_MOVEMENT) mob.getNavigation().stop();
         }
         if (effect.kind == QuickhackKind.CRIPPLE_MOVEMENT) {
           target.setDeltaMovement(0, Math.min(0, target.getDeltaMovement().y), 0);
@@ -259,16 +273,17 @@ public final class QuickhackEffects {
     };
   }
 
-  private static void arc(ServerPlayer p, Vec3 a, Vec3 b, QuickhackKind kind) {
+  private static void arc(LivingEntity p, Vec3 a, Vec3 b, QuickhackKind kind) {
     var dust = new DustParticleOptions(color(kind), .85f);
     for (int i = 0; i <= 16; i++) {
       var at = a.lerp(b, i / 16.).add(0, Math.sin(i * 2.3) * .12, Math.cos(i * 1.9) * .08);
-      p.serverLevel().sendParticles(dust, at.x, at.y, at.z, 1, .01, .01, .01, 0);
+      ((net.minecraft.server.level.ServerLevel) p.level())
+          .sendParticles(dust, at.x, at.y, at.z, 1, .01, .01, .01, 0);
     }
   }
 
-  private static void impact(ServerPlayer p, LivingEntity target, QuickhackKind kind) {
-    p.serverLevel()
+  private static void impact(LivingEntity p, LivingEntity target, QuickhackKind kind) {
+    ((net.minecraft.server.level.ServerLevel) p.level())
         .sendParticles(
             new DustParticleOptions(color(kind), 1),
             target.getX(),
@@ -280,7 +295,7 @@ public final class QuickhackEffects {
             .3,
             .05);
     if (kind == QuickhackKind.SHORT_CIRCUIT) {
-      p.serverLevel()
+      ((net.minecraft.server.level.ServerLevel) p.level())
           .sendParticles(
               ParticleTypes.ELECTRIC_SPARK,
               target.getX(),
@@ -302,7 +317,7 @@ public final class QuickhackEffects {
       PacketDistributor.sendToPlayersTrackingEntityAndSelf(
           p, new CyberwareNetwork.Impact(target.getId()));
     } else if (kind == QuickhackKind.OVERHEAT)
-      p.serverLevel()
+      ((net.minecraft.server.level.ServerLevel) p.level())
           .sendParticles(
               ParticleTypes.FLAME,
               target.getX(),

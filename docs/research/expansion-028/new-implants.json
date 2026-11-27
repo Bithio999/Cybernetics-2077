@@ -1,0 +1,542 @@
+[
+  {
+    "enum": "AXOLOTL",
+    "id": "axolotl",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 4,
+    "capacity": 55,
+    "iconic": true,
+    "title": "Axolotl"
+  },
+  {
+    "enum": "BIOCONDUCTOR",
+    "id": "bioconductor",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 3,
+    "capacity": 20,
+    "iconic": false,
+    "title": "Bioconductor"
+  },
+  {
+    "enum": "CAMILLO_RAM_MANAGER",
+    "id": "camillo_ram_manager",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 2,
+    "capacity": 10,
+    "iconic": false,
+    "title": "Camillo RAM Manager"
+  },
+  {
+    "enum": "COX_2",
+    "id": "cox_2_cybersomatic_optimizer",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 5,
+    "capacity": 50,
+    "iconic": true,
+    "title": "COX-2 Cybersomatic Optimizer"
+  },
+  {
+    "enum": "KERENZIKOV_BOOST",
+    "id": "kerenzikov_boost_system",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 3,
+    "capacity": 8,
+    "iconic": false,
+    "title": "Kerenzikov Boost System"
+  },
+  {
+    "enum": "MECHATRONIC_CORE",
+    "id": "mechatronic_core",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 1,
+    "capacity": 5,
+    "iconic": false,
+    "title": "Mechatronic Core"
+  },
+  {
+    "enum": "NEWTON_MODULE",
+    "id": "newton_module",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 2,
+    "capacity": 14,
+    "iconic": false,
+    "title": "Newton Module"
+  },
+  {
+    "enum": "QUANTUM_TUNER",
+    "id": "quantum_tuner",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 5,
+    "capacity": 45,
+    "iconic": true,
+    "title": "Quantum Tuner"
+  },
+  {
+    "enum": "RAM_REALLOCATOR",
+    "id": "ram_reallocator",
+    "category": "FRONTAL_CORTEX",
+    "firstTier": 4,
+    "capacity": 40,
+    "iconic": true,
+    "title": "RAM Reallocator"
+  },
+  {
+    "enum": "ZETATECH_SANDEVISTAN",
+    "id": "zetatech_sandevistan",
+    "category": "OPERATING_SYSTEM",
+    "firstTier": 2,
+    "capacity": 14,
+    "iconic": false,
+    "title": "Zetatech Sandevistan"
+  },
+  {
+    "enum": "QIANT_WARP_DANCER",
+    "id": "qiant_warp_dancer",
+    "category": "OPERATING_SYSTEM",
+    "firstTier": 2,
+    "capacity": 12,
+    "iconic": false,
+    "title": "QianT “Warp Dancer” Sandevistan"
+  },
+  {
+    "enum": "MILITECH_FALCON",
+    "id": "militech_falcon_sandevistan",
+    "category": "OPERATING_SYSTEM",
+    "firstTier": 4,
+    "capacity": 39,
+    "iconic": true,
+    "title": "Militech “Falcon” Sandevistan"
+  },
+  {
+    "enum": "MOORE_TECH_BERSERK",
+    "id": "moore_tech_berserk",
+    "category": "OPERATING_SYSTEM",
+    "firstTier": 2,
+    "capacity": 12,
+    "iconic": false,
+    "title": "Moore Tech Berserk"
+  },
+  {
+    "enum": "ZETATECH_BERSERK",
+    "id": "zetatech_berserk",
+    "category": "OPERATING_SYSTEM",
+    "firstTier": 2,
+    "capacity": 16,
+    "iconic": false,
+    "title": "Zetatech Berserk"
+  },
+  {
+    "enum": "MILITECH_BERSERK",
+    "id": "militech_berserk",
+    "category": "OPERATING_SYSTEM",
+    "firstTier": 4,
+    "capacity": 35,
+    "iconic": true,
+    "title": "Militech Berserk"
+  },
+  {
+    "enum": "CHROME_COMPRESSOR",
+    "id": "chrome_compressor",
+    "category": "OPERATING_SYSTEM",
+    "firstTier": 4,
+    "capacity": 0,
+    "iconic": true,
+    "title": "Chrome Compressor"
+  },
+  {
+    "enum": "COCKATRICE",
+    "id": "kiroshi_cockatrice_optics",
+    "category": "FACE",
+    "firstTier": 5,
+    "capacity": 30,
+    "iconic": true,
+    "title": "Kiroshi “Cockatrice” Optics"
+  },
+  {
+    "enum": "SENTRY",
+    "id": "kiroshi_sentry_optics",
+    "category": "FACE",
+    "firstTier": 1,
+    "capacity": 2,
+    "iconic": false,
+    "title": "Kiroshi “Sentry” Optics"
+  },
+  {
+    "enum": "ORACLE",
+    "id": "kiroshi_oracle_optics",
+    "category": "FACE",
+    "firstTier": 4,
+    "capacity": 10,
+    "iconic": false,
+    "title": "Kiroshi “The Oracle” Optics"
+  },
+  {
+    "enum": "BEHAVIORAL_FACEPLATE",
+    "id": "behavioral_imprint_synced_faceplate",
+    "category": "FACE",
+    "firstTier": 5,
+    "capacity": 6,
+    "iconic": true,
+    "title": "Behavioral Imprint-synced Faceplate"
+  },
+  {
+    "enum": "FEEN_X",
+    "id": "feen_x",
+    "category": "SKELETON",
+    "firstTier": 3,
+    "capacity": 16,
+    "iconic": false,
+    "title": "Feen-X"
+  },
+  {
+    "enum": "KINETIC_FRAME",
+    "id": "kinetic_frame",
+    "category": "SKELETON",
+    "firstTier": 2,
+    "capacity": 16,
+    "iconic": false,
+    "title": "Kinetic Frame"
+  },
+  {
+    "enum": "RARA_AVIS",
+    "id": "rara_avis",
+    "category": "SKELETON",
+    "firstTier": 5,
+    "capacity": 60,
+    "iconic": true,
+    "title": "Rara Avis"
+  },
+  {
+    "enum": "RAM_RECOUP",
+    "id": "ram_recoup",
+    "category": "SKELETON",
+    "firstTier": 1,
+    "capacity": 14,
+    "iconic": false,
+    "title": "RAM Recoup"
+  },
+  {
+    "enum": "SCAR_COALESCER",
+    "id": "scar_coalescer",
+    "category": "SKELETON",
+    "firstTier": 3,
+    "capacity": 20,
+    "iconic": false,
+    "title": "Scar Coalescer"
+  },
+  {
+    "enum": "SCARAB",
+    "id": "scarab",
+    "category": "SKELETON",
+    "firstTier": 2,
+    "capacity": 14,
+    "iconic": false,
+    "title": "Scarab"
+  },
+  {
+    "enum": "SPRING_JOINTS",
+    "id": "spring_joints",
+    "category": "SKELETON",
+    "firstTier": 2,
+    "capacity": 16,
+    "iconic": false,
+    "title": "Spring Joints"
+  },
+  {
+    "enum": "TITANIUM_BONES",
+    "id": "titanium_bones",
+    "category": "SKELETON",
+    "firstTier": 1,
+    "capacity": 6,
+    "iconic": false,
+    "title": "Titanium Bones"
+  },
+  {
+    "enum": "UNIVERSAL_BOOSTER",
+    "id": "universal_booster",
+    "category": "SKELETON",
+    "firstTier": 4,
+    "capacity": 25,
+    "iconic": false,
+    "title": "Universal Booster"
+  },
+  {
+    "enum": "TYGER_IMPRINT",
+    "id": "tyger_claws_dermal_imprint",
+    "category": "HANDS",
+    "firstTier": 1,
+    "capacity": 0,
+    "iconic": false,
+    "title": "Tattoo: Tyger Claws Dermal Imprint"
+  },
+  {
+    "enum": "JOHNNYS_SPECIAL",
+    "id": "johnnys_special",
+    "category": "HANDS",
+    "firstTier": 1,
+    "capacity": 0,
+    "iconic": false,
+    "title": "Tattoo: Johnny’s Special"
+  },
+  {
+    "enum": "TOGETHER_FOREVER",
+    "id": "together_forever",
+    "category": "HANDS",
+    "firstTier": 1,
+    "capacity": 0,
+    "iconic": false,
+    "title": "Tattoo: Together Forever"
+  },
+  {
+    "enum": "ADRENO_TRIGGER",
+    "id": "adreno_trigger",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 4,
+    "capacity": 20,
+    "iconic": true,
+    "title": "Adreno-trigger"
+  },
+  {
+    "enum": "ATOMIC_SENSORS",
+    "id": "atomic_sensors",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 1,
+    "capacity": 5,
+    "iconic": false,
+    "title": "Atomic Sensors"
+  },
+  {
+    "enum": "DEEP_FIELD",
+    "id": "deep_field_visual_interface",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 4,
+    "capacity": 40,
+    "iconic": true,
+    "title": "Deep-field Visual Interface"
+  },
+  {
+    "enum": "KERENZIKOV",
+    "id": "kerenzikov",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 2,
+    "capacity": 12,
+    "iconic": false,
+    "title": "Kerenzikov"
+  },
+  {
+    "enum": "REFLEX_TUNER",
+    "id": "reflex_tuner",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 2,
+    "capacity": 8,
+    "iconic": false,
+    "title": "Reflex Tuner"
+  },
+  {
+    "enum": "REVULSOR",
+    "id": "revulsor",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 4,
+    "capacity": 35,
+    "iconic": true,
+    "title": "Revulsor"
+  },
+  {
+    "enum": "SYNAPTIC_ACCELERATOR",
+    "id": "synaptic_accelerator",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 2,
+    "capacity": 5,
+    "iconic": false,
+    "title": "Synaptic Accelerator"
+  },
+  {
+    "enum": "TYROSINE_INJECTOR",
+    "id": "tyrosine_injector",
+    "category": "NERVOUS_SYSTEM",
+    "firstTier": 1,
+    "capacity": 8,
+    "iconic": false,
+    "title": "Tyrosine Injector"
+  },
+  {
+    "enum": "ADRENALINE_BOOSTER",
+    "id": "adrenaline_booster",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 1,
+    "capacity": 14,
+    "iconic": false,
+    "title": "Adrenaline Booster"
+  },
+  {
+    "enum": "BLACK_MAMBA",
+    "id": "black_mamba",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 3,
+    "capacity": 16,
+    "iconic": false,
+    "title": "Black Mamba"
+  },
+  {
+    "enum": "CLUTCH_PADDING",
+    "id": "clutch_padding",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 12,
+    "iconic": false,
+    "title": "Clutch Padding"
+  },
+  {
+    "enum": "ELECTROMAG_RECYCLER",
+    "id": "electromag_recycler",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 4,
+    "capacity": 40,
+    "iconic": true,
+    "title": "Electromag Recycler"
+  },
+  {
+    "enum": "FEEDBACK_CIRCUIT",
+    "id": "feedback_circuit",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 3,
+    "capacity": 14,
+    "iconic": false,
+    "title": "Feedback Circuit"
+  },
+  {
+    "enum": "ISOMETRIC_STABILIZER",
+    "id": "isometric_stabilizer",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 4,
+    "capacity": 40,
+    "iconic": true,
+    "title": "Isometric Stabilizer"
+  },
+  {
+    "enum": "MICROROTORS",
+    "id": "microrotors",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 12,
+    "iconic": false,
+    "title": "Microrotors"
+  },
+  {
+    "enum": "THREATEVAC",
+    "id": "threatevac",
+    "category": "CIRCULATORY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 5,
+    "iconic": false,
+    "title": "ThreatEvac"
+  },
+  {
+    "enum": "CARAPACE",
+    "id": "carapace",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 16,
+    "iconic": false,
+    "title": "Carapace"
+  },
+  {
+    "enum": "CELLULAR_ADAPTER",
+    "id": "cellular_adapter",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 3,
+    "capacity": 30,
+    "iconic": false,
+    "title": "Cellular Adapter"
+  },
+  {
+    "enum": "CHITIN",
+    "id": "chitin",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 5,
+    "capacity": 50,
+    "iconic": true,
+    "title": "Chitin"
+  },
+  {
+    "enum": "COGITO_LATTICE",
+    "id": "cogito_lattice",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 3,
+    "capacity": 12,
+    "iconic": false,
+    "title": "Cogito Lattice"
+  },
+  {
+    "enum": "COUNTERSHELL",
+    "id": "countershell",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 12,
+    "iconic": false,
+    "title": "Countershell"
+  },
+  {
+    "enum": "DEFENZIKOV",
+    "id": "defenzikov",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 3,
+    "capacity": 25,
+    "iconic": false,
+    "title": "Defenzikov"
+  },
+  {
+    "enum": "NANO_PLATING",
+    "id": "nano_plating",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 20,
+    "iconic": false,
+    "title": "Nano-plating"
+  },
+  {
+    "enum": "PAINDUCER",
+    "id": "painducer",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 4,
+    "capacity": 30,
+    "iconic": false,
+    "title": "Painducer"
+  },
+  {
+    "enum": "PERIPHERAL_INVERSE",
+    "id": "peripheral_inverse",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 4,
+    "capacity": 40,
+    "iconic": true,
+    "title": "Peripheral Inverse"
+  },
+  {
+    "enum": "PROXISHIELD",
+    "id": "proxishield",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 10,
+    "iconic": false,
+    "title": "ProxiShield"
+  },
+  {
+    "enum": "RANGEGUARD",
+    "id": "rangeguard",
+    "category": "INTEGUMENTARY_SYSTEM",
+    "firstTier": 2,
+    "capacity": 14,
+    "iconic": false,
+    "title": "RangeGuard"
+  },
+  {
+    "enum": "LEEROY_LIGAMENT",
+    "id": "leeroy_ligament_system",
+    "category": "LEGS",
+    "firstTier": 4,
+    "capacity": 8,
+    "iconic": true,
+    "title": "Leeroy Ligament System"
+  }
+]

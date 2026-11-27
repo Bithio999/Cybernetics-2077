@@ -1,5 +1,13 @@
 # Validation
 
+## Full catalogue and NPC systems (NeoForge 0.28.0)
+
+**110 JVM tests, 174 standalone GameTests, and 196 GameTests with TaCZ/Tweaks all pass.** Validation includes the full standalone server suite, the same suite with exact TaCZ/Tweaks dependencies, JVM rules, native integrated-client checks and strict documentation/package audits. [Machine-readable results](review/results/expansion-0.28.0.json) · [Implementation and limitations](development/EXPANSION-0.28.0.md) · [103-family reference coverage](research/expansion-028/coverage.json).
+
+Native screenshots cover [the three mechanical roles](images/cyberpsycho-roles-028.png), [new item sprites](images/expansion-icons-028.png), [reserve slots](images/titanium-reserve-028.png), [NPC time-field afterimages](images/blitz-time-bubble-028.png) and [revised rewards](images/expansion-028-cyberpsycho-offer.png). Native fixer checks exercise Wanted, Cyberpsycho containment, Recovery, actual payments, scanner navigation and small-window layout. The optional bridge is tested with TaCZ **1.2.0-hotfix** and Tweaks **3.0.0-alpha.12**, Kotlin **5.13.0**, YACL **3.8.2**. No validation dependencies or review code ship in the release.
+
+The previous in-game footage and fixtures are not an exhaustive balance test of every possible implant combination. Only 1.21.1 NeoForge is updated; the published Forge artifact's checksum is unchanged.
+
 ## Dedicated cyberpsychos and overcapacity (NeoForge 0.27.0)
 
 **109 JVM tests and 163 standalone GameTests pass.** Runtime checks cover all six real equipment/capacity bands, native Berserk activation, medical charges/recharge, Self-ICE interception, Second Heart fatal-hit handling, native melee/discharges, double jumping and save/load without healing or modifier stacking. The native client checks dedicated entity deployment, capacity in the contract menu/scanner, nonlethal containment and payment through the fixer UI. [Implementation](development/CYBERPSYCHOS-0.27.0.md) · [Results](review/results/cyberpsychos-0.27.0.json). Forge remains unchanged.

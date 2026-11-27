@@ -16,8 +16,10 @@ public final class GunCycleTime {
     var mc = Minecraft.getInstance();
     if (!(mc.getCameraEntity() instanceof LivingEntity living)
         || !TacZCompat.gun(living.getMainHandItem())) return realNanos;
-    double pace = dev.cybernetics2077.temporal.Sandevistan.weaponPace(living);
-    if (pace >= 1) return realNanos;
+    double pace =
+        dev.cybernetics2077.temporal.Sandevistan.weaponPace(living)
+            * dev.cybernetics2077.cyberware.ExpansionRuntime.gunRate(living);
+    if (Math.abs(pace - 1) < 1e-6) return realNanos;
     String name =
         NAMES.computeIfAbsent(
             runner,

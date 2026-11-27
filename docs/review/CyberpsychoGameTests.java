@@ -5,6 +5,7 @@ import static dev.cybernetics2077.cyberware.Augment.*;
 import dev.cybernetics2077.Cybernetics2077;
 import dev.cybernetics2077.city.*;
 import dev.cybernetics2077.cyberware.*;
+import dev.cybernetics2077.deck.*;
 import dev.cybernetics2077.mob.*;
 import java.util.*;
 import net.minecraft.core.BlockPos;
@@ -12,211 +13,199 @@ import net.minecraft.gametest.framework.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Husk;
+import net.minecraft.world.item.*;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.gametest.*;
 
 @GameTestHolder(Cybernetics2077.ID)
 @PrefixGameTestTemplate(false)
 public final class CyberpsychoGameTests {
-  private static Cyberpsycho psycho(GameTestHelper h, int rank) {
-    var c = CityContent.CYBERPSYCHO.get().create(h.getLevel());
-    c.configure(rank);
+  static Husk actor(GameTestHelper h, Augment... kinds) {
+    var m = EntityType.HUSK.create(h.getLevel());
     var p = h.absolutePos(new BlockPos(2, 90, 2));
-    c.moveTo(p.getX(), p.getY(), p.getZ(), 0, 0);
-    c.setNoGravity(true);
-    h.getLevel().addFreshEntity(c);
-    return c;
+    m.moveTo(p.getX() + .5, p.getY(), p.getZ() + .5, 0, 0);
+    m.setNoGravity(true);
+    EnhancedMobs.install(m, Arrays.stream(kinds).map(a -> Cybernetics2077.augment(a, 5)).toList());
+    h.getLevel().addFreshEntity(m);
+    return m;
   }
 
-  @GameTest(batch = "cyberpsychoSystems", template = "empty", timeoutTicks = 60)
+  @GameTest(batch = "psychoPlans", template = "empty", timeoutTicks = 100)
   public static void realInstalledCostsDetermineEveryContractTierAndSockets(GameTestHelper h) {
-    int[] costs = {162, 187, 215, 250, 270, 278};
     for (int rank = 1; rank <= 6; rank++) {
-      var plan = CyberpsychoLoadouts.forRank(rank);
-      var inv = plan.inventory();
-      h.assertTrue(
-          inv.capacityUsed() == costs[rank - 1] && plan.rank() == rank,
-          "Real capacity mismatches contract band");
-      int count = 0;
-      for (int s = 0; s < inv.getSlots(); s++) {
-        var stack = inv.getStackInSlot(s);
-        if (stack.isEmpty()) continue;
-        count++;
+      var roles = new HashSet<CyberpsychoLoadouts.Role>();
+      var distinct = new HashSet<String>();
+      for (long seed = 0; seed < 40; seed++) {
+        var plan = CyberpsychoLoadouts.forSeed(rank, seed);
+        var inv = plan.inventory();
+        roles.add(plan.role());
         h.assertTrue(
-            inv.isItemValid(s, stack) && stack.getItem() instanceof AugmentItem a && !a.iconic(),
-            "Invalid or iconic equipment");
+            plan.rank() == rank && inv.capacityUsed() == plan.capacity() && plan.capacity() > 150,
+            "Incorrect real capacity band");
+        var signature = new ArrayList<String>();
+        int count = 0;
+        for (int i = 0; i < inv.getSlots(); i++) {
+          var stack = inv.getStackInSlot(i);
+          if (stack.isEmpty()) continue;
+          count++;
+          h.assertTrue(
+              inv.isItemValid(i, stack)
+                  && stack.getItem() instanceof CyberwareItem item
+                  && !item.iconic(),
+              "Invalid or iconic socket equipment");
+          signature.add(stack.getItem().toString());
+          if (stack.getItem() instanceof CyberdeckItem deck) {
+            var programs = CyberdeckItem.programs(stack);
+            h.assertTrue(
+                !programs.isEmpty()
+                    && programs.size() <= deck.tier().programSlots()
+                    && programs.stream().allMatch(q -> q.tier().level <= deck.tier().level)
+                    && programs.stream().anyMatch(q -> !q.kind().control()),
+                "Illegal or empty installed NPC programs");
+          }
+        }
+        h.assertTrue(count == plan.implants().size(), "Missing equipment");
+        distinct.add(signature.toString());
+        var repeated = CyberpsychoLoadouts.forSeed(rank, seed);
+        h.assertTrue(repeated.equals(plan), "Seed rerolled the same dossier");
       }
-      h.assertTrue(count == plan.implants().size(), "Lost socket equipment");
-      var offer =
-          new BountyRules.Offer(
-              UUID.randomUUID(),
-              1,
-              rank,
-              0,
-              0,
-              "Test",
-              "cybernetics2077:cyberpsycho",
-              BountyRules.Kind.CYBERPSYCHO);
-      var dossier = BountyContracts.offerTag(offer);
       h.assertTrue(
-          dossier.getInt("capacity") == inv.capacityUsed()
-              && dossier.getInt("baseCapacity") == 150
-              && dossier.getInt("rank") == CyberpsychoRules.rank(inv.capacityUsed()),
-          "Offer did not derive rank from installed cost");
+          roles.size() == 3 && distinct.size() > 20, "Loadouts lack role/equipment variety");
     }
     h.succeed();
   }
 
-  @GameTest(batch = "cyberpsychoSystems", template = "empty", timeoutTicks = 80)
+  @GameTest(batch = "npcMedicine", template = "empty", timeoutTicks = 80)
   public static void nativeAiActivatesBerserkAndBiomonitorSpendsRealPumpCharges(GameTestHelper h) {
-    var c = psycho(h, 3);
-    var victim = h.spawn(EntityType.COW, new BlockPos(4, 90, 2));
+    var m = actor(h, BIODYNE_BERSERK, BLOOD_PUMP, BIOMONITOR, ADRENALINE_CONVERTER, NEOFIBER);
+    var victim = h.spawn(EntityType.COW, new BlockPos(7, 90, 2));
     victim.setNoAi(true);
     victim.setNoGravity(true);
-    c.setTarget(victim);
-    c.setHealth(c.getMaxHealth() * .3f);
-    float before = c.getHealth();
+    m.setTarget(victim);
+    m.setHealth(m.getMaxHealth() * .3f);
+    float before = m.getHealth();
     h.runAfterDelay(
-        2,
+        3,
         () -> {
           h.assertTrue(
-              c.berserk() && c.systems().getLong("berserkReady") > c.now(),
-              "No automatic OS activation");
+              MobImplants.berserk(m)
+                  && MobImplants.state(m).getInt("pumpCharges") == 1
+                  && m.getHealth() > before,
+              "Shared NPC actives did not activate/spend charge");
           h.assertTrue(
-              c.getHealth() > before
-                  && c.systems().getInt("pumpCharges") == 1
-                  && c.systems().getLong("pumpNext") > c.now(),
-              "Biomonitor did not spend pump charge");
-          h.assertTrue(
-              c.getAttributeValue(Attributes.MOVEMENT_SPEED) > .27 * 1.2,
-              "Adrenaline did not activate");
-          c.setTarget(null);
-          c.setNoAi(true);
-          c.discard();
+              m.getAttributeValue(Attributes.MOVEMENT_SPEED) > .23, "Adrenaline not applied");
+          m.discard();
           victim.discard();
           h.succeed();
         });
   }
 
-  @GameTest(batch = "cyberpsychoSystems", template = "empty", timeoutTicks = 80)
+  @GameTest(batch = "npcJump", template = "empty", timeoutTicks = 80)
   public static void reinforcedTendonsExecutesSecondAirborneImpulse(GameTestHelper h) {
     for (int x = 1; x <= 12; x++)
       for (int z = 1; z <= 4; z++)
         h.setBlock(new BlockPos(x, 89, z), net.minecraft.world.level.block.Blocks.STONE);
-    var c = psycho(h, 2);
-    c.setNoGravity(false);
-    c.setOnGround(true);
+    var m = actor(h, REINFORCED_TENDONS, SUBDERMAL_ARMOR);
+    m.setNoGravity(false);
+    m.setOnGround(true);
     var victim = h.spawn(EntityType.COW, new BlockPos(9, 90, 2));
     victim.setNoAi(true);
-    c.setTarget(victim);
+    m.setTarget(victim);
     h.runAfterDelay(
         9,
         () -> {
           h.assertTrue(
-              c.systems().getLong("jumpReady") > c.now()
-                  && c.systems().getLong("lastDoubleJump") > 0
-                  && c.getDeltaMovement().y > 0,
-              "No real second airborne jump: systems="
-                  + c.systems()
-                  + " pos="
-                  + c.position()
-                  + " velocity="
-                  + c.getDeltaMovement()
-                  + " ground="
-                  + c.onGround()
-                  + " target="
-                  + c.getTarget()
-                  + " sight="
-                  + c.hasLineOfSight(victim));
-          c.discard();
+              MobImplants.state(m).getLong("lastDoubleJump") > 0 && m.getDeltaMovement().y > 0,
+              "No real second airborne jump: " + MobImplants.state(m));
+          m.discard();
           victim.discard();
           h.succeed();
         });
   }
 
-  @GameTest(batch = "cyberpsychoSystems", template = "empty", timeoutTicks = 60)
+  @GameTest(batch = "npcCharges", template = "empty", timeoutTicks = 60)
   public static void pumpChargesRechargeAndSelfIceBlocksOnlyOnceUntilReady(GameTestHelper h) {
-    var c = psycho(h, 4);
-    c.setHealth(c.getMaxHealth() * .1f);
+    var m = actor(h, BLOOD_PUMP, SELF_ICE);
+    m.setHealth(m.getMaxHealth() * .05f);
     h.assertTrue(
-        c.usePump() && c.usePump() && !c.usePump() && c.systems().getInt("pumpCharges") == 0,
-        "Pump is not charge limited");
-    c.systems().putLong("pumpNext", c.now());
+        MobImplants.usePump(m) && MobImplants.usePump(m) && !MobImplants.usePump(m),
+        "Pump not charge limited");
+    MobImplants.state(m).putLong("pumpNext", m.level().getGameTime());
     var attacker =
         new FakePlayer(
             h.getLevel(), new com.mojang.authlib.GameProfile(UUID.randomUUID(), "IceReview"));
     h.assertTrue(
-        AugmentExpansion.blockHack(attacker, c) && !AugmentExpansion.blockHack(attacker, c),
-        "Self ICE did not intercept real quickhack path/cooldown");
+        AugmentExpansion.blockHack(attacker, m) && !AugmentExpansion.blockHack(attacker, m),
+        "Native hack boundary ignored ICE cooldown");
     h.runAfterDelay(
         2,
         () -> {
-          h.assertTrue(c.systems().getInt("pumpCharges") >= 1, "Pump never recharged");
-          c.discard();
+          h.assertTrue(MobImplants.state(m).getInt("pumpCharges") >= 1, "No pump recharge");
+          m.discard();
           h.succeed();
         });
   }
 
-  @GameTest(batch = "cyberpsychoSystems", template = "empty", timeoutTicks = 60)
+  @GameTest(batch = "npcRevival", template = "empty", timeoutTicks = 60)
   public static void fatalHitUsesSecondHeartThenCooldownAllowsDeathAndSalvage(GameTestHelper h) {
-    var c = psycho(h, 5);
-    c.setHealth(1);
-    c.hurt(h.getLevel().damageSources().generic(), 100000);
+    var m = actor(h, SECOND_HEART, EPIMORPHIC_SKELETON);
+    m.setHealth(1);
+    m.hurt(h.getLevel().damageSources().generic(), 100000);
     h.assertTrue(
-        c.isAlive()
-            && c.getHealth() == c.getMaxHealth()
-            && c.systems().getLong("heartReady") > c.now(),
-        "Second Heart failed to stop fatal native damage");
-    c.invulnerableTime = 0;
-    c.hurt(h.getLevel().damageSources().generic(), 100000);
-    h.assertTrue(!c.isAlive(), "Second Heart ignored cooldown");
+        m.isAlive()
+            && m.getHealth() == m.getMaxHealth()
+            && MobImplants.state(m).getLong("heartReady") > m.level().getGameTime(),
+        "NPC Second Heart did not stop fatal native damage");
+    m.invulnerableTime = 0;
+    m.hurt(h.getLevel().damageSources().generic(), 100000);
+    h.assertTrue(!m.isAlive(), "Second Heart ignored rearm");
     h.succeed();
   }
 
-  @GameTest(batch = "cyberpsychoSystems", template = "empty", timeoutTicks = 60)
+  @GameTest(batch = "npcPersistence", template = "empty", timeoutTicks = 60)
   public static void saveReloadPreservesMedicalCooldownsEquipmentAndMissingHealth(
       GameTestHelper h) {
-    var c = psycho(h, 6);
-    c.setHealth(c.getMaxHealth() * .2f);
-    h.assertTrue(c.usePump(), "Pump failed");
-    c.blockHack();
-    float health = c.getHealth();
-    double armor = c.getAttributeValue(Attributes.ARMOR);
-    long ready = c.systems().getLong("iceReady");
-    var saved = c.saveWithoutId(new CompoundTag());
-    c.discard();
-    var loaded = CityContent.CYBERPSYCHO.get().create(h.getLevel());
-    loaded.load(saved);
+    var m = actor(h, BLOOD_PUMP, SELF_ICE, EPIMORPHIC_SKELETON, PARA_BELLUM);
+    m.setHealth(m.getMaxHealth() * .1f);
+    MobImplants.usePump(m);
+    AugmentExpansion.blockHack(null, m);
+    float hp = m.getHealth();
+    double armor = m.getAttributeValue(Attributes.ARMOR);
+    long ready = AugmentRuntime.state(m).iceReady;
+    var save = m.saveWithoutId(new CompoundTag());
+    m.discard();
+    var loaded = EntityType.HUSK.create(h.getLevel());
+    loaded.load(save);
     h.getLevel().addFreshEntity(loaded);
-    loaded.refresh(false);
+    MobImplants.attributes(loaded);
     h.assertTrue(
-        loaded.capacity() == 278
-            && loaded.rank() == 6
-            && loaded.getHealth() == health
+        loaded.getHealth() == hp
             && loaded.getAttributeValue(Attributes.ARMOR) == armor
-            && loaded.systems().getInt("pumpCharges") == 1
-            && loaded.systems().getLong("iceReady") == ready,
-        "Reload reset health, sockets, cooldowns or stacked attributes");
+            && MobImplants.state(loaded).getInt("pumpCharges") == 1
+            && AugmentRuntime.state(loaded).iceReady == ready,
+        "Reload reset medical state, HP or modifiers");
     loaded.discard();
     h.succeed();
   }
 
-  @GameTest(batch = "cyberpsychoSystems", template = "empty", timeoutTicks = 60)
+  @GameTest(batch = "npcMelee", template = "empty", timeoutTicks = 60)
   public static void nativeMeleeUsesWeaponDenseMarrowAndMicrogeneratorWithRearm(GameTestHelper h) {
-    var c = psycho(h, 3);
+    var m = actor(h, DENSE_MARROW, MICROGENERATOR);
+    m.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
     var victim = h.spawn(EntityType.COW, new BlockPos(3, 90, 2));
     victim.getAttribute(Attributes.MAX_HEALTH).setBaseValue(1000);
     victim.setHealth(1000);
     victim.setNoAi(true);
-    c.setTarget(victim);
+    m.setTarget(victim);
     h.assertTrue(
-        c.doHurtTarget(victim) && victim.getHealth() < 990,
-        "Native weapon/Dense Marrow attack ineffective");
-    long ready = c.systems().getLong("microReady");
-    h.assertTrue(ready > c.now(), "Microgenerator not used");
-    CyberpsychoCombat.microgenerator(c, victim);
-    h.assertTrue(c.systems().getLong("microReady") == ready, "Microgenerator ignored rearm");
-    c.discard();
+        m.doHurtTarget(victim) && victim.getHealth() < 990, "Weapon/Dense Marrow damage missing");
+    long ready = MobImplants.state(m).getLong("microReady");
+    h.assertTrue(ready > m.level().getGameTime(), "Microgenerator not used");
+    MobImplants.discharge(m, victim);
+    h.assertTrue(
+        MobImplants.state(m).getLong("microReady") == ready, "Microgenerator rearm bypass");
+    m.discard();
     victim.discard();
     h.succeed();
   }

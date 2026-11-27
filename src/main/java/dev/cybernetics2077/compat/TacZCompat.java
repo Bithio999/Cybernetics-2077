@@ -112,9 +112,12 @@ public final class TacZCompat {
   }
 
   public static boolean blocked(LivingEntity entity) {
-    return entity instanceof ServerPlayer p
-        ? MantisHands.occupied(p) || AugmentRuntime.berserk(p)
-        : entity.level().isClientSide && clientBlocked.test(entity);
+    return !entity.level().isClientSide
+            && (ExpansionRuntime.jammed(entity)
+                || entity instanceof Mob m && dev.cybernetics2077.mob.MobImplants.berserk(m))
+        || (entity instanceof ServerPlayer p
+            ? MantisHands.occupied(p) || AugmentRuntime.berserk(p)
+            : entity.level().isClientSide && clientBlocked.test(entity));
   }
 
   private static LivingEntity shooter(Object event) {
@@ -145,18 +148,26 @@ public final class TacZCompat {
   }
 
   private static void hurt(Object event) {
-    if (!(call(event, "getAttacker") instanceof ServerPlayer player)
+    if (!(call(event, "getAttacker") instanceof LivingEntity player)
         || !(call(event, "getHurtEntity") instanceof LivingEntity target)) return;
-    if (!CyberwareRuntime.canAttack(player, target)) {
+    if (!NeuralActors.canAttack(player, target)) {
       cancel(event);
       return;
     }
     float base = ((Number) call(event, "getBaseAmount")).floatValue();
     if (base <= 0) return;
-    if (player.getRandom().nextFloat() < AugmentExpansion.weaponCritChance(player, target, false)) {
-      base *= AugmentExpansion.critMultiplier(player);
-      player
-          .serverLevel()
+    float crit =
+        player instanceof ServerPlayer p
+            ? AugmentExpansion.weaponCritChance(p, target, false)
+            : Math.min(
+                    .5f,
+                    AugmentRuntime.tier(player, VISUAL_CORTEX_SUPPORT)
+                        * .06f
+                        * (float) Math.clamp(player.distanceTo(target) / 32., 0, 1))
+                + ExpansionRuntime.critChance(player, target);
+    if (player.getRandom().nextFloat() < crit) {
+      base *= player instanceof ServerPlayer p ? AugmentExpansion.critMultiplier(p) : 1.5f;
+      ((ServerLevel) player.level())
           .sendParticles(
               net.minecraft.core.particles.ParticleTypes.CRIT,
               target.getX(),
@@ -176,6 +187,15 @@ public final class TacZCompat {
           "setHeadshotMultiplier",
           ((Number) call(event, "getHeadshotMultiplier")).floatValue()
               * Sandevistan.model(player).headshotMultiplier());
+    base *=
+        ExpansionRuntime.attackBonus(
+            player,
+            target,
+            true,
+            Boolean.TRUE.equals(call(event, "isHeadShot")),
+            aiming(player)
+                && player.level().getGameTime() - ExpansionRuntime.extra(player).getLong("aimStart")
+                    >= 10);
     Entity bullet = (Entity) call(event, "getBullet");
     if (bullet != null && bullet.getPersistentData().getCompound(DATA).getBoolean("bounced"))
       base *= 1 + .05f * AugmentRuntime.tier(player, BALLISTIC_COPROCESSOR);
@@ -189,7 +209,7 @@ public final class TacZCompat {
   }
 
   private static void hit(Object event) {
-    if (call(event, "getAttacker") instanceof ServerPlayer player
+    if (call(event, "getAttacker") instanceof LivingEntity player
         && call(
                 event,
                 event.getClass().getSimpleName().equals("EntityKillByGunEvent")
@@ -201,8 +221,14 @@ public final class TacZCompat {
       var data = bullet.getPersistentData().getCompound(DATA);
       if (data.hasUUID("hitTarget")
           && data.getUUID("hitTarget").equals(target.getUUID())
-          && data.getFloat("beforeHit") > target.getHealth() + target.getAbsorptionAmount())
-        HandsRuntime.discharge(player, target, AugmentRuntime.tier(player, MICROGENERATOR));
+          && data.getFloat("beforeHit") > target.getHealth() + target.getAbsorptionAmount()) {
+        if (player instanceof ServerPlayer p)
+          HandsRuntime.discharge(p, target, AugmentRuntime.tier(player, MICROGENERATOR));
+        else if (player instanceof Mob m) dev.cybernetics2077.mob.MobImplants.discharge(m, target);
+        if (aiming(player)
+            && player.level().getGameTime() - ExpansionRuntime.extra(player).getLong("aimStart")
+                >= 10) ExpansionRuntime.precisionHit(player, target);
+      }
       data.remove("hitTarget");
     }
   }
@@ -216,14 +242,21 @@ public final class TacZCompat {
     if (!bullet(entity)
         || !(entity instanceof Projectile projectile)
         || !(entity.level() instanceof ServerLevel level)
-        || !(projectile.getOwner() instanceof ServerPlayer player)) return;
+        || !(projectile.getOwner() instanceof LivingEntity player)) return;
     var tag = entity.getPersistentData().getCompound(DATA);
     if (!entity.getPersistentData().contains(DATA)) {
       tag = new net.minecraft.nbt.CompoundTag();
       entity.getPersistentData().put(DATA, tag);
     }
     completeBounce(entity);
-    LivingEntity target = tag.getBoolean("bounced") ? null : HandsRuntime.locked(player);
+    LivingEntity target =
+        tag.getBoolean("bounced")
+            ? null
+            : player instanceof ServerPlayer p
+                ? HandsRuntime.locked(p)
+                : player instanceof Mob m
+                    ? dev.cybernetics2077.mob.MobImplants.smartTarget(m)
+                    : null;
     if (target != null
         && BulletTime.age(entity) <= 40
         && entity.distanceToSqr(target) <= 64 * 64
@@ -232,16 +265,20 @@ public final class TacZCompat {
             level, entity.position(), target.getBoundingBox().getCenter(), entity)) {
       var v = entity.getDeltaMovement();
       var d = target.getBoundingBox().getCenter().subtract(entity.position());
+      var movement = target.position().subtract(new Vec3(target.xo, target.yo, target.zo));
       var turn =
-          HandsRules.turn(
+          HandsRules.guide(
               v.x,
               v.y,
               v.z,
               d.x,
               d.y,
               d.z,
-              (.035 + .012 * AugmentRuntime.tier(player, SMART_LINK))
-                  * (BulletTime.eligible(entity) ? Math.min(1, Sandevistan.pace(entity)) : 1));
+              movement.x,
+              movement.y,
+              movement.z,
+              HandsRuntime.smartTier(player),
+              BulletTime.eligible(entity) ? Math.min(1, Sandevistan.pace(entity)) : 1);
       entity.setDeltaMovement(turn.x(), turn.y(), turn.z());
       tag.putBoolean("controlled", true);
     }
@@ -332,7 +369,7 @@ public final class TacZCompat {
   private static void bounce(Object event) {
     if (!(call(event, "getAmmo") instanceof Projectile bullet)
         || !(bullet.level() instanceof ServerLevel level)
-        || !(bullet.getOwner() instanceof ServerPlayer player)) return;
+        || !(bullet.getOwner() instanceof LivingEntity player)) return;
     BlockHitResult hit = (BlockHitResult) call(event, "getHitResult");
     int tier = AugmentRuntime.tier(player, BALLISTIC_COPROCESSOR);
     var tag = bullet.getPersistentData().getCompound(DATA);
@@ -402,7 +439,7 @@ public final class TacZCompat {
   }
 
   public static long interval(LivingEntity shooter, long nativeInterval) {
-    double pace = Sandevistan.weaponPace(shooter);
+    double pace = Sandevistan.weaponPace(shooter) * ExpansionRuntime.gunRate(shooter);
     return Math.max(1, Math.round(nativeInterval / Math.max(.05, pace)));
   }
 

@@ -79,13 +79,15 @@ public final class EnhancedMobLayer<T extends LivingEntity, M extends EntityMode
             EntityType.PILLAGER,
             EntityType.VINDICATOR
           })
-        if (e.getRenderer(type) instanceof LivingEntityRenderer renderer)
+        if (e.getRenderer(type) instanceof LivingEntityRenderer renderer) {
+          renderer.addLayer(new dev.cybernetics2077.client.mantis.MobMantisLayer(renderer));
           renderer.addLayer(
               new EnhancedMobLayer(
                   renderer,
                   type == EntityType.SKELETON
                       || type == EntityType.STRAY
                       || type == EntityType.BOGGED));
+        }
     }
   }
 }

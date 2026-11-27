@@ -19,7 +19,7 @@ Each fixer has **three offers per player each Minecraft day**. The board include
 | 40 | Tier 5 | 5 | 6 | 2 | €$3,400 | 3 |
 | 50 | Elite Tier 5 | 5 | 6 | 3 | €$4,800 | 3 |
 
-The table shows standard Wanted jobs. New contracts use the reduced rewards; previously accepted dossiers keep their quoted payment.
+The table shows standard Wanted jobs. Previously accepted dossiers keep their quoted base payment.
 
 The mark wears **real non-Iconic combat implants at the listed tier**, including armor and, at higher tiers, Blood Pump and Neofiber. Named targets have additional health, damage, armor, toughness and pursuit range. Guards are one tier lower, with up to three implants. The normal chromed-mob chassis and equipment effects apply. These are specific named targets, not a quota of random kills.
 
@@ -35,24 +35,34 @@ The mark wears **real non-Iconic combat implants at the listed tier**, including
 
 Fight the named cyberpsycho down to **10% maximum health**. Your hit—or your tamed pet's—automatically contains them, even if that hit would otherwise be fatal. A contained target stops fighting and is protected from normal follow-up damage. Return to the issuing fixer network to collect payment.
 
-Cyberpsychos are **dedicated human mobs**, not chromed vanilla monsters. Their base cyberware capacity is **150**. Their installed implants exceed that limit; every additional **25 capacity** raises the contract tier, up to Tier 6. This is separate from the tiers of their individual implants.
+Cyberpsychos are dedicated, heavily chromed humanoids with three combat builds: **Berserker**, **Netrunner** and **Blitz**. Their armored frames, exposed machinery and role-specific silhouettes distinguish them from ordinary NPCs.
 
-| Contract tier | Overcapacity band | Installed capacity | Implant tier | Implants |
-| ---: | --- | ---: | ---: | ---: |
-| 1 | +1–25 | 162 / 150 | 3 | 14 |
-| 2 | +26–50 | 187 / 150 | 3 | 15 |
-| 3 | +51–75 | 215 / 150 | 4 | 15 |
-| 4 | +76–100 | 250 / 150 | 4 | 16 |
-| 5 | +101–125 | 270 / 150 | 5 | 16 |
-| 6 | +126 or more | 278 / 150 | 5 | 17 |
+Their normal capacity is **150**. Actual installed capacity determines contract difficulty. Each dossier has a persistent, varied, socket-valid loadout; two targets in the same band need not have the same implants.
 
-Their combat implants work automatically: **Biodyne Berserk**, **Biomonitor/Blood Pump**, **Adrenaline Converter**, **Reinforced Tendons**, **Microgenerator** and **Shock-N-Awe**, plus melee, armor, toughness and mitigation bonuses. Self-ICE blocks an incoming quickhack before recharging. Higher contract tiers add Para Bellum, Epimorphic Skeleton, Pain Editor, Second Heart and Handle Wrap. Berserk's temporary 25% health floor must expire before containment is possible. No Iconic implants are equipped.
+| Contract tier | Installed capacity | Implant tiers | Base payment |
+| ---: | ---: | --- | ---: |
+| 1 | 151–175 | 2–3 | €$1,800 |
+| 2 | 176–200 | 2–3 | €$3,000 |
+| 3 | 201–225 | 3–4 | €$4,800 |
+| 4 | 226–250 | 3–4 | €$7,200 |
+| 5 | 251–275 | 4–5 | €$10,200 |
+| 6 | 276–325 | 4–5 | €$14,400 |
 
-The contract menu, shard and scanner show their capacity. Their base payment remains **25% higher** than standard Wanted jobs. A target killed by another player or the environment before containment fails the job.
+A family's minimum tier still applies. Iconics never appear in enemy loadouts.
 
-![Cyberpsycho sighting dossier](../images/psycho-027-offer.png)
+- **Berserkers** rush with melee weapons or Mantis Blades, backed by one of the ordinary Berserk systems.
+- **Netrunners** use bows and real cyberdecks with installed quickhacks. Their programs match the deck's tier and slot limit. Uploads spend regenerating RAM, queue sequentially and require range and line of sight at completion. Break sight to evade an enemy upload; Self-ICE can block it.
+- **Blitz** builds use a Dynalar, Zetatech or QianT Sandevistan, fast pursuit and melee. Their time bubbles interact with player Sandevistans using the same relative-time rules.
 
-![Cyberpsycho and capacity scan](../images/psycho-027-scanner.png)
+Medical implants, defenses, crit bonuses, jumps, camouflage and other installed combat implants operate through shared mob cyberware behavior. Blood Pump has two charges. Second Heart can save a fatal hit when ready. Berserk's temporary HP floor must end before containment is possible.
+
+Cyberpsycho base payment is **three times** a standard Wanted job of the same contract tier, before optional bonuses. A target killed by another player or the environment before containment fails the job.
+
+![Cyberpsycho sighting dossier](../images/expansion-028-cyberpsycho-offer.png)
+
+![Cyberpsycho and capacity scan](../images/expansion-028-cyberpsycho-scanner.png)
+
+![Three Cyberpsycho combat frames](../images/cyberpsycho-roles-028.png)
 
 ### Cyberware Recovery
 
@@ -70,10 +80,10 @@ Recovery jobs offer **10% higher base payment** than the table and run one rank 
 | --- | --- |
 | **Mara:** identify the mark through optical scanning before engaging its group | +20% base payment and +1 Street Cred |
 | **Ren:** defeat the mark within 90 seconds of the first combat hit involving its group | +20% base payment and +1 Street Cred |
-| Do not kill villagers, wandering traders or service NPCs during the hunt | +10% base payment |
+| Take no HP damage before completing the objective | **+30% base payment** |
 | Do not die during the hunt | +10% base payment |
 
-Optical identification requires an installed scanner; navigation alone does not identify a target. Missing an optional objective **never reduces the base payment**. Surviving, civilian protection and specialty results determine the rating: **S / A / B / C** for **3 / 2 / 1 / 0** successful optionals. Street Cred remains capped at 50.
+Optical identification requires an installed scanner; navigation alone does not identify a target. Missing an optional objective **never reduces the base payment**. Survival, no-damage and specialty results determine the rating: **S / A / B / C** for **3 / 2 / 1 / 0** successful optionals. Street Cred remains capped at 50.
 
 Every **third completed bounty for the same fixer network** adds a **25% base-payment loyalty bonus**. Separately, your first **three Elite Tier 5 completions** award **one Tier 5 Iconic Requisition Chip**, once per player. If your inventory is full, the bonus chip drops at your feet. This grants purchase authorization, not an Iconic implant; eddies, stock, Street Cred and other purchase requirements still apply.
 
@@ -81,7 +91,7 @@ Every **third completed bounty for the same fixer network** adds a **25% base-pa
 
 ### Active jobs and recovery
 
-You can hold **one bounty at a time**, alongside the introductory delivery. An active bounty takes priority in scanner navigation. Accepted jobs persist through dawn, logout and death. Death only loses the survival bonus.
+You can hold **one bounty at a time**, alongside the introductory delivery. An active bounty takes priority in scanner navigation. Accepted jobs persist through dawn, logout and death. Death loses the survival and no-damage bonuses. Blocked hits and fully absorbed hits preserve the no-damage bonus; any positive final HP damage loses it. Damage after completing the objective does not change the result.
 
 Use **Reissue Shard** if the dossier is lost. To abandon a job, press **Abandon Job**, then confirm it. Accepted offers remain used for that day, including abandoned or failed jobs. Loaded abandoned targets are removed; unloaded ones are cleaned up when their chunk next loads.
 

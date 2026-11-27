@@ -4,11 +4,8 @@ import dev.cybernetics2077.Cybernetics2077;
 import dev.cybernetics2077.cyberware.*;
 import java.util.*;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.*;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -18,7 +15,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.*;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
 /**
  * Vanilla mobs keep their own AI, equipment and spawn rules. No extra mob spawns or per-player
@@ -70,13 +66,7 @@ public final class EnhancedMobs {
   }
 
   public static int tier(Mob mob, Augment kind) {
-    var inv = mob.getData(Cybernetics2077.CYBERWARE);
-    for (int i = kind.category.firstSlot();
-        i < kind.category.firstSlot() + kind.category.sockets;
-        i++)
-      if (inv.getStackInSlot(i).getItem() instanceof AugmentItem a && a.augment() == kind)
-        return a.tier().level;
-    return 0;
+    return AugmentRuntime.tier(mob, kind);
   }
 
   @SubscribeEvent
@@ -124,6 +114,7 @@ public final class EnhancedMobs {
     state(mob).putBoolean("active", true);
     state(mob).remove("pending");
     apply(mob, true);
+    MobImplants.initialize(mob);
   }
 
   private static void modifier(
@@ -139,6 +130,10 @@ public final class EnhancedMobs {
     if (old != null && old.amount() == value && old.operation() == operation) return;
     instance.removeModifier(id);
     if (value != 0) instance.addPermanentModifier(new AttributeModifier(id, value, operation));
+  }
+
+  public static void refresh(Mob mob) {
+    apply(mob, false);
   }
 
   private static void apply(Mob mob, boolean fill) {
@@ -172,86 +167,15 @@ public final class EnhancedMobs {
         toughness,
         AttributeModifier.Operation.ADD_VALUE);
     if (fill) mob.setHealth(mob.getMaxHealth());
-    mob.setCustomName(
-        Component.translatable(
-                "cybernetics2077.enhanced.name",
-                mob.getType().getDescription(),
-                String.format(Locale.ROOT, "%.1f", l.averageTier),
-                l.count)
-            .withStyle(ChatFormatting.AQUA));
+    if (!mob.getPersistentData().contains(dev.cybernetics2077.city.BountyContracts.MOB_DATA))
+      mob.setCustomName(
+          Component.translatable(
+                  "cybernetics2077.enhanced.name",
+                  mob.getType().getDescription(),
+                  String.format(Locale.ROOT, "%.1f", l.averageTier),
+                  l.count)
+              .withStyle(ChatFormatting.AQUA));
     // Naming does not make these ordinary hostile mobs persistent: normal despawning still applies.
-  }
-
-  @SubscribeEvent
-  public static void tick(EntityTickEvent.Post e) {
-    if (!(e.getEntity() instanceof Mob mob)
-        || !(mob.level() instanceof ServerLevel level)
-        || Math.floorMod(mob.tickCount + mob.getId(), 20) != 0
-        || !mob.isAlive()
-        || !enhanced(mob)) return;
-    var s = state(mob);
-    long now = level.getGameTime();
-    int adrenaline = tier(mob, Augment.ADRENALINE_CONVERTER);
-    boolean combat = mob.getTarget() != null && mob.getTarget().isAlive();
-    if (combat && adrenaline > 0 && now >= s.getLong("adrenalineReady")) {
-      s.putLong("adrenalineEnd", now + (4 + adrenaline) * 20L);
-      s.putLong("adrenalineReady", now + 400);
-    }
-    modifier(
-        mob,
-        Attributes.MOVEMENT_SPEED,
-        "adrenaline",
-        now < s.getLong("adrenalineEnd") ? .08 * adrenaline : 0,
-        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-    int pump = tier(mob, Augment.BLOOD_PUMP);
-    if (pump > 0 && mob.getHealth() <= mob.getMaxHealth() * .5 && now >= s.getLong("pumpReady")) {
-      mob.heal(mob.getMaxHealth() * (.10f + .05f * pump));
-      s.putLong("pumpEnd", now + 120);
-      s.putLong("pumpReady", now + (50 - 5 * pump) * 20L);
-      level.sendParticles(
-          ParticleTypes.HEART,
-          mob.getX(),
-          mob.getY() + mob.getBbHeight() * .7,
-          mob.getZ(),
-          2,
-          .2,
-          .1,
-          .2,
-          0);
-    }
-    if (pump > 0 && now < s.getLong("pumpEnd")) mob.heal(mob.getMaxHealth() * pump * .005f);
-    // Two small sparks per second, only during combat; no block edits or per-frame geometry.
-    if (combat)
-      level.sendParticles(
-          ParticleTypes.ELECTRIC_SPARK,
-          mob.getX(),
-          mob.getEyeY(),
-          mob.getZ(),
-          2,
-          .12,
-          .06,
-          .12,
-          .02);
-  }
-
-  @SubscribeEvent
-  public static void projectileDamage(LivingIncomingDamageEvent e) {
-    if (e.getSource().getEntity() instanceof Mob mob
-        && enhanced(mob)
-        && e.getSource().is(DamageTypeTags.IS_PROJECTILE)) {
-      var l = loadout(mob);
-      e.setAmount(e.getAmount() * (float) (1 + l.count * l.averageTier * .08));
-    }
-  }
-
-  @SubscribeEvent
-  public static void damage(LivingDamageEvent.Pre e) {
-    if (!(e.getEntity() instanceof Mob mob)
-        || !enhanced(mob)
-        || e.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) return;
-    int neo = tier(mob, Augment.NEOFIBER);
-    if (neo > 0 && mob.getRandom().nextFloat() < neo * .02f)
-      e.setNewDamage(e.getNewDamage() * (1 - (.5f + neo * .02f)));
   }
 
   @SubscribeEvent

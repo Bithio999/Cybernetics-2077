@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.*;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -53,8 +54,10 @@ public final class CyberwareRuntime {
   }
 
   public static net.minecraft.world.item.ItemStack deck(Player p) {
-    return p.getData(Cybernetics2077.CYBERWARE)
-        .getStackInSlot(CyberwareCategory.OPERATING_SYSTEM.firstSlot());
+    return ExpansionRuntime.disabled(p)
+        ? ItemStack.EMPTY
+        : p.getData(Cybernetics2077.CYBERWARE)
+            .getStackInSlot(CyberwareCategory.OPERATING_SYSTEM.firstSlot());
   }
 
   public static boolean claws(Player p) {
@@ -81,13 +84,24 @@ public final class CyberwareRuntime {
 
   public static float quickhackDamage(Player p, QuickhackItem program) {
     float bonus = deck(p).getItem() instanceof CyberdeckItem item ? item.damageBonus() : 0;
-    float damage = program.damage() * (1 + bonus);
+    float damage =
+        program.damage()
+            * (deck(p).getItem() instanceof CyberdeckItem d ? d.damageMultiplier(program) : 1);
     if (program.kind() == dev.cybernetics2077.deck.QuickhackKind.SYNAPSE_BURNOUT
         && p instanceof ServerPlayer server) {
       float spent = Math.max(0, AugmentRuntime.maxRam(p) - state(server).ram + program.cost());
       damage *= 1 + Math.min(1, spent * .1f);
     }
+    float chance =
+        AugmentRuntime.tier(p, Augment.COX_2) > 0
+            ? 1
+            : AugmentRuntime.tier(p, Augment.BIOCONDUCTOR) * .08f;
+    if (p.getRandom().nextFloat() < chance) damage *= 1.5f;
     return damage;
+  }
+
+  public static int quickhackCost(Player p, QuickhackItem program) {
+    return deck(p).getItem() instanceof CyberdeckItem d ? d.cost(program) : program.cost();
   }
 
   /** Equipment changes cancel only affected reservations; swapping decks cannot amplify uploads. */
@@ -132,7 +146,7 @@ public final class CyberwareRuntime {
     t.putInt("programSlots", deckTier(p).programSlots());
     t.putInt("queueLimit", deckTier(p).queueLimit());
     t.putInt("hackTier", program == null ? 0 : program.tier().level);
-    t.putInt("hackCost", program == null ? 0 : program.cost());
+    t.putInt("hackCost", program == null ? 0 : quickhackCost(p, program));
     t.putFloat("hackDamage", program == null ? 0 : quickhackDamage(p, program));
     t.putInt("uploadTicks", program == null ? 0 : AugmentRuntime.uploadTicks(p, program));
     AugmentRuntime.snapshot(p, t);
@@ -182,7 +196,7 @@ public final class CyberwareRuntime {
     t.putString("category", program.kind().category);
     t.putString("type", program.kind().damageType);
     t.putInt("tier", program.tier().level);
-    t.putInt("cost", program.cost());
+    t.putInt("cost", quickhackCost(p, program));
     t.putFloat("damage", quickhackDamage(p, program));
     t.putInt("duration", program.duration());
     t.putInt("uploadTicks", AugmentRuntime.uploadTicks(p, program));
@@ -310,13 +324,13 @@ public final class CyberwareRuntime {
         || !(deck(p).getItem() instanceof CyberdeckItem)
         || program == null
         || s.uploads.size() >= deckTier(p).queueLimit()
-        || s.ram + .0001f < program.cost()
+        || s.ram + .0001f < quickhackCost(p, program)
         || !ScannerNetwork.inspect(p, id).contains("id")) return false;
     var target = p.serverLevel().getEntity(id);
     if (!(target instanceof LivingEntity living) || !canAttack(p, living)) return false;
     long now = p.serverLevel().getGameTime();
     long start = s.uploads.isEmpty() ? now : Math.max(now, s.uploads.getLast().finish);
-    int cost = program.cost();
+    int cost = quickhackCost(p, program);
     float damage = quickhackDamage(p, program);
     s.ram -= cost;
     s.uploads.add(
@@ -368,20 +382,22 @@ public final class CyberwareRuntime {
     }
     reconcileUploads(p);
     if (deck(p).getItem() instanceof CyberdeckItem item)
-      s.ram =
-          Math.min(
-              AugmentRuntime.maxRam(p),
-              s.ram
-                  + (item.ramPerSecond()
-                          + dev.cybernetics2077.cyberware.AugmentExpansion.ramRecovery(p))
-                      / 20);
+      s.ram = Math.min(AugmentRuntime.maxRam(p), s.ram + ExpansionRuntime.ramRate(p) / 20);
     if (!s.uploads.isEmpty() && s.uploads.getFirst().finish <= now) {
       var upload = s.uploads.removeFirst();
       var target = p.serverLevel().getEntity(upload.target);
       if (target instanceof LivingEntity living
           && canAttack(p, living)
           && p.distanceToSqr(living) <= Math.pow(ScannerNetwork.range(p) + 16, 2)) {
-        QuickhackEffects.land(p, living, upload.program, upload.damage, upload.sourceDeck);
+        var next = s.uploads.isEmpty() ? null : s.uploads.getFirst();
+        float queued =
+            upload.sourceDeck.getItem() instanceof CyberdeckItem d
+                    && next != null
+                    && next.target.equals(upload.target)
+                    && next.sourceDeck == upload.sourceDeck
+                ? d.queuedMultiplier(upload.program, next.program)
+                : 1;
+        QuickhackEffects.land(p, living, upload.program, upload.damage * queued, upload.sourceDeck);
       }
     }
     if (now % 4 == 0) syncIfChanged(p);

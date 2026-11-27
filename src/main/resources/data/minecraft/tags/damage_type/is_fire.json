@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "cybernetics2077:mantis_thermal"
+    "cybernetics2077:mantis_thermal",
+    "cybernetics2077:overheat"
   ]
 }

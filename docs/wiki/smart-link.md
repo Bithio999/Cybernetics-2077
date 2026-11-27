@@ -8,7 +8,7 @@
 | --- | --- | ---: |
 | Hands | 1–5 | 4 |
 
-Scan a visible enemy with your [optical scanner](scanning.md) to establish a lock. Arrows and thrown tridents fired during that lock gently steer toward the target. While drawing a weapon or aiming a gun, slim **LINKED** brackets follow the target, with distance and remaining lock time. The scanner keeps its own target display.
+Scan a visible enemy with your [optical scanner](scanning.md) to establish a lock. Compatible TaCZ bullets, arrows and thrown tridents fired during that lock predict the target’s movement and steer toward an interception point. While drawing a weapon or aiming a gun, slim **LINKED** brackets follow the target, with distance and remaining lock time. The scanner keeps its own target display.
 
 Guidance lasts for the projectile's first **2 seconds**. It cannot turn sharply backward or follow targets through solid blocks. Losing the target, line of sight or the projectile's 64-block pursuit range ends guidance. A ricochet also ends guidance. Landed and returning tridents are left to vanilla behavior.
 
@@ -27,3 +27,5 @@ The lock indicator also appears while aiming a TaCZ gun. TaCZ bullets support th
 ![Smart Link target brackets while aiming a TaCZ gun](../images/neo023-smart-lock.png)
 
 [All cyberware](cyberware.md) · [Installing implants](installation.md) · [Street Cred requirements](street-cred.md)
+
+Guidance turns more strongly at higher tiers while preserving projectile speed. It has a short lead horizon, respects walls and stops steering toward targets behind the shot. It does not create extra projectiles.

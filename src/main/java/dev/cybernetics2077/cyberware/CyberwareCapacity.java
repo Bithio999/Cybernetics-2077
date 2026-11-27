@@ -12,7 +12,16 @@ public final class CyberwareCapacity {
   }
 
   public static int limit(Player player) {
-    return limit(Cybernetics2077.CAPACITY.get(), player.getData(CityContent.ACCOUNT).streetCred());
+    int t = AugmentRuntime.tier(player, Augment.CHROME_COMPRESSOR);
+    return (int)
+        Math.clamp(
+            (long)
+                    limit(
+                        Cybernetics2077.CAPACITY.get(),
+                        player.getData(CityContent.ACCOUNT).streetCred())
+                + (t > 0 ? (t == 4 ? 40 : 70) : 0),
+            1,
+            Integer.MAX_VALUE);
   }
 
   private CyberwareCapacity() {}

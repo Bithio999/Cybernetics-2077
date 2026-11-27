@@ -63,6 +63,36 @@ public final class Cybernetics2077 {
   public static final java.util.Map<QuickhackKind, java.util.List<Supplier<QuickhackItem>>>
       QUICKHACKS = registerQuickhacks();
 
+  public static final java.util.Map<CyberdeckItem.Model, java.util.List<Supplier<CyberdeckItem>>>
+      EXTRA_DECKS = registerExtraDecks();
+
+  private static java.util.Map<CyberdeckItem.Model, java.util.List<Supplier<CyberdeckItem>>>
+      registerExtraDecks() {
+    var result =
+        new java.util.EnumMap<CyberdeckItem.Model, java.util.List<Supplier<CyberdeckItem>>>(
+            CyberdeckItem.Model.class);
+    for (var model : CyberdeckItem.Model.values()) {
+      if (model == CyberdeckItem.Model.PARALINE || model == CyberdeckItem.Model.RAVEN) continue;
+      var list = new java.util.ArrayList<Supplier<CyberdeckItem>>();
+      for (int t = CyberdeckItem.firstTier(model); t <= 5; t++) {
+        var tier = CyberwareTier.of(t);
+        list.add(
+            ITEMS.register(
+                CyberdeckItem.id(model) + "_tier_" + t, () -> new CyberdeckItem(tier, model)));
+      }
+      result.put(model, java.util.List.copyOf(list));
+    }
+    return java.util.Collections.unmodifiableMap(result);
+  }
+
+  public static CyberdeckItem deck(CyberdeckItem.Model model, int tier) {
+    return model == CyberdeckItem.Model.PARALINE
+        ? CYBERDECK_TIERS.get(tier - 1).get()
+        : model == CyberdeckItem.Model.RAVEN
+            ? RAVEN_TIERS.get(tier - 3).get()
+            : EXTRA_DECKS.get(model).get(tier - CyberdeckItem.firstTier(model)).get();
+  }
+
   private static java.util.Map<QuickhackKind, java.util.List<Supplier<QuickhackItem>>>
       registerQuickhacks() {
     var result =
@@ -197,6 +227,13 @@ public final class Cybernetics2077 {
           () ->
               net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create(
                   CyberdeckMenu::new));
+  public static final Supplier<MenuType<CarryReserveMenu>> RESERVE_MENU =
+      MENUS.register(
+          "carry_reserve", () -> new MenuType<>(CarryReserveMenu::new, FeatureFlags.DEFAULT_FLAGS));
+  public static final Supplier<AttachmentType<CarryReserve>> CARRY_RESERVE =
+      ATTACHMENTS.register(
+          "carry_reserve",
+          () -> AttachmentType.serializable(CarryReserve::new).copyOnDeath().build());
   public static final Supplier<AttachmentType<CyberwareInventory>> CYBERWARE =
       ATTACHMENTS.register(
           "cyberware",

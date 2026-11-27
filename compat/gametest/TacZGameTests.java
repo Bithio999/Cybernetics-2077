@@ -898,4 +898,52 @@ public final class TacZGameTests {
         "Removing optics left a live lock");
     h.succeed();
   }
+
+  @GameTest(batch = "movingGuidance", template = "empty", timeoutTicks = 80)
+  public static void enhancedGuidanceLeadsMovingNativeRoundsWithoutSpeedOrReverseSnap(
+      GameTestHelper h) throws Exception {
+    var p = player(h);
+    equip(p, Augment.SMART_LINK, 5, 0);
+    p.getData(Cybernetics2077.CYBERWARE)
+        .setStackInSlot(
+            CyberwareCategory.FACE.firstSlot(), new ItemStack(Cybernetics2077.OPTICS.get()));
+    var target = h.spawn(EntityType.HUSK, new BlockPos(2, 90, 20));
+    target.setNoAi(true);
+    target.setNoGravity(true);
+    target.setPos(p.position().add(0, 0, 20));
+    target.xo = target.getX() - .35;
+    target.yo = target.getY();
+    target.zo = target.getZ();
+    HandsRuntime.lock(p, target);
+    var b = bullet(h, p);
+    double speed = b.getDeltaMovement().length();
+    TacZCompat.tick(b);
+    h.assertTrue(
+        b.getDeltaMovement().x > .03
+            && Math.abs(b.getDeltaMovement().length() - speed) < .00001
+            && b.getDeltaMovement().z > 0,
+        "Predictive native guidance lost lead/speed/direction");
+    target.setPos(p.position().add(0, 0, -20));
+    var before = b.getDeltaMovement();
+    TacZCompat.tick(b);
+    h.assertTrue(
+        before.distanceTo(b.getDeltaMovement()) < .00001,
+        "Guidance reversed native bullet toward a target behind it");
+    target.discard();
+    h.succeed();
+  }
+
+  @GameTest(batch = "expandedGun", template = "empty", timeoutTicks = 60)
+  public static void gunMechanismRecoveryUsesNewImplantsAndWeaponJamsBlockNativeFire(
+      GameTestHelper h) throws Exception {
+    var p = player(h);
+    var raw = TacZCompat.interval(p, 100);
+    equip(p, Augment.CLUTCH_PADDING, 5, 0);
+    h.assertTrue(
+        TacZCompat.interval(p, 100) < raw,
+        "Clutch Padding did not affect actual gun mechanism interval");
+    ExpansionRuntime.extra(p).putLong("jammedUntil", p.level().getGameTime() + 60);
+    h.assertTrue(TacZCompat.blocked(p), "Quickhack jam did not reach native firing permission");
+    h.succeed();
+  }
 }

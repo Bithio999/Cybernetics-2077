@@ -21,3 +21,12 @@ Open **Operating System → Manage Quickhacks** in the inventory cyberware menu,
 ![Quickhack loadout editor](../images/neo023-quickhack-loadout.png)
 
 [Programs and costs](quickhacks.md) · [How scanning works](scanning.md)
+
+## Specialist decks
+
+| Deck | Tiers | Focus |
+| --- | --- | --- |
+| [Arasaka](arasaka.md) | 1–5 | Cheaper, longer Control programs |
+| [Biotech Σ](biotech-sigma.md) | 2–5 | Longer damage-over-time programs |
+| [NetWatch Netdriver](netwatch-netdriver.md) | 5 Iconic | Damage and duration |
+| [Tetratronic Rippler](tetratronic-rippler.md) | 1–5 | Combat → Control queues and weapon follow-up |

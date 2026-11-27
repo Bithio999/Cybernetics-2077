@@ -9,6 +9,7 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
  * Absolute server-clock timers persist across logout/death, so reinstallation cannot reset them.
  */
 public final class AugmentState implements INBTSerializable<CompoundTag> {
+  public CompoundTag extra = new CompoundTag();
   public long berserkEnd,
       berserkReady,
       camoEnd,
@@ -40,6 +41,7 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
   @Override
   public CompoundTag serializeNBT(HolderLookup.Provider registries) {
     var t = new CompoundTag();
+    t.put("Expansion", extra.copy());
     t.putLong("microReady", microReady);
     t.putLong("wrapReady", wrapReady);
     t.putLong("wrapEnd", wrapEnd);
@@ -75,6 +77,7 @@ public final class AugmentState implements INBTSerializable<CompoundTag> {
 
   @Override
   public void deserializeNBT(HolderLookup.Provider registries, CompoundTag t) {
+    extra = t.getCompound("Expansion").copy();
     microReady = t.getLong("microReady");
     wrapReady = t.getLong("wrapReady");
     wrapEnd = t.getLong("wrapEnd");

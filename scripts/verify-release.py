@@ -40,6 +40,21 @@ with PortZip(jar) as z:
             assert entry in names and z.read(entry) == path.read_bytes(), f'Missing/stale resource: {entry}'
             if path.suffix == '.json':
                 json.loads(z.read(entry))
+    if not forge:
+        import re
+        coverage=json.loads((root/'docs/research/expansion-028/coverage.json').read_text())
+        assert len(coverage)==103 and len({x['family'] for x in coverage})==103
+        for extra in ('cyberware/ExpansionRuntime','cyberware/BerserkSpecs','mob/MobImplants','combat/NeuralActors','combat/NeuralInterference','cyberware/CarryReserveMenu','client/ui/CarryReserveScreen','client/ui/CyberpsychoModel','client/mantis/MobMantisLayer','mixin/MobGoalAccess','mixin/MobMeleeTimingMixin','mixin/MobBowTimingMixin'):
+            assert 'dev/cybernetics2077/'+extra+'.class' in names, extra
+        definitions=json.loads((root/'docs/research/expansion-028/new-implants.json').read_text())
+        language=json.loads(z.read('assets/cybernetics2077/lang/en_us.json'))
+        for d in definitions:
+            for t in range(d['firstTier'],6):
+                assert f"assets/cybernetics2077/models/item/{d['id']}_tier_{t}.json" in names
+                assert f"item.cybernetics2077.{d['id']}_tier_{t}" in language
+            assert f"assets/cybernetics2077/textures/item/{d['id']}.png" in names
+        assert 'assets/cybernetics2077/textures/entity/cyberpsycho.png' in names
+        assert not [n for n in names if 'canto' in n.lower() or '/recipe/' in n and any(d['id'] in n for d in definitions)], 'Excluded cyberdeck or unrequested cyberware recipes'
     for required in ('dev/cybernetics2077/Cybernetics2077.class',
                      'dev/cybernetics2077/mob/EnhancedMobs.class',
                      'dev/cybernetics2077/mob/SalvageOdds.class',

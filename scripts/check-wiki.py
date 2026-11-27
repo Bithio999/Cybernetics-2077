@@ -91,9 +91,14 @@ families = {
     'short_circuit_tier_1':'short-circuit', 'overheat':'overheat', 'contagion':'contagion',
     'reboot_optics':'reboot-optics', 'cripple_movement':'cripple-movement', 'synapse_burnout':'synapse-burnout',
 }
+import json
+for entry in json.loads((ROOT / 'docs/research/expansion-028/new-implants.json').read_text()):
+    families[entry['id']] = entry['id'].replace('_','-')
+for identifier in ('arasaka','biotech_sigma','netwatch_netdriver','tetratronic_rippler','weapon_glitch','cyberware_malfunction'):
+    families[identifier] = identifier.replace('_','-')
 for definition in ('cyberware/Augment.java', 'deck/QuickhackKind.java'):
     source = (ROOT / 'src/main/java/dev/cybernetics2077' / definition).read_text()
-    for identifier in re.findall(r'^\s*[A-Z][A-Z_]+\("([a-z_]+)"', source, flags=re.MULTILINE):
+    for identifier in re.findall(r'^\s*[A-Z][A-Z_]+\("([a-z_0-9]+)"', source, flags=re.MULTILINE):
         icon = 'short_circuit_tier_1' if identifier == 'short_circuit' else identifier
         if icon not in families:
             errors.append(f'Shipped item family lacks wiki coverage: {identifier}')
@@ -103,7 +108,7 @@ for icon, page in families.items():
         errors.append(f'Missing item page: {page}')
     if not (WIKI / 'assets/icons' / (icon+'.png')).is_file():
         errors.append(f'Missing item icon: {icon}')
-for page in ['short-circuit','overheat','contagion','reboot-optics','cripple-movement','synapse-burnout','mantis-blades','thermal-mantis-blades','electrifying-mantis-blades','toxic-mantis-blades','ballistic-coprocessor','microgenerator']:
+for page in ['weapon-glitch','cyberware-malfunction','short-circuit','overheat','contagion','reboot-optics','cripple-movement','synapse-burnout','mantis-blades','thermal-mantis-blades','electrifying-mantis-blades','toxic-mantis-blades','ballistic-coprocessor','microgenerator']:
     if '**Damage type:**' not in (WIKI / (page+'.md')).read_text():
         errors.append(f'Missing damage type: {page}')
 

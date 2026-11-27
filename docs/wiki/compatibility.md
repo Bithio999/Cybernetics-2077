@@ -53,3 +53,11 @@ Server owners can adjust `timeBubbleExcludedBlockNamespaces` in the Cybernetics 
 The supplied Forge pack list contains **159 pinned mod files**, including TaCZ, TaCZ: Creatified and Cybernetic System. Its sanitized manifest and detailed validation notes are in [the compatibility directory](https://github.com/Bithio999/Cybernetics-2077/tree/main/compat). Third-party mods and assets are not bundled with Cybernetics 2077.
 
 Pack-specific configs, scripts and extra gunpacks were not supplied, so those settings require a check in your actual instance. Cybernetic System remains a separate mod with its own equipment and progression.
+
+## Expanded implant integration
+
+Smart Link predicts moving targets and uses stronger, bounded steering on the original projectile. It preserves bullet speed, native ammo, attachments, damage and headshot handling. Guidance requires a valid visible lock and cannot turn a shot backward.
+
+Weapon Glitch blocks TaCZ firing before ammunition consumption. Cyberware Malfunction disables cybernetic guidance and other implants. Clutch Padding and Isometric Stabilizer accelerate firing mechanisms; Sandevistan still slows the gun mechanism on the world clock and leaves reloads normal. Cockatrice, Deep-Field, Black Mamba, Cellular Adapter, Tyrosine Injector and active-system crit bonuses feed the native gun damage path once.
+
+Feedback Circuit and Electromag Recycler use steady aimed TaCZ hits, or fully drawn bows, as Minecraft’s charged-shot equivalent. TaCZ does not supply Cyberpunk’s Tech/Smart/Power weapon classes; ordinary compatible guns use the installed hand implant’s behavior.

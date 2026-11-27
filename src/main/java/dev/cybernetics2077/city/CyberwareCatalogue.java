@@ -42,13 +42,15 @@ public final class CyberwareCatalogue {
           for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
       for (var entry : Cybernetics2077.RAVEN_TIERS) add(list, entry.get());
       for (var kind : dev.cybernetics2077.deck.QuickhackKind.values())
-        if (kind != dev.cybernetics2077.deck.QuickhackKind.SHORT_CIRCUIT)
+        if (kind != dev.cybernetics2077.deck.QuickhackKind.SHORT_CIRCUIT
+            && kind.ordinal() <= dev.cybernetics2077.deck.QuickhackKind.SYNAPSE_BURNOUT.ordinal())
           for (var entry : Cybernetics2077.QUICKHACKS.get(kind)) add(list, entry.get());
       // Append new families: saved daily stock IDs keep referring to the same original offers.
       for (var kind : Augment.values())
         if (kind.ordinal() > Augment.FORTIFIED_ANKLES.ordinal()
             && kind != Augment.MILITECH_APOGEE
-            && kind != Augment.DAVIDS_SANDEVISTAN)
+            && kind != Augment.DAVIDS_SANDEVISTAN
+            && !ExpansionImplants.added(kind))
           for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
       for (var variant : MantisVariant.values())
         if (variant != MantisVariant.PHYSICAL)
@@ -57,6 +59,14 @@ public final class CyberwareCatalogue {
       for (var kind : Augment.values())
         if (kind == Augment.MILITECH_APOGEE || kind == Augment.DAVIDS_SANDEVISTAN)
           for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
+      for (var kind : Augment.values())
+        if (ExpansionImplants.added(kind))
+          for (var entry : Cybernetics2077.AUGMENTS.get(kind)) add(list, entry.get());
+      for (var family : Cybernetics2077.EXTRA_DECKS.values())
+        for (var entry : family) add(list, entry.get());
+      for (var kind : dev.cybernetics2077.deck.QuickhackKind.values())
+        if (kind.ordinal() > dev.cybernetics2077.deck.QuickhackKind.SYNAPSE_BURNOUT.ordinal())
+          for (var entry : Cybernetics2077.QUICKHACKS.get(kind)) add(list, entry.get());
       offers = List.copyOf(list);
     }
     return offers;

@@ -73,6 +73,10 @@ public class CyberwareItem extends Item {
                   tier.queueLimit(),
                   Math.round(deck.damageBonus() * 100))
               .withStyle(net.minecraft.ChatFormatting.GRAY));
+      if (!deck.specialty().isEmpty())
+        lines.add(
+            net.minecraft.network.chat.Component.literal(deck.specialty())
+                .withStyle(net.minecraft.ChatFormatting.AQUA));
       if (deck.relayTargets() > 0)
         lines.add(
             net.minecraft.network.chat.Component.translatable(

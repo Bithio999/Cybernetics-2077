@@ -1,0 +1,723 @@
+[
+  {
+    "referenceName": "Arasaka",
+    "referenceSlug": "arasaka-mk3",
+    "family": "arasaka",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "BioDyne Berserk",
+    "referenceSlug": "biodyne-berserk",
+    "family": "biodyne_berserk",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Biotech Σ",
+    "referenceSlug": "biotech-s-mk3",
+    "family": "biotech_sigma",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Chrome Compressor",
+    "referenceSlug": "chrome-compressor",
+    "family": "chrome_compressor",
+    "referenceCategory": "Operating System",
+    "iconic": true
+  },
+  {
+    "referenceName": "Dynalar Sandevistan",
+    "referenceSlug": "dynalar-sandevistan",
+    "family": "dynalar_sandevistan",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Militech \"Apogee\" Sandevistan",
+    "referenceSlug": "militech-apogee-sandevistan",
+    "family": "militech_apogee_sandevistan",
+    "referenceCategory": "Operating System",
+    "iconic": true
+  },
+  {
+    "referenceName": "Militech \"Falcon\" Sandevistan",
+    "referenceSlug": "militech-falcon-sandevistan",
+    "family": "militech_falcon_sandevistan",
+    "referenceCategory": "Operating System",
+    "iconic": true
+  },
+  {
+    "referenceName": "Militech Berserk",
+    "referenceSlug": "militech-berserk",
+    "family": "militech_berserk",
+    "referenceCategory": "Operating System",
+    "iconic": true
+  },
+  {
+    "referenceName": "Militech Paraline",
+    "referenceSlug": "militech-paraline",
+    "family": "militech_paraline",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Moore Tech Berserk",
+    "referenceSlug": "moore-tech-berserk-mk.2",
+    "family": "moore_tech_berserk",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "NetWatch Netdriver Mk.1",
+    "referenceSlug": "netwatch-netdriver-mk.1",
+    "family": "netwatch_netdriver",
+    "referenceCategory": "Operating System",
+    "iconic": true
+  },
+  {
+    "referenceName": "QianT \"Warp Dancer\" Sandevistan",
+    "referenceSlug": "warp-dancer",
+    "family": "qiant_warp_dancer",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Raven Microcyber",
+    "referenceSlug": "raven-microcyber",
+    "family": "raven_microcyber",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Tetratronic Rippler",
+    "referenceSlug": "tetratronic-rippler",
+    "family": "tetratronic_rippler",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Zetatech Berserk",
+    "referenceSlug": "zetatech-berserk-mk.5",
+    "family": "zetatech_berserk",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Zetatech Sandevistan",
+    "referenceSlug": "zetatech-sandevistan",
+    "family": "zetatech_sandevistan",
+    "referenceCategory": "Operating System",
+    "iconic": false
+  },
+  {
+    "referenceName": "Axolotl",
+    "referenceSlug": "axolotl",
+    "family": "axolotl",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Bioconductor",
+    "referenceSlug": "bioconductor",
+    "family": "bioconductor",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Camillo RAM Manager",
+    "referenceSlug": "camillo-ram-manage",
+    "family": "camillo_ram_manager",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "COX-2 Cybersomatic Optimizer",
+    "referenceSlug": "cox-2-cybersomatic-optimizer",
+    "family": "cox_2_cybersomatic_optimizer",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Ex-Disk",
+    "referenceSlug": "ex-disk",
+    "family": "ex_disk",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Kerenzikov Boost System",
+    "referenceSlug": "kerenzikov-boost-system",
+    "family": "kerenzikov_boost_system",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Mechatronic Core",
+    "referenceSlug": "mechatronic-core",
+    "family": "mechatronic_core",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Memory Boost",
+    "referenceSlug": "memory-boost",
+    "family": "memory_boost",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Newton Module",
+    "referenceSlug": "newton-module",
+    "family": "newton_module",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Quantum Tuner",
+    "referenceSlug": "quantum-tuner",
+    "family": "quantum_tuner",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "RAM Reallocator",
+    "referenceSlug": "ram-reallocator",
+    "family": "ram_reallocator",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "RAM Upgrade",
+    "referenceSlug": "ram-upgrade",
+    "family": "ram_upgrade",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Self-ICE",
+    "referenceSlug": "self-ice",
+    "family": "self_ice",
+    "referenceCategory": "Frontal Cortex Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Ballistic Coprocessor",
+    "referenceSlug": "ballistic-coprocessor",
+    "family": "ballistic_coprocessor",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Handle Wrap",
+    "referenceSlug": "handle-wrap",
+    "family": "handle_wrap",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Immovable Force",
+    "referenceSlug": "immovable-force",
+    "family": "immovable_force",
+    "referenceCategory": "Hands",
+    "iconic": true
+  },
+  {
+    "referenceName": "Microgenerator",
+    "referenceSlug": "microgenerator",
+    "family": "microgenerator",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Shock Absorber",
+    "referenceSlug": "shock-absorber",
+    "family": "shock_absorber",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Smart Link",
+    "referenceSlug": "smart-link",
+    "family": "smart_link",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Tattoo: Johnny's Special",
+    "referenceSlug": "tattoo-johnnys-special",
+    "family": "johnnys_special",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Tattoo: Together Forever",
+    "referenceSlug": "tattoo-together-forever",
+    "family": "together_forever",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Tattoo: Tyger Claws Dermal Imprint",
+    "referenceSlug": "tattoo-tyger-claws-dermal-imprint",
+    "family": "tyger_claws_dermal_imprint",
+    "referenceCategory": "Hands",
+    "iconic": false
+  },
+  {
+    "referenceName": "Bionic Joints",
+    "referenceSlug": "bionic-joints",
+    "family": "bionic_joints",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Dense Marrow",
+    "referenceSlug": "dense-marrow",
+    "family": "dense_marrow",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Epimorphic Skeleton",
+    "referenceSlug": "epimorphic-skeleton",
+    "family": "epimorphic_skeleton",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Feen-X",
+    "referenceSlug": "feen-x",
+    "family": "feen_x",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Kinetic Frame",
+    "referenceSlug": "kinetic-frame",
+    "family": "kinetic_frame",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Para Bellum",
+    "referenceSlug": "para-bellum",
+    "family": "para_bellum",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "RAM Recoup",
+    "referenceSlug": "ram-recoup",
+    "family": "ram_recoup",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Rara Avis",
+    "referenceSlug": "rara-avis",
+    "family": "rara_avis",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Scar Coalescer",
+    "referenceSlug": "scar-coalescer",
+    "family": "scar_coalescer",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Scarab",
+    "referenceSlug": "scarab",
+    "family": "scarab",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Spring Joints",
+    "referenceSlug": "spring-joints",
+    "family": "spring_joints",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Titanium Bones",
+    "referenceSlug": "titanium-bones",
+    "family": "titanium_bones",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Universal Booster",
+    "referenceSlug": "universal-booster",
+    "family": "universal_booster",
+    "referenceCategory": "Skeleton Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Adrenaline Converter",
+    "referenceSlug": "adrenaline-converter",
+    "family": "adrenaline_converter",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Adreno-trigger",
+    "referenceSlug": "adreno-trigger",
+    "family": "adreno_trigger",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Atomic Sensors",
+    "referenceSlug": "atomic-sensors",
+    "family": "atomic_sensors",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Deep-field Visual Interface",
+    "referenceSlug": "deep-field-visual-interface",
+    "family": "deep_field_visual_interface",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Kerenzikov",
+    "referenceSlug": "kerenzikov",
+    "family": "kerenzikov",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "NeoFiber",
+    "referenceSlug": "neofiber",
+    "family": "neofiber",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Reflex Tuner",
+    "referenceSlug": "reflex-tuner",
+    "family": "reflex_tuner",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Revulsor",
+    "referenceSlug": "revulsor",
+    "family": "revulsor",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Stabber",
+    "referenceSlug": "stabber",
+    "family": "stabber",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Synaptic Accelerator",
+    "referenceSlug": "synaptic-accelerator",
+    "family": "synaptic_accelerator",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Tyrosine Injector",
+    "referenceSlug": "tyrosine-injector",
+    "family": "tyrosine_injector",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Visual Cortex Support",
+    "referenceSlug": "visual-cortex-support",
+    "family": "visual_cortex_support",
+    "referenceCategory": "Nervous System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Adrenaline Booster",
+    "referenceSlug": "adrenaline-booster",
+    "family": "adrenaline_booster",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Biomonitor",
+    "referenceSlug": "biomonitor",
+    "family": "biomonitor",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Black Mamba",
+    "referenceSlug": "black-mamba",
+    "family": "black_mamba",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Blood Pump",
+    "referenceSlug": "blood-pump",
+    "family": "blood_pump",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Clutch Padding",
+    "referenceSlug": "clutch-padding",
+    "family": "clutch_padding",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Electromag Recycler",
+    "referenceSlug": "electromag-recycler",
+    "family": "electromag_recycler",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Feedback Circuit",
+    "referenceSlug": "feedback-circuit",
+    "family": "feedback_circuit",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Heal-On-Kill",
+    "referenceSlug": "heal-on-kill",
+    "family": "heal_on_kill",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Isometric Stabilizer",
+    "referenceSlug": "isometric-stabilizer",
+    "family": "isometric_stabilizer",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Microrotors",
+    "referenceSlug": "microrotors",
+    "family": "microrotors",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Second Heart",
+    "referenceSlug": "second-heart",
+    "family": "second_heart",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "ThreatEvac",
+    "referenceSlug": "threatevac",
+    "family": "threatevac",
+    "referenceCategory": "Circulatory System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Carapace",
+    "referenceSlug": "carapace",
+    "family": "carapace",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Cellular Adapter",
+    "referenceSlug": "cellular-adapter",
+    "family": "cellular_adapter",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Chitin",
+    "referenceSlug": "chitin",
+    "family": "chitin",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Cogito Lattice",
+    "referenceSlug": "cogito-lattice",
+    "family": "cogito_lattice",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Countershell",
+    "referenceSlug": "countershell",
+    "family": "countershell",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Defenzikov",
+    "referenceSlug": "defenzikov",
+    "family": "defenzikov",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Nano-plating",
+    "referenceSlug": "nano-plating",
+    "family": "nano_plating",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Optical Camo",
+    "referenceSlug": "optical-camo",
+    "family": "optical_camo",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Pain Editor",
+    "referenceSlug": "pain-editor",
+    "family": "pain_editor",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Painducer",
+    "referenceSlug": "painducer",
+    "family": "painducer",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Peripheral Inverse",
+    "referenceSlug": "peripheral-inverse",
+    "family": "peripheral_inverse",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "ProxiShield",
+    "referenceSlug": "proxishield",
+    "family": "proxishield",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "RangeGuard",
+    "referenceSlug": "rangeguard",
+    "family": "rangeguard",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Shock-n-Awe",
+    "referenceSlug": "shock-n-awe",
+    "family": "shock_n_awe",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Subdermal Armor",
+    "referenceSlug": "subdermal-armor",
+    "family": "subdermal_armor",
+    "referenceCategory": "Integumentary System Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Basic Kiroshi Optics",
+    "referenceSlug": "basic-kiroshi-optics",
+    "family": "optical_scanner",
+    "referenceCategory": "Face Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Behavioral Imprint-synced Faceplate",
+    "referenceSlug": "behavioral-imprint-synced-faceplate",
+    "family": "behavioral_imprint_synced_faceplate",
+    "referenceCategory": "Face Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Kiroshi \"Clairvoyant\" Optics",
+    "referenceSlug": "kiroshi-clairvoyant-optics",
+    "family": "kiroshi_clairvoyant_optics",
+    "referenceCategory": "Face Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Kiroshi \"Cockatrice\" Optics",
+    "referenceSlug": "kiroshi-cockatrice-optics",
+    "family": "kiroshi_cockatrice_optics",
+    "referenceCategory": "Face Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Kiroshi \"Doomsayer\" Optics",
+    "referenceSlug": "kiroshi-doomsayer-optics",
+    "family": "kiroshi_doomsayer_optics",
+    "referenceCategory": "Face Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Kiroshi \"Sentry\" Optics",
+    "referenceSlug": "kiroshi-sentry-optics",
+    "family": "kiroshi_sentry_optics",
+    "referenceCategory": "Face Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Kiroshi \"Stalker\" Optics",
+    "referenceSlug": "stalker",
+    "family": "kiroshi_stalker_optics",
+    "referenceCategory": "Face Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Kiroshi \"The Oracle\" Optics",
+    "referenceSlug": "the-oracle",
+    "family": "kiroshi_oracle_optics",
+    "referenceCategory": "Face Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Fortified Ankles",
+    "referenceSlug": "fortified-ankles",
+    "family": "fortified_ankles",
+    "referenceCategory": "Legs Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Jenkins' Tendons",
+    "referenceSlug": "jenkins-tendons",
+    "family": "jenkins_tendons",
+    "referenceCategory": "Legs Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Leeroy Ligament System",
+    "referenceSlug": "leeroy-ligament-system",
+    "family": "leeroy_ligament_system",
+    "referenceCategory": "Legs Cyberware",
+    "iconic": true
+  },
+  {
+    "referenceName": "Lynx Paws",
+    "referenceSlug": "lynx-paws",
+    "family": "lynx_paws",
+    "referenceCategory": "Legs Cyberware",
+    "iconic": false
+  },
+  {
+    "referenceName": "Reinforced Tendons",
+    "referenceSlug": "reinforced-tendons",
+    "family": "reinforced_tendons",
+    "referenceCategory": "Legs Cyberware",
+    "iconic": false
+  }
+]

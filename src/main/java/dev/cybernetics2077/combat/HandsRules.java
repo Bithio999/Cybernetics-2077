@@ -30,6 +30,42 @@ public final class HandsRules {
         (ax * a + bx * b) * speed, (ay * a + by * b) * speed, (az * a + bz * b) * speed);
   }
 
+  /** Constant-velocity intercept with a short lead horizon; preserves projectile speed. */
+  public static Vector guide(
+      double vx,
+      double vy,
+      double vz,
+      double dx,
+      double dy,
+      double dz,
+      double tx,
+      double ty,
+      double tz,
+      int tier,
+      double step) {
+    double speed = Math.sqrt(vx * vx + vy * vy + vz * vz);
+    double a = tx * tx + ty * ty + tz * tz - speed * speed;
+    double b = 2 * (dx * tx + dy * ty + dz * tz), c = dx * dx + dy * dy + dz * dz;
+    double time = speed > 1e-8 ? Math.sqrt(c) / speed : 0;
+    double disc = b * b - 4 * a * c;
+    if (Math.abs(a) > 1e-8 && disc >= 0) {
+      double one = (-b - Math.sqrt(disc)) / (2 * a), two = (-b + Math.sqrt(disc)) / (2 * a);
+      if (one > 0 && two > 0) time = Math.min(one, two);
+      else if (one > 0 || two > 0) time = Math.max(one, two);
+    }
+    time = Math.clamp(time, 0, 8);
+    double movement = Math.sqrt(tx * tx + ty * ty + tz * tz);
+    if (movement * time > 4) time = 4 / movement;
+    return turn(
+        vx,
+        vy,
+        vz,
+        dx + tx * time,
+        dy + ty * time,
+        dz + tz * time,
+        (.14 + .035 * Math.clamp(tier, 1, 5)) * Math.clamp(step, 0, 1));
+  }
+
   public static double bounceSpeed(int tier) {
     return .60 + .05 * Math.clamp(tier, 1, 5);
   }

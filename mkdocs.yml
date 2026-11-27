@@ -49,11 +49,31 @@ nav:
       - All cyberware: cyberware.md
       - Iconic cyberware: iconics.md
       - Frontal Cortex:
+          - "Axolotl": axolotl.md
+          - "Bioconductor": bioconductor.md
+          - "COX-2 Cybersomatic Optimizer": cox-2-cybersomatic-optimizer.md
+          - "Camillo RAM Manager": camillo-ram-manager.md
+          - "Kerenzikov Boost System": kerenzikov-boost-system.md
+          - "Mechatronic Core": mechatronic-core.md
+          - "Newton Module": newton-module.md
+          - "Quantum Tuner": quantum-tuner.md
+          - "RAM Reallocator": ram-reallocator.md
           - Ex-Disk: ex-disk.md
           - Memory Boost: memory-boost.md
           - RAM Upgrade: ram-upgrade.md
           - Self-ICE: self-ice.md
       - Operating System:
+          - "Arasaka": arasaka.md
+          - "Biotech Σ": biotech-sigma.md
+          - "Chrome Compressor": chrome-compressor.md
+          - "Militech Berserk": militech-berserk.md
+          - "Militech “Falcon” Sandevistan": militech-falcon-sandevistan.md
+          - "Moore Tech Berserk": moore-tech-berserk.md
+          - "NetWatch Netdriver": netwatch-netdriver.md
+          - "QianT “Warp Dancer” Sandevistan": qiant-warp-dancer.md
+          - "Tetratronic Rippler": tetratronic-rippler.md
+          - "Zetatech Berserk": zetatech-berserk.md
+          - "Zetatech Sandevistan": zetatech-sandevistan.md
           - Compare cyberdecks: cyberdecks.md
           - Militech Paraline: militech-paraline.md
           - Raven Microcyber: raven-microcyber.md
@@ -67,6 +87,9 @@ nav:
           - Electrifying Mantis Blades: electrifying-mantis-blades.md
           - Toxic Mantis Blades: toxic-mantis-blades.md
       - Hands:
+          - "Tattoo: Johnny’s Special": johnnys-special.md
+          - "Tattoo: Together Forever": together-forever.md
+          - "Tattoo: Tyger Claws Dermal Imprint": tyger-claws-dermal-imprint.md
           - Smart Link: smart-link.md
           - Ballistic Coprocessor: ballistic-coprocessor.md
           - Microgenerator: microgenerator.md
@@ -74,31 +97,72 @@ nav:
           - Shock Absorber: shock-absorber.md
           - Immovable Force: immovable-force.md
       - Face:
+          - "Behavioral Imprint-synced Faceplate": behavioral-imprint-synced-faceplate.md
+          - "Kiroshi “Cockatrice” Optics": kiroshi-cockatrice-optics.md
+          - "Kiroshi “Sentry” Optics": kiroshi-sentry-optics.md
+          - "Kiroshi “The Oracle” Optics": kiroshi-oracle-optics.md
           - Basic Kiroshi Optics: kiroshi-optics.md
           - Clairvoyant Optics: clairvoyant-optics.md
           - Kiroshi “Doomsayer” Optics: doomsayer-optics.md
           - Kiroshi “Stalker” Optics: stalker-optics.md
       - Skeleton:
+          - "Feen-X": feen-x.md
+          - "Kinetic Frame": kinetic-frame.md
+          - "RAM Recoup": ram-recoup.md
+          - "Rara Avis": rara-avis.md
+          - "Scar Coalescer": scar-coalescer.md
+          - "Scarab": scarab.md
+          - "Spring Joints": spring-joints.md
+          - "Titanium Bones": titanium-bones.md
+          - "Universal Booster": universal-booster.md
           - Bionic Joints: bionic-joints.md
           - Epimorphic Skeleton: epimorphic-skeleton.md
           - Dense Marrow: dense-marrow.md
           - Para Bellum: para-bellum.md
       - Nervous System:
+          - "Adreno-trigger": adreno-trigger.md
+          - "Atomic Sensors": atomic-sensors.md
+          - "Deep-field Visual Interface": deep-field-visual-interface.md
+          - "Kerenzikov": kerenzikov.md
+          - "Reflex Tuner": reflex-tuner.md
+          - "Revulsor": revulsor.md
+          - "Synaptic Accelerator": synaptic-accelerator.md
+          - "Tyrosine Injector": tyrosine-injector.md
           - NeoFiber: neofiber.md
           - Adrenaline Converter: adrenaline-converter.md
           - Stabber: stabber.md
           - Visual Cortex Support: visual-cortex-support.md
       - Circulatory System:
+          - "Adrenaline Booster": adrenaline-booster.md
+          - "Black Mamba": black-mamba.md
+          - "Clutch Padding": clutch-padding.md
+          - "Electromag Recycler": electromag-recycler.md
+          - "Feedback Circuit": feedback-circuit.md
+          - "Isometric Stabilizer": isometric-stabilizer.md
+          - "Microrotors": microrotors.md
+          - "ThreatEvac": threatevac.md
           - Blood Pump: blood-pump.md
           - Heal-On-Kill: heal-on-kill.md
           - Biomonitor: biomonitor.md
           - Second Heart: second-heart.md
       - Integumentary System:
+          - "Carapace": carapace.md
+          - "Cellular Adapter": cellular-adapter.md
+          - "Chitin": chitin.md
+          - "Cogito Lattice": cogito-lattice.md
+          - "Countershell": countershell.md
+          - "Defenzikov": defenzikov.md
+          - "Nano-plating": nano-plating.md
+          - "Painducer": painducer.md
+          - "Peripheral Inverse": peripheral-inverse.md
+          - "ProxiShield": proxishield.md
+          - "RangeGuard": rangeguard.md
           - Subdermal Armor: subdermal-armor.md
           - Optical Camo: optical-camo.md
           - Shock-n-Awe: shock-n-awe.md
           - Pain Editor: pain-editor.md
       - Legs:
+          - "Leeroy Ligament System": leeroy-ligament-system.md
           - Reinforced Tendons: reinforced-tendons.md
           - Fortified Ankles: fortified-ankles.md
           - Lynx Paws: lynx-paws.md
@@ -111,6 +175,8 @@ nav:
       - Contagion: contagion.md
       - Reboot Optics: reboot-optics.md
       - Cripple Movement: cripple-movement.md
+      - Weapon Glitch: weapon-glitch.md
+      - Cyberware Malfunction: cyberware-malfunction.md
       - Synapse Burnout: synapse-burnout.md
   - Village services:
       - Enhanced mobs and salvage: enhanced-mobs.md

@@ -285,7 +285,7 @@ public final class CombatGameTests {
     h.succeed();
   }
 
-  @GameTest(template = "empty", timeoutTicks = 60)
+  @GameTest(template = "empty", batch = "isolatedLungeTarget", timeoutTicks = 60)
   public static void leapTargetRequiresAimRangeVisibilityAndCancelsOnUnequip(GameTestHelper h) {
     var p = ImplantGameTests.player(h);
     install(p);

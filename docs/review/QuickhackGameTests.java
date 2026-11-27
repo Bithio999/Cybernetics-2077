@@ -97,7 +97,7 @@ public final class QuickhackGameTests {
     var p = ImplantGameTests.player(h);
     var deck = loaded(true, 5, QuickhackKind.values());
     install(p, deck);
-    h.assertTrue(CyberdeckItem.programs(deck).size() == 6, "Mixed loadout lost programs");
+    h.assertTrue(CyberdeckItem.programs(deck).size() == 8, "Mixed loadout lost programs");
     var menu = new CyberdeckMenu(1, p.getInventory(), ContainerLevelAccess.NULL, deck);
     h.assertTrue(
         !menu.getSlot(6)
@@ -106,7 +106,7 @@ public final class QuickhackGameTests {
     var copy =
         ItemStack.parseOptional(
             p.registryAccess(), (net.minecraft.nbt.CompoundTag) deck.save(p.registryAccess()));
-    h.assertTrue(CyberdeckItem.programs(copy).size() == 6, "Serialization erased distinct chips");
+    h.assertTrue(CyberdeckItem.programs(copy).size() == 8, "Serialization erased distinct chips");
     var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), p.registryAccess());
     try {
       ItemStack.STREAM_CODEC.encode(buffer, deck);

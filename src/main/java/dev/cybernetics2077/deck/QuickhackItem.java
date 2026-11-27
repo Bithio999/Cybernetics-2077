@@ -75,6 +75,10 @@ public final class QuickhackItem extends Item {
                   String.format(java.util.Locale.ROOT, "%.0f", damage()),
                   kind.damageType)
               .withStyle(ChatFormatting.GRAY));
+    if (kind.control() && damage() > 0)
+      lines.add(
+          Component.literal("Initial damage: " + (int) damage() + " / " + kind.damageType)
+              .withStyle(ChatFormatting.GRAY));
     if (duration() > 0)
       lines.add(
           Component.translatable("cybernetics2077.hack.duration", duration() / 20)

@@ -61,8 +61,7 @@ public final class CreativeContent {
   private static String family(Item item) {
     if (item instanceof AugmentItem a) return a.augment().id;
     if (item instanceof OpticsItem) return "kiroshi_optics";
-    if (item instanceof CyberdeckItem d)
-      return d.model() == CyberdeckItem.Model.RAVEN ? "raven_microcyber" : "militech_paraline";
+    if (item instanceof CyberdeckItem d) return CyberdeckItem.id(d.model());
     if (item instanceof MantisBladesItem m) return m.variant().id + "_mantis_blades";
     return BuiltInRegistries.ITEM.getKey(item).getPath();
   }

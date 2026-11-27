@@ -41,7 +41,67 @@ public enum Augment {
   SHOCK_ABSORBER("shock_absorber", CyberwareCategory.HANDS, 1, 12),
   IMMOVABLE_FORCE("immovable_force", CyberwareCategory.HANDS, 2, 35),
   MILITECH_APOGEE("militech_apogee_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 44),
-  DAVIDS_SANDEVISTAN("davids_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 60);
+  DAVIDS_SANDEVISTAN("davids_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 60),
+  AXOLOTL("axolotl", CyberwareCategory.FRONTAL_CORTEX, 4, 55),
+  BIOCONDUCTOR("bioconductor", CyberwareCategory.FRONTAL_CORTEX, 3, 20),
+  CAMILLO_RAM_MANAGER("camillo_ram_manager", CyberwareCategory.FRONTAL_CORTEX, 2, 10),
+  COX_2("cox_2_cybersomatic_optimizer", CyberwareCategory.FRONTAL_CORTEX, 5, 50),
+  KERENZIKOV_BOOST("kerenzikov_boost_system", CyberwareCategory.FRONTAL_CORTEX, 3, 8),
+  MECHATRONIC_CORE("mechatronic_core", CyberwareCategory.FRONTAL_CORTEX, 1, 5),
+  NEWTON_MODULE("newton_module", CyberwareCategory.FRONTAL_CORTEX, 2, 14),
+  QUANTUM_TUNER("quantum_tuner", CyberwareCategory.FRONTAL_CORTEX, 5, 45),
+  RAM_REALLOCATOR("ram_reallocator", CyberwareCategory.FRONTAL_CORTEX, 4, 40),
+  ZETATECH_SANDEVISTAN("zetatech_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 2, 14),
+  QIANT_WARP_DANCER("qiant_warp_dancer", CyberwareCategory.OPERATING_SYSTEM, 2, 12),
+  MILITECH_FALCON("militech_falcon_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 4, 39),
+  MOORE_TECH_BERSERK("moore_tech_berserk", CyberwareCategory.OPERATING_SYSTEM, 2, 12),
+  ZETATECH_BERSERK("zetatech_berserk", CyberwareCategory.OPERATING_SYSTEM, 2, 16),
+  MILITECH_BERSERK("militech_berserk", CyberwareCategory.OPERATING_SYSTEM, 4, 35),
+  CHROME_COMPRESSOR("chrome_compressor", CyberwareCategory.OPERATING_SYSTEM, 4, 0),
+  COCKATRICE("kiroshi_cockatrice_optics", CyberwareCategory.FACE, 5, 30),
+  SENTRY("kiroshi_sentry_optics", CyberwareCategory.FACE, 1, 2),
+  ORACLE("kiroshi_oracle_optics", CyberwareCategory.FACE, 4, 10),
+  BEHAVIORAL_FACEPLATE("behavioral_imprint_synced_faceplate", CyberwareCategory.FACE, 5, 6),
+  FEEN_X("feen_x", CyberwareCategory.SKELETON, 3, 16),
+  KINETIC_FRAME("kinetic_frame", CyberwareCategory.SKELETON, 2, 16),
+  RARA_AVIS("rara_avis", CyberwareCategory.SKELETON, 5, 60),
+  RAM_RECOUP("ram_recoup", CyberwareCategory.SKELETON, 1, 14),
+  SCAR_COALESCER("scar_coalescer", CyberwareCategory.SKELETON, 3, 20),
+  SCARAB("scarab", CyberwareCategory.SKELETON, 2, 14),
+  SPRING_JOINTS("spring_joints", CyberwareCategory.SKELETON, 2, 16),
+  TITANIUM_BONES("titanium_bones", CyberwareCategory.SKELETON, 1, 6),
+  UNIVERSAL_BOOSTER("universal_booster", CyberwareCategory.SKELETON, 4, 25),
+  TYGER_IMPRINT("tyger_claws_dermal_imprint", CyberwareCategory.HANDS, 1, 0),
+  JOHNNYS_SPECIAL("johnnys_special", CyberwareCategory.HANDS, 1, 0),
+  TOGETHER_FOREVER("together_forever", CyberwareCategory.HANDS, 1, 0),
+  ADRENO_TRIGGER("adreno_trigger", CyberwareCategory.NERVOUS_SYSTEM, 4, 20),
+  ATOMIC_SENSORS("atomic_sensors", CyberwareCategory.NERVOUS_SYSTEM, 1, 5),
+  DEEP_FIELD("deep_field_visual_interface", CyberwareCategory.NERVOUS_SYSTEM, 4, 40),
+  KERENZIKOV("kerenzikov", CyberwareCategory.NERVOUS_SYSTEM, 2, 12),
+  REFLEX_TUNER("reflex_tuner", CyberwareCategory.NERVOUS_SYSTEM, 2, 8),
+  REVULSOR("revulsor", CyberwareCategory.NERVOUS_SYSTEM, 4, 35),
+  SYNAPTIC_ACCELERATOR("synaptic_accelerator", CyberwareCategory.NERVOUS_SYSTEM, 2, 5),
+  TYROSINE_INJECTOR("tyrosine_injector", CyberwareCategory.NERVOUS_SYSTEM, 1, 8),
+  ADRENALINE_BOOSTER("adrenaline_booster", CyberwareCategory.CIRCULATORY_SYSTEM, 1, 14),
+  BLACK_MAMBA("black_mamba", CyberwareCategory.CIRCULATORY_SYSTEM, 3, 16),
+  CLUTCH_PADDING("clutch_padding", CyberwareCategory.CIRCULATORY_SYSTEM, 2, 12),
+  ELECTROMAG_RECYCLER("electromag_recycler", CyberwareCategory.CIRCULATORY_SYSTEM, 4, 40),
+  FEEDBACK_CIRCUIT("feedback_circuit", CyberwareCategory.CIRCULATORY_SYSTEM, 3, 14),
+  ISOMETRIC_STABILIZER("isometric_stabilizer", CyberwareCategory.CIRCULATORY_SYSTEM, 4, 40),
+  MICROROTORS("microrotors", CyberwareCategory.CIRCULATORY_SYSTEM, 2, 12),
+  THREATEVAC("threatevac", CyberwareCategory.CIRCULATORY_SYSTEM, 2, 5),
+  CARAPACE("carapace", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 16),
+  CELLULAR_ADAPTER("cellular_adapter", CyberwareCategory.INTEGUMENTARY_SYSTEM, 3, 30),
+  CHITIN("chitin", CyberwareCategory.INTEGUMENTARY_SYSTEM, 5, 50),
+  COGITO_LATTICE("cogito_lattice", CyberwareCategory.INTEGUMENTARY_SYSTEM, 3, 12),
+  COUNTERSHELL("countershell", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 12),
+  DEFENZIKOV("defenzikov", CyberwareCategory.INTEGUMENTARY_SYSTEM, 3, 25),
+  NANO_PLATING("nano_plating", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 20),
+  PAINDUCER("painducer", CyberwareCategory.INTEGUMENTARY_SYSTEM, 4, 30),
+  PERIPHERAL_INVERSE("peripheral_inverse", CyberwareCategory.INTEGUMENTARY_SYSTEM, 4, 40),
+  PROXISHIELD("proxishield", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 10),
+  RANGEGUARD("rangeguard", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 14),
+  LEEROY_LIGAMENT("leeroy_ligament_system", CyberwareCategory.LEGS, 4, 8);
 
   public final String id;
   public final CyberwareCategory category;
@@ -64,15 +124,37 @@ public enum Augment {
         || this == OPTICAL_CAMO
         || this == DYNALAR_SANDEVISTAN
         || this == MILITECH_APOGEE
-        || this == DAVIDS_SANDEVISTAN;
+        || this == DAVIDS_SANDEVISTAN
+        || category == CyberwareCategory.OPERATING_SYSTEM && this != CHROME_COMPRESSOR
+        || this == BEHAVIORAL_FACEPLATE;
   }
 
   public boolean iconic() {
-    return this == MILITECH_APOGEE || this == DAVIDS_SANDEVISTAN || this == IMMOVABLE_FORCE;
+    return this == MILITECH_APOGEE
+        || this == DAVIDS_SANDEVISTAN
+        || this == IMMOVABLE_FORCE
+        || this == AXOLOTL
+        || this == COX_2
+        || this == QUANTUM_TUNER
+        || this == RAM_REALLOCATOR
+        || this == MILITECH_FALCON
+        || this == MILITECH_BERSERK
+        || this == CHROME_COMPRESSOR
+        || this == COCKATRICE
+        || this == BEHAVIORAL_FACEPLATE
+        || this == RARA_AVIS
+        || this == ADRENO_TRIGGER
+        || this == DEEP_FIELD
+        || this == REVULSOR
+        || this == ELECTROMAG_RECYCLER
+        || this == ISOMETRIC_STABILIZER
+        || this == CHITIN
+        || this == PERIPHERAL_INVERSE
+        || this == LEEROY_LIGAMENT;
   }
 
   public boolean optics() {
-    return category == CyberwareCategory.FACE;
+    return category == CyberwareCategory.FACE && this != BEHAVIORAL_FACEPLATE;
   }
 
   public int scanRange(int tier) {
@@ -88,7 +170,7 @@ public enum Augment {
       case EPIMORPHIC_SKELETON -> tier * 2 - 2;
       case SUBDERMAL_ARMOR, PAIN_EDITOR -> tier;
       case SHOCK_N_AWE -> (tier + 1) / 2;
-      default -> 0;
+      default -> ExpansionImplants.armor(this, tier);
     };
   }
 
@@ -98,7 +180,7 @@ public enum Augment {
           case BIONIC_JOINTS, PARA_BELLUM -> .3;
           case EPIMORPHIC_SKELETON, PAIN_EDITOR -> .4;
           case SUBDERMAL_ARMOR, SHOCK_N_AWE -> .2;
-          default -> 0;
+          default -> ExpansionImplants.armor(this, tier) > 0 ? .2 : 0;
         };
   }
 
@@ -266,6 +348,7 @@ public enum Augment {
               "Base crit damage: 1.5x.");
       case VISUAL_CORTEX_SUPPORT ->
           List.of("Up to +" + (t * 6) + "% weapon crit chance at 32 blocks.");
+      default -> ExpansionImplants.details(this, t);
     };
   }
 }

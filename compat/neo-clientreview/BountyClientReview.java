@@ -190,7 +190,7 @@ public final class BountyClientReview {
           "Claim did not clear active job");
       check(
           ((FixerMenu) mc.player.containerMenu).board().getCompound("report").getInt("payout")
-              == 2240,
+              == 2560,
           "Client debrief payout incorrect");
       shot(out, "bounty-debrief");
       server(
@@ -238,7 +238,10 @@ public final class BountyClientReview {
                 target instanceof dev.cybernetics2077.mob.Cyberpsycho,
                 "Sighting did not deploy dedicated entity");
             var psycho = (dev.cybernetics2077.mob.Cyberpsycho) target;
-            check(psycho.capacity() == 215 && psycho.rank() == 3, "Incorrect real capacity/rank");
+            check(
+                dev.cybernetics2077.mob.CyberpsychoRules.rank(psycho.capacity()) == 3
+                    && psycho.rank() == 3,
+                "Incorrect real capacity/rank");
             psycho.moveTo(12, 90, 6, 180, 0);
             psycho.setYBodyRot(180);
             psycho.setYHeadRot(180);
@@ -259,7 +262,8 @@ public final class BountyClientReview {
             var scan = dev.cybernetics2077.scanner.ScannerNetwork.inspect(p, targetId);
             check(
                 scan.getInt("id") == targetId
-                    && scan.getInt("capacity") == 215
+                    && scan.getInt("capacity") > 200
+                    && scan.getInt("capacity") <= 225
                     && scan.getInt("baseCapacity") == 150,
                 "Native aimed scanner did not report installed capacity");
           });
@@ -338,7 +342,7 @@ public final class BountyClientReview {
           out.resolve("passed.txt"),
           "PASS: daily bounty board, native accept/dossier, real target/guards deployment,"
               + " pre-combat optical scan and navigation, actual player kill, native claim, S-rated"
-              + " 2240 payment and +3 SC, preserved introductory delivery; native cyberpsycho"
+              + " 2560 payment and +3 SC, preserved introductory delivery; native cyberpsycho"
               + " containment/claim and recovery courier/cache/shard-use/claim.\n");
       mc.stop();
     }

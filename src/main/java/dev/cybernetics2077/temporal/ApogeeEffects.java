@@ -70,9 +70,10 @@ public final class ApogeeEffects {
         Math.min(
             now + model.duration(Sandevistan.tier(p)) * 20L,
             state.sandyEnd + model.killExtensionTicks());
-    if (model == SandevistanModel.DAVID && now >= state.sandyHealReady) {
+    if ((model == SandevistanModel.DAVID || model == SandevistanModel.FALCON)
+        && now >= state.sandyHealReady) {
       state.sandyHealReady = now + 20;
-      p.heal(p.getMaxHealth() * .10f);
+      p.heal(p.getMaxHealth() * (model == SandevistanModel.FALCON ? .12f : .10f));
     }
     // Minecraft has no stamina bar. Recover 22% of one exhaustion cycle, never food points.
     p.getFoodData().setExhaustion(Math.max(0, p.getFoodData().getExhaustionLevel() - .88f));

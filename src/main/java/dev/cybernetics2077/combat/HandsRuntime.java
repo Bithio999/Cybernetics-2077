@@ -29,6 +29,11 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
  */
 @EventBusSubscriber(modid = Cybernetics2077.ID)
 public final class HandsRuntime {
+  public static int smartTier(net.minecraft.world.entity.LivingEntity e) {
+    return Math.max(
+        AugmentRuntime.tier(e, SMART_LINK), AugmentRuntime.tier(e, TYGER_IMPRINT) > 0 ? 1 : 0);
+  }
+
   public static final String DATA = "cybernetics2077_hands";
   public static final ResourceKey<DamageType> DISCHARGE =
       ResourceKey.create(Registries.DAMAGE_TYPE, Cybernetics2077.id("hand_discharge"));
@@ -47,10 +52,10 @@ public final class HandsRuntime {
   }
 
   public static void lock(ServerPlayer p, LivingEntity target) {
-    int tier = AugmentRuntime.tier(p, SMART_LINK);
+    int tier = smartTier(p);
     if (tier == 0
         || !ScannerNetwork.installed(p)
-        || !CyberwareRuntime.canAttack(p, target)
+        || !NeuralActors.canAttack(p, target)
         || !p.hasLineOfSight(target)
         || p.distanceToSqr(target) > Math.pow(24 + 4 * tier, 2)) return;
     var s = AugmentRuntime.state(p);
@@ -60,14 +65,14 @@ public final class HandsRuntime {
 
   public static LivingEntity locked(ServerPlayer p) {
     var s = AugmentRuntime.state(p);
-    int tier = AugmentRuntime.tier(p, SMART_LINK);
+    int tier = smartTier(p);
     if (tier == 0
         || !ScannerNetwork.installed(p)
         || s.smartTarget == null
         || AugmentRuntime.now(p) > s.smartUntil) return null;
     var target = p.serverLevel().getEntity(s.smartTarget);
     return target instanceof LivingEntity living
-            && CyberwareRuntime.canAttack(p, living)
+            && NeuralActors.canAttack(p, living)
             && !living.isInvisibleTo(p)
             && p.distanceToSqr(living) <= Math.pow(24 + 4 * tier, 2)
         ? living
@@ -92,7 +97,7 @@ public final class HandsRuntime {
   public static void snapshot(ServerPlayer p, CompoundTag t) {
     var target = locked(p);
     var s = AugmentRuntime.state(p);
-    t.putInt("smartTier", AugmentRuntime.tier(p, SMART_LINK));
+    t.putInt("smartTier", smartTier(p));
     t.putInt("ballisticTier", AugmentRuntime.tier(p, BALLISTIC_COPROCESSOR));
     t.putInt("shockTier", AugmentRuntime.tier(p, SHOCK_ABSORBER));
     t.putInt("immovableTier", AugmentRuntime.tier(p, IMMOVABLE_FORCE));
@@ -113,14 +118,17 @@ public final class HandsRuntime {
         == HitResult.Type.MISS;
   }
 
-  public static void launch(AbstractArrow arrow, ServerPlayer p) {
+  public static void launch(AbstractArrow arrow, LivingEntity p) {
     var data = arrow.getPersistentData();
     if (data.contains(DATA)) return;
     var t = new CompoundTag();
     data.put(DATA, t); // Mark once, including shots with no implants.
     if (!p.isAlive() || p.isSpectator()) return;
-    var target = locked(p);
-    int smart = AugmentRuntime.tier(p, SMART_LINK);
+    var target =
+        p instanceof ServerPlayer player
+            ? locked(player)
+            : p instanceof Mob m ? dev.cybernetics2077.mob.MobImplants.smartTarget(m) : null;
+    int smart = smartTier(p);
     if (target != null && p.hasLineOfSight(target)) {
       t.putUUID("target", target.getUUID());
       t.putInt("smart", smart);
@@ -133,14 +141,14 @@ public final class HandsRuntime {
     t.putBoolean(
         "modified",
         smart > 0 || t.getInt("bounce") > 0 || t.getInt("flat") > 0 || t.getInt("micro") > 0);
-    if (arrow instanceof ThrownTrident) primeWrap(p);
+    if (arrow instanceof ThrownTrident && p instanceof ServerPlayer player) primeWrap(player);
   }
 
   @SubscribeEvent
   public static void joined(EntityJoinLevelEvent e) {
     if (!e.getLevel().isClientSide
         && e.getEntity() instanceof AbstractArrow a
-        && a.getOwner() instanceof ServerPlayer p) launch(a, p);
+        && a.getOwner() instanceof LivingEntity p) launch(a, p);
   }
 
   @SubscribeEvent
@@ -154,7 +162,7 @@ public final class HandsRuntime {
       t.remove("pendingBounce");
       arrow.hasImpulse = true;
     }
-    if (!(arrow.getOwner() instanceof ServerPlayer p) || p.level() != level) return;
+    if (!(arrow.getOwner() instanceof LivingEntity p) || p.level() != level) return;
     if (!arrow.getPersistentData().contains(DATA)) {
       if (arrow.tickCount > 2) return;
       launch(arrow, p);
@@ -171,15 +179,27 @@ public final class HandsRuntime {
     if (t.contains("target") && arrow.tickCount < 40) {
       var candidate = level.getEntity(t.getUUID("target"));
       if (candidate instanceof LivingEntity target
-          && CyberwareRuntime.canAttack(p, target)
-          && !target.isInvisibleTo(p)
+          && NeuralActors.canAttack(p, target)
+          && !(p instanceof net.minecraft.world.entity.player.Player viewer
+              && target.isInvisibleTo(viewer))
           && arrow.distanceToSqr(target) <= 4096
           && clear(level, arrow.position(), target.getBoundingBox().getCenter(), arrow)) {
         var v = arrow.getDeltaMovement();
         var d = target.getBoundingBox().getCenter().subtract(arrow.position());
+        var movement = target.position().subtract(new Vec3(target.xo, target.yo, target.zo));
         var turn =
-            HandsRules.turn(
-                v.x, v.y, v.z, d.x, d.y, d.z, .035 + .012 * Math.clamp(t.getInt("smart"), 1, 5));
+            HandsRules.guide(
+                v.x,
+                v.y,
+                v.z,
+                d.x,
+                d.y,
+                d.z,
+                movement.x,
+                movement.y,
+                movement.z,
+                t.getInt("smart"),
+                1);
         arrow.setDeltaMovement(turn.x(), turn.y(), turn.z());
         arrow.hasImpulse = true;
         if (arrow.tickCount % 4 == 0)
@@ -205,14 +225,13 @@ public final class HandsRuntime {
   public static void impact(ProjectileImpactEvent e) {
     if (!(e.getProjectile() instanceof AbstractArrow arrow)
         || !(arrow.level() instanceof ServerLevel level)
-        || !(arrow.getOwner() instanceof ServerPlayer p)) return;
+        || !(arrow.getOwner() instanceof LivingEntity p)) return;
     var t = arrow.getPersistentData().getCompound(DATA);
     if (!t.getBoolean("modified")) return;
     if (e.getRayTraceResult() instanceof EntityHitResult hit) {
       t.putBoolean("landed", true);
       t.remove("target");
-      if (hit.getEntity() instanceof LivingEntity target
-          && !CyberwareRuntime.canAttack(p, target)) {
+      if (hit.getEntity() instanceof LivingEntity target && !NeuralActors.canAttack(p, target)) {
         e.setCanceled(true);
         arrow.setDeltaMovement(arrow.getDeltaMovement().scale(-.1));
       }
@@ -322,7 +341,7 @@ public final class HandsRuntime {
                 LivingEntity.class,
                 main.getBoundingBox().inflate(3),
                 target ->
-                    CyberwareRuntime.canAttack(p, target)
+                    NeuralActors.canAttack(p, target)
                         && target.distanceToSqr(point) <= 9
                         && (target == main || AugmentRuntime.hostile(p, target))
                         && clear(p.serverLevel(), point, target.getBoundingBox().getCenter(), p));

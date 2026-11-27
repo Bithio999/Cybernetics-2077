@@ -74,7 +74,12 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
 
               @Override
               public boolean mayPickup(Player player) {
-                return installationActive();
+                return installationActive()
+                    && capacityAfter(index, ItemStack.EMPTY)
+                        >= capacityUsed()
+                            - (getItem().getItem() instanceof CyberwareItem item
+                                ? item.capacityCost()
+                                : 0);
               }
 
               @Override
@@ -136,12 +141,29 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
     return StatWords.combine(capacity.get(0), capacity.get(1));
   }
 
+  private int capacityAfter(int index, ItemStack stack) {
+    int limit = capacityLimit();
+    if (index == CyberwareCategory.OPERATING_SYSTEM.firstSlot()) {
+      var old = implants.getStackInSlot(index);
+      int before =
+          old.getItem() instanceof AugmentItem a && a.augment() == Augment.CHROME_COMPRESSOR
+              ? (a.tier().level == 4 ? 40 : 70)
+              : 0;
+      int after =
+          stack.getItem() instanceof AugmentItem a && a.augment() == Augment.CHROME_COMPRESSOR
+              ? (a.tier().level == 4 ? 40 : 70)
+              : 0;
+      limit = limit - before + after;
+    }
+    return limit;
+  }
+
   public boolean fits(int index, ItemStack stack) {
     if (!implants.isItemValid(index, stack) || stack.isEmpty()) return false;
     int previous =
         implants.getStackInSlot(index).getItem() instanceof CyberwareItem i ? i.capacityCost() : 0;
     return (long) capacityUsed() - previous + ((CyberwareItem) stack.getItem()).capacityCost()
-        <= capacityLimit();
+        <= capacityAfter(index, stack);
   }
 
   public boolean hasDeck() {
@@ -174,7 +196,7 @@ public class CyberneticsBenchMenu extends AbstractContainerMenu {
   public ItemStack quickMoveStack(Player player, int index) {
     if (index < 0 || index >= slots.size()) return ItemStack.EMPTY;
     var slot = slots.get(index);
-    if (!slot.hasItem()) return ItemStack.EMPTY;
+    if (!slot.hasItem() || !slot.mayPickup(player)) return ItemStack.EMPTY;
     var stack = slot.getItem();
     var original = stack.copy();
     if (index < 21) {

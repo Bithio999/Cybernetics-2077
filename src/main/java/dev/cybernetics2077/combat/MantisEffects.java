@@ -6,7 +6,6 @@ import java.util.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.*;
 import net.minecraft.world.effect.*;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,16 +16,16 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 @EventBusSubscriber(modid = Cybernetics2077.ID)
 public final class MantisEffects {
   private record Bleed(
-      java.lang.ref.WeakReference<ServerPlayer> owner, float damage, long end, long next) {}
+      java.lang.ref.WeakReference<LivingEntity> owner, float damage, long end, long next) {}
 
   private static final Map<LivingEntity, Bleed> BLEEDS = new WeakHashMap<>();
   public static final ResourceKey<DamageType> BLEED =
       ResourceKey.create(Registries.DAMAGE_TYPE, Cybernetics2077.id("mantis_bleed"));
 
   public static void hit(
-      ServerPlayer p, LivingEntity target, MantisVariant variant, int tier, boolean lunge) {
+      LivingEntity p, LivingEntity target, MantisVariant variant, int tier, boolean lunge) {
     var point = target.getBoundingBox().getCenter();
-    p.serverLevel()
+    ((net.minecraft.server.level.ServerLevel) p.level())
         .sendParticles(
             switch (variant) {
               case PHYSICAL -> ParticleTypes.DAMAGE_INDICATOR;
@@ -71,7 +70,7 @@ public final class MantisEffects {
     if (owner == null
         || owner.level() != target.level()
         || now > bleed.end
-        || !CyberwareRuntime.canAttack(owner, target)) {
+        || !NeuralActors.canAttack(owner, target)) {
       BLEEDS.remove(target);
       return;
     }

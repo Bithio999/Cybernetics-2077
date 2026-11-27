@@ -396,9 +396,10 @@ public final class CyberwareScreen extends AbstractContainerScreen<CyberwareMenu
                 deck.ramPerSecond(),
                 Math.round(deck.damageBonus() * 100)),
             434,
-            deck.relayTargets() > 0 ? 573 : 584,
+            deck.relayTargets() > 0 || !deck.specialty().isEmpty() ? 565 : 584,
             14,
             WHITE);
+        if (!deck.specialty().isEmpty()) c.body(deck.specialty(), 434, 573, 12, CYAN);
         if (deck.relayTargets() > 0)
           c.body(
               "Relays to "

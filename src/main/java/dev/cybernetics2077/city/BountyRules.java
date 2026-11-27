@@ -59,7 +59,7 @@ public final class BountyRules {
   }
 
   public static int pay(int rank, Kind kind) {
-    return pay(rank) * (kind == Kind.CYBERPSYCHO ? 125 : kind == Kind.RECOVERY ? 110 : 100) / 100;
+    return pay(rank) * (kind == Kind.CYBERPSYCHO ? 300 : kind == Kind.RECOVERY ? 110 : 100) / 100;
   }
 
   public static int implants(int rank, Kind kind) {
@@ -124,16 +124,16 @@ public final class BountyRules {
     return List.copyOf(result);
   }
 
-  public static int optionalCount(boolean specialty, boolean civilians, boolean survival) {
-    return (specialty ? 1 : 0) + (civilians ? 1 : 0) + (survival ? 1 : 0);
+  public static int optionalCount(boolean specialty, boolean untouched, boolean survival) {
+    return (specialty ? 1 : 0) + (untouched ? 1 : 0) + (survival ? 1 : 0);
   }
 
   public static String rating(int count) {
     return count >= 3 ? "S" : count == 2 ? "A" : count == 1 ? "B" : "C";
   }
 
-  public static int bonusPercent(boolean specialty, boolean civilians, boolean survival) {
-    return (specialty ? 20 : 0) + (civilians ? 10 : 0) + (survival ? 10 : 0);
+  public static int bonusPercent(boolean specialty, boolean untouched, boolean survival) {
+    return (specialty ? 20 : 0) + (untouched ? 30 : 0) + (survival ? 10 : 0);
   }
 
   private static void check(int rank) {

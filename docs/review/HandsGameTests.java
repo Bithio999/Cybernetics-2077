@@ -43,7 +43,7 @@ public final class HandsGameTests {
         "Old saved stock indexes moved");
     int count = 0;
     for (var a : Augment.values()) if (a.category == CyberwareCategory.HANDS) count++;
-    h.assertTrue(count == 6, "Missing hands families");
+    h.assertTrue(count == 9, "Missing hands families");
     var p = AugmentGameTests.player(h);
     var inv = p.getData(Cybernetics2077.CYBERWARE);
     for (var variant : MantisVariant.values())

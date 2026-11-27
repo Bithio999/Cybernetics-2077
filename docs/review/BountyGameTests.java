@@ -139,12 +139,12 @@ public final class BountyGameTests {
     h.assertTrue(BountyContracts.claim(p, f) == 0, "Claim failed");
     var account = p.getData(CityContent.ACCOUNT);
     h.assertTrue(
-        account.eddies() == 840
+        account.eddies() == 960
             && account.streetCred() == 2
             && account.bountyReport().getString("rating").equals("S"),
         "Optional payment/rating incorrect");
     h.assertTrue(
-        BountyContracts.claim(p, f) == 20 && account.eddies() == 840, "Duplicate claim paid twice");
+        BountyContracts.claim(p, f) == 20 && account.eddies() == 960, "Duplicate claim paid twice");
     h.succeed();
   }
 
@@ -188,7 +188,7 @@ public final class BountyGameTests {
         "Pet kill did not credit its owner");
     h.assertTrue(
         !p.getData(CityContent.ACCOUNT).bountyReport().getBoolean("specialty")
-            && p.getData(CityContent.ACCOUNT).eddies() == 720,
+            && p.getData(CityContent.ACCOUNT).eddies() == 840,
         "Pet kill bypassed elapsed-time optional objective");
     h.succeed();
   }
@@ -243,7 +243,7 @@ public final class BountyGameTests {
     job.putLong("engagement", p.server.overworld().getGameTime() - 2000);
     BountyLedger.get(p.server).put(p.getUUID(), job);
     h.assertTrue(
-        job.getInt("stage") == 1 && !job.getBoolean("survival") && !job.getBoolean("civilians"),
+        job.getInt("stage") == 1 && !job.getBoolean("survival") && !job.getBoolean("untouched"),
         "Optional failures abandoned the main objective");
     kill(h, p, mark);
     h.assertTrue(BountyContracts.claim(p, f) == 0, "Base claim rejected");
@@ -406,7 +406,7 @@ public final class BountyGameTests {
             && clone.isInvulnerableTo(h.getLevel().damageSources().playerAttack(p)),
         "Contained state did not survive reload");
     h.assertTrue(
-        BountyContracts.claim(p, f) == 0 && p.getData(CityContent.ACCOUNT).eddies() == 900,
+        BountyContracts.claim(p, f) == 0 && p.getData(CityContent.ACCOUNT).eddies() == 2520,
         "Containment reward incorrect");
     h.assertTrue(
         BountyContracts.claim(p, f) == 20 && target.isRemoved(),
@@ -487,7 +487,7 @@ public final class BountyGameTests {
         "Native shard use did not secure cache");
     p.setPos(f.position().add(1, 0, 0));
     h.assertTrue(
-        BountyContracts.claim(p, f) == 0 && p.getData(CityContent.ACCOUNT).eddies() == 924,
+        BountyContracts.claim(p, f) == 0 && p.getData(CityContent.ACCOUNT).eddies() == 1056,
         "Recovery payout incorrect");
     h.assertTrue(
         BountyContracts.claim(p, f) == 20 && !BountyContracts.recover(p), "Recovery paid twice");
@@ -544,6 +544,36 @@ public final class BountyGameTests {
         h.assertTrue(
             BountyCombat.loadout(tier, count).size() == count, "Combat loadout incomplete");
     BountyContracts.abandon(p, f);
+    h.succeed();
+  }
+
+  @GameTest(batch = "noDamageBonus", template = "empty", timeoutTicks = 60)
+  public static void noDamageOptionalOnlyFailsOnActualHpLossAndStopsAtCompletion(GameTestHelper h) {
+    var p = AugmentGameTests.player(h);
+    var f = fixer(h, p, 0);
+    accept(h, p, f);
+    p.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_ABSORPTION)
+        .setBaseValue(10);
+    p.setAbsorptionAmount(10);
+    p.hurt(h.getLevel().damageSources().generic(), 5);
+    h.assertTrue(
+        BountyContracts.job(p).getBoolean("untouched"),
+        "Fully absorbed hit lost HP-only objective");
+    p.setAbsorptionAmount(0);
+    p.invulnerableTime = 0;
+    p.hurt(h.getLevel().damageSources().generic(), 1);
+    h.assertTrue(
+        !BountyContracts.job(p).getBoolean("untouched"), "Actual HP damage kept the bonus");
+    var job = BountyContracts.job(p);
+    job.putInt("stage", 2);
+    job.putBoolean("untouched", true);
+    BountyLedger.get(p.server).put(p.getUUID(), job);
+    p.invulnerableTime = 0;
+    p.hurt(h.getLevel().damageSources().generic(), 1);
+    h.assertTrue(
+        BountyContracts.job(p).getBoolean("untouched"), "Damage after completion rewrote result");
+    clear(p);
+    f.discard();
     h.succeed();
   }
 }

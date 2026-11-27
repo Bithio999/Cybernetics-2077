@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.cybernetics2077.Cybernetics2077;
 import dev.cybernetics2077.mob.Cyberpsycho;
 import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
@@ -14,14 +13,22 @@ import net.minecraft.resources.ResourceLocation;
 /** Minecraft humanoid skins with the mod's existing armored panels and illuminated implants. */
 public final class CyberpsychoRenderer
     extends HumanoidMobRenderer<Cyberpsycho, PlayerModel<Cyberpsycho>> {
-  private static final ResourceLocation[] SKINS = {
-    ResourceLocation.withDefaultNamespace("textures/entity/player/wide/kai.png"),
-    ResourceLocation.withDefaultNamespace("textures/entity/player/wide/makena.png"),
-    ResourceLocation.withDefaultNamespace("textures/entity/player/wide/zuri.png")
-  };
+  private static final ResourceLocation SKIN =
+      Cybernetics2077.id("textures/entity/cyberpsycho.png");
+  private final CyberpsychoModel[] bodies;
 
   public CyberpsychoRenderer(EntityRendererProvider.Context context) {
-    super(context, new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER), false), .45f);
+    super(context, new CyberpsychoModel(context.bakeLayer(CyberpsychoModel.LAYERS[0])), .5f);
+    bodies =
+        new CyberpsychoModel[] {
+          (CyberpsychoModel) model,
+          new CyberpsychoModel(context.bakeLayer(CyberpsychoModel.LAYERS[1])),
+          new CyberpsychoModel(context.bakeLayer(CyberpsychoModel.LAYERS[2]))
+        };
+    addLayer(
+        new net.minecraft.client.renderer.entity.layers.ItemInHandLayer<>(
+            this, context.getItemInHandRenderer()));
+    addLayer(new dev.cybernetics2077.client.mantis.MobMantisLayer<>(this));
     addLayer(
         new RenderLayer<>(this) {
           @Override
@@ -60,7 +67,19 @@ public final class CyberpsychoRenderer
   }
 
   @Override
+  public void render(
+      Cyberpsycho mob,
+      float yaw,
+      float partial,
+      PoseStack pose,
+      MultiBufferSource buffers,
+      int light) {
+    model = bodies[mob.role().ordinal()];
+    super.render(mob, yaw, partial, pose, buffers, light);
+  }
+
+  @Override
   public ResourceLocation getTextureLocation(Cyberpsycho mob) {
-    return SKINS[Math.floorMod(mob.getUUID().hashCode(), SKINS.length)];
+    return SKIN;
   }
 }

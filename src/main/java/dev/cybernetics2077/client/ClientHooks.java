@@ -67,6 +67,7 @@ public final class ClientHooks {
   public static final class Setup {
     @SubscribeEvent
     public static void screens(RegisterMenuScreensEvent e) {
+      e.register(Cybernetics2077.RESERVE_MENU.get(), CarryReserveScreen::new);
       e.<dev.cybernetics2077.cyberware.CyberwareMenu, CyberwareScreen>register(
           Cybernetics2077.MENU.get(), CyberwareScreen::new);
       e.<dev.cybernetics2077.bench.CyberneticsBenchMenu, CyberneticsBenchScreen>register(
@@ -78,11 +79,20 @@ public final class ClientHooks {
 
     @SubscribeEvent
     public static void renderers(EntityRenderersEvent.RegisterRenderers e) {
-      e.registerEntityRenderer(dev.cybernetics2077.city.CityContent.CYBERPSYCHO.get(), CyberpsychoRenderer::new);
+      e.registerEntityRenderer(
+          dev.cybernetics2077.city.CityContent.CYBERPSYCHO.get(), CyberpsychoRenderer::new);
       e.registerEntityRenderer(
           dev.cybernetics2077.city.CityContent.RIPPERDOC.get(), CityResidentRenderer::new);
       e.registerEntityRenderer(
           dev.cybernetics2077.city.CityContent.FIXER.get(), CityResidentRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void modelLayers(EntityRenderersEvent.RegisterLayerDefinitions e) {
+      for (int i = 0; i < 3; i++) {
+        final int role = i;
+        e.registerLayerDefinition(CyberpsychoModel.LAYERS[i], () -> CyberpsychoModel.create(role));
+      }
     }
 
     @SubscribeEvent

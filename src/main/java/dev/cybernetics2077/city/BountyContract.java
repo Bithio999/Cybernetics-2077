@@ -42,7 +42,7 @@ public final class BountyContract extends Item {
         Component.literal("Optional: " + BountyRules.specialty(t.getInt("profile")))
             .withStyle(ChatFormatting.GRAY));
     lines.add(
-        Component.literal("Optional: no civilian kills; survive the hunt.")
+        Component.literal("Optional: take no damage (+30%); survive the hunt.")
             .withStyle(ChatFormatting.GRAY));
     lines.add(
         Component.literal(

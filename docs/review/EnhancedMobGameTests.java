@@ -273,6 +273,7 @@ public final class EnhancedMobGameTests {
   public static void bloodPumpAndAdrenalineWorkInActualEntityTicks(GameTestHelper h) {
     var m = mob(h, 1);
     EnhancedMobs.install(m, six());
+    m.setNoAi(false);
     m.setHealth(m.getMaxHealth() * .2f);
     float before = m.getHealth();
     double speed = m.getAttributeValue(Attributes.MOVEMENT_SPEED);
@@ -291,7 +292,7 @@ public final class EnhancedMobGameTests {
           float low = restored.getMaxHealth() * .2f;
           restored.setHealth(low);
           restored.tickCount = Math.floorMod(-restored.getId(), 20);
-          EnhancedMobs.tick(new net.neoforged.neoforge.event.tick.EntityTickEvent.Post(restored));
+          MobImplants.tick(restored);
           h.assertTrue(
               restored.getHealth() < low + restored.getMaxHealth() * .1f,
               "Reload reset Blood Pump cooldown");

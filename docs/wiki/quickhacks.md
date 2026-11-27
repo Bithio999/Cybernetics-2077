@@ -11,6 +11,8 @@ Programs are chips loaded into an installed [cyberdeck](cyberdecks.md). You also
 | [Contagion](contagion.md) | 2–5 | Chemical | Spreading infection |
 | [Reboot Optics](reboot-optics.md) | 1–5 | None | Blindness and target disruption |
 | [Cripple Movement](cripple-movement.md) | 2–5 | None | Movement control |
+| [Weapon Glitch](weapon-glitch.md) | 2–5 | None | Jams ranged weapons, including TaCZ |
+| [Cyberware Malfunction](cyberware-malfunction.md) | 2–5 | Electrical at T3+ | Disables cyberware |
 | [Synapse Burnout](synapse-burnout.md) | 3–5 | Physical | Heavy burst scaling with spent RAM |
 
 ## Upload and queue
@@ -33,7 +35,7 @@ The scanner displays the selected program's actual cost, damage, duration and up
 | --- | --- |
 | Short Circuit | Deck base time |
 | Overheat / Contagion | Deck base + 6 ticks |
-| Reboot Optics / Cripple Movement | Half base, minimum 6 ticks |
+| Reboot Optics / Cripple Movement / Weapon Glitch / Cyberware Malfunction | Half base, minimum 6 ticks |
 | Synapse Burnout | Deck base + 12 ticks |
 
 Ex-Disk then reduces the time; no upload can be shorter than 6 ticks. Twenty ticks equal one second at normal game speed.

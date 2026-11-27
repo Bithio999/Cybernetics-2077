@@ -46,7 +46,8 @@ public final class SandevistanTrails {
     while (history.size() > count) discard(history.removeFirst());
   }
 
-  private static TrailStyle.PoseTint captureTint(AbstractClientPlayer player, double now) {
+  private static TrailStyle.PoseTint captureTint(
+      net.minecraft.world.entity.LivingEntity player, double now) {
     double origin = COLOR_ORIGINS.computeIfAbsent(player.getUUID(), id -> now);
     return TrailStyle.capture(now, now - origin);
   }
@@ -71,11 +72,15 @@ public final class SandevistanTrails {
         .keySet()
         .removeIf(
             id -> {
-              var player = m.level.getPlayerByUUID(id);
+              var player =
+                  Sandevistan.actors(m.level).stream()
+                      .filter(p -> p.getUUID().equals(id))
+                      .findFirst()
+                      .orElse(null);
               return player == null || !Sandevistan.active(player);
             });
     var candidates =
-        m.level.players().stream()
+        Sandevistan.actors(m.level).stream()
             .filter(
                 p ->
                     Sandevistan.active(p)
@@ -147,7 +152,11 @@ public final class SandevistanTrails {
         LAST_YAW.remove(entry.getKey());
         continue;
       }
-      var owner = m.level.getPlayerByUUID(entry.getKey());
+      var owner =
+          Sandevistan.actors(m.level).stream()
+              .filter(p -> p.getUUID().equals(entry.getKey()))
+              .findFirst()
+              .orElse(null);
       if (lastActors >= 6 || lastEchoes >= TrailStyle.WORLD_DRAW_LIMIT) continue;
       lastActors++;
       int budget =

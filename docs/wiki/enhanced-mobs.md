@@ -14,19 +14,26 @@ Every variant has **Subdermal Armor**. Additional implants draw from the **full 
 
 A family can only roll at tiers where it exists. Loadouts respect body-system sockets and do not repeat an implant family. Every equipped implant contributes to chassis strength, average tier and loot quality, including optics, decks and arms.
 
-These implants also retain their existing mob-specific effects:
+Installed cyberware is functional, with server-controlled activations:
 
-| Implant | Effect on the mob |
+| Equipment | Mob behavior |
 | --- | --- |
-| Bionic Joints | More armor |
-| Adrenaline Converter | Periodic speed burst during combat |
-| Blood Pump | Automatic healing below half health, followed by regeneration; has a cooldown |
-| NeoFiber | Chance to reduce an incoming hit |
-| Epimorphic Skeleton | More armor and maximum health |
+| Cyberdeck | Installed, tier-appropriate quickhacks; RAM, sequential uploads, range and clear sight |
+| Sandevistan | Activates in combat, uses its battery/recharge, creates a relative-time bubble and afterimages |
+| Berserk | Model-specific melee speed, defenses and recovery; activates in combat |
+| Blood Pump / Biomonitor | Two healing charges; automatic use below 35% HP, or 50% with Biomonitor |
+| Second Heart / Self-ICE | Fatal-hit recovery / quickhack defense, each with a real recharge |
+| Mantis Blades | Visible blade meshes, melee attacks, leaps and the installed elemental effect |
+| Legs and camouflage | Additional jumps, charged leaps and combat camouflage |
+| Other implants | Shared armor, toughness, conditional defenses, crits, damage and recovery bonuses |
 
-The reinforced chassis also adds **15% maximum health and 8% attack damage per total implant tier**. Ranged weapon attacks receive the same damage bonus. Existing AI and normal equipment remain in use. Player-only scanner interfaces, quickhack queues and manually activated cyberware are not automatically operated by mob AI. Loadouts and implant cooldowns persist through saves and ordinary mob conversions. Normal hostile despawning still applies.
+Enemy uploads notify their player target. Break line of sight or move beyond 32 blocks before completion to evade them. Teams and protected players remain respected. Cyberware Malfunction temporarily disables installed systems.
+
+The reinforced chassis adds **15% maximum health and 8% attack damage per total implant tier**. Ranged attacks receive the same chassis bonus. Original mob AI and equipment remain, augmented by supported cyberware actions. Cosmetic tattoos have no combat benefit; scanner UI controls remain player interfaces. Loadouts, installed chips, RAM and cooldowns persist through saves and ordinary mob conversions. Normal hostile despawning still applies.
 
 Low-tier loadouts are common among variants. The initial loadout-tier roll is **62% Tier 1, 25% Tier 2, 10% Tier 3, 2.7% Tier 4 and 0.3% Tier 5**. Individual additional implants can be one tier lower, so their displayed average may differ.
+
+![Enemy Sandevistan and captured afterimages](../images/blitz-time-bubble-028.png)
 
 ## Damaged cybernetic parts
 

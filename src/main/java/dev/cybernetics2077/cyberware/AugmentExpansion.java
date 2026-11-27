@@ -44,23 +44,20 @@ public final class AugmentExpansion {
     return AugmentRuntime.tier(player, RAM_UPGRADE) * .06f;
   }
 
-  public static boolean blockHack(ServerPlayer attacker, LivingEntity target) {
-    if (target instanceof dev.cybernetics2077.mob.Cyberpsycho psycho) {
-      if (!psycho.blockHack()) return false;
-      attacker.displayClientMessage(Component.translatable("cybernetics2077.self_ice.rejected"), true);
-      return true;
-    }
-    if (!(target instanceof ServerPlayer defender) || attacker == defender) return false;
+  public static boolean blockHack(LivingEntity attacker, LivingEntity defender) {
+    if (attacker == defender) return false;
     int t = AugmentRuntime.tier(defender, SELF_ICE);
     var state = AugmentRuntime.state(defender);
-    long now = AugmentRuntime.now(defender);
+    long now = defender.level().getGameTime();
     if (t == 0 || now < state.iceReady) return false;
-    state.iceReady = now + (50 - 6 * t) * 20L;
-    defender.displayClientMessage(Component.translatable("cybernetics2077.self_ice.blocked"), true);
-    attacker.displayClientMessage(
-        Component.translatable("cybernetics2077.self_ice.rejected"), true);
-    defender
-        .serverLevel()
+    state.iceReady =
+        ExpansionRuntime.finished(
+            defender, ExpansionRuntime.cooldown(defender, now + (50 - 6 * t) * 20L));
+    if (defender instanceof ServerPlayer p)
+      p.displayClientMessage(Component.translatable("cybernetics2077.self_ice.blocked"), true);
+    if (attacker instanceof ServerPlayer p)
+      p.displayClientMessage(Component.translatable("cybernetics2077.self_ice.rejected"), true);
+    ((net.minecraft.server.level.ServerLevel) defender.level())
         .sendParticles(
             ParticleTypes.ELECTRIC_SPARK,
             defender.getX(),
@@ -71,7 +68,6 @@ public final class AugmentExpansion {
             .3,
             .3,
             .02);
-    CyberwareRuntime.syncIfChanged(defender);
     return true;
   }
 
@@ -133,24 +129,27 @@ public final class AugmentExpansion {
 
   /** Probabilities combine independently, with a hard 50% cyberware chance cap. */
   public static float weaponCritChance(ServerPlayer p, Entity target, boolean blade) {
+    float external = ExpansionRuntime.critChance(p, target);
     float stab = blade ? AugmentRuntime.tier(p, STABBER) * .04f : 0;
     float distance = (float) Math.clamp(p.distanceTo(target) / 32., 0, 1);
     float visual = AugmentRuntime.tier(p, VISUAL_CORTEX_SUPPORT) * .06f * distance;
-    float berserk =
-        AugmentRuntime.berserk(p) ? (AugmentRuntime.tier(p, BIODYNE_BERSERK) - 1) * .05f : 0;
+    float berserk = BerserkSpecs.critChance(p);
     float sandy =
         dev.cybernetics2077.temporal.Sandevistan.active(p)
             ? dev.cybernetics2077.temporal.Sandevistan.model(p)
                 .critChance(dev.cybernetics2077.temporal.Sandevistan.tier(p))
             : 0;
-    return Math.min(
-        .5f,
-        1
-            - (1 - stab)
-                * (1 - visual)
-                * (1 - berserk)
-                * (1 - sandy)
-                * (1 - dev.cybernetics2077.combat.HandsRuntime.wrapChance(p)));
+    return 1
+        - (1 - external)
+            * (1
+                - Math.min(
+                    .5f,
+                    1
+                        - (1 - stab)
+                            * (1 - visual)
+                            * (1 - berserk)
+                            * (1 - sandy)
+                            * (1 - dev.cybernetics2077.combat.HandsRuntime.wrapChance(p))));
   }
 
   public static float critMultiplier(ServerPlayer p) {
@@ -160,9 +159,7 @@ public final class AugmentExpansion {
                 + dev.cybernetics2077.temporal.Sandevistan.model(p)
                     .critDamage(dev.cybernetics2077.temporal.Sandevistan.tier(p))
             : 1)
-        * (AugmentRuntime.berserk(p)
-            ? 1 + (AugmentRuntime.tier(p, BIODYNE_BERSERK) - 1) * .25f
-            : 1);
+        * BerserkSpecs.critDamage(p);
   }
 
   @SubscribeEvent

@@ -227,7 +227,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
         GOLD);
     line(c, BountyContracts.objective(t), x, 120, w, 8, GREEN);
     line(c, BountyRules.specialty(t.getInt("profile")), x, 132, w, 8, MUTED);
-    c.body("No civilian kills / +10% payment", x + 8, 144, 8, MUTED);
+    c.body("Take no damage / +30% payment", x + 8, 144, 8, MUTED);
     c.body("Survive the hunt / +10% payment", x + 8, 155, 8, MUTED);
     String objective =
         selection >= 0
@@ -293,8 +293,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
     int x = split + 32, w = imageWidth - x - 14;
     line(c, t.getString("title"), x - 8, 78, w + 8, 11, GREEN);
     c.body((t.getBoolean("specialty") ? "PASS" : "MISS") + " // Fixer specialty", x, 101, 9, MUTED);
-    c.body(
-        (t.getBoolean("civilians") ? "PASS" : "MISS") + " // No civilian kills", x, 116, 9, MUTED);
+    c.body((t.getBoolean("untouched") ? "PASS" : "MISS") + " // No damage taken", x, 116, 9, MUTED);
     c.body(
         (t.getBoolean("survival") ? "PASS" : "MISS") + " // Survived the hunt", x, 131, 9, MUTED);
     line(

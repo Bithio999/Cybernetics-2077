@@ -48,4 +48,19 @@ final class HandsRulesTest {
     }
     assertTrue(HandsRules.bounceSpeed(5) > HandsRules.bounceSpeed(1));
   }
+
+  @Test
+  void predictiveTrackingLeadsLateralMotionWithHigherAuthorityAndNoSpeedGain() {
+    var base = HandsRules.turn(0, 0, 3, 4, 0, 25, .095);
+    var guided = HandsRules.guide(0, 0, 3, 4, 0, 25, .25, 0, 0, 5, 1);
+    assertTrue(guided.x() > base.x());
+    assertEquals(
+        3,
+        Math.sqrt(guided.x() * guided.x() + guided.y() * guided.y() + guided.z() * guided.z()),
+        1e-9);
+    var slowed = HandsRules.guide(0, 0, 3, 4, 0, 25, .25, 0, 0, 5, .1);
+    assertTrue(Math.atan2(slowed.x(), slowed.z()) < Math.atan2(guided.x(), guided.z()));
+    assertEquals(
+        new HandsRules.Vector(0, 0, 3), HandsRules.guide(0, 0, 3, 0, 0, -20, 0, 0, 0, 5, 1));
+  }
 }

@@ -501,7 +501,7 @@ public final class CityGameTests {
       final int wanted = tier;
       int index =
           java.util.stream.IntStream.range(0, offers.size())
-              .filter(i -> offers.get(i).tier() == wanted)
+              .filter(i -> offers.get(i).tier() == wanted && !offers.get(i).iconic())
               .findFirst()
               .orElseThrow();
       int required = offers.get(index).requiredStreetCred();
@@ -520,7 +520,7 @@ public final class CityGameTests {
       for (int day = 0; day < 200 && available < 0; day++) {
         h.getLevel().getServer().overworld().setDayTime(day * 24000L);
         for (int i = 0; i < offers.size(); i++)
-          if (offers.get(i).tier() == wanted && m.stocked(i)) {
+          if (offers.get(i).tier() == wanted && !offers.get(i).iconic() && m.stocked(i)) {
             available = i;
             break;
           }

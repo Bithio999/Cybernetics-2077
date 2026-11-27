@@ -22,7 +22,12 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
  */
 @EventBusSubscriber(modid = Cybernetics2077.ID)
 public final class Sandevistan {
-  public record View(int tier, long end, double pace, boolean pvp, boolean apogee, boolean david) {
+  public record View(
+      int tier, long end, double pace, boolean pvp, boolean apogee, boolean david, int model) {
+    public View(int tier, long end, double pace, boolean pvp, boolean apogee, boolean david) {
+      this(tier, end, pace, pvp, apogee, david, david ? 2 : apogee ? 1 : 0);
+    }
+
     public View(int tier, long end, double pace, boolean pvp, boolean apogee) {
       this(tier, end, pace, pvp, apogee, false);
     }
@@ -32,9 +37,10 @@ public final class Sandevistan {
     }
   }
 
-  public static java.util.function.Function<Player, View> client = p -> new View(0, 0, 1, false);
+  public static java.util.function.Function<LivingEntity, View> client =
+      p -> new View(0, 0, 1, false);
 
-  private record Field(Player owner, double strength, boolean pvp) {}
+  private record Field(LivingEntity owner, double strength, boolean pvp) {}
 
   private static final ThreadLocal<Map<Level, List<Field>>> FIELDS =
       ThreadLocal.withInitial(WeakHashMap::new);
@@ -43,67 +49,93 @@ public final class Sandevistan {
   private static final ThreadLocal<Map<Entity, TemporalRules.Budget>> BUDGETS =
       ThreadLocal.withInitial(WeakHashMap::new);
 
-  public static int tier(Player p) {
-    return Math.max(
-        Math.max(
-            AugmentRuntime.tier(p, Augment.DYNALAR_SANDEVISTAN),
-            AugmentRuntime.tier(p, Augment.DAVIDS_SANDEVISTAN)),
-        AugmentRuntime.tier(p, Augment.MILITECH_APOGEE));
+  private static final ThreadLocal<Set<Mob>> MOB_ACTORS =
+      ThreadLocal.withInitial(() -> Collections.newSetFromMap(new WeakHashMap<>()));
+
+  public static void trackMob(Mob mob) {
+    MOB_ACTORS.get().add(mob);
+    invalidate(mob.level());
   }
 
-  public static SandevistanModel model(Player p) {
-    return SandevistanModel.of(
-        p instanceof ServerPlayer
-            ? AugmentRuntime.tier(p, Augment.MILITECH_APOGEE) > 0
-            : client.apply(p).apogee,
-        p instanceof ServerPlayer
-            ? AugmentRuntime.tier(p, Augment.DAVIDS_SANDEVISTAN) > 0
-            : client.apply(p).david);
+  public static int tier(LivingEntity p) {
+    var a = ExpansionImplants.os(p);
+    return a != null && ExpansionImplants.sandy(a) ? AugmentRuntime.tier(p, a) : 0;
   }
 
-  public static boolean active(Player p) {
+  public static SandevistanModel model(LivingEntity p) {
+    if (p.level().isClientSide)
+      return SandevistanModel.values()[
+          Math.clamp(client.apply(p).model, 0, SandevistanModel.values().length - 1)];
+    return SandevistanModel.of(ExpansionImplants.os(p));
+  }
+
+  public static SandevistanModel profile(AugmentState s) {
+    return s.extra.contains("sandyModel")
+        ? SandevistanModel.values()[
+            Math.clamp(s.extra.getInt("sandyModel"), 0, SandevistanModel.values().length - 1)]
+        : SandevistanModel.of(s.sandyApogee, s.sandyDavid);
+  }
+
+  public static boolean active(LivingEntity p) {
     if (!p.isAlive() || p.isSpectator()) return false;
-    if (p instanceof ServerPlayer sp)
-      return tier(p) > 0 && AugmentRuntime.state(p).sandyEnd > AugmentRuntime.now(sp);
+    if (!p.level().isClientSide)
+      return tier(p) > 0 && AugmentRuntime.state(p).sandyEnd > p.level().getGameTime();
     var v = client.apply(p);
     return v.tier > 0 && v.end > p.level().getGameTime();
   }
 
-  public static double strength(Player p) {
-    if (!active(p)) return 1;
-    int t = p instanceof ServerPlayer ? tier(p) : client.apply(p).tier;
-    return TemporalRules.acceleration(model(p).slowing(t));
+  public static double strength(LivingEntity p) {
+    double main =
+        active(p)
+            ? TemporalRules.acceleration(
+                model(p) == SandevistanModel.ZETATECH && !p.onGround()
+                    ? .6
+                    : model(p).slowing(p.level().isClientSide ? client.apply(p).tier : tier(p)))
+            : 1;
+    return Math.max(main, dev.cybernetics2077.cyberware.ExpansionRuntime.temporalStrength(p));
+  }
+
+  public static double personalStrength(LivingEntity e) {
+    double sandy =
+        active(e)
+            ? TemporalRules.acceleration(
+                model(e) == SandevistanModel.ZETATECH && !e.onGround()
+                    ? .6
+                    : model(e).slowing(e.level().isClientSide ? client.apply(e).tier : tier(e)))
+            : 1;
+    return Math.max(sandy, dev.cybernetics2077.cyberware.ExpansionRuntime.personalStrength(e));
+  }
+
+  public static double rechargeTicks(LivingEntity e, AugmentState s) {
+    return 20.
+        * profile(s).recharge(s.sandyProfile)
+        * (AugmentRuntime.tier(e, dev.cybernetics2077.cyberware.Augment.QUANTUM_TUNER) > 0
+            ? .85
+            : 1);
+  }
+
+  public static void finishRecharge(LivingEntity e, AugmentState s, long when) {
+    long ready = when + (long) rechargeTicks(e, s);
+    s.sandyClock -= ready - dev.cybernetics2077.cyberware.ExpansionRuntime.finished(e, ready);
   }
 
   public static double charge(ServerPlayer p) {
     var s = AugmentRuntime.state(p);
     long now = AugmentRuntime.now(p);
     if (s.sandyEnd > 0)
-      return Math.clamp(
-          (s.sandyEnd - now)
-              / (20. * SandevistanModel.of(s.sandyApogee, s.sandyDavid).duration(s.sandyProfile)),
-          0,
-          1);
-    return Math.clamp(
-        s.sandyCharge
-            + Math.max(0, now - s.sandyClock)
-                / (20. * SandevistanModel.of(s.sandyApogee, s.sandyDavid).recharge(s.sandyProfile)),
-        0,
-        1);
+      return Math.clamp((s.sandyEnd - now) / (20. * profile(s).duration(s.sandyProfile)), 0, 1);
+    return Math.clamp(s.sandyCharge + Math.max(0, now - s.sandyClock) / rechargeTicks(p, s), 0, 1);
   }
 
   public static void stop(ServerPlayer p, long when) {
     var s = AugmentRuntime.state(p);
     if (s.sandyEnd == 0) return;
     s.sandyCharge =
-        Math.clamp(
-            (s.sandyEnd - when)
-                / (20. * SandevistanModel.of(s.sandyApogee, s.sandyDavid).duration(s.sandyProfile)),
-            0,
-            1);
+        Math.clamp((s.sandyEnd - when) / (20. * profile(s).duration(s.sandyProfile)), 0, 1);
     s.sandyClock = when;
     s.sandyEnd = 0;
     s.sandyRearm = when + 20;
+    finishRecharge(p, s, when);
     invalidate(p.level());
   }
 
@@ -132,6 +164,7 @@ public final class Sandevistan {
       s.sandyProfile = t;
       s.sandyApogee = model(p) == SandevistanModel.APOGEE;
       s.sandyDavid = model(p) == SandevistanModel.DAVID;
+      s.extra.putInt("sandyModel", model(p).ordinal());
       s.sandyCharge = available;
       s.sandyClock = now;
       s.sandyEnd = now + Math.max(1, Math.round(available * model(p).duration(t) * 20));
@@ -154,16 +187,28 @@ public final class Sandevistan {
     if (!Objects.equals(CLOCKS.get().get(level), now)) {
       var list = new ArrayList<Field>();
       for (var p : level.players())
-        if (active(p))
+        if (strength(p) > 1)
           list.add(
               new Field(
                   p,
                   strength(p),
                   p instanceof ServerPlayer sp ? sp.server.isPvpAllowed() : client.apply(p).pvp));
+      MOB_ACTORS.get().removeIf(m -> m.isRemoved() || !m.isAlive());
+      for (var mob : MOB_ACTORS.get())
+        if (mob.level() == level && strength(mob) > 1)
+          list.add(new Field(mob, strength(mob), true));
       FIELDS.get().put(level, List.copyOf(list));
       CLOCKS.get().put(level, now);
     }
     return FIELDS.get().getOrDefault(level, List.of());
+  }
+
+  public static java.util.List<LivingEntity> actors(Level level) {
+    return java.util.stream.Stream.concat(
+            level.players().stream().map(p -> (LivingEntity) p),
+            MOB_ACTORS.get().stream().filter(m -> m.level() == level).map(m -> (LivingEntity) m))
+        .filter(e -> !e.isRemoved())
+        .toList();
   }
 
   public static double pace(Entity entity) {
@@ -181,24 +226,25 @@ public final class Sandevistan {
     double personal =
         !personalClock
             ? 1
-            : entity instanceof Player p
-                ? strength(p)
+            : entity instanceof LivingEntity p
+                ? personalStrength(p)
                 : entity instanceof Projectile projectile
-                        && projectile.getOwner() instanceof Player p
-                    ? strength(p)
+                        && projectile.getOwner() instanceof LivingEntity p
+                    ? personalStrength(p)
                     : 1;
-    double strongest = entity instanceof Player p ? strength(p) : 1;
+    double strongest = entity instanceof LivingEntity p ? strength(p) : 1;
     for (var field : fields(entity.level())) {
       var owner = field.owner;
       if (owner.level() != entity.level()) continue;
       if (owner.distanceToSqr(entity) > TemporalRules.RADIUS * TemporalRules.RADIUS) continue;
       if (entity instanceof Player other && other != owner) {
-        if (other.isCreative() || owner.isAlliedTo(other) || !field.pvp) continue;
+        if (other.isCreative() || owner.isAlliedTo(other) || owner instanceof Player && !field.pvp)
+          continue;
         if (owner instanceof ServerPlayer sp && !sp.canHarmPlayer(other)) continue;
       } else if (entity instanceof Projectile projectile
           && projectile.getOwner() instanceof Player shooter
           && shooter != owner) {
-        if (!field.pvp
+        if (owner instanceof Player && !field.pvp
             || owner.isAlliedTo(shooter)
             || owner instanceof ServerPlayer sp && !sp.canHarmPlayer(shooter)) continue;
       } else if (entity instanceof Mob && (owner.isAlliedTo(entity) || entity.isAlliedTo(owner)))
@@ -248,7 +294,7 @@ public final class Sandevistan {
     long now = AugmentRuntime.now(p);
     if (s.sandyEnd > 0
         && (tier(p) != s.sandyProfile
-            || model(p) != SandevistanModel.of(s.sandyApogee, s.sandyDavid)
+            || model(p) != profile(s)
             || !p.isAlive()
             || p.isSpectator()
             || now >= s.sandyEnd)) stop(p, Math.min(now, s.sandyEnd));
@@ -278,6 +324,7 @@ public final class Sandevistan {
     tag.putBoolean("sandyApogee", s.sandyApogee);
     tag.putBoolean("sandyDavid", s.sandyDavid);
     tag.putLong("sandyRearm", s.sandyRearm);
+    tag.putDouble("sandyRechargeTicks", rechargeTicks(p, s));
   }
 
   public static boolean controlled(Entity e) {
@@ -351,6 +398,7 @@ public final class Sandevistan {
     FIELDS.get().remove(e.getLevel());
     CLOCKS.get().remove(e.getLevel());
     BUDGETS.get().keySet().removeIf(entity -> entity.level() == e.getLevel());
+    MOB_ACTORS.get().removeIf(entity -> entity.level() == e.getLevel());
   }
 
   @SubscribeEvent

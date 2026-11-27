@@ -64,7 +64,7 @@ public final class IconicGameTests {
       h.assertTrue(
           o.tier() == 5 && o.price() == 75000 && o.requiredStreetCred() == 40,
           "Incorrect iconic cost/tier/reputation");
-      h.assertTrue(i == CyberwareCatalogue.offers().size() - 2, "Existing offer indexes moved");
+      h.assertTrue(i == 197, "Existing offer indexes moved");
       h.assertTrue(
           !m.clickMenuButton(p, 1000 + i) && m.result() == 7, "Full-price bypass without chip");
       p.getInventory()

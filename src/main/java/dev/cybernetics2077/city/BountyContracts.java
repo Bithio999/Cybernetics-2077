@@ -16,7 +16,6 @@ import net.minecraft.server.level.*;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.*;
 import net.minecraft.world.level.Level;
@@ -80,7 +79,12 @@ public final class BountyContracts {
     t.putInt("guards", BountyRules.guards(offer.rank()));
     t.putInt("eddies", BountyRules.pay(offer.rank(), offer.kind()));
     t.putInt("cred", BountyRules.cred(offer.rank()));
-    if (offer.kind() == BountyRules.Kind.CYBERPSYCHO) psychoPlan(t);
+    if (offer.kind() == BountyRules.Kind.CYBERPSYCHO) {
+      t.putLong(
+          "loadoutSeed",
+          offer.id().getMostSignificantBits() ^ offer.id().getLeastSignificantBits());
+      psychoPlan(t);
+    }
     return t;
   }
 
@@ -104,7 +108,8 @@ public final class BountyContracts {
   }
 
   private static void psychoPlan(CompoundTag t) {
-    var plan = CyberpsychoLoadouts.forRank(Math.clamp(t.getInt("rank"), 1, 6));
+    var plan =
+        CyberpsychoLoadouts.forSeed(Math.clamp(t.getInt("rank"), 1, 6), t.getLong("loadoutSeed"));
     t.putInt("rank", plan.rank());
     t.putString("mob", "cybernetics2077:cyberpsycho");
     t.putInt("tier", plan.tier());
@@ -112,7 +117,8 @@ public final class BountyContracts {
     t.putInt("baseCapacity", CyberpsychoRules.BASE_CAPACITY);
     t.putInt("capacity", plan.capacity());
     t.putInt("overcapacity", plan.overcapacity());
-    t.putInt("psychoVersion", 1);
+    t.putString("role", plan.role().name());
+    t.putInt("psychoVersion", 2);
   }
 
   private static boolean valid(ServerPlayer p, CityResident fixer) {
@@ -154,7 +160,8 @@ public final class BountyContracts {
     t.putInt("y", fixer.getBlockY());
     t.putInt("z", z);
     t.putInt("stage", 1);
-    t.putBoolean("civilians", true);
+    t.putBoolean("untouched", true);
+    t.putInt("bonusVersion", 2);
     t.putBoolean("survival", true);
     t.putLong("accepted", p.server.overworld().getGameTime());
     removeShards(p);
@@ -174,7 +181,7 @@ public final class BountyContracts {
                     + " cache. Then bring the payload back."
                 : fixer.style() == 0
                     ? "The dossier is yours. Confirm the mark through your scanner before you"
-                        + " engage. Keep civilians out of it."
+                        + " engage. Keep yourself unscathed for the extra payout."
                     : "That's your mark. Once the fight starts, finish it inside ninety seconds."
                         + " Get back here for payment.");
     return 0;
@@ -244,9 +251,9 @@ public final class BountyContracts {
     if (fixer.style() != job.getInt("profile")) return 21;
     var account = p.getData(CityContent.ACCOUNT);
     boolean special = specialty(job),
-        civilians = job.getBoolean("civilians"),
+        untouched = job.getBoolean("untouched"),
         survival = job.getBoolean("survival");
-    int percent = BountyRules.bonusPercent(special, civilians, survival);
+    int percent = BountyRules.bonusPercent(special, untouched, survival);
     boolean chain = (account.favor(fixer.style()) + 1) % 3 == 0;
     int base = job.getInt("eddies"),
         bonus = base * percent / 100,
@@ -275,7 +282,7 @@ public final class BountyContracts {
     report.putInt("credEarned", account.streetCred() - before);
     report.putBoolean("chip", chip);
     report.putString(
-        "rating", BountyRules.rating(BountyRules.optionalCount(special, civilians, survival)));
+        "rating", BountyRules.rating(BountyRules.optionalCount(special, untouched, survival)));
     account.bountyReport(report);
     removeShards(p);
     changed(p);
@@ -439,7 +446,8 @@ public final class BountyContracts {
       var pos = places.get(i);
       mob.moveTo(pos.getX() + .5, pos.getY(), pos.getZ() + .5, 0, 0);
       int tier = i == 0 ? job.getInt("tier") : Math.max(1, job.getInt("tier") - 1);
-      if (i == 0 && mob instanceof Cyberpsycho psycho) psycho.configure(job.getInt("rank"));
+      if (i == 0 && mob instanceof Cyberpsycho psycho)
+        psycho.configure(job.getInt("rank"), job.getLong("loadoutSeed"));
       else
         EnhancedMobs.install(
             mob,
@@ -469,7 +477,8 @@ public final class BountyContracts {
                       : mob.getType() == EntityType.VINDICATOR
                           ? Items.IRON_AXE
                           : tier >= 3 ? Items.IRON_SWORD : Items.STONE_SWORD;
-      mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(weapon));
+      if (!(mob instanceof Cyberpsycho))
+        mob.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(weapon));
       mob.setDropChance(EquipmentSlot.MAINHAND, 0);
       if (!(mob instanceof Cyberpsycho)) {
         var helmet = new ItemStack(Items.IRON_HELMET);
@@ -572,6 +581,12 @@ public final class BountyContracts {
     if (server.overworld().getGameTime() % 20 != 0) return;
     for (var player : server.getPlayerList().getPlayers()) {
       var job = job(player);
+      if (!job.isEmpty() && job.getInt("bonusVersion") < 2) {
+        job.putInt("bonusVersion", 2);
+        job.putBoolean("untouched", true);
+        save(player, job);
+        changed(player);
+      }
       if (job.getInt("stage") == 4) {
         if (server
                 .overworld()
@@ -582,7 +597,7 @@ public final class BountyContracts {
         continue;
       }
       if (job.getInt("stage") != 1) continue;
-      if (kind(job) == BountyRules.Kind.CYBERPSYCHO && job.getInt("psychoVersion") < 1) {
+      if (kind(job) == BountyRules.Kind.CYBERPSYCHO && job.getInt("psychoVersion") < 2) {
         // Upgrade uncompleted sightings without changing their accepted rewards or token.
         cleanup(server, job);
         psychoPlan(job);
@@ -675,6 +690,17 @@ public final class BountyContracts {
     ledger.put(owner, job);
   }
 
+  @SubscribeEvent
+  public static void playerDamaged(LivingDamageEvent.Post e) {
+    if (!(e.getEntity() instanceof ServerPlayer p) || e.getNewDamage() <= 0) return;
+    var job = job(p);
+    if ((job.getInt("stage") == 1 || job.getInt("stage") == 4) && job.getBoolean("untouched")) {
+      job.putBoolean("untouched", false);
+      save(p, job);
+      changed(p);
+    }
+  }
+
   private static UUID ownedCredit(Entity source) {
     return source instanceof ServerPlayer player
         ? player.getUUID()
@@ -688,6 +714,7 @@ public final class BountyContracts {
       var job = job(p);
       if (job.getInt("stage") == 1 || job.getInt("stage") == 4) {
         job.putBoolean("survival", false);
+        job.putBoolean("untouched", false);
         save(p, job);
       }
     }
@@ -695,14 +722,6 @@ public final class BountyContracts {
     var credit = killer instanceof LivingEntity living ? living : e.getEntity().getKillCredit();
     UUID credited = ownedCredit(credit);
     var ledger = BountyLedger.get(level.getServer());
-    if (credited != null
-        && (e.getEntity() instanceof AbstractVillager || e.getEntity() instanceof CityResident)) {
-      var job = ledger.job(credited);
-      if (job.getInt("stage") == 1 || job.getInt("stage") == 4) {
-        job.putBoolean("civilians", false);
-        ledger.put(credited, job);
-      }
-    }
     var marker = e.getEntity().getPersistentData().getCompound(MOB_DATA);
     if (!marker.hasUUID("owner") || marker.getInt("role") != 0) return;
     var job = ledger.job(marker.getUUID("owner"));

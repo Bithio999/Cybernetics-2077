@@ -36,6 +36,13 @@ public final class CyberwareClient {
       DEPLOYMENT.put(id, new MantisDeployment(from, active ? 1 : 0));
     }
     STATES.put(id, t);
+    var mc = Minecraft.getInstance();
+    if (t.getBoolean("mob")
+        && mc.level != null
+        && mc.level.getEntity(id) instanceof net.minecraft.world.entity.Mob mob
+        && t.hasUUID("uuid")
+        && mob.getUUID().equals(t.getUUID("uuid")))
+      dev.cybernetics2077.temporal.Sandevistan.trackMob(mob);
   }
 
   public static CompoundTag own() {

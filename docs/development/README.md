@@ -81,3 +81,5 @@ Ripperdoc and Fixer spawn eggs are available in Creative. [Building design and a
 - [Inventory icons and creative tab — NeoForge 0.26.0](ICONS-CREATIVE-0.26.0.md)
 
 - [Dedicated cyberpsychos and overcapacity — NeoForge 0.27.0](CYBERPSYCHOS-0.27.0.md)
+
+[0.28.0 catalogue, shared NPC runtime and guidance](EXPANSION-0.28.0.md) · [Research and coverage](../research/expansion-028/README.md).

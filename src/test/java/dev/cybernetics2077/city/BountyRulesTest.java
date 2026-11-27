@@ -48,7 +48,7 @@ class BountyRulesTest {
     for (int mask = 0; mask < 8; mask++) {
       boolean s = (mask & 1) != 0, c = (mask & 2) != 0, v = (mask & 4) != 0;
       assertEquals(Integer.bitCount(mask), BountyRules.optionalCount(s, c, v));
-      assertEquals((s ? 20 : 0) + (c ? 10 : 0) + (v ? 10 : 0), BountyRules.bonusPercent(s, c, v));
+      assertEquals((s ? 20 : 0) + (c ? 30 : 0) + (v ? 10 : 0), BountyRules.bonusPercent(s, c, v));
     }
     assertEquals("S", BountyRules.rating(3));
     assertEquals("A", BountyRules.rating(2));

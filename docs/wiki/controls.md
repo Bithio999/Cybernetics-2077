@@ -27,3 +27,7 @@ Default bindings can be changed under **Options → Controls → Cybernetics 207
 With **TaCZ installed**, new default bindings use **Alt+V** for the scanner, **Alt+G** for blades, **Alt+H** for Blood Pump, **Alt+C** for camo, **Alt+O** for Sandevistan and **Alt+I** for Berserk. This avoids conflicting with the gun controls. Previously saved keybindings are kept; resolve existing conflicts in Options → Controls.
 
 [TaCZ compatibility](compatibility.md) · [Cyberware](cyberware.md) · [Quickhacks](quickhacks.md)
+
+## Additional implants
+
+**B:** open Titanium Bones’ carry reserve. **J:** activate Behavioral Imprint Faceplate after five seconds without attacking or taking damage. **O:** Sandevistan; **I:** Berserk. All bindings are configurable in Minecraft Controls.

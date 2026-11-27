@@ -7,7 +7,9 @@ public enum QuickhackKind {
   CONTAGION("contagion", 2, "COMBAT", "Chemical"),
   REBOOT_OPTICS("reboot_optics", 1, "CONTROL", "None"),
   CRIPPLE_MOVEMENT("cripple_movement", 2, "CONTROL", "None"),
-  SYNAPSE_BURNOUT("synapse_burnout", 3, "COMBAT", "Physical");
+  SYNAPSE_BURNOUT("synapse_burnout", 3, "COMBAT", "Physical"),
+  WEAPON_GLITCH("weapon_glitch", 2, "CONTROL", "None"),
+  CYBERWARE_MALFUNCTION("cyberware_malfunction", 2, "CONTROL", "Electrical");
   public final String id, category, damageType;
   public final int firstTier;
 
@@ -19,7 +21,7 @@ public enum QuickhackKind {
   }
 
   public boolean control() {
-    return this == REBOOT_OPTICS || this == CRIPPLE_MOVEMENT;
+    return category.equals("CONTROL");
   }
 
   public int cost(int tier) {
@@ -27,7 +29,8 @@ public enum QuickhackKind {
       case SHORT_CIRCUIT -> tier + 1;
       case OVERHEAT, CONTAGION -> tier + 2;
       case REBOOT_OPTICS -> (tier + 3) / 2;
-      case CRIPPLE_MOVEMENT -> tier;
+      case CRIPPLE_MOVEMENT, WEAPON_GLITCH -> tier;
+      case CYBERWARE_MALFUNCTION -> tier + 1;
       case SYNAPSE_BURNOUT -> tier + 3;
     };
   }
@@ -45,6 +48,7 @@ public enum QuickhackKind {
       case OVERHEAT -> 8 + 4 * tier;
       case CONTAGION -> 6 * tier;
       case SYNAPSE_BURNOUT -> 6 + 6 * tier;
+      case CYBERWARE_MALFUNCTION -> tier >= 3 ? 2 * tier : 0;
       default -> 0;
     };
   }
@@ -54,7 +58,8 @@ public enum QuickhackKind {
       case OVERHEAT -> 80;
       case CONTAGION -> 160;
       case REBOOT_OPTICS -> 60 + 20 * tier;
-      case CRIPPLE_MOVEMENT -> 40 + 20 * tier;
+      case CRIPPLE_MOVEMENT, WEAPON_GLITCH -> 40 + 20 * tier;
+      case CYBERWARE_MALFUNCTION -> 60 + 20 * tier;
       default -> 0;
     };
   }

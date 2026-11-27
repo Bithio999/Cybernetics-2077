@@ -18,7 +18,9 @@ import org.lwjgl.glfw.GLFW;
 public final class AugmentClient {
   public static final KeyMapping BERSERK = key("berserk", GLFW.GLFW_KEY_I),
       PUMP = key("blood_pump", GLFW.GLFW_KEY_H),
-      CAMO = key("optical_camo", GLFW.GLFW_KEY_C);
+      CAMO = key("optical_camo", GLFW.GLFW_KEY_C),
+      RESERVE = key("carry_reserve", GLFW.GLFW_KEY_B),
+      FACEPLATE = key("faceplate", GLFW.GLFW_KEY_J);
   private static boolean jumpDown, charging;
   private static Object level;
 
@@ -53,6 +55,8 @@ public final class AugmentClient {
     while (BERSERK.consumeClick()) action(5);
     while (PUMP.consumeClick()) action(6);
     while (CAMO.consumeClick()) action(7);
+    while (RESERVE.consumeClick()) action(20);
+    while (FACEPLATE.consumeClick()) action(21);
   }
 
   @SubscribeEvent
@@ -151,15 +155,20 @@ public final class AugmentClient {
       if (s.getInt("sandyTier") > 0) {
         int profile = Math.clamp(s.getInt("sandyProfile"), 2, 5);
         var battery =
-            dev.cybernetics2077.temporal.SandevistanModel.of(
-                s.getBoolean("sandyApogee"), s.getBoolean("sandyDavid"));
+            dev.cybernetics2077.temporal.SandevistanModel.values()[
+                Math.clamp(
+                    s.getInt("sandyModel"),
+                    0,
+                    dev.cybernetics2077.temporal.SandevistanModel.values().length - 1)];
         boolean active = s.getLong("sandyEnd") > time;
         double charge =
             active
                 ? (s.getLong("sandyEnd") - time) / (20. * battery.duration(profile))
                 : s.getDouble("sandyCharge")
                     + Math.max(0, time - s.getLong("sandyClock"))
-                        / (20. * battery.recharge(profile));
+                        / (s.contains("sandyRechargeTicks")
+                            ? s.getDouble("sandyRechargeTicks")
+                            : 20. * battery.recharge(profile));
         badge(
             c,
             5,
@@ -169,7 +178,11 @@ public final class AugmentClient {
                 .getString(),
             (s.getInt("sandyModel") == dev.cybernetics2077.temporal.SandevistanModel.DAVID.ordinal()
                     ? "DAVID "
-                    : s.getBoolean("sandyIconic") ? "APOGEE " : "SANDY ")
+                    : battery == dev.cybernetics2077.temporal.SandevistanModel.APOGEE
+                        ? "APOGEE "
+                        : battery == dev.cybernetics2077.temporal.SandevistanModel.FALCON
+                            ? "FALCON "
+                            : "SANDY ")
                 + (active
                     ? seconds(s.getLong("sandyEnd"), time)
                     : Math.round(Math.clamp(charge, 0, 1) * 100) + "%"),
@@ -210,6 +223,8 @@ public final class AugmentClient {
       e.register(BERSERK);
       e.register(PUMP);
       e.register(CAMO);
+      e.register(RESERVE);
+      e.register(FACEPLATE);
     }
 
     @SubscribeEvent

@@ -24,7 +24,7 @@ public final class SandevistanClient {
   private static Object level;
   private static Hum hum;
 
-  public static Sandevistan.View view(net.minecraft.world.entity.player.Player p) {
+  public static Sandevistan.View view(net.minecraft.world.entity.LivingEntity p) {
     var t = CyberwareClient.state(p.getId());
     return new Sandevistan.View(
         t.getInt("sandyTier"),
@@ -32,7 +32,8 @@ public final class SandevistanClient {
         t.contains("temporalPace") ? Math.clamp(t.getDouble("temporalPace"), .05, 1.25) : 1,
         t.getBoolean("sandyPvp"),
         t.getBoolean("sandyIconic") && t.getInt("sandyModel") != SandevistanModel.DAVID.ordinal(),
-        t.getInt("sandyModel") == SandevistanModel.DAVID.ordinal());
+        t.getInt("sandyModel") == SandevistanModel.DAVID.ordinal(),
+        t.getInt("sandyModel"));
   }
 
   public static void frame() {
