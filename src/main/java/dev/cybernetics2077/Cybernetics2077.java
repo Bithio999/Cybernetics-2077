@@ -261,28 +261,8 @@ public final class Cybernetics2077 {
     bus.addListener(this::network);
     bus.addListener(ScannerNetwork::register);
     bus.addListener(CyberwareNetwork::register);
-    bus.addListener(this::creative);
+    CreativeContent.register(bus);
     dev.cybernetics2077.compat.TacZCompat.init();
-  }
-
-  private void creative(net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent e) {
-    if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.FUNCTIONAL_BLOCKS)
-      e.accept(BENCH_ITEM.get());
-    if (e.getTabKey() == net.minecraft.world.item.CreativeModeTabs.TOOLS_AND_UTILITIES) {
-      for (var family :
-          java.util.List.of(
-              OPTICS_TIERS, CYBERDECK_TIERS, RAVEN_TIERS, SHORT_CIRCUIT_TIERS, MANTIS_TIERS))
-        for (var item : family) e.accept(item.get());
-      for (var variant : MantisVariant.values())
-        if (variant != MantisVariant.PHYSICAL)
-          for (var item : MANTIS_VARIANTS.get(variant)) e.accept(item.get());
-      for (var family : AUGMENTS.values()) for (var item : family) e.accept(item.get());
-      for (var part : DAMAGED_PARTS) e.accept(part.get());
-      for (var chip : ICONIC_REQUISITIONS) e.accept(chip.get());
-      for (var kind : QuickhackKind.values())
-        if (kind != QuickhackKind.SHORT_CIRCUIT)
-          for (var item : QUICKHACKS.get(kind)) e.accept(item.get());
-    }
   }
 
   private void network(RegisterPayloadHandlersEvent e) {

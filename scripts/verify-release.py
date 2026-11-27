@@ -14,6 +14,7 @@ def build_version(project):
 neo_version = build_version(Path('.'))
 jar = Path(sys.argv[1]) if len(sys.argv) > 1 else root / f'build/libs/Cybernetics2077-NeoForge-1.21.1-{neo_version}.jar'
 forge = '-Forge-1.20.1-' in jar.name
+sprite_size = (32, 32)
 resource_root = root / ('forge-1.20.1/build/generated/port/resources' if forge else 'src/main/resources')
 def versioned(entry):
     if not forge: return entry
@@ -116,9 +117,16 @@ with PortZip(jar) as z:
                      'assets/cybernetics2077/font/rajdhani-license.txt'):
         assert versioned(required) in names, required
     if not forge:
+        assert metadata['mods'][0]['logoFile'] in names
+        assert struct.unpack('>II',z.read(metadata['mods'][0]['logoFile'])[16:24])==(128,128)
+        for name in names:
+            if name.startswith('assets/cybernetics2077/textures/item/') and name.endswith('.png'):
+                png=z.read(name)
+                assert struct.unpack('>II',png[16:24])==sprite_size and png[25]==6, name
         for required in (
             'dev/cybernetics2077/cyberware/CyberwareCapacity.class',
             'dev/cybernetics2077/city/BountyCombat.class',
+            'dev/cybernetics2077/CreativeContent.class',
             'dev/cybernetics2077/client/GuidedBulletClient.class',
             'dev/cybernetics2077/client/SmoothBulletClient.class',
             'dev/cybernetics2077/client/GunCycleTime.class',
@@ -138,7 +146,7 @@ with PortZip(jar) as z:
     assert 'assets/cybernetics2077/textures/entity/diagnostic.png' not in names, 'Diagnostic placeholder skin still shipped'
     for icon in ('optical_scanner','cyberdeck_tier_1','mantis_claws_tier_1','short_circuit_tier_1'):
         png=z.read('assets/cybernetics2077/textures/item/'+icon+'.png')
-        assert struct.unpack('>II',png[16:24]) == (32,32), 'Equipment sprite is not 32px pixel art: '+icon
+        assert struct.unpack('>II',png[16:24]) == sprite_size, 'Incorrect equipment sprite dimensions: '+icon
     assert struct.unpack('>II', z.read('assets/cybernetics2077/textures/entity/mantis_elemental.png')[16:24]) == (64, 32)
     recipes = {n for n in names if n.startswith(versioned('data/cybernetics2077/recipe/')) and n.endswith('.json')}
     unlocks = {n for n in names if n.startswith(versioned('data/cybernetics2077/advancement/recipes/')) and n.endswith('.json')}
@@ -155,7 +163,7 @@ with PortZip(jar) as z:
         model=json.loads(z.read(f'assets/cybernetics2077/models/item/{part}.json'))
         assert model['textures']['layer0']=='cybernetics2077:item/'+part
         png=z.read(f'assets/cybernetics2077/textures/item/{part}.png')
-        assert struct.unpack('>II',png[16:24])==(32,32)
+        assert struct.unpack('>II',png[16:24])==sprite_size
     for original, prefix, title in (
         ('optical_scanner', 'kiroshi_optics', 'Basic Kiroshi Optics'),
         ('cyberdeck_tier_1', 'militech_paraline', 'Militech Paraline'),
@@ -173,7 +181,7 @@ with PortZip(jar) as z:
         assert f'assets/cybernetics2077/models/item/{item}.json' in names
     for kind, first in {'overheat':1,'contagion':2,'reboot_optics':1,'cripple_movement':2,'synapse_burnout':3}.items():
         png=z.read(f'assets/cybernetics2077/textures/item/{kind}.png')
-        assert struct.unpack('>II',png[16:24])==(32,32)
+        assert struct.unpack('>II',png[16:24])==sprite_size
         for tier in range(first,6):
             item=f'{kind}_tier_{tier}'
             assert 'item.cybernetics2077.'+item in lang
@@ -185,7 +193,7 @@ with PortZip(jar) as z:
         assert 'item.cybernetics2077.'+chip in lang
         assert f'assets/cybernetics2077/models/item/{chip}.json' in names
         png=z.read(f'assets/cybernetics2077/textures/item/{chip}.png')
-        assert struct.unpack('>II',png[16:24])==(32,32)
+        assert struct.unpack('>II',png[16:24])==sprite_size
     assert 'cybernetics2077.implant.iconic' in lang
     augment_starts = {
         'ex_disk': 3, 'memory_boost': 2, 'biodyne_berserk': 2, 'kiroshi_clairvoyant_optics': 3,
@@ -214,14 +222,14 @@ with PortZip(jar) as z:
         for cls in ('BountyRules', 'BountyLedger', 'BountyContracts', 'BountyNetwork', 'BountyContract'):
             assert f'dev/cybernetics2077/city/{cls}.class' in names
         png = z.read('assets/cybernetics2077/textures/item/bounty_contract.png')
-        assert struct.unpack('>II', png[16:24]) == (32, 32)
+        assert struct.unpack('>II', png[16:24]) == sprite_size
         assert lang['item.cybernetics2077.bounty_contract'] == 'Bounty Dossier'
         augment_starts['davids_sandevistan'] = 5
     assert 'data/cybernetics2077/recipe/mantis_claws_tier_1.json' not in names
     assert not any('CrossbowReloadMixin' in n for n in names), 'Obsolete crossbow reload hook shipped'
     for variant, title in [('thermal', 'Thermal'), ('electrical', 'Electrifying'), ('toxic', 'Toxic')]:
         icon = variant + '_mantis_blades'
-        assert struct.unpack('>II', z.read(f'assets/cybernetics2077/textures/item/{icon}.png')[16:24]) == (32, 32)
+        assert struct.unpack('>II', z.read(f'assets/cybernetics2077/textures/item/{icon}.png')[16:24]) == sprite_size
         assert struct.unpack('>II', z.read(f'assets/cybernetics2077/textures/entity/mantis_{variant}.png')[16:24]) == (512, 544)
         for lod in ('near', 'far'):
             assert f'assets/cybernetics2077/meshes/mantis/{variant}_{lod}.cymesh' in names
@@ -239,7 +247,7 @@ with PortZip(jar) as z:
 
     for implant, first in augment_starts.items():
         png = z.read(f'assets/cybernetics2077/textures/item/{implant}.png')
-        assert struct.unpack('>II', png[16:24]) == (32, 32)
+        assert struct.unpack('>II', png[16:24]) == sprite_size
         for tier in range(first, 6):
             item = f'{implant}_tier_{tier}'
             assert lang['item.cybernetics2077.' + item] == lang['cybernetics2077.augment.' + implant]

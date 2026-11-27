@@ -6,7 +6,7 @@
 
 | Minecraft | Loader | Java | Version / Download |
 | --- | --- | --- | --- |
-| 1.21.1 | NeoForge 21.1.248+ | 21 | 0.25.0 · [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.25.0.jar) |
+| 1.21.1 | NeoForge 21.1.248+ | 21 | 0.26.0 · [NeoForge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-NeoForge-1.21.1-0.26.0.jar) |
 | 1.20.1 | Forge 47.4+ (tested 47.4.29) | 17 | 0.20.0 · [Forge JAR](https://github.com/Bithio999/Cybernetics-2077/raw/refs/heads/main/releases/Cybernetics2077-Forge-1.20.1-0.20.0.jar) |
 
 1. Install the loader and Java version matching your Minecraft instance.
@@ -30,3 +30,7 @@ Supply barrels also contain [Eurodollar Credit Chips](street-cred.md#eddies), wo
 Install a **[cyberdeck](cyberdecks.md)** in Operating System, then open **Operating System → Manage Quickhacks** from the inventory cyberware tab. Load a chip, hold **V**, scroll to select it, and left-click a visible target to upload.
 
 [All controls](controls.md) · [How installation works](installation.md)
+
+## Creative inventory
+
+Use the arrow buttons above the creative inventory to cycle through tab pages, then open the **Cybernetics 2077** tab to browse implants by body system, followed by quickhacks, parts, workshop blocks and NPC spawn eggs. Use its search box to narrow the list by name. Implant families are ordered from their first available tier through Tier 5.

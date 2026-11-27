@@ -1,0 +1,19 @@
+{
+  "purpose": "Visual reference for adapted Cyberpunk 2077-style implant artwork; reference images are not shipped.",
+  "credit": "Cyberpunk 2077 cyberware designs and reference artwork: CD PROJEKT RED.",
+  "referenceHost": "https://github.com/Crispsy/Unofficial-Cyberpunk-2077-Build-Creator/tree/main/images/Cyberware",
+  "examples": [
+    "basic.png",
+    "bloodpump.png",
+    "bionicjoints.png",
+    "ballisticcoprocessor.png",
+    "dynalar.png",
+    "mantisblades.png",
+    "biomonitor.png",
+    "parabellum.png",
+    "subdermalarmor.png",
+    "militechapogee.png",
+    "smartlink.png",
+    "ex-disk.png"
+  ]
+}

@@ -1,5 +1,9 @@
 # Validation
 
+## Pixel icons and creative inventory (NeoForge 0.26.0)
+
+**107 JVM tests and 156 standalone GameTests pass.** Native client review selects the real mod tab using the creative inventory's page buttons, checks all 240 canonical items, searches for the six Sandevistans and restores the full list. All 63 item sprites are 32×32 with binary alpha and a limited palette. The release audit checks their dimensions, the bundled mod badge and absence of review fixtures. [Implementation](development/ICONS-CREATIVE-0.26.0.md) · [Results](review/results/icons-creative-0.26.0.json) · [Inventory](images/creative-026-all.png) · [Search](images/creative-026-search.png). Forge remains unchanged.
+
 ## Contract types and named-target balance (NeoForge 0.25.0)
 
 **107 JVM tests and 155 standalone GameTests pass.** Native client review with TaCZ and TaCZ Tweaks completes Wanted, Cyberpsycho Sighting and Cyberware Recovery through the fixer UI, including native containment damage and contract-shard cache recovery. The introductory delivery and small GUI checks also pass. [Rules and implementation](development/CONTRACTS-0.25.0.md) · [Results](review/results/contracts-0.25.0.json). Forge remains unchanged.

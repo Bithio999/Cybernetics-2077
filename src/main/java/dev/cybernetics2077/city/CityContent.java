@@ -168,16 +168,6 @@ public final class CityContent {
           e.put(RIPPERDOC.get(), CityResident.attributes().build());
           e.put(FIXER.get(), CityResident.attributes().build());
         });
-    bus.addListener(
-        (net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent e) -> {
-          if (e.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS)
-            for (var item : BLOCK_ITEMS.values()) e.accept(item.get());
-          if (e.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) e.accept(EDDIES.get());
-          if (e.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
-            e.accept(DOC_EGG.get());
-            e.accept(FIXER_EGG.get());
-          }
-        });
   }
 
   private CityContent() {}

@@ -1,0 +1,11 @@
+# Inventory artwork and creative tab — NeoForge 0.26.0
+
+The item art now follows Cyberpunk 2077's colored implant-art direction, using clean 32px pixel art with simplified silhouettes and a limited palette. The work covers all 63 item textures, including optics, operating systems, implants, elemental Mantis variants, program chips, parts and contracts. Shared item models automatically carry the new art into inventory, cyberware sockets and shops. Existing wiki icon files update from the same source. The mod list also receives a matching original circuit badge.
+
+The checked-in atlas and cell manifest are exported through [the asset pipeline](../../art/inventory-icons/README.md). Textures are centered, padded 32px RGBA with binary alpha; the mod badge is 128px. Nearest-neighbor export preserves hard pixel edges and uses at most 20 colors per sprite. The artwork adds no custom renderer, effect loop or gameplay hooks. Registry IDs, tier data and progression remain the existing ones.
+
+`CreativeContent` registers one native searchable tab. Implants are ordered by body system, then family and ascending tier, including families whose original Tier 1 registry name differs from later tiers. Quickhacks, damaged parts, authorization chips, the bench, city blocks, currency, contract shards and NPC eggs follow. The legacy Mantis registry alias is excluded; canonical Tier 2–5 items remain. The previous vanilla-tab insertion listeners are replaced by this tab so the same collection does not flood Tools & Utilities. The long tab name remains available on hover; the content title is hidden to leave the native search field clear.
+
+The runtime coverage test compares contents against the canonical item registry, checks uniqueness, legacy exclusion, Tier 1 ordering and native search-tab output. Native client review opens the real creative inventory, selects the registered tab, filters to the six Sandevistans, clears search and checks complete contents restoration. Screenshots document [the complete tab](../images/creative-026-all.png) and [native search](../images/creative-026-search.png). [Enlarged sprite samples](../images/icons-026-pixel-samples.png) show the final pixel treatment.
+
+[Results](../review/results/icons-creative-0.26.0.json). Active development is NeoForge 1.21.1. The Forge 1.20.1 release remains at 0.20.0.
