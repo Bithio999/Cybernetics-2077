@@ -1,5 +1,9 @@
 # Validation
 
+## Drawn-gun Smart Link indicator (NeoForge 0.28.1)
+
+Native client review with TaCZ 1.2.0-hotfix and TaCZ Tweaks 3.0.0-alpha.12 confirms the lock brackets render while holding a gun without ADS. The same fixture verifies ADS, scanner handover, ammunition preservation, David's world-clock gun interval and unchanged reload timing. [Native hip-fire capture](images/smart-link-drawn-0.28.1.png) · [Results](review/results/smart-link-drawn-0.28.1.json). Projectile guidance and server lock acquisition are unchanged. Forge remains 0.20.0.
+
 ## Full catalogue and NPC systems (NeoForge 0.28.0)
 
 **110 JVM tests, 174 standalone GameTests, and 196 GameTests with TaCZ/Tweaks all pass.** Validation includes the full standalone server suite, the same suite with exact TaCZ/Tweaks dependencies, JVM rules, native integrated-client checks and strict documentation/package audits. [Machine-readable results](review/results/expansion-0.28.0.json) · [Implementation and limitations](development/EXPANSION-0.28.0.md) · [103-family reference coverage](research/expansion-028/coverage.json).

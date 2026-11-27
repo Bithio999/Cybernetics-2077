@@ -57,8 +57,8 @@ public final class HandsClient {
         || m.options.hideGui
         || ScannerClient.active()) return;
     var t = CyberwareClient.own();
-    if (t.getInt("smartTier") == 0 || !m.player.isUsingItem() && !TacZCompat.aiming(m.player))
-      return;
+    if (t.getInt("smartTier") == 0
+        || !m.player.isUsingItem() && !TacZCompat.gun(m.player.getMainHandItem())) return;
     var g = e.getGuiGraphics();
     CyberBatch.begin();
     try {

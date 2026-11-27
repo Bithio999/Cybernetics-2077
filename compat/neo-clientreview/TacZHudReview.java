@@ -96,7 +96,14 @@ public final class TacZHudReview {
       mc.player.setXRot(6);
     }
     if (tick == 10) mc.player.getInventory().selected = 0;
-    if (tick == 30) shot(out, "gun-idle");
+    if (tick == 30) {
+      if (TacZCompat.aiming(mc.player)
+          || !TacZCompat.gun(mc.player.getMainHandItem())
+          || CyberwareClient.own().getInt("smartTarget") < 0)
+        throw new IllegalStateException(
+            "Hip-fire Smart Link fixture has no drawn gun/lock, or is aiming");
+      shot(out, "gun-drawn-smart-lock");
+    }
     if (tick == 35) aim(true);
     if (tick == 50) {
       if (!TacZCompat.aiming(mc.player)
@@ -187,8 +194,8 @@ public final class TacZHudReview {
     if (tick == 160) {
       Files.writeString(
           out.resolve("passed.txt"),
-          "PASS: native ADS, Smart Link HUD, scanner handover and ammo preservation; client David"
-              + " gun interval x16 with native reload timing unchanged.\n");
+          "PASS: drawn-gun hip-fire and ADS Smart Link HUD, scanner handover and ammo preservation;"
+              + " client David gun interval x16 with native reload timing unchanged.\n");
       mc.stop();
     }
   }

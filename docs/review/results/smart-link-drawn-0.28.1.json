@@ -1,0 +1,34 @@
+{
+  "version": "0.28.1",
+  "platform": "Minecraft 1.21.1 / NeoForge 21.1.248",
+  "scope": "Client Smart Link overlay eligibility uses a held TaCZ gun instead of requiring ADS; bow-use behavior and existing scanner/menu/HUD guards retained.",
+  "nativeClient": {
+    "status": "passed",
+    "dependencies": {
+      "tacz": "1.2.0-hotfix",
+      "taczTweaks": "3.0.0-alpha.12+1.21.1-neoforge"
+    },
+    "checked": [
+      "native gun held with aiming false and synchronized valid Smart Link target",
+      "visible hip-fire lock brackets in actual framebuffer",
+      "native ADS lock",
+      "scanner HUD handover and original crosshair cancellation",
+      "blocked scanner shot preserves ammunition",
+      "David gun cycle world clock and unchanged reload timing"
+    ],
+    "screenshot": "smart-link-drawn-0.28.1.png"
+  },
+  "forgeUpdated": false,
+  "jvm": {
+    "tests": 110,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "release": {
+    "cleanBuild": true,
+    "packageAudit": "passed",
+    "strictWiki": "passed",
+    "sha256": "c83450982a0a4bef73e391c1d1c26846860173bc66e10a9d4c790d8c8b60f493"
+  }
+}
