@@ -133,13 +133,12 @@ public final class BountyGameTests {
     h.assertTrue(BountyContracts.claim(p, f) == 0, "Claim failed");
     var account = p.getData(CityContent.ACCOUNT);
     h.assertTrue(
-        account.eddies() == 2520
-            && account.streetCred() == 3
+        account.eddies() == 840
+            && account.streetCred() == 2
             && account.bountyReport().getString("rating").equals("S"),
         "Optional payment/rating incorrect");
     h.assertTrue(
-        BountyContracts.claim(p, f) == 20 && account.eddies() == 2520,
-        "Duplicate claim paid twice");
+        BountyContracts.claim(p, f) == 20 && account.eddies() == 840, "Duplicate claim paid twice");
     h.succeed();
   }
 
@@ -183,7 +182,7 @@ public final class BountyGameTests {
         "Pet kill did not credit its owner");
     h.assertTrue(
         !p.getData(CityContent.ACCOUNT).bountyReport().getBoolean("specialty")
-            && p.getData(CityContent.ACCOUNT).eddies() == 2160,
+            && p.getData(CityContent.ACCOUNT).eddies() == 720,
         "Pet kill bypassed elapsed-time optional objective");
     h.succeed();
   }
@@ -243,7 +242,7 @@ public final class BountyGameTests {
     kill(h, p, mark);
     h.assertTrue(BountyContracts.claim(p, f) == 0, "Base claim rejected");
     h.assertTrue(
-        p.getData(CityContent.ACCOUNT).eddies() == 1800
+        p.getData(CityContent.ACCOUNT).eddies() == 600
             && p.getData(CityContent.ACCOUNT).bountyReport().getString("rating").equals("C"),
         "Optional failure reduced base pay");
     h.succeed();
@@ -263,7 +262,7 @@ public final class BountyGameTests {
         h.assertTrue(BountyContracts.claim(p, f) == 0, "Elite claim failed");
         var report = p.getData(CityContent.ACCOUNT).bountyReport();
         h.assertTrue(
-            report.getInt("chainBonus") == ((i + 1) % 3 == 0 ? 6000 : 0),
+            report.getInt("chainBonus") == ((i + 1) % 3 == 0 ? 1200 : 0),
             "Loyalty bonus not paid every third job");
       }
       int chips =
@@ -365,6 +364,180 @@ public final class BountyGameTests {
         BountyContracts.safeGround(h.getLevel(), far, p, Set.of()).isEmpty()
             && h.getLevel().getChunkSource().getLoadedChunksCount() == loaded,
         "Ground search generated unloaded terrain");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void cyberpsychoOverkillContainsRatherThanKillsAndPaysOnce(GameTestHelper h) {
+    var p = player(h);
+    var f = fixer(h, p, 0);
+    h.assertTrue(
+        BountyContracts.accept(p, f, BountyContracts.offers(p, f).get(1)) == 0,
+        "Sighting could not be accepted");
+    var target = mark(h, p);
+    target.setNoAi(false);
+    target.setHealth(target.getMaxHealth());
+    target.hurt(h.getLevel().damageSources().playerAttack(p), 100000);
+    var job = BountyContracts.job(p);
+    h.assertTrue(
+        target.isAlive()
+            && target.getHealth() <= target.getMaxHealth() * .1f + .01f
+            && target.isNoAi()
+            && job.getInt("stage") == 2
+            && job.getBoolean("contained"),
+        "Lethal owner attack did not safely contain cyberpsycho");
+    target.invulnerableTime = 0;
+    target.hurt(h.getLevel().damageSources().playerAttack(p), 100000);
+    h.assertTrue(target.isAlive(), "Follow-up hit killed contained target");
+    var saved = target.saveWithoutId(new CompoundTag());
+    var clone = (Mob) target.getType().create(h.getLevel());
+    clone.load(saved);
+    var joining = new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(clone, h.getLevel());
+    BountyContracts.join(joining);
+    h.assertTrue(
+        !joining.isCanceled()
+            && clone.isNoAi()
+            && clone.isInvulnerableTo(h.getLevel().damageSources().playerAttack(p)),
+        "Contained state did not survive reload");
+    h.assertTrue(
+        BountyContracts.claim(p, f) == 0 && p.getData(CityContent.ACCOUNT).eddies() == 900,
+        "Containment reward incorrect");
+    h.assertTrue(
+        BountyContracts.claim(p, f) == 20 && target.isRemoved(),
+        "Repeated claim or contained target cleanup failed");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void outsiderCannotContainAndEnvironmentalDeathFailsSighting(GameTestHelper h) {
+    var p = player(h);
+    var f = fixer(h, p, 0);
+    BountyContracts.accept(p, f, BountyContracts.offers(p, f).get(1));
+    var target = mark(h, p);
+    var outsider = player(h);
+    target.hurt(h.getLevel().damageSources().playerAttack(outsider), 100000);
+    h.assertTrue(
+        !target.isAlive()
+            && BountyContracts.job(p).getInt("stage") == 3
+            && BountyContracts.claim(p, f) == 20,
+        "Foreign kill completed a containment job");
+    BountyContracts.abandon(p, f);
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", batch = "recoveryCache", timeoutTicks = 100)
+  public static void recoveryRequiresOwnerNearVisibleCacheAndCannotPayTwice(GameTestHelper h) {
+    var p = player(h);
+    var f = fixer(h, p, 1);
+    BountyContracts.accept(p, f, BountyContracts.offers(p, f).get(2));
+    var target = mark(h, p);
+    var floor = target.blockPosition().below();
+    for (int x = -3; x <= 3; x++)
+      for (int z = -3; z <= 3; z++)
+        h.getLevel().setBlock(floor.offset(x, 0, z), Blocks.STONE.defaultBlockState(), 3);
+    kill(h, p, target);
+    var job = BountyContracts.job(p);
+    h.assertTrue(
+        job.getInt("stage") == 4
+            && job.hasUUID("cache")
+            && h.getLevel().getEntity(job.getUUID("cache")) instanceof Display.BlockDisplay,
+        "Courier did not leave recovery cache");
+    h.assertTrue(
+        BountyContracts.claim(p, f) == 20
+            && BountyContracts.navigation(p).getString("objective").contains("RECOVER"),
+        "Courier kill skipped recovery phase");
+    var cache = h.getLevel().getEntity(job.getUUID("cache"));
+    var outsider = player(h);
+    outsider.setPos(cache.position());
+    h.assertTrue(!BountyContracts.recover(outsider), "Other player stole recovery objective");
+    p.setPos(cache.position().add(10, 0, 0));
+    h.assertTrue(!BountyContracts.recover(p), "Remote recovery accepted");
+    p.setPos(cache.position().add(2, 0, 0));
+    var copied = p.getInventory().getItem(0).copy();
+    var forged =
+        copied
+            .getOrDefault(
+                net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+                net.minecraft.world.item.component.CustomData.EMPTY)
+            .copyTag();
+    forged.putUUID("owner", outsider.getUUID());
+    copied.set(
+        net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+        net.minecraft.world.item.component.CustomData.of(forged));
+    p.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, copied);
+    ((BountyContract) copied.getItem())
+        .use(h.getLevel(), p, net.minecraft.world.InteractionHand.MAIN_HAND);
+    h.assertTrue(BountyContracts.job(p).getInt("stage") == 4, "Foreign shard recovered the cache");
+    forged.putUUID("owner", p.getUUID());
+    copied.set(
+        net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+        net.minecraft.world.item.component.CustomData.of(forged));
+    ((BountyContract) copied.getItem())
+        .use(h.getLevel(), p, net.minecraft.world.InteractionHand.MAIN_HAND);
+    h.assertTrue(
+        BountyContracts.job(p).getInt("stage") == 2
+            && BountyContracts.job(p).getBoolean("recovered")
+            && cache.isRemoved(),
+        "Native shard use did not secure cache");
+    p.setPos(f.position().add(1, 0, 0));
+    h.assertTrue(
+        BountyContracts.claim(p, f) == 0 && p.getData(CityContent.ACCOUNT).eddies() == 924,
+        "Recovery payout incorrect");
+    h.assertTrue(
+        BountyContracts.claim(p, f) == 20 && !BountyContracts.recover(p), "Recovery paid twice");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", batch = "recoveryCleanup", timeoutTicks = 80)
+  public static void recoveryCacheSavesAndAbandonRejectsStaleCache(GameTestHelper h) {
+    var p = player(h);
+    var f = fixer(h, p, 0);
+    BountyContracts.accept(p, f, BountyContracts.offers(p, f).get(2));
+    kill(h, p, mark(h, p));
+    var job = BountyContracts.job(p);
+    var ledger = BountyLedger.get(p.server);
+    var saved =
+        BountyLedger.load(
+            ledger.save(new CompoundTag(), h.getLevel().registryAccess()),
+            h.getLevel().registryAccess());
+    h.assertTrue(
+        saved.job(p.getUUID()).getInt("stage") == 4
+            && saved.job(p.getUUID()).getUUID("cache").equals(job.getUUID("cache")),
+        "Recovery state lost on save");
+    var cache = h.getLevel().getEntity(job.getUUID("cache"));
+    var data = cache.saveWithoutId(new CompoundTag());
+    BountyContracts.abandon(p, f);
+    h.assertTrue(cache.isRemoved(), "Abandon left cache behind");
+    var stale = EntityType.BLOCK_DISPLAY.create(h.getLevel());
+    stale.load(data);
+    h.assertTrue(!h.getLevel().addFreshEntity(stale), "Stale recovery cache survived reload");
+    h.succeed();
+  }
+
+  @GameTest(template = "empty", timeoutTicks = 80)
+  public static void namedCombatChassisReloadDoesNotStackOrRefillHealth(GameTestHelper h) {
+    var p = player(h);
+    var f = fixer(h, p, 0);
+    accept(h, p, f);
+    var target = mark(h, p);
+    float max = target.getMaxHealth();
+    h.assertTrue(
+        max >= 60
+            && target.getArmorValue() >= 4
+            && target.getAttributeValue(
+                    net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE)
+                > 4,
+        "Named target remains ordinary chromed strength");
+    target.setHealth(10);
+    for (int i = 0; i < 3; i++) BountyCombat.apply(target, 1, false, false);
+    h.assertTrue(
+        target.getMaxHealth() == max && target.getHealth() == 10,
+        "Reload stacked chassis or healed target");
+    for (int tier = 1; tier <= 5; tier++)
+      for (int count = 1; count <= 6; count++)
+        h.assertTrue(
+            BountyCombat.loadout(tier, count).size() == count, "Combat loadout incomplete");
+    BountyContracts.abandon(p, f);
     h.succeed();
   }
 }

@@ -118,6 +118,7 @@ with PortZip(jar) as z:
     if not forge:
         for required in (
             'dev/cybernetics2077/cyberware/CyberwareCapacity.class',
+            'dev/cybernetics2077/city/BountyCombat.class',
             'dev/cybernetics2077/client/GuidedBulletClient.class',
             'dev/cybernetics2077/client/SmoothBulletClient.class',
             'dev/cybernetics2077/client/GunCycleTime.class',

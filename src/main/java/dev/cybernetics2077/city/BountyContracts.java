@@ -34,6 +34,15 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 public final class BountyContracts {
   public static final String MOB_DATA = "cybernetics2077:bounty";
 
+  public static BountyRules.Kind kind(CompoundTag job) {
+    return BountyRules.Kind.from(job.getString("kind"));
+  }
+
+  public static String objective(CompoundTag job) {
+    if (job.getInt("stage") == 4) return "RECOVER CACHE / USE CONTRACT SHARD NEARBY";
+    return kind(job).objective;
+  }
+
   public static long day(MinecraftServer server) {
     return Math.floorDiv(server.overworld().getDayTime(), 24000);
   }
@@ -62,13 +71,14 @@ public final class BountyContracts {
     t.putInt("slot", offer.slot());
     t.putInt("rank", offer.rank());
     t.putInt("profile", offer.profile());
-    t.putString("title", "Wanted: " + offer.alias());
+    t.putString("kind", offer.kind().id);
+    t.putString("title", offer.kind().label + ": " + offer.alias());
     t.putString("alias", offer.alias());
     t.putString("mob", offer.mob());
     t.putInt("tier", BountyRules.tier(offer.rank()));
-    t.putInt("implants", BountyRules.implants(offer.rank()));
+    t.putInt("implants", BountyRules.implants(offer.rank(), offer.kind()));
     t.putInt("guards", BountyRules.guards(offer.rank()));
-    t.putInt("eddies", BountyRules.pay(offer.rank()));
+    t.putInt("eddies", BountyRules.pay(offer.rank(), offer.kind()));
     t.putInt("cred", BountyRules.cred(offer.rank()));
     return t;
   }
@@ -124,11 +134,17 @@ public final class BountyContracts {
     say(
         p,
         fixer,
-        fixer.style() == 0
-            ? "The dossier is yours. Confirm the mark through your scanner before you engage. Keep"
-                + " civilians out of it."
-            : "That's your mark. Once the fight starts, finish it inside ninety seconds. Get back"
-                + " here for payment.");
+        offer.kind() == BountyRules.Kind.CYBERPSYCHO
+            ? "Bring them down to critical health. Your last hit will contain them. Keep them alive"
+                + " and return for debrief."
+            : offer.kind() == BountyRules.Kind.RECOVERY
+                ? "Find the courier. Once they're down, use your contract shard beside the sealed"
+                    + " cache. Then bring the payload back."
+                : fixer.style() == 0
+                    ? "The dossier is yours. Confirm the mark through your scanner before you"
+                        + " engage. Keep civilians out of it."
+                    : "That's your mark. Once the fight starts, finish it inside ninety seconds."
+                        + " Get back here for payment.");
     return 0;
   }
 
@@ -218,6 +234,7 @@ public final class BountyContracts {
       if (!p.getInventory().add(reward)) p.drop(reward, false);
     }
     var report = job.copy();
+    report.putInt("eddies", base);
     report.putInt("stage", 3);
     report.putBoolean("specialty", special);
     report.putInt("bonus", bonus);
@@ -263,6 +280,10 @@ public final class BountyContracts {
 
   private static void cleanup(MinecraftServer server, CompoundTag job) {
     var level = server.overworld();
+    if (job.hasUUID("cache")) {
+      var cache = level.getEntity(job.getUUID("cache"));
+      if (cache != null) cache.discard();
+    }
     if (job.hasUUID("target")) {
       var e = level.getEntity(job.getUUID("target"));
       if (e != null && e.isAlive()) e.discard();
@@ -291,9 +312,9 @@ public final class BountyContracts {
         "objective",
         returning
             ? "RETURN TO " + BountyRules.profileName(job.getInt("profile"))
-            : job.getBoolean("spawned")
-                ? "ELIMINATE MARK / TIER " + job.getInt("tier")
-                : "SEARCH AREA / APPROACH THE LEAD");
+            : job.getInt("stage") == 4
+                ? "RECOVER CACHE / USE CONTRACT SHARD NEARBY"
+                : job.getBoolean("spawned") ? objective(job) : "SEARCH AREA / APPROACH THE LEAD");
     return nav;
   }
 
@@ -387,14 +408,19 @@ public final class BountyContracts {
       int tier = i == 0 ? job.getInt("tier") : Math.max(1, job.getInt("tier") - 1);
       EnhancedMobs.install(
           mob,
-          MobCyberwarePool.rollExactTier(
-              tier,
-              i == 0 ? job.getInt("implants") : Math.min(3, job.getInt("implants")),
-              mob.getRandom()));
+          i == 0
+              ? BountyCombat.loadout(tier, job.getInt("implants"))
+              : MobCyberwarePool.rollExactTier(
+                  tier, Math.min(3, job.getInt("implants")), mob.getRandom()));
+      if (i == 0)
+        BountyCombat.apply(
+            mob, job.getInt("rank"), kind(job) == BountyRules.Kind.CYBERPSYCHO, true);
       var marker = new CompoundTag();
       marker.putUUID("owner", player.getUUID());
       marker.putUUID("token", job.getUUID("token"));
       marker.putInt("role", i == 0 ? 0 : 1);
+      marker.putInt("rank", job.getInt("rank"));
+      marker.putString("kind", kind(job).id);
       mob.getPersistentData().put(MOB_DATA, marker);
       mob.setPersistenceRequired();
       mob.setCanPickUpLoot(false);
@@ -439,19 +465,34 @@ public final class BountyContracts {
 
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public static void join(EntityJoinLevelEvent e) {
-    if (e.getLevel().isClientSide || !(e.getEntity() instanceof Mob mob)) return;
-    var marker = mob.getPersistentData().getCompound(MOB_DATA);
+    if (e.getLevel().isClientSide) return;
+    var entity = e.getEntity();
+    var marker = entity.getPersistentData().getCompound(MOB_DATA);
+    if (marker.getInt("role") == 2 && marker.hasUUID("owner")) {
+      var job = BountyLedger.get(e.getLevel().getServer()).job(marker.getUUID("owner"));
+      if (job.getInt("stage") != 4
+          || !job.hasUUID("cache")
+          || !job.getUUID("cache").equals(entity.getUUID())
+          || !marker.hasUUID("token")
+          || !job.hasUUID("token")
+          || !marker.getUUID("token").equals(job.getUUID("token"))) {
+        e.setCanceled(true);
+        entity.discard();
+      }
+      return;
+    }
+    if (!(entity instanceof Mob mob)) return;
     if (!marker.hasUUID("owner") || !marker.hasUUID("token")) return;
     var job = BountyLedger.get(e.getLevel().getServer()).job(marker.getUUID("owner"));
     boolean valid =
         job.hasUUID("token")
             && marker.getUUID("token").equals(job.getUUID("token"))
-            && (job.getInt("stage") == 1 || job.getInt("stage") == 2);
+            && (job.getInt("stage") == 1 || job.getInt("stage") == 2 || job.getInt("stage") == 4);
     if (valid && marker.getInt("role") == 0)
       valid =
           job.hasUUID("target")
               && mob.getUUID().equals(job.getUUID("target"))
-              && job.getInt("stage") == 1;
+              && (job.getInt("stage") == 1 || job.getBoolean("contained"));
     if (valid && marker.getInt("role") != 0)
       valid =
           job.getList("guardIds", Tag.TAG_STRING).stream()
@@ -461,6 +502,16 @@ public final class BountyContracts {
       mob.discard();
       return;
     }
+    if (marker.getInt("role") == 0) {
+      marker.putInt("rank", job.getInt("rank"));
+      marker.putString("kind", kind(job).id);
+    }
+    if (marker.getInt("role") == 0)
+      BountyCombat.apply(
+          mob,
+          Math.clamp(job.getInt("rank"), 1, 6),
+          kind(job) == BountyRules.Kind.CYBERPSYCHO,
+          false);
     if (marker.getInt("role") == 0)
       mob.setCustomName(
           Component.translatable(
@@ -477,6 +528,15 @@ public final class BountyContracts {
     if (server.overworld().getGameTime() % 20 != 0) return;
     for (var player : server.getPlayerList().getPlayers()) {
       var job = job(player);
+      if (job.getInt("stage") == 4) {
+        if (server
+                .overworld()
+                .hasChunkAt(new BlockPos(job.getInt("x"), job.getInt("y"), job.getInt("z")))
+            && (!job.hasUUID("cache")
+                || server.overworld().getEntity(job.getUUID("cache")) == null))
+          spawnCache(server, player.getUUID(), job);
+        continue;
+      }
       if (job.getInt("stage") != 1) continue;
       if (!job.getBoolean("spawned")) {
         deploy(player);
@@ -528,6 +588,18 @@ public final class BountyContracts {
   public static void damage(LivingIncomingDamageEvent e) {
     if (!(e.getEntity().level() instanceof ServerLevel level) || e.getAmount() <= 0) return;
     var actor = e.getSource().getEntity();
+    if (actor instanceof Mob attacker
+        && e.getSource().is(net.minecraft.tags.DamageTypeTags.IS_PROJECTILE)) {
+      var data = attacker.getPersistentData().getCompound(MOB_DATA);
+      if (data.hasUUID("owner") && data.getInt("role") == 0)
+        e.setAmount(
+            e.getAmount()
+                * (float)
+                    BountyCombat.damage(
+                        Math.clamp(data.getInt("rank"), 1, 6),
+                        BountyRules.Kind.from(data.getString("kind"))
+                            == BountyRules.Kind.CYBERPSYCHO));
+    }
     UUID owner = ownedCredit(actor);
     var marker = e.getEntity().getPersistentData().getCompound(MOB_DATA);
     if (owner == null && e.getEntity() instanceof ServerPlayer p) {
@@ -560,7 +632,7 @@ public final class BountyContracts {
     if (!(e.getEntity().level() instanceof ServerLevel level)) return;
     if (e.getEntity() instanceof ServerPlayer p) {
       var job = job(p);
-      if (job.getInt("stage") == 1) {
+      if (job.getInt("stage") == 1 || job.getInt("stage") == 4) {
         job.putBoolean("survival", false);
         save(p, job);
       }
@@ -572,7 +644,7 @@ public final class BountyContracts {
     if (credited != null
         && (e.getEntity() instanceof AbstractVillager || e.getEntity() instanceof CityResident)) {
       var job = ledger.job(credited);
-      if (job.getInt("stage") == 1) {
+      if (job.getInt("stage") == 1 || job.getInt("stage") == 4) {
         job.putBoolean("civilians", false);
         ledger.put(credited, job);
       }
@@ -583,24 +655,142 @@ public final class BountyContracts {
     if (job.getInt("stage") != 1
         || !job.hasUUID("target")
         || !job.getUUID("target").equals(e.getEntity().getUUID())) return;
-    boolean success = marker.getUUID("owner").equals(credited);
-    job.putInt("stage", success ? 2 : 3);
+    boolean success =
+        marker.getUUID("owner").equals(credited) && kind(job) != BountyRules.Kind.CYBERPSYCHO;
+    job.putInt("stage", success ? kind(job) == BountyRules.Kind.RECOVERY ? 4 : 2 : 3);
     job.putLong("finished", level.getServer().overworld().getGameTime());
     if (success && !job.getBoolean("engaged")) {
       job.putBoolean("engaged", true);
       job.putLong("engagement", job.getLong("finished"));
     }
-    if (!success) job.putString("failure", "The mark was eliminated without your kill credit.");
+    if (!success)
+      job.putString(
+          "failure",
+          kind(job) == BountyRules.Kind.CYBERPSYCHO
+              ? "The cyberpsycho died before containment."
+              : "The mark was eliminated without your kill credit.");
+    if (success && kind(job) == BountyRules.Kind.RECOVERY) {
+      job.putInt("x", e.getEntity().getBlockX());
+      job.putInt("y", e.getEntity().getBlockY());
+      job.putInt("z", e.getEntity().getBlockZ());
+    }
     ledger.put(marker.getUUID("owner"), job);
+    if (success && kind(job) == BountyRules.Kind.RECOVERY)
+      spawnCache(level.getServer(), marker.getUUID("owner"), job);
     var owner = level.getServer().getPlayerList().getPlayer(marker.getUUID("owner"));
     if (owner != null) {
       changed(owner);
       owner.sendSystemMessage(
           Component.literal(
                   success
-                      ? "BOUNTY CONFIRMED // Return to your fixer for payment."
+                      ? kind(job) == BountyRules.Kind.RECOVERY
+                          ? "COURIER DOWN // Use your contract shard beside the sealed cache."
+                          : "BOUNTY CONFIRMED // Return to your fixer for payment."
                       : "BOUNTY LOST // Return to a fixer to clear the dossier.")
               .withStyle(success ? ChatFormatting.AQUA : ChatFormatting.RED));
+    }
+  }
+
+  private static void spawnCache(MinecraftServer server, UUID owner, CompoundTag job) {
+    var level = server.overworld();
+    int x = job.getInt("x"), z = job.getInt("z");
+    if (!level.hasChunkAt(new BlockPos(x, 0, z))) return;
+    int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+    var cache = EntityType.BLOCK_DISPLAY.create(level);
+    if (cache == null) return;
+    var data = cache.saveWithoutId(new CompoundTag());
+    data.put(
+        "block_state",
+        NbtUtils.writeBlockState(
+            net.minecraft.world.level.block.Blocks.BARREL.defaultBlockState()));
+    cache.load(data);
+    cache.setPos(x, y, z);
+    cache.setInvulnerable(true);
+    var marker = new CompoundTag();
+    marker.putUUID("owner", owner);
+    marker.putUUID("token", job.getUUID("token"));
+    marker.putInt("role", 2);
+    cache.getPersistentData().put(MOB_DATA, marker);
+    job.putUUID("cache", cache.getUUID());
+    job.putInt("y", y);
+    BountyLedger.get(server).put(owner, job);
+    level.addFreshEntity(cache);
+  }
+
+  public static boolean recover(ServerPlayer p) {
+    var job = job(p);
+    if (kind(job) != BountyRules.Kind.RECOVERY
+        || job.getInt("stage") != 4
+        || p.level().dimension() != Level.OVERWORLD
+        || !p.isAlive()
+        || p.isSpectator()) return false;
+    var center =
+        new net.minecraft.world.phys.Vec3(
+            job.getInt("x") + .5, job.getInt("y") + .4, job.getInt("z") + .5);
+    if (p.distanceToSqr(center) > 16
+        || p.level()
+                .clip(
+                    new net.minecraft.world.level.ClipContext(
+                        p.getEyePosition(),
+                        center,
+                        net.minecraft.world.level.ClipContext.Block.COLLIDER,
+                        net.minecraft.world.level.ClipContext.Fluid.NONE,
+                        p))
+                .getType()
+            != net.minecraft.world.phys.HitResult.Type.MISS) return false;
+    if (!job.hasUUID("cache") || p.serverLevel().getEntity(job.getUUID("cache")) == null)
+      return false;
+    p.serverLevel().getEntity(job.getUUID("cache")).discard();
+    job.putInt("stage", 2);
+    job.putBoolean("recovered", true);
+    job.putLong("finished", p.server.overworld().getGameTime());
+    save(p, job);
+    changed(p);
+    p.sendSystemMessage(
+        Component.literal("CYBERWARE SECURED // Return to your fixer for payment.")
+            .withStyle(ChatFormatting.AQUA));
+    return true;
+  }
+
+  @SubscribeEvent(priority = EventPriority.LOWEST)
+  public static void contain(LivingDamageEvent.Pre e) {
+    if (!(e.getEntity() instanceof Mob target)
+        || !(target.level() instanceof ServerLevel level)
+        || e.getNewDamage() <= 0
+        || e.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) return;
+    var marker = target.getPersistentData().getCompound(MOB_DATA);
+    if (!marker.hasUUID("owner") || marker.getInt("role") != 0) return;
+    var owner = marker.getUUID("owner");
+    var job = BountyLedger.get(level.getServer()).job(owner);
+    if (kind(job) != BountyRules.Kind.CYBERPSYCHO
+        || job.getInt("stage") != 1
+        || !job.hasUUID("target")
+        || !job.getUUID("target").equals(target.getUUID())
+        || !owner.equals(ownedCredit(e.getSource().getEntity()))
+        || !marker.hasUUID("token")
+        || !job.getUUID("token").equals(marker.getUUID("token"))) return;
+    float threshold = Math.max(1, target.getMaxHealth() * .1f);
+    if (target.getHealth() - e.getNewDamage() > threshold) return;
+    e.setNewDamage(0);
+    target.setHealth(Math.min(target.getHealth(), threshold));
+    target.setTarget(null);
+    target.setNoAi(true);
+    target.setInvulnerable(true);
+    target.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+    job.putInt("stage", 2);
+    job.putBoolean("contained", true);
+    job.putLong("finished", level.getServer().overworld().getGameTime());
+    if (!job.getBoolean("engaged")) {
+      job.putBoolean("engaged", true);
+      job.putLong("engagement", job.getLong("finished"));
+    }
+    BountyLedger.get(level.getServer()).put(owner, job);
+    var player = level.getServer().getPlayerList().getPlayer(owner);
+    if (player != null) {
+      changed(player);
+      player.sendSystemMessage(
+          Component.literal("CYBERPSYCHO CONTAINED // Return to your fixer.")
+              .withStyle(ChatFormatting.AQUA));
     }
   }
 

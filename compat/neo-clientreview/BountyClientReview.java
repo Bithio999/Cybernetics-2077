@@ -190,12 +190,12 @@ public final class BountyClientReview {
           "Claim did not clear active job");
       check(
           ((FixerMenu) mc.player.containerMenu).board().getCompound("report").getInt("payout")
-              == 8400,
+              == 2240,
           "Client debrief payout incorrect");
       shot(out, "bounty-debrief");
       server(
           p ->
-              check(p.getData(CityContent.ACCOUNT).streetCred() == 25, "Wrong earned Street Cred"));
+              check(p.getData(CityContent.ACCOUNT).streetCred() == 23, "Wrong earned Street Cred"));
     }
     if (tick == 180) button("DELIVERY");
     if (tick == 190) {
@@ -225,14 +225,116 @@ public final class BountyClientReview {
       shot(out, "bounty-small-window");
       org.lwjgl.glfw.GLFW.glfwSetWindowSize(mc.getWindow().getWindow(), 854, 480);
     }
-    if (tick == 255) {
+    if (tick == 260 || tick == 350) button("BOUNTIES");
+    if (tick == 265) card("CYBERPSYCHO SIGHTING:");
+    if (tick == 270) shot(out, "cyberpsycho-offer");
+    if (tick == 275) button("ACCEPT BOUNTY");
+    if (tick == 290) deploy(mc);
+    if (tick == 310) {
+      server(
+          p -> {
+            var target = (Mob) p.serverLevel().getEntity(targetId);
+            target.setNoAi(false);
+            target.hurt(p.serverLevel().damageSources().playerAttack(p), 100000);
+            check(
+                target.isAlive() && BountyContracts.job(p).getBoolean("contained"),
+                "Native attack failed containment");
+            p.teleportTo(0, 90, 0);
+            open(p);
+          });
+    }
+    if (tick == 330) shot(out, "cyberpsycho-ready");
+    if (tick == 335) button("CLAIM PAYMENT");
+    if (tick == 355) card("CYBERWARE RECOVERY:");
+    if (tick == 360) shot(out, "recovery-offer");
+    if (tick == 365) button("ACCEPT BOUNTY");
+    if (tick == 380) deploy(mc);
+    if (tick == 400)
+      server(
+          p -> {
+            var target = (Mob) p.serverLevel().getEntity(targetId);
+            target.hurt(p.serverLevel().damageSources().playerAttack(p), 100000);
+            var job = BountyContracts.job(p);
+            check(job.getInt("stage") == 4, "Courier kill bypassed recovery");
+            p.teleportTo(job.getInt("x") + 2, job.getInt("y"), job.getInt("z"));
+          });
+    if (tick == 420) {
+      var cache =
+          java.util.stream.StreamSupport.stream(
+                  mc.level.entitiesForRendering().spliterator(), false)
+              .filter(
+                  e -> e.getType() == EntityType.BLOCK_DISPLAY && e.distanceToSqr(mc.player) < 36)
+              .findFirst()
+              .orElseThrow();
+      var d = cache.position().add(.5, .4, .5).subtract(mc.player.getEyePosition());
+      mc.player.setYRot((float) (Math.toDegrees(Math.atan2(d.z, d.x)) - 90));
+      mc.player.setXRot((float) -Math.toDegrees(Math.atan2(d.y, Math.hypot(d.x, d.z))));
+      mc.gui.getChat().clearMessages(false);
+    }
+    if (tick == 423) shot(out, "recovery-cache");
+    if (tick == 425) {
+      for (int i = 0; i < 9; i++)
+        if (mc.player.getInventory().getItem(i).is(CityContent.BOUNTY_CONTRACT.get()))
+          mc.player.getInventory().selected = i;
+      mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
+    }
+    if (tick == 445)
+      server(
+          p -> {
+            check(
+                BountyContracts.job(p).getBoolean("recovered")
+                    && BountyContracts.job(p).getInt("stage") == 2,
+                "Native shard use did not recover payload");
+            p.teleportTo(0, 90, 0);
+            open(p);
+          });
+    if (tick == 465) shot(out, "recovery-ready");
+    if (tick == 470) button("CLAIM PAYMENT");
+    if (tick == 490) {
+      check(
+          ((FixerMenu) mc.player.containerMenu).board().getCompound("job").isEmpty(),
+          "Recovery claim failed");
+      shot(out, "recovery-debrief");
+    }
+    if (tick == 495) {
       Files.writeString(
           out.resolve("passed.txt"),
           "PASS: daily bounty board, native accept/dossier, real target/guards deployment,"
               + " pre-combat optical scan and navigation, actual player kill, native claim, S-rated"
-              + " 8400 payment and +5 SC, preserved introductory delivery.\n");
+              + " 2240 payment and +3 SC, preserved introductory delivery; native cyberpsycho"
+              + " containment/claim and recovery courier/cache/shard-use/claim.\n");
       mc.stop();
     }
+  }
+
+  private static void card(String prefix) {
+    var mc = Minecraft.getInstance();
+    mc.screen.children().stream()
+        .filter(AbstractButton.class::isInstance)
+        .map(AbstractButton.class::cast)
+        .filter(b -> b.visible && b.active && b.getMessage().getString().startsWith(prefix))
+        .findFirst()
+        .orElseThrow()
+        .onPress();
+  }
+
+  private static void deploy(Minecraft mc) {
+    mc.player.closeContainer();
+    mc.setScreen(null);
+    server(
+        p -> {
+          var j = BountyContracts.job(p);
+          j.putInt("x", 60);
+          j.putInt("y", 90);
+          j.putInt("z", 0);
+          BountyLedger.get(p.server).put(p.getUUID(), j);
+          check(BountyContracts.deploy(p), "New contract did not deploy");
+          j = BountyContracts.job(p);
+          var target = (Mob) p.serverLevel().getEntity(j.getUUID("target"));
+          targetId = target.getId();
+          target.setNoAi(true);
+          p.teleportTo(12, 90, 0);
+        });
   }
 
   private BountyClientReview() {}

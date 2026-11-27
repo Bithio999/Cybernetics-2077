@@ -29,6 +29,7 @@ public final class BountyContract extends Item {
       return;
     }
     lines.add(Component.literal(t.getString("title")).withStyle(ChatFormatting.AQUA));
+    lines.add(Component.literal(BountyContracts.objective(t)).withStyle(ChatFormatting.YELLOW));
     lines.add(
         Component.literal(
                 BountyRules.rankName(Math.clamp(t.getInt("rank"), 1, 6))
@@ -83,6 +84,29 @@ public final class BountyContract extends Item {
 
   @Override
   public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    if (player instanceof ServerPlayer p) {
+      var t =
+          player
+              .getItemInHand(hand)
+              .getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)
+              .copyTag();
+      var job = BountyContracts.job(p);
+      boolean valid =
+          t.hasUUID("owner")
+              && t.getUUID("owner").equals(p.getUUID())
+              && t.hasUUID("token")
+              && job.hasUUID("token")
+              && t.getUUID("token").equals(job.getUUID("token"));
+      if (valid && job.getInt("stage") == 4) {
+        if (!BountyContracts.recover(p))
+          p.displayClientMessage(
+              Component.literal(
+                  "Approach the sealed cache and use this shard within 4 blocks, with clear"
+                      + " sight."),
+              true);
+        return InteractionResultHolder.success(player.getItemInHand(hand));
+      }
+    }
     if (!level.isClientSide)
       player.displayClientMessage(
           Component.literal(

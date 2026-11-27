@@ -37,7 +37,10 @@ class BountyRulesTest {
     assertTrue(
         board.stream()
             .allMatch(
-                o -> o.mob().equals("minecraft:skeleton") || o.mob().equals("minecraft:pillager")));
+                o ->
+                    o.kind() == BountyRules.Kind.CYBERPSYCHO
+                        || o.mob().equals("minecraft:skeleton")
+                        || o.mob().equals("minecraft:pillager")));
   }
 
   @Test
@@ -53,6 +56,23 @@ class BountyRulesTest {
     assertEquals("C", BountyRules.rating(0));
     for (int rank = 2; rank <= 6; rank++)
       assertTrue(BountyRules.pay(rank) > BountyRules.pay(rank - 1));
+  }
+
+  @Test
+  void boardsIncludeEveryJobTypeAndReducedProgressionRewards() {
+    var board = BountyRules.offers(fixer, player, 8, 50, 0);
+    assertEquals(
+        Set.of(BountyRules.Kind.values()),
+        new HashSet<>(board.stream().map(BountyRules.Offer::kind).toList()));
+    int[] prices = {600, 1000, 1600, 2400, 3400, 4800};
+    for (int rank = 1; rank <= 6; rank++) {
+      assertEquals(prices[rank - 1], BountyRules.pay(rank));
+      assertEquals((rank + 1) / 2, BountyRules.cred(rank));
+      assertTrue(BountyRules.pay(rank, BountyRules.Kind.CYBERPSYCHO) > BountyRules.pay(rank));
+      assertTrue(
+          BountyRules.implants(rank, BountyRules.Kind.CYBERPSYCHO) >= BountyRules.implants(rank));
+    }
+    assertEquals(BountyRules.Kind.HUNT, BountyRules.Kind.from(""));
   }
 
   @Test

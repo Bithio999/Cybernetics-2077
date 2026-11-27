@@ -8,26 +8,46 @@ Talk to **Mara Voss** or **Ren Calder** at the Afterlife. Their menu has **Bount
 
 Available on **NeoForge 0.22.0 and later**. Forge 0.20.0 retains the introductory delivery only.
 
-Each fixer has **three offers per player each Minecraft day**. Offers rotate at Overworld dawn. Reopening the menu does not reroll them. Street Cred unlocks stronger marks; some lower-difficulty work remains available.
+Each fixer has **three offers per player each Minecraft day**. The board includes a **Wanted** mark, a **Cyberpsycho Sighting** and a **Cyberware Recovery** job. Offers rotate at Overworld dawn. Reopening the menu does not reroll them. Street Cred unlocks stronger marks; some lower-difficulty work remains available.
 
 | Required Street Cred | Difficulty | Target implant tier | Implants | Guards | Base payment | Base Street Cred |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: |
-| 0 | Tier 1 | 1 | 1 | 0 | €$1,800 | 2 |
-| 10 | Tier 2 | 2 | 2 | 0 | €$3,500 | 3 |
-| 20 | Tier 3 | 3 | 3 | 1 | €$6,000 | 4 |
-| 30 | Tier 4 | 4 | 4 | 1 | €$10,000 | 5 |
-| 40 | Tier 5 | 5 | 5 | 2 | €$16,000 | 6 |
-| 50 | Elite Tier 5 | 5 | 6 | 3 | €$24,000 | 7 |
+| 0 | Tier 1 | 1 | 2 | 0 | €$600 | 1 |
+| 10 | Tier 2 | 2 | 3 | 0 | €$1,000 | 1 |
+| 20 | Tier 3 | 3 | 4 | 1 | €$1,600 | 2 |
+| 30 | Tier 4 | 4 | 5 | 1 | €$2,400 | 2 |
+| 40 | Tier 5 | 5 | 6 | 2 | €$3,400 | 3 |
+| 50 | Elite Tier 5 | 5 | 6 | 3 | €$4,800 | 3 |
 
-The mark wears **real non-Iconic implants at the listed tier**. Guards are one tier lower, with up to three implants. The normal chromed-mob chassis and equipment effects apply. These are specific named targets, not a quota of random kills.
+The table shows standard Wanted jobs. New contracts use the reduced rewards; previously accepted dossiers keep their quoted payment.
+
+The mark wears **real non-Iconic combat implants at the listed tier**, including armor and, at higher tiers, Blood Pump and Neofiber. Named targets have additional health, damage, armor, toughness and pursuit range. Guards are one tier lower, with up to three implants. The normal chromed-mob chassis and equipment effects apply. These are specific named targets, not a quota of random kills.
 
 1. Choose an offer and **Accept Bounty**. You need one free inventory slot.
 2. Hold the scan key to follow the lead. The encounter deploys on safe loaded ground as you approach, without changing blocks or force-loading distant chunks.
-3. Eliminate your assigned mark. Your kill credit—or your tamed pet's—must confirm the kill. Another player's kill does not pay your contract.
+3. Complete the assigned objective below. For Wanted jobs, eliminate your assigned mark. Your kill credit—or your tamed pet's—must confirm the kill. Another player's kill does not pay your contract.
 4. Return to the issuing fixer, or another fixer in the same network, and **Claim Payment**. The shard can also be used on the correct fixer when payment is ready.
 5. Read your rating, payment breakdown and optional results in **Debrief**.
 
-![Daily bounty dossiers](../images/neo023-fixer-board.png)
+![Daily bounty dossiers](../images/contracts-025-board.png)
+
+### Cyberpsycho Sighting
+
+Fight the named cyberpsycho down to **10% maximum health**. Your hit—or your tamed pet's—automatically contains them, even if that hit would otherwise be fatal. A contained target stops fighting and is protected from normal follow-up damage. Return to the issuing fixer network to collect payment.
+
+Cyberpsychos have **one additional implant**, up to six, **50% more health** and **20% more damage** than an equivalent named mark. Their base payment is **25% higher** than the table. A target killed by another player or the environment before containment fails the job.
+
+![Cyberpsycho sighting dossier](../images/contracts-025-cyberpsycho.png)
+
+### Cyberware Recovery
+
+Defeat the assigned courier, then find the **sealed barrel cache** at their last location. Hold scan for the updated waypoint. With the contract shard in your hand, **use it within four blocks of the cache with clear sight** to secure the payload. Return to the fixer for payment.
+
+Killing the courier alone does not complete this job. The payload is recorded on your contract, so it does not need a separate inventory slot. Other players cannot collect your cache. Reissue a lost shard at a fixer; the cache remains part of the same job. Abandoning the job removes its cache and remaining guards.
+
+Recovery jobs offer **10% higher base payment** than the table and run one rank below your current maximum, with Tier 1 as the minimum. Ren's 90-second specialty timer includes retrieving the cache.
+
+![Recovery cache beside the defeated courier](../images/contracts-025-cache.png)
 
 ### Fixer specialties and optional bonuses
 

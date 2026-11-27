@@ -147,6 +147,8 @@ public final class SandevistanGameTests {
     var p = runner(h, 5);
     AugmentRuntime.action(p, 13);
     var center = new net.minecraft.world.level.ChunkPos(p.blockPosition());
+    var alreadyForced =
+        new it.unimi.dsi.fastutil.longs.LongOpenHashSet(h.getLevel().getForcedChunks());
     for (int x = center.x - 1; x <= center.x + 1; x++)
       for (int z = center.z - 1; z <= center.z + 1; z++) h.getLevel().setChunkForced(x, z, true);
     h.startSequence()
@@ -186,7 +188,9 @@ public final class SandevistanGameTests {
                       cleanup(p);
                       for (int x = center.x - 1; x <= center.x + 1; x++)
                         for (int z = center.z - 1; z <= center.z + 1; z++)
-                          h.getLevel().setChunkForced(x, z, false);
+                          if (!alreadyForced.contains(
+                              net.minecraft.world.level.ChunkPos.asLong(x, z)))
+                            h.getLevel().setChunkForced(x, z, false);
                     }
                     h.succeed();
                   });

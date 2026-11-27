@@ -1,5 +1,9 @@
 # Validation
 
+## Contract types and named-target balance (NeoForge 0.25.0)
+
+**107 JVM tests and 155 standalone GameTests pass.** Native client review with TaCZ and TaCZ Tweaks completes Wanted, Cyberpsycho Sighting and Cyberware Recovery through the fixer UI, including native containment damage and contract-shard cache recovery. The introductory delivery and small GUI checks also pass. [Rules and implementation](development/CONTRACTS-0.25.0.md) · [Results](review/results/contracts-0.25.0.json). Forge remains unchanged.
+
 ## TaCZ Tweaks ricochet compatibility (NeoForge 0.24.1)
 
 **106 JVM tests, 150 standalone GameTests, 20 TaCZ tests with Tweaks and 20 without Tweaks pass.** The reported Tweaks alpha.12 artifact reproduced four failures before the fix. Duplicate callbacks, read-only geometry queries and shared trace-state isolation are now covered. Native client tests fire six actual AKM/Desert Eagle rounds, confirm 12 cancelled impact callbacks, reflected target damage and visible outgoing paths. [Investigation and scope](development/TACZ-TWEAKS-0.24.1.md) · [Results](review/results/tacz-tweaks-0.24.1.json). Forge remains unchanged.

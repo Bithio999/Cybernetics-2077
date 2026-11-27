@@ -235,19 +235,22 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
         105,
         10,
         GOLD);
-    line(c, BountyRules.specialty(t.getInt("profile")), x, 123, w, 9, MUTED);
-    c.body("No civilian kills / +10% payment", x + 8, 138, 8, MUTED);
-    c.body("Survive the hunt / +10% payment", x + 8, 151, 8, MUTED);
+    line(c, BountyContracts.objective(t), x, 120, w, 8, GREEN);
+    line(c, BountyRules.specialty(t.getInt("profile")), x, 132, w, 8, MUTED);
+    c.body("No civilian kills / +10% payment", x + 8, 144, 8, MUTED);
+    c.body("Survive the hunt / +10% payment", x + 8, 155, 8, MUTED);
     String objective =
         selection >= 0
             ? "Specialty bonus: +20% and +1 SC"
             : t.getInt("stage") == 2
-                ? "MARK CONFIRMED // RETURN FOR PAYMENT"
+                ? "OBJECTIVE COMPLETE // RETURN FOR PAYMENT"
                 : t.getInt("stage") == 3
                     ? "MARK LOST // CLEAR OR ABANDON"
-                    : t.getBoolean("spawned")
-                        ? "TARGET LOCATED // HOLD SCAN TO TRACK"
-                        : "SEARCH THE LEAD // HOLD SCAN FOR ROUTE";
+                    : t.getInt("stage") == 4
+                        ? "RECOVER CACHE // USE CONTRACT SHARD"
+                        : t.getBoolean("spawned")
+                            ? "TARGET LOCATED // HOLD SCAN TO TRACK"
+                            : "SEARCH THE LEAD // HOLD SCAN FOR ROUTE";
     line(c, objective, x, 166, w, 8, t.getInt("stage") == 2 ? GREEN : GOLD);
     int restock = state.getInt("restock");
     c.body(
@@ -334,7 +337,7 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
       case 12 -> "Offers changed. Review the refreshed board before accepting.";
       case 13 -> "Bounty hunting is unavailable in Peaceful difficulty.";
       case 14 -> "Bounties require an Overworld fixer and a lead inside the world border.";
-      case 20 -> "Eliminate your assigned mark before claiming payment.";
+      case 20 -> "Complete your assigned objective before claiming payment.";
       case 21 -> "Return to the issuing fixer's network for payment.";
       default ->
           tab == 0
@@ -434,7 +437,11 @@ public final class FixerScreen extends AbstractContainerScreen<FixerMenu> {
         c.line(
             getX() + 4, getY() + height, getX() + width, getY() + height, .5f, ServiceStyle.LINE);
         c.text(
-            c.fit(slot < 0 ? "CURRENT JOB" : dossier.getString("alias"), width - 12, 9, true),
+            c.fit(
+                slot < 0 ? "CURRENT JOB" : BountyRules.Kind.from(dossier.getString("kind")).label,
+                width - 12,
+                9,
+                true),
             getX() + 6,
             getY() + 4,
             9,
