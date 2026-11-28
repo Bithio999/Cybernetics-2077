@@ -4,6 +4,7 @@ gradle.projectsEvaluated {
     def forge = p.plugins.hasPlugin('net.neoforged.moddev.legacyforge')
     def ext = forge ? p.legacyForge : p.neoForge
     def prefix = forge ? '../' : ''
+    if (p.hasProperty('compatGunRecoveryReview')) ext.runs.client.systemProperty('cybernetics2077.gunRecoveryReview','true')
     if (p.hasProperty('compatIconIdentityReview')) ext.runs.client.systemProperty('cybernetics2077.iconIdentityReview','true')
     if (p.hasProperty('compatFullExpansionReview')) ext.runs.client.systemProperty('cybernetics2077.fullExpansionReview','true')
     if (p.hasProperty('compatCreativeReview')) ext.runs.client.systemProperty('cybernetics2077.creativeReview','true')

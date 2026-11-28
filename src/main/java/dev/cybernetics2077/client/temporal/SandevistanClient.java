@@ -108,6 +108,7 @@ public final class SandevistanClient {
 
   @SubscribeEvent
   public static void tick(ClientTickEvent.Post e) {
+    dev.cybernetics2077.compat.GunRecovery.sampleAll();
     var m = Minecraft.getInstance();
     if (level != m.level) {
       level = m.level;

@@ -144,6 +144,10 @@ public final class NeoClientReview {
                     dev.cybernetics2077.temporal.Sandevistan.toggle(p);
                 });
       }
+      if (Boolean.getBoolean("cybernetics2077.gunRecoveryReview") && tick >= 300) {
+        GunRecoveryReview.tick(tick - 300, OUT);
+        return;
+      }
       if (Boolean.getBoolean("cybernetics2077.iconIdentityReview") && tick >= 300) {
         IconIdentityClientReview.tick(tick - 300, OUT);
         return;

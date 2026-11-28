@@ -31,7 +31,8 @@
     "TacZCrosshairMixin",
     "TacZBulletVisualMixin",
     "TacZTracerMixin",
-    "TacZAnimationTimeMixin"
+    "TacZAnimationTimeMixin",
+    "TacZClientRecoveryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

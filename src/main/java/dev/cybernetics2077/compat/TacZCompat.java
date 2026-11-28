@@ -439,6 +439,7 @@ public final class TacZCompat {
   }
 
   public static long interval(LivingEntity shooter, long nativeInterval) {
+    if (GunRecovery.captureInterval(nativeInterval)) return nativeInterval;
     double pace = Sandevistan.weaponPace(shooter) * ExpansionRuntime.gunRate(shooter);
     return Math.max(
         1,

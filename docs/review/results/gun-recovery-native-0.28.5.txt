@@ -1,0 +1,8 @@
+AKM in 99.9% slow: client cooldown=0, native trigger=SUCCESS
+AKM after slow reactivation: client cooldown=0, native trigger=SUCCESS
+AKM after slow ends: client cooldown=0, native trigger=SUCCESS
+AKM server accepted shots=3
+Deagle in 99.9% slow: client cooldown=0, native trigger=SUCCESS
+Deagle after slow ends: client cooldown=0, native trigger=SUCCESS
+Deagle after slow reactivation: client cooldown=0, native trigger=SUCCESS
+Deagle server accepted shots=3

@@ -1,0 +1,19 @@
+{
+  "version": "0.28.5",
+  "platform": "Minecraft 1.21.1 NeoForge",
+  "jvmTests": 116,
+  "standaloneGameTests": 177,
+  "taczWithTweaksGameTests": 200,
+  "nativeClient": "PASS: AKM and Deagle, six native client triggers and six server-confirmed ammo consumptions, including released-trigger off/on cycle without an intervening shot",
+  "checks": [
+    "Recovery stores completed mechanical work across pace changes instead of rescaling the entire time since the last shot",
+    "Ordinary and between-burst recovery through the actual TaCZ methods; new shots have independent recovery",
+    "Native shot/packet timestamps unchanged; original server 5ms/client 0ms tolerances retained; native reload regressions pass",
+    "Per-tick weak sampler keeps recovery advancing with trigger released, including the first shot",
+    "Backward network-time queries cannot rewind/recount progress; native-clock reset/script-offset cases covered",
+    "TaCZ 1.2.0 hotfix with TaCZ Tweaks 3.0.0-alpha.12; standalone launch without TaCZ",
+    "Strict wiki validation/build; clean release has no review fixtures"
+  ],
+  "forge": "0.20.0 unchanged",
+  "sha256": "a6aa8f06868bd431d605d36b4c714bc109c54788488f665698c9230c4a848816"
+}

@@ -67,6 +67,8 @@ with PortZip(jar) as z:
         for n in names:
             if n.startswith('data/') and ('/recipe/' in n or '/loot_table/' in n):
                 assert b'creative_sandevistan' not in z.read(n), 'Creative implant in survival acquisition: '+n
+        for cls in ('temporal/GunRecoveryClock', 'compat/GunRecovery', 'mixin/TacZRecoveryMixin', 'mixin/TacZBurstRecoveryMixin', 'mixin/client/TacZClientRecoveryMixin'):
+            assert 'dev/cybernetics2077/'+cls+'.class' in names, 'Missing gun recovery integration: '+cls
         assert 'assets/cybernetics2077/textures/entity/cyberpsycho.png' in names
         assert not [n for n in names if 'canto' in n.lower() or '/recipe/' in n and any(d['id'] in n for d in definitions)], 'Excluded cyberdeck or unrequested cyberware recipes'
     for required in ('dev/cybernetics2077/Cybernetics2077.class',

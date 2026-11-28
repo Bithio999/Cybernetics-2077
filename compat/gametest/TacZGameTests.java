@@ -684,6 +684,74 @@ public final class TacZGameTests {
     h.succeed();
   }
 
+  @GameTest(template = "empty", batch = "gunRecovery", timeoutTicks = 80)
+  public static void nativeAkAndDeagleRecoverySurvivesSandevistanOffOn(GameTestHelper h)
+      throws Exception {
+    var p = player(h);
+    h.getLevel().addNewPlayer(p);
+    try {
+      for (String variant : List.of("ak47", "ak47_burst", "deagle")) {
+        String id = variant.replace("_burst", "");
+        Object builder =
+            Class.forName("com.tacz.guns.api.item.builder.GunItemBuilder")
+                .getMethod("create")
+                .invoke(null);
+        call(builder, "setId", net.minecraft.resources.ResourceLocation.parse("tacz:" + id));
+        if (variant.endsWith("_burst"))
+          call(
+              builder,
+              "setFireMode",
+              Class.forName("com.tacz.guns.api.item.gun.FireMode").getField("BURST").get(null));
+        ItemStack gun = (ItemStack) call(builder, "build");
+        p.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, gun);
+        Class<?> holder = Class.forName("com.tacz.guns.entity.shooter.ShooterDataHolder");
+        Object data = holder.getConstructor().newInstance();
+        holder
+            .getField("currentGunItem")
+            .set(data, (java.util.function.Supplier<ItemStack>) () -> gun);
+        Class<?> drawType = Class.forName("com.tacz.guns.entity.shooter.LivingEntityDrawGun");
+        Object draw = drawType.getConstructor(LivingEntity.class, holder).newInstance(p, data);
+        Object shoot =
+            Class.forName("com.tacz.guns.entity.shooter.LivingEntityShoot")
+                .getConstructor(LivingEntity.class, holder, drawType)
+                .newInstance(p, data, draw);
+        holder.getField("shootTimestamp").setLong(data, 1000);
+        equip(p, Augment.CREATIVE_SANDEVISTAN, 5, 0);
+        AugmentRuntime.state(p).sandyCharge = 1;
+        AugmentRuntime.state(p).sandyRearm = 0;
+        h.assertTrue(Sandevistan.toggle(p), "Activation failed");
+        long initial = ((Number) call(shoot, "getShootCoolDown", 1000L)).longValue();
+        h.assertTrue(initial > 10000, "Extreme slow was not applied to actual recovery: " + id);
+        long progressed = ((Number) call(shoot, "getShootCoolDown", 1100L)).longValue();
+        h.assertTrue(Math.abs(initial - progressed - 100) <= 1, "Slow recovery lost work");
+        Sandevistan.stop(p, AugmentRuntime.now(p));
+        long off = ((Number) call(shoot, "getShootCoolDown", 1100L)).longValue();
+        h.assertTrue(off < 1000, "Slow deadline stuck after deactivation: " + id);
+        h.assertTrue(
+            ((Number) call(shoot, "getShootCoolDown", 2100L)).longValue() == 0,
+            "Gun did not recover at normal speed");
+        AugmentRuntime.state(p).sandyRearm = 0;
+        h.assertTrue(Sandevistan.toggle(p), "Reactivation failed");
+        h.assertTrue(
+            ((Number) call(shoot, "getShootCoolDown", 2200L)).longValue() == 0,
+            "Completed recovery returned after reactivation: " + id);
+        h.assertTrue(
+            holder.getField("shootTimestamp").getLong(data) == 1000,
+            "Native network timestamp was mutated");
+        holder.getField("shootTimestamp").setLong(data, 2200);
+        h.assertTrue(
+            ((Number) call(shoot, "getShootCoolDown", 2200L)).longValue() == initial,
+            "New shot did not start an independent recovery");
+        Sandevistan.stop(p, AugmentRuntime.now(p));
+      }
+    } finally {
+      Sandevistan.stop(p, AugmentRuntime.now(p));
+      p.discard();
+      Sandevistan.invalidate(h.getLevel());
+    }
+    h.succeed();
+  }
+
   @GameTest(template = "empty", timeoutTicks = 80)
   public static void nativeGunIntervalsFollowWorldTimeAndPreserveReloadData(GameTestHelper h)
       throws Exception {

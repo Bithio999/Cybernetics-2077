@@ -20,7 +20,9 @@
     "TacZTweaksTraceMixin",
     "MobGoalAccess",
     "MobMeleeTimingMixin",
-    "MobBowTimingMixin"
+    "MobBowTimingMixin",
+    "TacZRecoveryMixin",
+    "TacZBurstRecoveryMixin"
   ],
   "injectors": {
     "defaultRequire": 1
