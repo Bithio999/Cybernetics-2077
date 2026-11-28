@@ -30,11 +30,11 @@ class TemporalRulesTest {
 
   @Test
   void fractionalClockDoesNotLoseTime() {
-    for (double pace : new double[] {.25, .375, .625, 1, 1.25}) {
+    for (double pace : new double[] {.001, .00125, .025, .25, .375, .625, 1, 1.25}) {
       var b = new TemporalRules.Budget();
       int n = 0;
-      for (int i = 0; i < 200; i++) n += b.advance(pace);
-      assertEquals(200 * pace, n, 1e-8);
+      for (int i = 0; i < 4000; i++) n += b.advance(pace);
+      assertEquals(4000 * pace, n, 1e-8);
     }
   }
 

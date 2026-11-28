@@ -73,6 +73,7 @@ public final class CyberwareCatalogue {
   }
 
   private static void add(List<Offer> list, Item item) {
+    if (item instanceof AugmentItem a && a.augment().creativeOnly()) return;
     int t = item instanceof CyberwareItem i ? i.tier().level : ((QuickhackItem) item).tier().level;
     int base =
         item instanceof CyberwareItem i && i.iconic()

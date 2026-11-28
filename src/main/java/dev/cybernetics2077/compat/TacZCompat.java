@@ -440,7 +440,10 @@ public final class TacZCompat {
 
   public static long interval(LivingEntity shooter, long nativeInterval) {
     double pace = Sandevistan.weaponPace(shooter) * ExpansionRuntime.gunRate(shooter);
-    return Math.max(1, Math.round(nativeInterval / Math.max(.05, pace)));
+    return Math.max(
+        1,
+        Math.round(
+            nativeInterval / Math.max(dev.cybernetics2077.temporal.TemporalRules.MIN_PACE, pace)));
   }
 
   public static boolean aiming(LivingEntity shooter) {

@@ -689,5 +689,7 @@
   "death.attack.cyberware_malfunction.player": "%1$s was disabled by %2$s",
   "key.cybernetics2077.carry_reserve": "Open Carry Reserve",
   "key.cybernetics2077.faceplate": "Activate Faceplate",
-  "cybernetics2077.reserve": "TITANIUM // CARRY RESERVE"
+  "cybernetics2077.reserve": "TITANIUM // CARRY RESERVE",
+  "cybernetics2077.augment.creative_sandevistan": "Creative Sandevistan",
+  "item.cybernetics2077.creative_sandevistan_tier_5": "Creative Sandevistan — Tier 5"
 }

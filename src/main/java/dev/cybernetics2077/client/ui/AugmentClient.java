@@ -176,13 +176,16 @@ public final class AugmentClient {
             dev.cybernetics2077.client.temporal.SandevistanClient.KEY
                 .getTranslatedKeyMessage()
                 .getString(),
-            (s.getInt("sandyModel") == dev.cybernetics2077.temporal.SandevistanModel.DAVID.ordinal()
-                    ? "DAVID "
-                    : battery == dev.cybernetics2077.temporal.SandevistanModel.APOGEE
-                        ? "APOGEE "
-                        : battery == dev.cybernetics2077.temporal.SandevistanModel.FALCON
-                            ? "FALCON "
-                            : "SANDY ")
+            (battery == dev.cybernetics2077.temporal.SandevistanModel.CREATIVE
+                    ? "CREATIVE "
+                    : s.getInt("sandyModel")
+                            == dev.cybernetics2077.temporal.SandevistanModel.DAVID.ordinal()
+                        ? "DAVID "
+                        : battery == dev.cybernetics2077.temporal.SandevistanModel.APOGEE
+                            ? "APOGEE "
+                            : battery == dev.cybernetics2077.temporal.SandevistanModel.FALCON
+                                ? "FALCON "
+                                : "SANDY ")
                 + (active
                     ? seconds(s.getLong("sandyEnd"), time)
                     : Math.round(Math.clamp(charge, 0, 1) * 100) + "%"),

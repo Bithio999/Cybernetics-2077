@@ -4,9 +4,11 @@ package dev.cybernetics2077.temporal;
 public final class TemporalRules {
   public static final double RADIUS = 32;
   public static final double CARRIER = 1.25;
+  public static final double MAX_SLOW = .999;
+  public static final double MIN_PACE = 1 - MAX_SLOW;
 
   public static double acceleration(double slowing) {
-    return 1 / (1 - Math.clamp(slowing, 0, .95));
+    return 1 / (1 - Math.clamp(slowing, 0, MAX_SLOW));
   }
 
   public static double slowing(int tier) {
@@ -42,7 +44,7 @@ public final class TemporalRules {
     public double phase;
 
     public int advance(double pace) {
-      phase += Math.clamp(pace, .05, CARRIER);
+      phase += Math.clamp(pace, TemporalRules.MIN_PACE, CARRIER);
       int steps = (int) Math.floor(phase + 1e-9);
       phase = Math.max(0, phase - steps);
       return steps;

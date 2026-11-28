@@ -47,7 +47,7 @@ public final class ExpansionGameTests {
       h.assertTrue(count == (excluded ? 0 : 2), "Wrong new family count in " + category);
     }
     for (var a : Augment.values())
-      if (a.ordinal() > FORTIFIED_ANKLES.ordinal())
+      if (a.ordinal() > FORTIFIED_ANKLES.ordinal() && !a.creativeOnly())
         for (int t = a.firstTier; t <= 5; t++) {
           var item = Cybernetics2077.augment(a, t);
           h.assertTrue(

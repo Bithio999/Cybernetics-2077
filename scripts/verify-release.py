@@ -62,6 +62,11 @@ with PortZip(jar) as z:
                 assert f"assets/cybernetics2077/models/item/{d['id']}_tier_{t}.json" in names
                 assert f"item.cybernetics2077.{d['id']}_tier_{t}" in language
             assert f"assets/cybernetics2077/textures/item/{d['id']}.png" in names
+        assert 'assets/cybernetics2077/models/item/creative_sandevistan_tier_5.json' in names
+        assert language['item.cybernetics2077.creative_sandevistan_tier_5'] == 'Creative Sandevistan — Tier 5'
+        for n in names:
+            if n.startswith('data/') and ('/recipe/' in n or '/loot_table/' in n):
+                assert b'creative_sandevistan' not in z.read(n), 'Creative implant in survival acquisition: '+n
         assert 'assets/cybernetics2077/textures/entity/cyberpsycho.png' in names
         assert not [n for n in names if 'canto' in n.lower() or '/recipe/' in n and any(d['id'] in n for d in definitions)], 'Excluded cyberdeck or unrequested cyberware recipes'
     for required in ('dev/cybernetics2077/Cybernetics2077.class',

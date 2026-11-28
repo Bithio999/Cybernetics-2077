@@ -596,36 +596,43 @@ public final class TacZGameTests {
   }
 
   @GameTest(template = "empty", batch = "continuousFlight", timeoutTicks = 80)
-  public static void davidBulletsMoveEveryWorldTickAndRetainLocalLifetime(GameTestHelper h)
-      throws Exception {
+  public static void davidAndCreativeBulletsMoveEveryWorldTickAndRetainLocalLifetime(
+      GameTestHelper h) throws Exception {
     var p = player(h);
-    equip(p, Augment.DAVIDS_SANDEVISTAN, 5, 0);
     h.getLevel().addNewPlayer(p);
     try {
-      Sandevistan.toggle(p);
-      Sandevistan.invalidate(h.getLevel());
-      var b = bullet(h, p);
-      b.setPos(p.position().add(0, 8, 0));
-      b.setDeltaMovement(0, 0, .25);
-      double start = b.getZ();
-      for (int i = 0; i < 16; i++) {
+      for (var model : List.of(Augment.DAVIDS_SANDEVISTAN, Augment.CREATIVE_SANDEVISTAN)) {
+        equip(p, model, 5, 0);
+        AugmentRuntime.state(p).sandyRearm = 0;
+        AugmentRuntime.state(p).sandyCharge = 1;
+        h.assertTrue(Sandevistan.toggle(p), "Activation failed: " + model);
+        Sandevistan.invalidate(h.getLevel());
+        var b = bullet(h, p);
+        b.setPos(p.position().add(0, 8, 0));
+        b.setDeltaMovement(0, 0, .25);
+        double start = b.getZ();
+        int steps = model == Augment.CREATIVE_SANDEVISTAN ? 800 : 16;
+        for (int i = 0; i < steps; i++) {
+          double old = b.getZ();
+          b.tickCount++;
+          Sandevistan.tickEntity(b, b::tick);
+          h.assertTrue(b.getZ() > old, "A slow round froze on a world tick: " + model);
+        }
+        h.assertTrue(
+            Math.abs(b.getZ() - start - .25) < .00001,
+            "Fractional displacement changed native travel: " + model);
+        h.assertTrue(
+            Math.abs(dev.cybernetics2077.temporal.BulletTime.age(b) - 1) < .00001,
+            "Bullet lifetime advanced in world time: " + model);
+        h.assertTrue(b.isAlive(), "Slowed round expired before local lifetime");
+        b.setPos(p.position().add(40, 8, 0));
         double old = b.getZ();
         b.tickCount++;
         Sandevistan.tickEntity(b, b::tick);
-        h.assertTrue(b.getZ() > old, "A slow round froze on a world tick");
+        h.assertTrue(b.getZ() - old > .2, "Leaving bubble did not restore native flight");
+        b.discard();
+        Sandevistan.stop(p, AugmentRuntime.now(p));
       }
-      h.assertTrue(
-          Math.abs(b.getZ() - start - .25) < .00001,
-          "Fractional displacement changed native travel");
-      h.assertTrue(
-          Math.abs(dev.cybernetics2077.temporal.BulletTime.age(b) - 1) < .00001,
-          "Bullet lifetime advanced in world time");
-      h.assertTrue(b.isAlive(), "Slowed round expired before local lifetime");
-      b.setPos(p.position().add(40, 8, 0));
-      double old = b.getZ();
-      b.tickCount++;
-      Sandevistan.tickEntity(b, b::tick);
-      h.assertTrue(b.getZ() - old > .2, "Leaving bubble did not restore native flight");
     } finally {
       Sandevistan.stop(p, AugmentRuntime.now(p));
       h.getLevel().removePlayerImmediately(p, Entity.RemovalReason.DISCARDED);
@@ -712,8 +719,12 @@ public final class TacZGameTests {
     h.getLevel().addNewPlayer(p);
     try {
       var models =
-          List.of(Augment.DYNALAR_SANDEVISTAN, Augment.MILITECH_APOGEE, Augment.DAVIDS_SANDEVISTAN);
-      double[] worldPaces = {.625, .1875, .0625};
+          List.of(
+              Augment.DYNALAR_SANDEVISTAN,
+              Augment.MILITECH_APOGEE,
+              Augment.DAVIDS_SANDEVISTAN,
+              Augment.CREATIVE_SANDEVISTAN);
+      double[] worldPaces = {.625, .1875, .0625, .00125};
       for (int i = 0; i < models.size(); i++) {
         equip(p, models.get(i), 5, 0);
         AugmentRuntime.state(p).sandyRearm = 0;

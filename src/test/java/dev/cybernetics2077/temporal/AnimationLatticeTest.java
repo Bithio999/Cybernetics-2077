@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class AnimationLatticeTest {
   @Test
   void localPhaseIsContinuousAndRateIsModelSpecific() {
-    for (double pace : new double[] {.625, .1875}) {
+    for (double pace : new double[] {.00125, .025, .625, .1875}) {
       var grid = new AnimationLattice();
       grid.touch(0, 0, 0, 10, pace);
       var c = grid.clocks.get(new AnimationLattice.Node(0, 0, 0));

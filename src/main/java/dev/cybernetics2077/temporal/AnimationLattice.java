@@ -38,7 +38,7 @@ public final class AnimationLattice {
       clocks.put(key, clock);
     }
     clock.advance(now);
-    clock.pace = Math.clamp(pace, .05, 1);
+    clock.pace = Math.clamp(pace, TemporalRules.MIN_PACE, 1);
     if (pace < 1) clock.slow = now;
   }
 

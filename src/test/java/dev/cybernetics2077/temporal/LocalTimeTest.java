@@ -6,6 +6,16 @@ import org.junit.jupiter.api.Test;
 
 final class LocalTimeTest {
   @Test
+  void creativeFieldDoesNotClampMachineOrVisualClocksToFivePercent() {
+    double pace = TemporalRules.pace(1, TemporalRules.acceleration(.999));
+    var timer = new LocalTime.Timer(10, 0);
+    var visual = new LocalTime.Visual(0);
+    timer.advance(800, pace);
+    assertEquals(9, timer.remaining, 1e-9);
+    assertEquals(1, visual.advance(800, pace), 1e-9);
+  }
+
+  @Test
   void fixedDelayConsumesLocalTimeRatherThanOnlyDeferringItsLastTick() {
     var t = new LocalTime.Timer(10, 0);
     for (int i = 1; i <= 15; i++) {

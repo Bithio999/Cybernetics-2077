@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 /** Minecraft-scale definitions for the remaining current (2.x) non-arm catalogue. */
 public final class ExpansionImplants {
   public static boolean added(Augment a) {
-    return a.ordinal() > DAVIDS_SANDEVISTAN.ordinal();
+    return a.ordinal() > DAVIDS_SANDEVISTAN.ordinal() && !a.creativeOnly();
   }
 
   public static boolean sandy(Augment a) {
@@ -17,7 +17,8 @@ public final class ExpansionImplants {
         || a == DAVIDS_SANDEVISTAN
         || a == ZETATECH_SANDEVISTAN
         || a == QIANT_WARP_DANCER
-        || a == MILITECH_FALCON;
+        || a == MILITECH_FALCON
+        || a == CREATIVE_SANDEVISTAN;
   }
 
   public static boolean berserk(Augment a) {

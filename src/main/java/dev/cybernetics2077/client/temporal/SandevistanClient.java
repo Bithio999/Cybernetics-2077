@@ -29,7 +29,12 @@ public final class SandevistanClient {
     return new Sandevistan.View(
         t.getInt("sandyTier"),
         t.getLong("sandyEnd"),
-        t.contains("temporalPace") ? Math.clamp(t.getDouble("temporalPace"), .05, 1.25) : 1,
+        t.contains("temporalPace")
+            ? Math.clamp(
+                t.getDouble("temporalPace"),
+                dev.cybernetics2077.temporal.TemporalRules.MIN_PACE,
+                1.25)
+            : 1,
         t.getBoolean("sandyPvp"),
         t.getBoolean("sandyIconic") && t.getInt("sandyModel") != SandevistanModel.DAVID.ordinal(),
         t.getInt("sandyModel") == SandevistanModel.DAVID.ordinal(),

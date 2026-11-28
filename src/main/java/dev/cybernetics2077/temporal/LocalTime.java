@@ -12,7 +12,7 @@ public final class LocalTime {
     }
 
     public void advance(long now, double pace) {
-      if (now > last) remaining -= (now - last) * Math.clamp(pace, .05, 1);
+      if (now > last) remaining -= (now - last) * Math.clamp(pace, TemporalRules.MIN_PACE, 1);
       last = now;
     }
   }
@@ -25,7 +25,7 @@ public final class LocalTime {
     }
 
     public double advance(double now, double pace) {
-      if (now >= last) time += (now - last) * Math.clamp(pace, .05, 1);
+      if (now >= last) time += (now - last) * Math.clamp(pace, TemporalRules.MIN_PACE, 1);
       else time = now;
       last = now;
       return time;

@@ -101,7 +101,8 @@ public enum Augment {
   PERIPHERAL_INVERSE("peripheral_inverse", CyberwareCategory.INTEGUMENTARY_SYSTEM, 4, 40),
   PROXISHIELD("proxishield", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 10),
   RANGEGUARD("rangeguard", CyberwareCategory.INTEGUMENTARY_SYSTEM, 2, 14),
-  LEEROY_LIGAMENT("leeroy_ligament_system", CyberwareCategory.LEGS, 4, 8);
+  LEEROY_LIGAMENT("leeroy_ligament_system", CyberwareCategory.LEGS, 4, 8),
+  CREATIVE_SANDEVISTAN("creative_sandevistan", CyberwareCategory.OPERATING_SYSTEM, 5, 0);
 
   public final String id;
   public final CyberwareCategory category;
@@ -127,6 +128,10 @@ public enum Augment {
         || this == DAVIDS_SANDEVISTAN
         || category == CyberwareCategory.OPERATING_SYSTEM && this != CHROME_COMPRESSOR
         || this == BEHAVIORAL_FACEPLATE;
+  }
+
+  public boolean creativeOnly() {
+    return this == CREATIVE_SANDEVISTAN;
   }
 
   public boolean iconic() {
@@ -190,6 +195,10 @@ public enum Augment {
 
   public List<String> details(int t) {
     return switch (this) {
+      case CREATIVE_SANDEVISTAN ->
+          List.of(
+              "Creative only. O: 99.9% slow / 32 blocks.",
+              "Battery 10s / recharge 30s. Early off saves charge. Rearm 1s.");
       case DAVIDS_SANDEVISTAN ->
           List.of(
               "O: 95% slow / 32 blocks. Battery 10s / recharge 40s.",

@@ -1,0 +1,21 @@
+{
+  "version": "0.28.3",
+  "platform": "Minecraft 1.21.1 NeoForge",
+  "jvmTests": 112,
+  "standaloneGameTests": 176,
+  "taczWithTweaksGameTests": 198,
+  "checks": [
+    "Creative/search tab coverage; native OS installation; no ripperdoc or chromed-mob offers; unchanged 415 saved catalogue indices",
+    "Actual 1000x temporal strength, 99.9% relative slow and mob tick budget; supported environmental and visual clocks",
+    "Native TaCZ kinetic rounds move on every world tick, retain local lifetime and recover native flight outside bubble",
+    "Native TaCZ AKM intervals at 0.00125 world pace; native reload data unchanged",
+    "New profile synchronization, persistence and uninstall cleanup; existing model regressions",
+    "137 wiki pages with complete navigation; clean production JAR has no review fixtures"
+  ],
+  "notes": [
+    "Creative-only means acquisition in Creative or through commands; installed copies remain usable in Survival",
+    "Extreme-field fixtures use a separate batch to avoid field overlap with standard-speed fixtures",
+    "Forge 1.20.1 remains 0.20.0, unchanged"
+  ],
+  "sha256": "b9b92ed239bd0171daf38450a2956b31491caf6d22d905efddc2d644104ffac2"
+}

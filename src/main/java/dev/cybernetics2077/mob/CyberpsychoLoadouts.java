@@ -116,6 +116,7 @@ public final class CyberpsychoLoadouts {
                   .filter(
                       a ->
                           !a.iconic()
+                              && !a.creativeOnly()
                               && a.firstTier <= tier
                               && a.capacity > 0
                               && a.category != CyberwareCategory.OPERATING_SYSTEM

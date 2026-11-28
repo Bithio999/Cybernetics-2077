@@ -56,7 +56,7 @@ public final class BulletTime {
       nativeTick.run();
       return;
     }
-    double dt = Math.clamp(Sandevistan.pace(e), .05, 1);
+    double dt = Math.clamp(Sandevistan.pace(e), TemporalRules.MIN_PACE, 1);
     var clock = CLOCKS.get().get(e);
     if (clock == null && dt >= 1) {
       nativeTick.run();

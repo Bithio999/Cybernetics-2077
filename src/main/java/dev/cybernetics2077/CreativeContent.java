@@ -43,6 +43,9 @@ public final class CreativeContent {
           .sorted(order)
           .map(CyberwareCatalogue.Offer::item)
           .forEach(items::add);
+    for (var kind : Augment.values())
+      if (kind.creativeOnly())
+        for (var entry : Cybernetics2077.AUGMENTS.get(kind)) items.add(entry.get());
     for (var kind : QuickhackKind.values())
       for (var entry : Cybernetics2077.QUICKHACKS.get(kind)) items.add(entry.get());
     for (var entry : Cybernetics2077.DAMAGED_PARTS) items.add(entry.get());

@@ -6,6 +6,21 @@ import org.junit.jupiter.api.Test;
 
 class SandevistanModelTest {
   @Test
+  void creativeModelActuallySupportsNinetyNinePointNinePercentSlow() {
+    var model = SandevistanModel.CREATIVE;
+    double strength = TemporalRules.acceleration(model.slowing(5));
+    assertEquals(1000, strength, 1e-8);
+    assertEquals(
+        .001, TemporalRules.pace(1, strength) / TemporalRules.pace(strength, strength), 1e-12);
+    assertEquals(1.25, TemporalRules.pace(strength, strength), 1e-9);
+    assertEquals(.025, TemporalRules.pace(TemporalRules.acceleration(.95), strength), 1e-9);
+    assertEquals(10, model.duration(5));
+    assertEquals(30, model.recharge(5));
+    assertEquals(0, model.critChance(5));
+    assertEquals(0, model.critDamage(5));
+  }
+
+  @Test
   void apogeeHasDistinctStrengthAndEqualUserParity() {
     double a = TemporalRules.acceleration(SandevistanModel.APOGEE.slowing(5));
     double d = TemporalRules.acceleration(SandevistanModel.DYNALAR.slowing(5));

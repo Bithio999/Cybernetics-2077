@@ -7,7 +7,8 @@ public enum SandevistanModel {
   DAVID,
   ZETATECH,
   QIANT,
-  FALCON;
+  FALCON,
+  CREATIVE;
 
   public boolean iconic() {
     return this == APOGEE || this == DAVID || this == FALCON;
@@ -15,6 +16,7 @@ public enum SandevistanModel {
 
   public double slowing(int tier) {
     return switch (this) {
+      case CREATIVE -> .999;
       case DAVID -> .95;
       case ZETATECH -> .3;
       case QIANT -> .2;
@@ -48,7 +50,7 @@ public enum SandevistanModel {
       case DAVID -> .25f;
       case APOGEE -> .20f;
       case FALCON -> .15f;
-      case ZETATECH, QIANT -> 0;
+      case ZETATECH, QIANT, CREATIVE -> 0;
       default -> TemporalRules.critChance(tier);
     };
   }
@@ -58,7 +60,7 @@ public enum SandevistanModel {
       case DAVID -> .30f;
       case APOGEE -> .20f;
       case FALCON -> .10f;
-      case ZETATECH, QIANT -> 0;
+      case ZETATECH, QIANT, CREATIVE -> 0;
       default -> TemporalRules.critDamage(tier);
     };
   }
@@ -79,6 +81,7 @@ public enum SandevistanModel {
     if (a == null) return DYNALAR;
     return switch (a) {
       case MILITECH_APOGEE -> APOGEE;
+      case CREATIVE_SANDEVISTAN -> CREATIVE;
       case DAVIDS_SANDEVISTAN -> DAVID;
       case ZETATECH_SANDEVISTAN -> ZETATECH;
       case QIANT_WARP_DANCER -> QIANT;

@@ -57,6 +57,7 @@ families = {
     'dynalar_sandevistan':'dynalar-sandevistan',
     'militech_apogee_sandevistan':'militech-apogee',
     'davids_sandevistan':'davids-sandevistan',
+    'creative_sandevistan':'creative-sandevistan',
     'thermal_mantis_blades':'thermal-mantis-blades',
     'electrical_mantis_blades':'electrifying-mantis-blades',
     'toxic_mantis_blades':'toxic-mantis-blades',
