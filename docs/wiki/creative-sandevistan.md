@@ -11,9 +11,9 @@ A **Tier 5 Operating System**, available only from the **Cybernetics 2077 Creati
 | Slow relative to the user | 99.9% |
 | Radius | 32 blocks |
 | Capacity | 0 |
-| Full battery | 10 seconds |
-| Full recharge while inactive | 30 seconds |
-| Rearm after deactivation | 1 second |
+| Full battery | 1 hour |
+| Full recharge while inactive | 0.1 seconds (2 ticks) |
+| Rearm after deactivation | 0.1 seconds (2 ticks) |
 
 Install it in the Operating System socket through a cybernetics bench or a ripperdoc's **Install** tab. Press **O** to activate or deactivate. Early deactivation saves remaining charge; activation needs at least 20% charge. It grants no additional critical-hit bonuses.
 

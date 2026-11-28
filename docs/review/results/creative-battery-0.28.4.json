@@ -1,0 +1,18 @@
+{
+  "version": "0.28.4",
+  "platform": "Minecraft 1.21.1 NeoForge",
+  "creativeBatterySeconds": 3600,
+  "creativeRechargeTicks": 2,
+  "creativeRearmTicks": 2,
+  "jvmTests": 112,
+  "standaloneGameTests": 177,
+  "checks": [
+    "Actual activation receives 72000 ticks of battery",
+    "Real battery expiry empties charge; one tick restores 50% but still blocks reactivation; two ticks restore full charge and allow another full one-hour activation",
+    "Server snapshot sends two-tick recharge to HUD",
+    "Existing Sandevistan battery and activation regressions pass",
+    "Wiki validation and strict build pass; production JAR verified without review fixtures"
+  ],
+  "forge": "0.20.0 unchanged",
+  "sha256": "dcccd94d745599b3fe4366f870134abee6cbabc498eccade1b960046fe5cb1f7"
+}

@@ -28,14 +28,16 @@ public enum SandevistanModel {
 
   public int duration(int tier) {
     return switch (this) {
+      case CREATIVE -> 3600;
       case DAVID, FALCON -> 10;
       case APOGEE -> 6;
       default -> TemporalRules.duration(tier);
     };
   }
 
-  public int recharge(int tier) {
+  public double recharge(int tier) {
     return switch (this) {
+      case CREATIVE -> .1;
       case DAVID -> 40;
       case ZETATECH -> 50 - 6 * tier;
       case QIANT -> 90 - 10 * tier;
@@ -43,6 +45,10 @@ public enum SandevistanModel {
       case APOGEE -> 25;
       default -> TemporalRules.recharge(tier);
     };
+  }
+
+  public int rearmTicks() {
+    return this == CREATIVE ? 2 : 20;
   }
 
   public float critChance(int tier) {

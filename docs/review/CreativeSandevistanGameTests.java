@@ -38,6 +38,47 @@ public final class CreativeSandevistanGameTests {
   }
 
   @GameTest(template = "empty", batch = "creativeSandevistan", timeoutTicks = 60)
+  public static void hourLongBatteryFullyRechargesAndRearmsAfterTwoTicks(GameTestHelper h) {
+    var p = SandevistanGameTests.runner(h, 5);
+    equip(p, CREATIVE_SANDEVISTAN, 5, 0);
+    h.assertTrue(Sandevistan.toggle(p), "Creative activation failed");
+    var s = AugmentRuntime.state(p);
+    long now = AugmentRuntime.now(p);
+    h.assertTrue(s.sandyEnd - now == 72000, "Battery does not last one hour");
+    var snapshot = new CompoundTag();
+    Sandevistan.snapshot(p, snapshot);
+    h.assertTrue(snapshot.getDouble("sandyRechargeTicks") == 2, "HUD recharge is not two ticks");
+    // Exercise real expiry and recharge without waiting an hour in the test server.
+    s.sandyEnd = now;
+    Sandevistan.tick(p);
+    h.assertTrue(
+        !Sandevistan.active(p) && Sandevistan.charge(p) == 0, "Expired battery was not emptied");
+    h.assertTrue(!Sandevistan.toggle(p), "Rearm delay was skipped");
+    h.runAfterDelay(
+        1,
+        () -> {
+          h.assertTrue(
+              Math.abs(Sandevistan.charge(p) - .5) < 1e-9, "Half charge not restored in one tick");
+          h.assertTrue(!Sandevistan.toggle(p), "Reactivated before the two-tick rearm");
+        });
+    h.runAfterDelay(
+        2,
+        () -> {
+          try {
+            h.assertTrue(
+                Sandevistan.charge(p) == 1 && Sandevistan.toggle(p),
+                "Full battery/rearm not available after two ticks");
+            h.assertTrue(
+                s.sandyEnd - AugmentRuntime.now(p) == 72000,
+                "Recharged activation shortened the battery");
+          } finally {
+            SandevistanGameTests.cleanup(p);
+          }
+          h.succeed();
+        });
+  }
+
+  @GameTest(template = "empty", batch = "creativeSandevistan", timeoutTicks = 60)
   public static void extremeSlowPropagatesThroughRealFieldEntityBudgetAndSnapshot(
       GameTestHelper h) {
     var p = SandevistanGameTests.runner(h, 5);

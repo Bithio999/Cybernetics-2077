@@ -14,8 +14,8 @@ class SandevistanModelTest {
         .001, TemporalRules.pace(1, strength) / TemporalRules.pace(strength, strength), 1e-12);
     assertEquals(1.25, TemporalRules.pace(strength, strength), 1e-9);
     assertEquals(.025, TemporalRules.pace(TemporalRules.acceleration(.95), strength), 1e-9);
-    assertEquals(10, model.duration(5));
-    assertEquals(30, model.recharge(5));
+    assertEquals(3600, model.duration(5));
+    assertEquals(.1, model.recharge(5));
     assertEquals(0, model.critChance(5));
     assertEquals(0, model.critDamage(5));
   }

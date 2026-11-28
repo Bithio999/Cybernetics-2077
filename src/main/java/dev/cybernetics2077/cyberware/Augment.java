@@ -198,7 +198,7 @@ public enum Augment {
       case CREATIVE_SANDEVISTAN ->
           List.of(
               "Creative only. O: 99.9% slow / 32 blocks.",
-              "Battery 10s / recharge 30s. Early off saves charge. Rearm 1s.");
+              "Battery 1 hour / recharge 0.1s. Early off saves charge. Rearm 0.1s.");
       case DAVIDS_SANDEVISTAN ->
           List.of(
               "O: 95% slow / 32 blocks. Battery 10s / recharge 40s.",

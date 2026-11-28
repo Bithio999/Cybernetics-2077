@@ -134,7 +134,7 @@ public final class Sandevistan {
         Math.clamp((s.sandyEnd - when) / (20. * profile(s).duration(s.sandyProfile)), 0, 1);
     s.sandyClock = when;
     s.sandyEnd = 0;
-    s.sandyRearm = when + 20;
+    s.sandyRearm = when + profile(s).rearmTicks();
     finishRecharge(p, s, when);
     invalidate(p.level());
   }
